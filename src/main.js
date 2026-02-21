@@ -9,19 +9,17 @@ const revealObserver = new IntersectionObserver(
       }
     })
   },
-  { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
+  { threshold: 0.05, rootMargin: '0px 0px -10px 0px' }
 )
 
 document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el))
 
 const nav = document.getElementById('nav')
 window.addEventListener('scroll', () => {
-  if (window.scrollY > 20) {
-    nav.classList.add('border-border')
-    nav.classList.remove('border-transparent')
+  if (window.scrollY > 40) {
+    nav.style.borderColor = 'rgba(255,255,255,0.04)'
   } else {
-    nav.classList.remove('border-border')
-    nav.classList.add('border-transparent')
+    nav.style.borderColor = 'transparent'
   }
 }, { passive: true })
 
