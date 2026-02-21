@@ -1,29 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-void: #060609;
-  --color-surface: #0c0c14;
-  --color-surface-raised: #12121e;
-  --color-border: #1a1a2e;
-  --color-border-subtle: #111122;
-  --color-text-primary: #e8e8ed;
-  --color-text-secondary: #7878a0;
-  --color-text-muted: #4a4a6a;
-  --color-accent: #4f7cff;
-  --color-accent-dim: #3a5cc0;
+  --color-void: #050507;
+  --color-surface: #0a0a0f;
+  --color-border: #18182a;
+  --color-text-primary: #ededf0;
+  --color-text-secondary: #8585a8;
+  --color-text-muted: #4a4a68;
+  --color-accent: #5882ff;
   --color-data: #00d4aa;
-  --color-data-dim: #00a080;
-  --color-warn: #ff6b4f;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
   scroll-behavior: smooth;
@@ -32,185 +23,62 @@ html {
 }
 
 body {
-  background-color: var(--color-void);
+  background: var(--color-void);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
-::selection {
-  background: var(--color-accent);
-  color: white;
+::selection { background: var(--color-accent); color: white; }
+
+.nav-blur {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
-/* Grid background */
-.grid-bg {
-  background-image:
-    linear-gradient(rgba(26, 26, 46, 0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26, 26, 46, 0.3) 1px, transparent 1px);
-  background-size: 60px 60px;
-}
-
-.grid-bg-dense {
-  background-image:
-    linear-gradient(rgba(26, 26, 46, 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26, 26, 46, 0.15) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Glow effects */
-.glow-accent {
-  box-shadow: 0 0 40px rgba(79, 124, 255, 0.15), 0 0 80px rgba(79, 124, 255, 0.05);
-}
-
-.glow-data {
-  box-shadow: 0 0 40px rgba(0, 212, 170, 0.15), 0 0 80px rgba(0, 212, 170, 0.05);
-}
-
-.text-glow-accent {
-  text-shadow: 0 0 30px rgba(79, 124, 255, 0.3);
-}
-
-.text-glow-data {
-  text-shadow: 0 0 30px rgba(0, 212, 170, 0.3);
-}
-
-/* Glucose curve canvas */
-#glucose-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.12;
-  pointer-events: none;
-}
-
-/* Animate on scroll */
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
 
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-
-/* Subtle pulse for live data indicator */
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.5); }
-}
-
-.pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-/* Horizontal rule */
 .rule {
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--color-border), transparent);
 }
 
-/* Feature card hover */
-.feature-card {
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
 }
 
-.feature-card:hover {
-  border-color: rgba(79, 124, 255, 0.3);
-  box-shadow: 0 0 30px rgba(79, 124, 255, 0.08);
-}
-
-/* Pricing card highlight */
-.pricing-highlight {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 60px rgba(79, 124, 255, 0.12), inset 0 1px 0 rgba(79, 124, 255, 0.2);
-}
-
-/* Number counter animation */
-@keyframes count-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Floating particles */
-@keyframes float {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  25% { transform: translateY(-10px) translateX(5px); }
-  50% { transform: translateY(-5px) translateX(-5px); }
-  75% { transform: translateY(-15px) translateX(3px); }
-}
-
-/* Scanline effect for hero */
-.scanline::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(79, 124, 255, 0.015) 2px,
-    rgba(79, 124, 255, 0.015) 4px
-  );
-  pointer-events: none;
-}
-
-/* Nav blur */
-.nav-blur {
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-}
-
-/* Smooth gradient mask for sections */
-.fade-top {
-  mask-image: linear-gradient(to bottom, transparent, black 80px);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 80px);
-}
-
-.fade-bottom {
-  mask-image: linear-gradient(to top, transparent, black 80px);
-  -webkit-mask-image: linear-gradient(to top, transparent, black 80px);
-}
-
-/* App Store button */
 .app-store-btn {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .app-store-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(79, 124, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(88, 130, 255, 0.15);
 }
 
-/* Data metric styling */
-.metric-value {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+.feature-card {
+  transition: border-color 0.3s ease;
+}
+.feature-card:hover {
+  border-color: rgba(88, 130, 255, 0.25);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
+.pulse-subtle { animation: pulse-subtle 2.5s ease-in-out infinite; }
 
-::-webkit-scrollbar-track {
-  background: var(--color-void);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
-}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-void); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
