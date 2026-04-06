@@ -50,9 +50,30 @@ body{background:#0d1117;color:#e6edf3;font-family:ui-sans-serif,-apple-system,Bl
 #hint{position:fixed;bottom:16px;right:16px;background:rgba(10,14,20,.84);padding:10px 14px;border:1px solid #243041;border-radius:10px;font-size:11px;color:#a8b3c2;line-height:1.5;pointer-events:none}
 #hint kbd{background:#111826;border:1px solid #243041;border-radius:4px;padding:1px 5px;color:#dce4ef}
 .footer-note{padding:0 18px 18px;font-size:10px;line-height:1.55;color:#7d8590}
+.mobile-toggle{display:none}
+@media(max-width:768px){
+  #shell{display:block;z-index:100}
+  #sidebar{position:fixed;left:0;top:0;bottom:0;width:82vw;max-width:340px;z-index:100;transform:translateX(-100%);transition:transform .25s ease;-webkit-overflow-scrolling:touch;padding-top:52px}
+  #sidebar.open{transform:translateX(0)}
+  #detail{position:fixed;left:8px;right:8px;top:auto;bottom:8px;width:auto;max-width:100%;max-height:40vh;overflow-y:auto;border-radius:14px;z-index:50}
+  #hint{display:none}
+  .view-bar{grid-template-columns:repeat(3,1fr);gap:8px}
+  .view-btn{padding:10px 6px;font-size:12px}
+  .part-head{padding:12px 14px}
+  .name{font-size:14px}
+  .sub{font-size:11px}
+  .label3d{font-size:10px;padding:3px 6px}
+  .mobile-toggle{display:block;position:fixed;top:12px;left:12px;z-index:101;background:rgba(10,14,20,.92);border:1px solid #243041;border-radius:10px;padding:10px 14px;color:#8fd3ff;font-size:14px;font-weight:700;cursor:pointer;pointer-events:auto;backdrop-filter:blur(8px);-webkit-tap-highlight-color:transparent}
+  .mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;-webkit-tap-highlight-color:transparent}
+  .mobile-overlay.open{display:block}
+  .top-note{font-size:12px;line-height:1.6}
+  .footer-note{display:none}
+}
 </style>
 </head>
 <body>
+<button class="mobile-toggle" id="mobile-toggle">☰ Parts</button>
+<div class="mobile-overlay" id="mobile-overlay"></div>
 <div id="shell">
   <aside id="sidebar">
     <h1>StatsKey V1.2</h1>
@@ -507,6 +528,18 @@ function init() {
   highlightPart('puck-shell');
 
   window.addEventListener('resize', onResize);
+
+  const mobileToggle = document.getElementById('mobile-toggle');
+  const mobileOverlay = document.getElementById('mobile-overlay');
+  const sidebar = document.getElementById('sidebar');
+  function toggleSidebar() {
+    const open = sidebar.classList.toggle('open');
+    mobileOverlay.classList.toggle('open', open);
+    mobileToggle.textContent = open ? '✕ Close' : '☰ Parts';
+  }
+  mobileToggle.addEventListener('click', toggleSidebar);
+  mobileOverlay.addEventListener('click', toggleSidebar);
+
   animate();
 }
 
@@ -528,7 +561,7 @@ function buildViewButtons() {
     const btn = document.createElement('button');
     btn.className = 'view-btn';
     btn.textContent = data.label;
-    btn.onclick = () => setView(id);
+    btn.onclick = () => { setView(id); closeMobileSidebar(); };
     btn.id = `view-${id}`;
     viewBar.appendChild(btn);
   });
@@ -1006,8 +1039,16 @@ function detailHTML(part){
   `;
 }
 
+function closeMobileSidebar(){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('mobile-overlay');
+  const btn = document.getElementById('mobile-toggle');
+  if(sb && window.innerWidth <= 768){ sb.classList.remove('open'); ov.classList.remove('open'); btn.textContent='☰ Parts'; }
+}
+
 function highlightPart(id){
   activePart = id;
+  closeMobileSidebar();
   document.querySelectorAll('.part').forEach(el => el.classList.remove('active'));
   const item = document.getElementById(`part-${id}`);
   if (item) item.classList.add('active');
