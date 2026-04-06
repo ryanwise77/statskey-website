@@ -3,6 +3,7 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/support", "destination": "/support.html" },
-    { "source": "/prototype", "destination": "/prototype.html" }
+    { "source": "/prototype", "destination": "/prototype.html" },
+    { "source": "/prototype.html", "destination": "/prototype.html" }
   ]
 }
