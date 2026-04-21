@@ -996,7 +996,13 @@ const state = {
 
 let desiredCamera = camera.position.clone();
 let desiredTarget = controls.target.clone();
+let cameraMoveActive = false;
 let suppressSceneClicksUntil = 0;
+
+// Any user interaction with OrbitControls cancels the programmatic framing
+// so drag-to-rotate, scroll-to-zoom, and right-drag pan are not fought on
+// every frame by the lerp toward desiredCamera/desiredTarget.
+controls.addEventListener('start', () => { cameraMoveActive = false; });
 
 function mmBox(w, d, h) {
   return new THREE.BoxGeometry(w * MM, h * MM, d * MM);
@@ -1434,6 +1440,7 @@ function fitCameraToObject(object, padding = 2.2) {
   const distance = Math.max(2.5, maxDim * padding);
   desiredTarget.copy(center);
   desiredCamera.copy(center.clone().add(new THREE.Vector3(distance, distance * 0.62, distance * 0.88)));
+  cameraMoveActive = true;
 }
 
 function fitCameraToScene() {
@@ -1636,8 +1643,14 @@ function animate() {
   state.explode = THREE.MathUtils.lerp(state.explode, state.targetExplode, 0.16);
   state.roofLift = THREE.MathUtils.lerp(state.roofLift, state.targetRoofLift, 0.16);
   state.xray = THREE.MathUtils.lerp(state.xray, state.targetXray, 0.16);
-  camera.position.lerp(desiredCamera, 0.12);
-  controls.target.lerp(desiredTarget, 0.12);
+  if (cameraMoveActive) {
+    camera.position.lerp(desiredCamera, 0.12);
+    controls.target.lerp(desiredTarget, 0.12);
+    if (camera.position.distanceTo(desiredCamera) < 0.002 &&
+        controls.target.distanceTo(desiredTarget) < 0.002) {
+      cameraMoveActive = false;
+    }
+  }
 
   updatePartTransforms();
   applyMaterialState();
