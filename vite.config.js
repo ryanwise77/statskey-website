@@ -1,8 +1,31 @@
 import { resolve } from 'path'
 import tailwindcss from '@tailwindcss/vite'
 
+// Mirror production Vercel rewrites for extension-less paths during `vite dev`
+// so the embedded bid viewer iframe and clean URLs behave the same locally.
+const DEV_REWRITES = {
+  '/prototype': '/prototype.html',
+  '/bid/alaska-dotpf': '/bid/alaska-dotpf.html',
+  '/bid/3d/viewer': '/bid/3d/viewer.html',
+}
+
+function devRewritePlugin() {
+  return {
+    name: 'statskey-dev-rewrites',
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        if (!req.url) return next()
+        const [path, qs] = req.url.split('?')
+        const target = DEV_REWRITES[path]
+        if (target) req.url = qs ? `${target}?${qs}` : target
+        next()
+      })
+    },
+  }
+}
+
 export default {
-  plugins: [tailwindcss()],
+  plugins: [tailwindcss(), devRewritePlugin()],
   build: {
     rollupOptions: {
       input: {
