@@ -797,9 +797,9 @@ const parts = [
     exactness: 'informed-approx',
     sourceUrl: 'https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/',
     sourceLabel: 'Deckro EdgeFlex B20',
-    description: 'Overhead canopy plus a glass end-cap door frame sealing the cold aisle in front of the rack row. The racks form the long walls, so containment only needs a roof and an entry frame.',
+    description: 'Overhead glass canopy with sliding-glass end-cap doors at each short end of the aisle. The racks themselves form the two long walls, so a technician walks in from the service corridor, through either end-cap door, and is inside a fully sealed cold aisle.',
     base: [2140, 72, 263],
-    explode: [0, -80, 200],
+    explode: [0, -200, 280],
     kind: 'aisleContainment'
   },
   {
@@ -1433,29 +1433,49 @@ function createRaisedFloor(part) {
 
 function createAisleContainment(part) {
   const g = new THREE.Group();
-  const w = 1800;
-  const d = 1140;
-  const h = 1800;
-  // Overhead canopy (clear panel with a mullion frame)
+  const w = 1800;   // along the rack row (aisle length, X)
+  const d = 1140;   // across the aisle (depth, Z)
+  const h = 1800;   // vertical (Y)
+  const framePost = 50;      // structural post size
+  const frameTop = 40;       // top rail thickness
+  const threshold = 18;      // low floor threshold at the doorway
+  const frameColor = 0x3d4753;
+  const glassColor = 0xbfe5ff;
+  const handleColor = 0xced7de;
+
+  // Overhead glass canopy spanning the aisle, with visible mullions so it
+  // reads as structured glazing instead of a floating ghost.
   addBox(g, part.id, { w: w, d: d, h: 14, x: 0, z: 0, y: h - 14, color: 0xdce9ef, opacity: 0.12, layer: 'containment' });
-  // Canopy frame mullions so the roof reads as structured glass, not a ghost
-  for (let i = 0; i < 4; i++) {
-    addBox(g, part.id, { w: 20, d: d, h: 18, x: (w - 20) * i / 3, z: 0, y: h - 18, color: 0x47525c, opacity: 0.9, layer: 'containment' });
+  for (let i = 0; i <= 3; i++) {
+    addBox(g, part.id, { w: 18, d: d, h: 20, x: (w - 18) * i / 3, z: 0, y: h - 22, color: frameColor, opacity: 0.95, layer: 'containment' });
   }
-  addBox(g, part.id, { w: w, d: 20, h: 18, x: 0, z: 0, y: h - 18, color: 0x47525c, opacity: 0.9, layer: 'containment' });
-  addBox(g, part.id, { w: w, d: 20, h: 18, x: 0, z: d - 20, y: h - 18, color: 0x47525c, opacity: 0.9, layer: 'containment' });
-  // End-cap door frame at the cold-aisle entry (closest to the service corridor)
-  const frameZ = 0;
-  addBox(g, part.id, { w: 40, d: 40, h: h, x: 0, z: frameZ, y: 0, color: 0x3d4753, opacity: 0.95, layer: 'containment' });
-  addBox(g, part.id, { w: 40, d: 40, h: h, x: w - 40, z: frameZ, y: 0, color: 0x3d4753, opacity: 0.95, layer: 'containment' });
-  addBox(g, part.id, { w: w, d: 40, h: 40, x: 0, z: frameZ, y: h - 40, color: 0x3d4753, opacity: 0.95, layer: 'containment' });
-  // Two sliding glass doors inside the frame (translucent, hairline separator)
-  addBox(g, part.id, { w: (w - 80) / 2, d: 10, h: h - 40, x: 40, z: frameZ + 15, y: 0, color: 0xbfe5ff, opacity: 0.10, layer: 'containment' });
-  addBox(g, part.id, { w: (w - 80) / 2, d: 10, h: h - 40, x: 40 + (w - 80) / 2, z: frameZ + 15, y: 0, color: 0xbfe5ff, opacity: 0.10, layer: 'containment' });
-  addBox(g, part.id, { w: 4, d: 14, h: h - 60, x: w / 2 - 2, z: frameZ + 13, y: 30, color: 0x9fb4c2, opacity: 0.7, layer: 'containment' });
-  // Door handles
-  addBox(g, part.id, { w: 14, d: 8, h: 110, x: w / 2 - 80, z: frameZ + 2, y: 900, color: 0xced7de, opacity: 0.9, layer: 'containment' });
-  addBox(g, part.id, { w: 14, d: 8, h: 110, x: w / 2 + 66, z: frameZ + 2, y: 900, color: 0xced7de, opacity: 0.9, layer: 'containment' });
+  addBox(g, part.id, { w: w, d: 20, h: 20, x: 0, z: 0, y: h - 22, color: frameColor, opacity: 0.95, layer: 'containment' });
+  addBox(g, part.id, { w: w, d: 20, h: 20, x: 0, z: d - 20, y: h - 22, color: frameColor, opacity: 0.95, layer: 'containment' });
+
+  // End-cap door assembly at the short end of the aisle (perpendicular to the rack row).
+  // This is what a technician walks through from the service corridor.
+  function endCap(xBase) {
+    // Vertical posts on the front-wall side and the rack side
+    addBox(g, part.id, { w: framePost, d: framePost, h: h, x: xBase, z: 0, y: 0, color: frameColor, opacity: 0.96, layer: 'containment' });
+    addBox(g, part.id, { w: framePost, d: framePost, h: h, x: xBase, z: d - framePost, y: 0, color: frameColor, opacity: 0.96, layer: 'containment' });
+    // Head jamb
+    addBox(g, part.id, { w: framePost, d: d, h: frameTop, x: xBase, z: 0, y: h - frameTop, color: frameColor, opacity: 0.96, layer: 'containment' });
+    // Floor threshold so the opening reads as walkable
+    addBox(g, part.id, { w: framePost, d: d - 2 * framePost, h: threshold, x: xBase, z: framePost, y: 0, color: 0x606c78, opacity: 0.95, layer: 'containment' });
+    // Two sliding glass door panes meeting in the middle
+    const openingD = d - 2 * framePost;
+    const paneD = openingD / 2;
+    const paneH = h - frameTop - threshold;
+    addBox(g, part.id, { w: 12, d: paneD, h: paneH, x: xBase + (framePost - 12) / 2, z: framePost, y: threshold, color: glassColor, opacity: 0.12, layer: 'containment' });
+    addBox(g, part.id, { w: 12, d: paneD, h: paneH, x: xBase + (framePost - 12) / 2, z: framePost + paneD, y: threshold, color: glassColor, opacity: 0.12, layer: 'containment' });
+    // Hairline seam where the two sliding panes meet
+    addBox(g, part.id, { w: 14, d: 6, h: paneH - 40, x: xBase + (framePost - 14) / 2, z: framePost + paneD - 3, y: threshold + 20, color: 0x8ea3b3, opacity: 0.85, layer: 'containment' });
+    // Door pulls on each pane
+    addBox(g, part.id, { w: 10, d: 14, h: 140, x: xBase - 2, z: framePost + paneD * 0.65, y: 950, color: handleColor, opacity: 0.95, layer: 'containment' });
+    addBox(g, part.id, { w: 10, d: 14, h: 140, x: xBase - 2, z: framePost + paneD + paneD * 0.35, y: 950, color: handleColor, opacity: 0.95, layer: 'containment' });
+  }
+  endCap(0);               // near end (closest to container main entry)
+  endCap(w - framePost);   // far end (closest to reefer unit)
   registerPart(part, g);
 }
 
