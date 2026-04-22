@@ -4,6 +4,11 @@
 <meta charset="utf-8" />
 <title>AuroraEdge AK-20 Interactive Product Viewer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<script>
+  if (new URLSearchParams(window.location.search).get('embed') === '1') {
+    document.documentElement.classList.add('embed-mode');
+  }
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -403,6 +408,68 @@
 
   a { color: var(--aqua); text-decoration: none; }
 
+  html.embed-mode .brand {
+    display: none;
+  }
+  html.embed-mode .toolbar {
+    top: 12px;
+    right: 12px;
+    width: min(320px, calc(100vw - 24px));
+    padding: 12px;
+    clip-path: none;
+    border-radius: 14px;
+  }
+  html.embed-mode .toolbar h2,
+  html.embed-mode .metrics,
+  html.embed-mode .foot-hint {
+    display: none;
+  }
+  html.embed-mode .view-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  html.embed-mode .tool-btn {
+    padding: 8px 9px;
+    font-size: 11px;
+  }
+  html.embed-mode .slider-wrap {
+    margin-top: 10px;
+  }
+  html.embed-mode .drawer-toggle {
+    top: 12px;
+    left: 12px;
+    padding: 9px 12px;
+    clip-path: none;
+    border-radius: 12px;
+  }
+  html.embed-mode .parts {
+    top: 58px;
+    left: 12px;
+    bottom: 12px;
+    width: min(300px, calc(100vw - 24px));
+    border-radius: 14px;
+  }
+  html.embed-mode .inspector {
+    right: 12px;
+    bottom: 12px;
+    width: min(320px, calc(100vw - 24px));
+    min-height: 0;
+    padding: 12px;
+    clip-path: none;
+    border-radius: 14px;
+  }
+  html.embed-mode .part-label {
+    display: none !important;
+  }
+  html.embed-mode .inspector h2 {
+    margin-bottom: 8px;
+  }
+  html.embed-mode .inspector__name {
+    font-size: 22px;
+  }
+  html.embed-mode .inspector__desc {
+    font-size: 12px;
+  }
+
   @media (max-width: 1080px) {
     .brand { width: min(380px, calc(100vw - 36px)); }
     .toolbar { width: min(320px, calc(100vw - 36px)); }
@@ -431,6 +498,117 @@
     }
     .foot-hint {
       display: none;
+    }
+  }
+  @media (max-width: 780px) {
+    .brand {
+      width: calc(100vw - 24px);
+      top: 12px;
+      left: 12px;
+      padding: 14px 16px;
+    }
+    .brand__title {
+      font-size: clamp(24px, 8vw, 32px);
+    }
+    .brand__subtitle,
+    .brand__meta {
+      display: none;
+    }
+    .toolbar {
+      left: 12px;
+      right: 12px;
+      top: auto;
+      bottom: 12px;
+      width: auto;
+      padding: 12px;
+      clip-path: none;
+      border-radius: 14px;
+    }
+    .view-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .toolbar h2,
+    .metrics,
+    .part-label {
+      display: none !important;
+    }
+    .tool-btn {
+      padding: 9px 8px;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+    .drawer-toggle {
+      top: 12px;
+      left: 12px;
+      padding: 9px 12px;
+      clip-path: none;
+      border-radius: 12px;
+    }
+    .parts {
+      left: 12px;
+      right: 12px;
+      top: 64px;
+      bottom: 96px;
+      width: auto;
+      border-radius: 14px;
+      transform: translateY(0);
+    }
+    .parts.closed {
+      transform: translateY(calc(100% + 20px));
+    }
+    .inspector {
+      left: 12px;
+      right: 12px;
+      width: auto;
+      min-height: 0;
+      max-height: 34vh;
+      overflow: auto;
+      bottom: 96px;
+      padding: 12px;
+      clip-path: none;
+      border-radius: 14px;
+    }
+    .inspector__name {
+      font-size: 22px;
+    }
+    .kv {
+      grid-template-columns: 92px 1fr;
+      gap: 5px 10px;
+      font-size: 11px;
+    }
+  }
+  @media (max-width: 780px) and (orientation: landscape) {
+    .parts {
+      bottom: 84px;
+      max-width: 300px;
+      right: auto;
+    }
+    .inspector {
+      left: auto;
+      right: 12px;
+      width: min(320px, calc(100vw - 24px));
+      bottom: 84px;
+      max-height: 44vh;
+    }
+  }
+  @media (max-width: 780px) {
+    html.embed-mode .toolbar {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      width: auto;
+    }
+    html.embed-mode .parts {
+      top: 56px;
+      bottom: 86px;
+    }
+    html.embed-mode .inspector {
+      left: 12px;
+      right: 12px;
+      width: auto;
+      bottom: 86px;
+      max-height: 30vh;
     }
   }
 </style>
@@ -516,6 +694,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const EMBED = new URLSearchParams(window.location.search).get('embed') === '1';
+const mobileMedia = window.matchMedia('(max-width: 780px)');
+const isCompactViewport = () => EMBED || mobileMedia.matches;
 
 const MM = 0.001;
 const dims = {
@@ -984,8 +1166,8 @@ const selectableMeshes = [];
 const partEntries = new Map();
 
 const state = {
-  explode: location.hash === '#assembled' ? 0 : 0.85,
-  targetExplode: location.hash === '#assembled' ? 0 : 0.85,
+  explode: EMBED ? 0.18 : (location.hash === '#assembled' ? 0 : 0.85),
+  targetExplode: EMBED ? 0.18 : (location.hash === '#assembled' ? 0 : 0.85),
   roofLift: 0,
   targetRoofLift: 0,
   xray: 0,
@@ -1448,9 +1630,11 @@ function fitCameraToScene() {
 }
 
 const inspectorContent = document.getElementById('inspectorContent');
+const inspectorEl = document.querySelector('.inspector');
 
 function updateInspector() {
   if (!state.selectedId) {
+    inspectorEl.style.display = isCompactViewport() ? 'none' : 'block';
     inspectorContent.className = 'inspector__empty';
     inspectorContent.innerHTML = `
       Click any part in the scene or from the parts drawer to isolate and inspect it.
@@ -1458,6 +1642,7 @@ function updateInspector() {
     `;
     return;
   }
+  inspectorEl.style.display = 'block';
   const part = partEntries.get(state.selectedId).part;
   inspectorContent.className = '';
   inspectorContent.innerHTML = `
@@ -1491,6 +1676,16 @@ function clearSelectionState() {
 
 function suppressSceneClicks(ms = 500) {
   suppressSceneClicksUntil = performance.now() + ms;
+}
+
+function syncResponsiveUI() {
+  const drawer = document.getElementById('partsDrawer');
+  if (isCompactViewport()) {
+    drawer.classList.add('closed');
+  }
+  if (!state.selectedId) {
+    inspectorEl.style.display = EMBED ? 'none' : 'block';
+  }
 }
 
 inspectorContent.addEventListener('click', event => {
@@ -1531,7 +1726,7 @@ function applyMaterialState() {
 
     const label = group.userData.label;
     if (label) {
-      label.visible = !!state.selectedId ? isSelected : state.explode > 0.45;
+      label.visible = !!state.selectedId && isSelected;
     }
   });
 
@@ -1627,16 +1822,23 @@ function updatePartTransforms() {
 }
 
 updatePartTransforms();
+syncResponsiveUI();
 updateInspector();
 updateCardState();
-setView(location.hash === '#assembled' ? 'assembled' : 'exploded');
+setView(
+  EMBED
+    ? 'assembled'
+    : (location.hash === '#assembled' ? 'assembled' : 'exploded')
+);
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  syncResponsiveUI();
 });
+mobileMedia.addEventListener?.('change', syncResponsiveUI);
 
 function animate() {
   requestAnimationFrame(animate);

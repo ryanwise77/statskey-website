@@ -108,7 +108,13 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
 .viewer-wrap{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:12px;background:#060c12;position:relative}
 .viewer-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface)}
 .viewer-bar .k{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
-.viewer-iframe{width:100%;height:620px;border:0;display:block;background:#060c12}
+.viewer-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end}
+.viewer-header p{margin:0;color:var(--muted-2);font-size:13px}
+.viewer-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.viewer-mobile-alt{display:none;padding:18px 16px 20px;background:linear-gradient(180deg,#0a1018,#0b121c);border-top:1px solid var(--border)}
+.viewer-mobile-alt h4{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--blue);margin-bottom:8px}
+.viewer-mobile-alt p{margin:0 0 12px;color:var(--muted-2);font-size:13px;line-height:1.55}
+.viewer-iframe{width:100%;height:min(78vh,760px);min-height:560px;border:0;display:block;background:#060c12}
 .viewer-hint{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--border);background:var(--bg-soft)}
 
 /* ---------- Filter bar for BOM ---------- */
@@ -138,14 +144,21 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
   .toc h4{width:100%;margin:8px 0 2px}
   .toc a{padding:5px 9px;font-size:12px;background:var(--surface-2);border:1px solid var(--border-soft)}
   .two-col,.three-col{grid-template-columns:1fr}
-  .viewer-iframe{height:480px}
+  .viewer-header{grid-template-columns:1fr}
+  .viewer-actions{justify-content:flex-start}
+  .viewer-iframe{height:min(74vh,680px);min-height:520px}
 }
 @media (max-width:640px){
   .bar__row{padding:9px 14px}
   .bar__title{display:none}
   section.card{padding:20px 18px}
   .hero{padding:22px 20px}
-  .viewer-iframe{height:380px}
+  .viewer-bar{padding:10px 12px;align-items:flex-start}
+  .viewer-actions{width:100%}
+  .viewer-actions .btn{flex:1;justify-content:center}
+  .viewer-iframe{display:none}
+  .viewer-mobile-alt{display:block}
+  .viewer-hint{display:none}
 }
 
 /* ---------- Print ---------- */
@@ -333,14 +346,26 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
       <!-- 3D viewer -->
       <section class="card" id="viewer">
         <h2><span class="n">5</span>3D product viewer</h2>
-        <p class="lead">Component-accurate model of the enclosure, racks, compute stack, cooling, power, and Starlink hardware. Click any part for a source-backed dimension readout.</p>
+        <div class="viewer-header">
+          <p class="lead">Component-accurate model of the enclosure, racks, compute stack, cooling, power, and Starlink hardware. The inline version is a lighter preview optimized for document browsing; use fullscreen for the complete inspection workflow.</p>
+          <div class="viewer-actions">
+            <a class="btn btn--primary" href="/bid/3d/viewer" target="_blank" rel="noreferrer">Open fullscreen ↗</a>
+          </div>
+        </div>
         <div class="viewer-wrap">
           <div class="viewer-bar">
-            <span class="k">Interactive · real-scale · source-backed</span>
-            <a class="btn" href="/bid/3d/viewer" target="_blank" rel="noreferrer">Open fullscreen ↗</a>
+            <span class="k">Inline preview · real-scale · source-backed</span>
+            <span class="muted">touch / drag enabled</span>
           </div>
-          <iframe class="viewer-iframe" src="/bid/3d/viewer" title="AuroraEdge AK-20 3D viewer" loading="lazy" allow="fullscreen"></iframe>
-          <div class="viewer-hint">Drag to orbit · scroll to zoom · right-drag to pan · click a part to inspect · use the view bar for exploded / assembled / x-ray / roof-off modes.</div>
+          <iframe class="viewer-iframe" src="/bid/3d/viewer?embed=1" title="AuroraEdge AK-20 3D viewer" loading="lazy" allow="fullscreen"></iframe>
+          <div class="viewer-mobile-alt">
+            <h4>Mobile viewer</h4>
+            <p>The inline preview is intentionally simplified on smaller screens to keep the bid readable. Open the standalone viewer for the full touch experience, parts drawer, and inspection workflow.</p>
+            <div class="viewer-actions">
+              <a class="btn btn--primary" href="/bid/3d/viewer" target="_blank" rel="noreferrer">Open fullscreen ↗</a>
+            </div>
+          </div>
+          <div class="viewer-hint">Inline mode trims the standalone chrome for easier reading inside the bid. On mobile, use <strong>Open fullscreen</strong> for the best experience.</div>
         </div>
       </section>
 
