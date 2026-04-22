@@ -636,16 +636,6 @@
 <section class="brand">
   <div class="brand__eyebrow">AuroraEdge AK-20</div>
   <h1 class="brand__title">Interactive Product Viewer</h1>
-  <p class="brand__subtitle">
-    This viewer shows the current physically buildable AuroraEdge concept:
-    a 20-foot reefer-based edge data center with exact-size modeled components,
-    rack-level assemblies, and source-backed geometry notes.
-  </p>
-  <div class="brand__meta">
-    <span class="chip">Exploded / assembled modes</span>
-    <span class="chip">Source-backed dimensions</span>
-    <span class="chip">Real-scale rack assembly</span>
-  </div>
 </section>
 
 <section class="toolbar">
@@ -788,16 +778,29 @@ const parts = [
   },
   {
     id: 'raised-floor',
-    label: 'Raised floor + containment',
+    label: 'Raised access floor',
     section: 'Enclosure',
-    dims: [1920, 1235, 2080],
+    dims: [1920, 1235, 120],
     exactness: 'informed-approx',
     sourceUrl: 'https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/',
     sourceLabel: 'Deckro EdgeFlex B20',
-    description: 'Raised floor tiles and overhead containment sized to the three-rack cold aisle.',
+    description: 'Data-center-grade raised floor under the rack row and cold aisle. Perforated tiles supply cold air from below, solid tiles carry cabling; the slab sits on 120 mm pedestals.',
     base: [2090, 55, 143],
-    explode: [0, -120, 0],
-    kind: 'floorContainment'
+    explode: [0, -120, -40],
+    kind: 'raisedFloor'
+  },
+  {
+    id: 'aisle-containment',
+    label: 'Cold-aisle containment',
+    section: 'Enclosure',
+    dims: [1800, 1140, 1800],
+    exactness: 'informed-approx',
+    sourceUrl: 'https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/',
+    sourceLabel: 'Deckro EdgeFlex B20',
+    description: 'Overhead canopy plus a glass end-cap door frame sealing the cold aisle in front of the rack row. The racks form the long walls, so containment only needs a roof and an entry frame.',
+    base: [2140, 72, 263],
+    explode: [0, -80, 200],
+    kind: 'aisleContainment'
   },
   {
     id: 'ups',
@@ -1399,21 +1402,60 @@ function createReeferUnit(part) {
   registerPart(part, g);
 }
 
-function createFloorContainment(part) {
+function createRaisedFloor(part) {
   const g = new THREE.Group();
   addBox(g, part.id, { w: 1920, d: 1235, h: 120, x: 0, z: 0, y: 0, color: 0x2f3337, opacity: 0.96, layer: 'floor' });
   for (let tx = 0; tx < 3; tx++) {
     for (let tz = 0; tz < 2; tz++) {
+      const solid = (tx + tz) % 2 === 0;
       addBox(g, part.id, {
         w: 596, d: 596, h: 2,
         x: 8 + tx * 604, z: 8 + tz * 604, y: 118,
-        color: 0xaab6bf, opacity: 0.85, layer: 'detail'
+        color: solid ? 0xaab6bf : 0x46525c, opacity: 0.88, layer: 'floor'
       });
+      if (!solid) {
+        for (let px = 0; px < 3; px++) {
+          for (let pz = 0; pz < 3; pz++) {
+            addBox(g, part.id, {
+              w: 120, d: 120, h: 1,
+              x: 8 + tx * 604 + 140 + px * 150,
+              z: 8 + tz * 604 + 140 + pz * 150,
+              y: 120,
+              color: 0x0c1016, opacity: 1, layer: 'floor'
+            });
+          }
+        }
+      }
     }
   }
-  addBox(g, part.id, { w: 1820, d: 1210, h: 12, x: 50, z: 20, y: 1950, color: 0xdce9ef, opacity: 0.1, layer: 'containment' });
-  addBox(g, part.id, { w: 8, d: 1210, h: 1760, x: 50, z: 20, y: 190, color: 0x79f3d2, opacity: 0.16, layer: 'containment' });
-  addBox(g, part.id, { w: 8, d: 1210, h: 1760, x: 1862, z: 20, y: 190, color: 0x79f3d2, opacity: 0.16, layer: 'containment' });
+  registerPart(part, g);
+}
+
+function createAisleContainment(part) {
+  const g = new THREE.Group();
+  const w = 1800;
+  const d = 1140;
+  const h = 1800;
+  // Overhead canopy (clear panel with a mullion frame)
+  addBox(g, part.id, { w: w, d: d, h: 14, x: 0, z: 0, y: h - 14, color: 0xdce9ef, opacity: 0.12, layer: 'containment' });
+  // Canopy frame mullions so the roof reads as structured glass, not a ghost
+  for (let i = 0; i < 4; i++) {
+    addBox(g, part.id, { w: 20, d: d, h: 18, x: (w - 20) * i / 3, z: 0, y: h - 18, color: 0x47525c, opacity: 0.9, layer: 'containment' });
+  }
+  addBox(g, part.id, { w: w, d: 20, h: 18, x: 0, z: 0, y: h - 18, color: 0x47525c, opacity: 0.9, layer: 'containment' });
+  addBox(g, part.id, { w: w, d: 20, h: 18, x: 0, z: d - 20, y: h - 18, color: 0x47525c, opacity: 0.9, layer: 'containment' });
+  // End-cap door frame at the cold-aisle entry (closest to the service corridor)
+  const frameZ = 0;
+  addBox(g, part.id, { w: 40, d: 40, h: h, x: 0, z: frameZ, y: 0, color: 0x3d4753, opacity: 0.95, layer: 'containment' });
+  addBox(g, part.id, { w: 40, d: 40, h: h, x: w - 40, z: frameZ, y: 0, color: 0x3d4753, opacity: 0.95, layer: 'containment' });
+  addBox(g, part.id, { w: w, d: 40, h: 40, x: 0, z: frameZ, y: h - 40, color: 0x3d4753, opacity: 0.95, layer: 'containment' });
+  // Two sliding glass doors inside the frame (translucent, hairline separator)
+  addBox(g, part.id, { w: (w - 80) / 2, d: 10, h: h - 40, x: 40, z: frameZ + 15, y: 0, color: 0xbfe5ff, opacity: 0.10, layer: 'containment' });
+  addBox(g, part.id, { w: (w - 80) / 2, d: 10, h: h - 40, x: 40 + (w - 80) / 2, z: frameZ + 15, y: 0, color: 0xbfe5ff, opacity: 0.10, layer: 'containment' });
+  addBox(g, part.id, { w: 4, d: 14, h: h - 60, x: w / 2 - 2, z: frameZ + 13, y: 30, color: 0x9fb4c2, opacity: 0.7, layer: 'containment' });
+  // Door handles
+  addBox(g, part.id, { w: 14, d: 8, h: 110, x: w / 2 - 80, z: frameZ + 2, y: 900, color: 0xced7de, opacity: 0.9, layer: 'containment' });
+  addBox(g, part.id, { w: 14, d: 8, h: 110, x: w / 2 + 66, z: frameZ + 2, y: 900, color: 0xced7de, opacity: 0.9, layer: 'containment' });
   registerPart(part, g);
 }
 
@@ -1589,7 +1631,8 @@ function createDish(part) {
 const factoryMap = {
   shell: createShell,
   reeferUnit: createReeferUnit,
-  floorContainment: createFloorContainment,
+  raisedFloor: createRaisedFloor,
+  aisleContainment: createAisleContainment,
   ups: createUPS,
   ats: createATS,
   fm200: createFM200,
