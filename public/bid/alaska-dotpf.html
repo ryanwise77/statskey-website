@@ -70,24 +70,51 @@ section.card ul,section.card ol{padding-left:22px;color:var(--ink-2);margin:8px 
 section.card li{margin:5px 0}
 section.card strong{color:var(--ink)}
 
-/* ---------- Hero ---------- */
-.hero{background:linear-gradient(160deg,#0e1826 0%,#0b1119 70%);border:1px solid var(--border);border-radius:16px;padding:34px 32px;margin-bottom:22px;position:relative;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 0%,rgba(143,211,255,.12),transparent 45%),radial-gradient(circle at 0% 100%,rgba(240,198,116,.07),transparent 45%);pointer-events:none}
-.hero__eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:var(--amber);margin-bottom:10px}
-.hero h1{font-size:clamp(26px,3.6vw,38px);line-height:1.1;letter-spacing:-.02em;color:var(--ink)}
-.hero__kicker{margin-top:10px;color:var(--muted-2);font-size:15px;max-width:70ch}
-.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:22px}
-.meta-cell{background:rgba(14,22,34,.7);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
-.meta-cell .k{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
-.meta-cell .v{color:var(--ink);font-size:13px;font-weight:600}
+/* ---------- Cinema hero ---------- */
+.cinema{position:relative;overflow:hidden;border-radius:18px;border:1px solid var(--border);margin-bottom:22px;background:linear-gradient(160deg,#0b1424 0%,#060b11 100%);min-height:clamp(520px,86vh,880px);isolation:isolate}
+.cinema__stage{position:absolute;inset:0;z-index:0}
+.cinema__stage iframe{width:100%;height:100%;border:0;display:block;background:transparent}
+.cinema__grain{position:absolute;inset:0;pointer-events:none;z-index:1;background-image:radial-gradient(circle at 15% 15%,rgba(143,211,255,.14),transparent 42%),radial-gradient(circle at 88% 92%,rgba(240,198,116,.10),transparent 46%);mix-blend-mode:screen;opacity:.9}
+.cinema__veil{position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(180deg,rgba(6,11,18,0) 0%,rgba(6,11,18,.05) 42%,rgba(6,11,18,.72) 88%,rgba(6,11,18,.92) 100%)}
+.cinema__frame{position:absolute;inset:0;pointer-events:none;z-index:3;border:1px solid rgba(143,211,255,.06);border-radius:inherit;box-shadow:inset 0 0 80px rgba(0,0,0,.45)}
+.cinema__content{position:relative;z-index:4;display:grid;grid-template-rows:1fr auto;padding:32px 34px 28px;min-height:inherit;pointer-events:none}
+.cinema__chip-row{display:flex;gap:10px;flex-wrap:wrap;align-self:start;margin-bottom:auto;animation:cinemaFade .9s ease .05s both}
+.cinema__chip{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(9,15,22,.55);backdrop-filter:blur(6px);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
+.cinema__chip--amber{color:var(--amber);border-color:rgba(240,198,116,.4)}
+.cinema__chip--mint{color:var(--mint);border-color:rgba(126,227,192,.4)}
+.cinema__chip .dot{width:6px;height:6px;border-radius:999px;background:currentColor;box-shadow:0 0 10px currentColor}
+.cinema__headline{display:grid;gap:16px;max-width:920px}
+.cinema__eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);animation:cinemaFade 1s ease .12s both}
+.cinema__title{margin:0;font-size:clamp(34px,6.4vw,78px);line-height:.96;letter-spacing:-.025em;color:var(--ice,#e8f4ff);font-weight:700;animation:cinemaRise 1.1s cubic-bezier(.2,.8,.2,1) .18s both}
+.cinema__title em{font-style:normal;color:var(--blue);position:relative;white-space:nowrap}
+.cinema__title em::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:.55}
+.cinema__kicker{margin:0;color:var(--ink-2);font-size:clamp(14px,1.6vw,18px);line-height:1.5;max-width:62ch;animation:cinemaRise 1.1s cubic-bezier(.2,.8,.2,1) .3s both}
+.cinema__ctas{display:flex;gap:10px;flex-wrap:wrap;pointer-events:auto;margin-top:6px;animation:cinemaFade 1s ease .45s both}
+.cinema__ctas .btn{padding:10px 16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.cinema__scroll{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:4;pointer-events:none;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:6px;animation:cinemaFade 1.2s ease .9s both}
+.cinema__scroll::after{content:"";width:1px;height:28px;background:linear-gradient(180deg,var(--blue),transparent);animation:cinemaBeam 1.8s ease-in-out infinite}
+@keyframes cinemaFade{from{opacity:0}to{opacity:1}}
+@keyframes cinemaRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cinemaBeam{0%,100%{opacity:.2;transform:scaleY(.4)}50%{opacity:1;transform:scaleY(1)}}
+@media (prefers-reduced-motion: reduce){
+  .cinema__chip-row,.cinema__eyebrow,.cinema__title,.cinema__kicker,.cinema__ctas,.cinema__scroll{animation:none !important}
+  .cinema__scroll::after{animation:none}
+}
 
-/* ---------- Stat strip ---------- */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0 4px}
-.stat{background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-.stat .v{font-size:22px;color:var(--blue);font-weight:700;letter-spacing:-.01em}
-.stat .l{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:2px}
-.stat--amber .v{color:var(--amber)}
-.stat--mint .v{color:var(--mint)}
+/* ---------- Quick facts strip ---------- */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.fact{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.fact::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue);opacity:.7}
+.fact.fact--amber::before{background:var(--amber)}
+.fact.fact--mint::before{background:var(--mint)}
+.fact__label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:6px}
+.fact__value{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.fact__value--num{font-variant-numeric:tabular-nums}
+.fact__sub{margin-top:4px;font-size:11px;color:var(--muted-2)}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:22px}
+.spec{background:rgba(14,22,34,.6);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.spec .k{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
+.spec .v{color:var(--ink);font-size:13px;font-weight:600}
 
 /* ---------- Tables ---------- */
 .tbl-wrap{overflow:auto;border:1px solid var(--border);border-radius:10px;margin:12px 0}
@@ -147,12 +174,18 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
   .viewer-header{grid-template-columns:1fr}
   .viewer-actions{justify-content:flex-start}
   .viewer-iframe{height:min(74vh,680px);min-height:520px}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cinema{min-height:clamp(480px,72vh,720px)}
+  .cinema__content{padding:22px 22px 26px}
 }
 @media (max-width:640px){
   .bar__row{padding:9px 14px}
   .bar__title{display:none}
   section.card{padding:20px 18px}
-  .hero{padding:22px 20px}
+  .cinema{min-height:clamp(420px,70vh,620px);border-radius:14px}
+  .cinema__content{padding:20px 18px 22px}
+  .cinema__title{font-size:clamp(30px,10vw,46px)}
+  .cinema__scroll{display:none}
   .viewer-bar{padding:10px 12px;align-items:flex-start}
   .viewer-actions{width:100%}
   .viewer-actions .btn{flex:1;justify-content:center}
@@ -164,14 +197,17 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
 /* ---------- Print ---------- */
 @media print{
   body{background:#fff;color:#111}
-  .bar,.toc,.viewer-wrap,.bom-tools,.bar__actions{display:none!important}
+  .bar,.toc,.viewer-wrap,.bom-tools,.bar__actions,.cinema__stage,.cinema__grain,.cinema__veil,.cinema__frame,.cinema__scroll,.cinema__ctas{display:none!important}
   .layout{grid-template-columns:1fr;padding:0;max-width:none}
-  section.card,.hero{box-shadow:none;border:1px solid #ddd;background:#fff;color:#111;break-inside:avoid;page-break-inside:avoid}
-  section.card h2,section.card h3,.hero h1{color:#111}
+  section.card,.cinema,.facts,.specs,.fact,.spec{box-shadow:none;border:1px solid #ddd;background:#fff;color:#111;break-inside:avoid;page-break-inside:avoid}
+  .cinema{min-height:0;padding:18px 22px;margin-bottom:18px}
+  .cinema__content{position:static;padding:0}
+  .cinema__title,.cinema__kicker,.cinema__eyebrow,.cinema__chip{color:#111}
+  .cinema__chip{background:#f7f7f7;border-color:#ddd}
+  section.card h2,section.card h3,.cinema__title{color:#111}
   table.tbl th,table.tbl td{color:#111;border-color:#ddd}
   a{color:#0b5fa5}
-  .meta-cell,.stat,.diagram,.note,pre,code,kbd{background:#f7f7f7;color:#111;border-color:#ddd}
-  .hero::before{display:none}
+  .fact,.spec,.diagram,.note,pre,code,kbd{background:#f7f7f7;color:#111;border-color:#ddd}
 }
 </style>
 </head>
@@ -216,26 +252,51 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
 
     <div class="content">
 
-      <!-- Hero / Cover -->
-      <header class="hero" id="cover">
-        <div class="hero__eyebrow">Formal bid · firm-fixed purchase</div>
-        <h1>AuroraEdge AK-20 — Deployable Edge Data Center for Alaska Remote Sensing and Emergency Response</h1>
-        <div class="hero__kicker">A 20-foot ruggedized edge compute node engineered for the Fairbanks climate and the Alaska DOT&amp;PF drone-to-decision workflow. Delivers the same "minutes-to-intelligence" outcome as the current Galleon <code>Cruiser</code> deployment at dramatically lower total cost of ownership and with hardware ownership retained by the State.</div>
-        <div class="meta-grid">
-          <div class="meta-cell"><div class="k">Customer</div><div class="v">Alaska DOT&amp;PF</div></div>
-          <div class="meta-cell"><div class="k">Program</div><div class="v">Cruiser replacement / expansion</div></div>
-          <div class="meta-cell"><div class="k">Reference site</div><div class="v">Fairbanks (primary), Anchorage RSL failover</div></div>
-          <div class="meta-cell"><div class="k">Offer type</div><div class="v">Firm-fixed-price purchase</div></div>
-          <div class="meta-cell"><div class="k">Validity</div><div class="v">90 days from issue</div></div>
-          <div class="meta-cell"><div class="k">Delivery window</div><div class="v">16–20 weeks ARO</div></div>
+      <!-- Cinema hero -->
+      <header class="cinema" id="cover" aria-labelledby="cinema-title">
+        <div class="cinema__stage">
+          <iframe src="/bid/3d/viewer?hero=1" title="AuroraEdge AK-20 cinematic product render" loading="eager" tabindex="-1" aria-hidden="true"></iframe>
         </div>
-        <div class="stats">
-          <div class="stat"><div class="v">$598,000</div><div class="l">Firm-fixed one-time</div></div>
-          <div class="stat stat--amber"><div class="v">$73,960</div><div class="l">Year 1 support bundle</div></div>
-          <div class="stat"><div class="v">$959,800</div><div class="l">5-year TCO</div></div>
-          <div class="stat stat--mint"><div class="v">~$2.0M</div><div class="l">5-yr savings vs loaded Galleon</div></div>
+        <div class="cinema__grain" aria-hidden="true"></div>
+        <div class="cinema__veil" aria-hidden="true"></div>
+        <div class="cinema__frame" aria-hidden="true"></div>
+        <div class="cinema__content">
+          <div class="cinema__chip-row">
+            <span class="cinema__chip cinema__chip--amber"><span class="dot"></span>Private · Confidential</span>
+            <span class="cinema__chip">Firm-fixed purchase</span>
+            <span class="cinema__chip cinema__chip--mint">Alaska DOT&amp;PF · Fairbanks</span>
+          </div>
+          <div class="cinema__headline">
+            <div class="cinema__eyebrow">AuroraEdge AK-20 · Formal bid</div>
+            <h1 class="cinema__title" id="cinema-title">Deployable edge data center for <em>remote-sensing Alaska</em>.</h1>
+            <p class="cinema__kicker">A 20-foot ruggedized edge compute node engineered for the Fairbanks climate and the Alaska DOT&amp;PF drone-to-decision workflow. Matches the current Galleon <code>Cruiser</code> outcome at dramatically lower 5-year cost of ownership — with the hardware owned outright by the State.</p>
+            <div class="cinema__ctas">
+              <a class="btn btn--primary" href="#viewer">Explore the 3D design ↓</a>
+              <a class="btn" href="#pricing">Pricing</a>
+              <a class="btn" href="#tco">TCO comparison</a>
+            </div>
+          </div>
         </div>
+        <div class="cinema__scroll" aria-hidden="true">Scroll</div>
       </header>
+
+      <!-- Quick facts strip -->
+      <div class="facts" aria-label="Program headline numbers">
+        <div class="fact"><div class="fact__label">Firm-fixed one-time</div><div class="fact__value fact__value--num">$598,000</div><div class="fact__sub">CapEx, hardware delivered</div></div>
+        <div class="fact fact--amber"><div class="fact__label">Year 1 support bundle</div><div class="fact__value fact__value--num">$73,960</div><div class="fact__sub">Premium SLA + software + Starlink</div></div>
+        <div class="fact"><div class="fact__label">5-year TCO</div><div class="fact__value fact__value--num">$959,800</div><div class="fact__sub">All-in, State owns the hardware</div></div>
+        <div class="fact fact--mint"><div class="fact__label">5-yr savings vs loaded Galleon</div><div class="fact__value fact__value--num">~$2.0M</div><div class="fact__sub">Same "minutes-to-intelligence" outcome</div></div>
+      </div>
+
+      <!-- Program facts -->
+      <div class="specs" aria-label="Program facts">
+        <div class="spec"><div class="k">Customer</div><div class="v">Alaska DOT&amp;PF</div></div>
+        <div class="spec"><div class="k">Program</div><div class="v">Cruiser replacement / expansion</div></div>
+        <div class="spec"><div class="k">Reference site</div><div class="v">Fairbanks primary · Anchorage RSL failover</div></div>
+        <div class="spec"><div class="k">Offer type</div><div class="v">Firm-fixed-price purchase</div></div>
+        <div class="spec"><div class="k">Validity</div><div class="v">90 days from issue</div></div>
+        <div class="spec"><div class="k">Delivery window</div><div class="v">16–20 weeks ARO</div></div>
+      </div>
 
       <!-- Executive summary -->
       <section class="card" id="exec">

@@ -8,6 +8,9 @@
   if (new URLSearchParams(window.location.search).get('embed') === '1') {
     document.documentElement.classList.add('embed-mode');
   }
+  if (new URLSearchParams(window.location.search).get('hero') === '1') {
+    document.documentElement.classList.add('hero-mode');
+  }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -460,6 +463,30 @@
   html.embed-mode .part-label {
     display: none !important;
   }
+
+  html.hero-mode body {
+    background:
+      radial-gradient(ellipse at 50% 58%, rgba(8,20,34,0.0), rgba(4,8,13,0.95) 72%),
+      radial-gradient(circle at 18% 14%, rgba(0,183,255,0.18), transparent 32%),
+      radial-gradient(circle at 82% 78%, rgba(255,122,61,0.12), transparent 34%),
+      linear-gradient(150deg, #050a11 0%, #08111b 50%, #05090f 100%);
+  }
+  html.hero-mode body::before,
+  html.hero-mode body::after {
+    opacity: 0.05;
+  }
+  html.hero-mode .brand,
+  html.hero-mode .toolbar,
+  html.hero-mode .drawer-toggle,
+  html.hero-mode .parts,
+  html.hero-mode .inspector,
+  html.hero-mode .foot-hint,
+  html.hero-mode .part-label {
+    display: none !important;
+  }
+  html.hero-mode #app {
+    pointer-events: none;
+  }
   html.embed-mode .inspector h2 {
     margin-bottom: 8px;
   }
@@ -695,9 +722,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-const EMBED = new URLSearchParams(window.location.search).get('embed') === '1';
+const params = new URLSearchParams(window.location.search);
+const EMBED = params.get('embed') === '1';
+const HERO = params.get('hero') === '1';
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const mobileMedia = window.matchMedia('(max-width: 780px)');
-const isCompactViewport = () => EMBED || mobileMedia.matches;
+const isCompactViewport = () => EMBED || HERO || mobileMedia.matches;
 
 const MM = 0.001;
 const dims = {
@@ -1095,18 +1125,23 @@ const parts = [
 
 const app = document.getElementById('app');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x060c12);
-scene.fog = new THREE.Fog(0x060c12, 18, 66);
+if (HERO) {
+  scene.background = null;
+} else {
+  scene.background = new THREE.Color(0x060c12);
+  scene.fog = new THREE.Fog(0x060c12, 18, 66);
+}
 
 const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 200);
 camera.position.set(10.8, 6.6, 10.5);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(window.devicePixelRatio);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: HERO });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, HERO ? 2 : 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+if (HERO) renderer.setClearColor(0x000000, 0);
 app.appendChild(renderer.domElement);
 
 const labelRenderer = new CSS2DRenderer();
@@ -1121,9 +1156,14 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.075;
 controls.screenSpacePanning = false;
 controls.target.set(dims.CONT_EXT_L * MM * 0.5, dims.CONT_EXT_H * MM * 0.36, dims.CONT_EXT_W * MM * 0.5);
+if (HERO) {
+  controls.enabled = false;
+  controls.autoRotate = !reducedMotion;
+  controls.autoRotateSpeed = 0.55;
+}
 
-scene.add(new THREE.HemisphereLight(0xc8dbeb, 0x071019, 0.72));
-const key = new THREE.DirectionalLight(0xffffff, 1.1);
+scene.add(new THREE.HemisphereLight(0xc8dbeb, 0x071019, HERO ? 0.85 : 0.72));
+const key = new THREE.DirectionalLight(0xffffff, HERO ? 1.35 : 1.1);
 key.position.set(10, 14, 9);
 key.castShadow = true;
 key.shadow.mapSize.set(2048, 2048);
@@ -1133,9 +1173,15 @@ key.shadow.camera.top = 14;
 key.shadow.camera.bottom = -14;
 scene.add(key);
 
-const rim = new THREE.DirectionalLight(0x7fd4ff, 0.35);
+const rim = new THREE.DirectionalLight(0x7fd4ff, HERO ? 0.6 : 0.35);
 rim.position.set(-8, 6, -10);
 scene.add(rim);
+
+if (HERO) {
+  const fill = new THREE.DirectionalLight(0xffba63, 0.35);
+  fill.position.set(-6, 5, 8);
+  scene.add(fill);
+}
 
 const ground = new THREE.Mesh(
   new THREE.PlaneGeometry(240, 240),
@@ -1165,9 +1211,10 @@ const mouse = new THREE.Vector2();
 const selectableMeshes = [];
 const partEntries = new Map();
 
+const initialExplode = HERO ? 0 : (EMBED ? 0.18 : (location.hash === '#assembled' ? 0 : 0.85));
 const state = {
-  explode: EMBED ? 0.18 : (location.hash === '#assembled' ? 0 : 0.85),
-  targetExplode: EMBED ? 0.18 : (location.hash === '#assembled' ? 0 : 0.85),
+  explode: initialExplode,
+  targetExplode: initialExplode,
   roofLift: 0,
   targetRoofLift: 0,
   xray: 0,
@@ -1825,11 +1872,20 @@ updatePartTransforms();
 syncResponsiveUI();
 updateInspector();
 updateCardState();
-setView(
-  EMBED
-    ? 'assembled'
-    : (location.hash === '#assembled' ? 'assembled' : 'exploded')
-);
+if (HERO) {
+  setView('assembled');
+  const heroTarget = new THREE.Vector3(dims.CONT_EXT_L * MM * 0.5, dims.CONT_EXT_H * MM * 0.42, dims.CONT_EXT_W * MM * 0.5);
+  const heroDist = 12.5;
+  desiredTarget.copy(heroTarget);
+  desiredCamera.set(heroTarget.x + heroDist * 0.88, heroTarget.y + heroDist * 0.38, heroTarget.z + heroDist * 0.82);
+  cameraMoveActive = true;
+} else {
+  setView(
+    EMBED
+      ? 'assembled'
+      : (location.hash === '#assembled' ? 'assembled' : 'exploded')
+  );
+}
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
