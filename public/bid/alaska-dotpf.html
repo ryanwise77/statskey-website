@@ -72,8 +72,22 @@ section.card strong{color:var(--ink)}
 
 /* ---------- Cinema hero ---------- */
 .cinema{position:relative;overflow:hidden;border-radius:18px;border:1px solid var(--border);margin-bottom:22px;background:linear-gradient(160deg,#0b1424 0%,#060b11 100%);min-height:clamp(520px,86vh,880px);isolation:isolate}
-.cinema__stage{position:absolute;inset:0;z-index:0}
+.cinema__stage{position:absolute;inset:0;z-index:0;overflow:hidden}
 .cinema__stage iframe{width:100%;height:100%;border:0;display:block;background:transparent}
+.cinema__poster{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(ellipse 70% 60% at 68% 58%,rgba(143,211,255,.22),transparent 70%),
+  radial-gradient(ellipse 55% 40% at 22% 78%,rgba(240,198,116,.16),transparent 70%),
+  linear-gradient(160deg,#0d1a2b 0%,#060b13 70%,#05090f 100%);
+  background-size:cover}
+.cinema__poster::before{content:"";position:absolute;inset:0;background-image:
+  linear-gradient(rgba(143,211,255,.06) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(143,211,255,.05) 1px,transparent 1px);
+  background-size:90px 90px;mask-image:radial-gradient(ellipse at 60% 55%,rgba(0,0,0,.9),transparent 75%)}
+.cinema__poster::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(ellipse 38% 58% at 62% 58%,rgba(9,15,22,.0) 0,rgba(9,15,22,.0) 58%,rgba(9,15,22,.0) 62%,rgba(6,11,18,.0) 70%),
+  linear-gradient(180deg,transparent 0 55%,rgba(6,11,18,.35) 100%)}
+/* Hide the CSS poster once the live iframe is hydrated */
+.cinema__stage.is-live .cinema__poster{opacity:0;transition:opacity .6s ease}
 .cinema__grain{position:absolute;inset:0;pointer-events:none;z-index:1;background-image:radial-gradient(circle at 15% 15%,rgba(143,211,255,.14),transparent 42%),radial-gradient(circle at 88% 92%,rgba(240,198,116,.10),transparent 46%);mix-blend-mode:screen;opacity:.9}
 .cinema__veil{position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(180deg,rgba(6,11,18,0) 0%,rgba(6,11,18,.05) 42%,rgba(6,11,18,.72) 88%,rgba(6,11,18,.92) 100%)}
 .cinema__frame{position:absolute;inset:0;pointer-events:none;z-index:3;border:1px solid rgba(143,211,255,.06);border-radius:inherit;box-shadow:inset 0 0 80px rgba(0,0,0,.45)}
@@ -254,8 +268,9 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
 
       <!-- Cinema hero -->
       <header class="cinema" id="cover" aria-labelledby="cinema-title">
-        <div class="cinema__stage">
-          <iframe src="/bid/3d/viewer?hero=1" title="AuroraEdge AK-20 cinematic product render" loading="eager" tabindex="-1" aria-hidden="true"></iframe>
+        <div class="cinema__stage" aria-hidden="true">
+          <iframe data-src="/bid/3d/viewer?hero=1" title="AuroraEdge AK-20 cinematic product render" tabindex="-1" aria-hidden="true"></iframe>
+          <div class="cinema__poster"></div>
         </div>
         <div class="cinema__grain" aria-hidden="true"></div>
         <div class="cinema__veil" aria-hidden="true"></div>
@@ -418,7 +433,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
             <span class="k">Inline preview · real-scale · source-backed</span>
             <span class="muted">touch / drag enabled</span>
           </div>
-          <iframe class="viewer-iframe" src="/bid/3d/viewer?embed=1" title="AuroraEdge AK-20 3D viewer" loading="lazy" allow="fullscreen"></iframe>
+          <iframe class="viewer-iframe" data-src="/bid/3d/viewer?embed=1" title="AuroraEdge AK-20 3D viewer" loading="lazy" allow="fullscreen"></iframe>
           <div class="viewer-mobile-alt">
             <h4>Mobile viewer</h4>
             <p>The inline preview is intentionally simplified on smaller screens to keep the bid readable. Open the standalone viewer for the full touch experience, parts drawer, and inspection workflow.</p>
@@ -664,6 +679,55 @@ table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var
  * No client-side access gate. If stronger privacy is required later, wire
  * Firebase auth (already in package.json) around these routes. */
 document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+/* --------- Deferred iframe hydration ----------
+ * Mobile browsers aggressively kill tabs that spawn multiple WebGL contexts,
+ * so we only hydrate the embedded 3D viewers on capable devices and we only
+ * run the hero iframe while it is actually on screen. */
+(function(){
+  const mobileMedia = window.matchMedia("(max-width: 780px)");
+  function canHydrate(iframe){
+    if (!iframe) return false;
+    if (mobileMedia.matches) return false;
+    return true;
+  }
+  function hydrateIfEligible(iframe){
+    if (!canHydrate(iframe)) return;
+    if (iframe.dataset.src && !iframe.src){
+      iframe.src = iframe.dataset.src;
+      const stage = iframe.closest(".cinema__stage");
+      if (stage) stage.classList.add("is-live");
+    }
+  }
+  function unhydrate(iframe){
+    if (!iframe || !iframe.src) return;
+    iframe.removeAttribute("src");
+    const stage = iframe.closest(".cinema__stage");
+    if (stage) stage.classList.remove("is-live");
+  }
+  const hero = document.querySelector(".cinema__stage iframe");
+  const section5 = document.querySelector(".viewer-iframe");
+  // Hydrate eligible frames immediately; the observer below only unhydrates
+  // the hero when it scrolls out of view to conserve resources.
+  hydrateIfEligible(hero);
+  hydrateIfEligible(section5);
+  if ("IntersectionObserver" in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) hydrateIfEligible(e.target);
+        else if (e.target === hero) unhydrate(e.target);
+      });
+    }, { rootMargin: "200px 0px" });
+    if (hero) io.observe(hero);
+    if (section5) io.observe(section5);
+  }
+  mobileMedia.addEventListener?.("change", () => {
+    [hero, section5].forEach(f => {
+      if (mobileMedia.matches) unhydrate(f);
+      else hydrateIfEligible(f);
+    });
+  });
+})();
 
 /* --------- TOC active section ---------- */
 const tocLinks = Array.from(document.querySelectorAll(".toc a"));
