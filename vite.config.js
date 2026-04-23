@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
 
 // Mirror production Vercel rewrites for extension-less paths during `vite dev`
 // so the embedded bid viewer iframe and clean URLs behave the same locally.
@@ -25,7 +26,7 @@ function devRewritePlugin() {
 }
 
 export default {
-  plugins: [tailwindcss(), devRewritePlugin()],
+  plugins: [tailwindcss(), react(), devRewritePlugin()],
   build: {
     rollupOptions: {
       input: {
@@ -33,7 +34,12 @@ export default {
         privacy: resolve(__dirname, 'privacy.html'),
         terms: resolve(__dirname, 'terms.html'),
         support: resolve(__dirname, 'support.html'),
+        app: resolve(__dirname, 'app.html'),
       },
     },
+  },
+  server: {
+    // When running `vite dev`, the React app is reached at /app.html.
+    // In production Vercel rewrites `/app/*` -> `/app.html` (see vercel.json).
   },
 }

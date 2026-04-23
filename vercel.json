@@ -6,6 +6,8 @@
     { "source": "/prototype", "destination": "/prototype.html" },
     { "source": "/prototype.html", "destination": "/prototype.html" },
     { "source": "/bid/alaska-dotpf", "destination": "/bid/alaska-dotpf.html" },
-    { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" }
+    { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/app/:path*", "destination": "/app.html" }
   ]
 }
