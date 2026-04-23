@@ -19,6 +19,8 @@ export function Shell() {
             <div className="flex items-center gap-5 text-[13px] text-text-muted">
               <NavLink to="/" end className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Dashboard</NavLink>
               <NavLink to="/record" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Record</NavLink>
+              <NavLink to="/flow" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Flow</NavLink>
+              <NavLink to="/friends" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Friends</NavLink>
               <NavLink to="/history" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>History</NavLink>
               <NavLink to="/profile" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Profile</NavLink>
             </div>

@@ -17,6 +17,7 @@ import {
 import { onSnapshot, doc } from 'firebase/firestore'
 import { auth, db } from './firebase'
 import { ensureProfile, loadProfile, saveProfile, type UserProfile } from './profile'
+import { syncUserLookup } from './writers'
 
 interface AuthState {
   user: User | null
@@ -61,12 +62,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const loaded = await loadProfile(user.uid)
         if (cancelled) return
-        if (loaded) {
-          setProfile(loaded)
-        } else {
-          const ensured = await ensureProfile(user)
-          if (!cancelled) setProfile(ensured)
+        let current = loaded
+        if (!current) {
+          current = await ensureProfile(user)
         }
+        if (!cancelled) setProfile(current)
+
+        // Keep userLookup in sync so web users can be found by friend code.
+        syncUserLookup(user.uid, {
+          displayName: current.name || user.displayName || '',
+          email: current.email || user.email || '',
+        }).catch(() => {})
       } catch (e) {
         if (!cancelled) setError(toMessage(e))
       } finally {

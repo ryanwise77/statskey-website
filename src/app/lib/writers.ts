@@ -1,7 +1,9 @@
 import {
+  addDoc,
   collection,
   doc,
   deleteDoc,
+  getDoc,
   increment,
   setDoc,
   Timestamp,
@@ -195,6 +197,94 @@ export async function saveWorkout(uid: string, workout: WorkoutSession): Promise
 
 export async function deleteWorkout(uid: string, workoutId: string): Promise<void> {
   await deleteDoc(doc(db, 'users', uid, 'workoutSessions', workoutId))
+}
+
+// MARK: - Friendships
+
+/**
+ * Resolves a free-form identifier (UID, 8-char friend code, or username) to a UID.
+ * Matches biometrics/StatsKey/Services/DatabaseService.swift:578-596.
+ */
+export async function resolveUserIdentifier(input: string): Promise<string | null> {
+  const trimmed = input.trim()
+  if (!trimmed) return null
+
+  // (1) treat as raw UID
+  const asUidSnap = await getDoc(doc(db, 'users', trimmed)).catch(() => null)
+  if (asUidSnap?.exists()) return trimmed
+
+  // (2) friend code (uppercased)
+  const upper = trimmed.toUpperCase()
+  const upperSnap = await getDoc(doc(db, 'userLookup', upper)).catch(() => null)
+  if (upperSnap?.exists()) {
+    const raw = upperSnap.data() as Record<string, unknown>
+    if (typeof raw.userId === 'string') return raw.userId
+  }
+
+  // (3) username (lowercased)
+  const lower = trimmed.toLowerCase()
+  const lowerSnap = await getDoc(doc(db, 'userLookup', lower)).catch(() => null)
+  if (lowerSnap?.exists()) {
+    const raw = lowerSnap.data() as Record<string, unknown>
+    if (typeof raw.userId === 'string') return raw.userId
+  }
+
+  return null
+}
+
+/**
+ * Sends a friend request by creating a top-level `friendships` doc. Matches
+ * sendFriendRequest at biometrics/StatsKey/Services/DatabaseService.swift:475-482.
+ */
+export async function sendFriendRequest(senderUid: string, targetIdentifier: string): Promise<string> {
+  const targetUid = await resolveUserIdentifier(targetIdentifier)
+  if (!targetUid) throw new Error('Could not find a user with that code, username, or ID.')
+  if (targetUid === senderUid) throw new Error("That's you!")
+
+  const ref = await addDoc(collection(db, 'friendships'), {
+    users: [senderUid, targetUid].sort(),
+    senderId: senderUid,
+    targetIdentifier: targetIdentifier.trim(),
+    status: 'pending',
+    createdAt: Timestamp.fromDate(new Date()),
+  })
+  return ref.id
+}
+
+export async function acceptFriendship(friendshipId: string): Promise<void> {
+  await setDoc(
+    doc(db, 'friendships', friendshipId),
+    { status: 'accepted' },
+    { merge: true }
+  )
+}
+
+export async function deleteFriendship(friendshipId: string): Promise<void> {
+  await deleteDoc(doc(db, 'friendships', friendshipId))
+}
+
+/**
+ * Mirrors syncUserLookup at DatabaseService.swift:598-611 — writes lookup docs
+ * for the user's 8-char uppercased friend code and (if set) their username.
+ * Should be called once on login so web users are discoverable.
+ */
+export async function syncUserLookup(uid: string, opts: {
+  displayName?: string
+  email?: string
+  username?: string
+}): Promise<void> {
+  const friendCode = uid.slice(0, 8).toUpperCase()
+  const base = {
+    userId: uid,
+    displayName: opts.displayName ?? '',
+    username: opts.username ?? '',
+    email: opts.email ?? '',
+    friendCode,
+  }
+  await setDoc(doc(db, 'userLookup', friendCode), base, { merge: true })
+  if (opts.username) {
+    await setDoc(doc(db, 'userLookup', opts.username.toLowerCase()), base, { merge: true })
+  }
 }
 
 // MARK: - ID helper
