@@ -5,6 +5,7 @@ import { Profile } from './routes/Profile'
 import { History } from './routes/History'
 import { MealDetail } from './routes/MealDetail'
 import { WorkoutDetail } from './routes/WorkoutDetail'
+import { Record } from './routes/Record'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Shell } from './components/Shell'
 import { useAuth } from './lib/auth'
@@ -32,6 +33,7 @@ export function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="record" element={<Record />} />
         <Route path="history" element={<History />} />
         <Route path="meals/:id" element={<MealDetail />} />
         <Route path="workouts/:id" element={<WorkoutDetail />} />

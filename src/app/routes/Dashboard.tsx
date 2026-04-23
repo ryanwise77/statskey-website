@@ -8,6 +8,7 @@ import { useTodayWellness } from '../lib/data/useTodayWellness'
 import { useRecentWorkouts } from '../lib/data/useRecentWorkouts'
 import { useLatestGlucose } from '../lib/data/useLatestGlucose'
 import { dailyTotals } from '../lib/aggregates'
+import { addWaterOz } from '../lib/writers'
 import { MacroCard } from '../components/MacroCard'
 import { WaterCard } from '../components/WaterCard'
 import { FiberCard } from '../components/FiberCard'
@@ -45,11 +46,14 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-display text-[28px] font-bold tracking-[-0.02em]">
-          {firstName ? `Hello, ${firstName}` : 'Today'}
-        </h1>
-        <p className="text-text-secondary text-[14px] mt-1">{today}</p>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-[28px] font-bold tracking-[-0.02em]">
+            {firstName ? `Hello, ${firstName}` : 'Today'}
+          </h1>
+          <p className="text-text-secondary text-[14px] mt-1">{today}</p>
+        </div>
+        <Link to="/record" className="btn btn-primary">+ Log</Link>
       </header>
 
       <div className="grid md:grid-cols-3 gap-4">
@@ -61,7 +65,11 @@ export function Dashboard() {
           />
         </div>
         <div className="grid grid-rows-[auto_auto] gap-4">
-          <WaterCard amountOz={waterState.water?.amount ?? 0} targetOz={targetsState.targets.water} />
+          <WaterCard
+            amountOz={waterState.water?.amount ?? 0}
+            targetOz={targetsState.targets.water}
+            onAdd={uid ? (oz) => addWaterOz(uid, oz) : undefined}
+          />
           <FiberCard amount={totals.fiber} target={targetsState.targets.fiber} />
         </div>
       </div>

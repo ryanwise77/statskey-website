@@ -1,0 +1,211 @@
+import {
+  collection,
+  doc,
+  deleteDoc,
+  increment,
+  setDoc,
+  Timestamp,
+} from 'firebase/firestore'
+import { db } from './firebase'
+import { localDateString, startOfDay } from './firestore'
+import type {
+  FoodItem,
+  Meal,
+  WellnessData,
+  WellnessEntry,
+  WorkoutSession,
+} from './types'
+
+/**
+ * Encodes a FoodItem back into a plain Firestore payload. Matches the fields
+ * written by biometrics/StatsKey/Models/FoodItem.swift so iOS can read the
+ * item natively.
+ */
+export function encodeFoodItem(item: FoodItem): Record<string, unknown> {
+  const out: Record<string, unknown> = {
+    id: item.id,
+    name: item.name,
+    servingSize: item.servingSize,
+    servingUnit: item.servingUnit,
+    nutrients: item.nutrients,
+    isFavorite: item.isFavorite,
+    useCount: item.useCount,
+    source: item.source,
+    itemCategory: item.itemCategory,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+  }
+  if (item.brand) out.brand = item.brand
+  if (item.barcode) out.barcode = item.barcode
+  if (item.baseNutrients) out.baseNutrients = item.baseNutrients
+  if (item.baseServingSize != null) out.baseServingSize = item.baseServingSize
+  if (item.baseServingUnit) out.baseServingUnit = item.baseServingUnit
+  if (item.gramWeight != null) out.gramWeight = item.gramWeight
+  if (item.gramsPerCup != null) out.gramsPerCup = item.gramsPerCup
+  if (item.lastUsed) out.lastUsed = item.lastUsed
+  if (item.notes) out.notes = item.notes
+  if (item.geminiExplanation) out.geminiExplanation = item.geminiExplanation
+  return out
+}
+
+/**
+ * Encodes a Meal into a plain Firestore payload matching the iOS Meal model.
+ * Writes to users/{uid}/meals/{id}.
+ */
+export async function saveMeal(uid: string, meal: Meal): Promise<void> {
+  const payload: Record<string, unknown> = {
+    id: meal.id,
+    userId: uid,
+    items: meal.items.map(encodeFoodItem),
+    date: meal.date,
+    multiplier: meal.multiplier,
+    isFavorite: meal.isFavorite,
+    createdAt: meal.createdAt,
+    updatedAt: new Date(),
+  }
+  if (meal.name) payload.name = meal.name
+  if (meal.glucoseResponse) payload.glucoseResponse = meal.glucoseResponse
+  if (meal.photoURLs && meal.photoURLs.length) payload.photoURLs = meal.photoURLs
+  if (meal.analysisMode) payload.analysisMode = meal.analysisMode
+
+  await setDoc(doc(db, 'users', uid, 'meals', meal.id), payload, { merge: true })
+}
+
+export async function deleteMeal(uid: string, mealId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'meals', mealId))
+}
+
+/**
+ * Water is stored at users/{uid}/water/{YYYY-MM-DD} with a cumulative `amount`.
+ * This helper ADDS to the existing amount atomically using FieldValue.increment.
+ * The doc ID matches biometrics/StatsKey/Services/DatabaseService.swift:137-141.
+ */
+export async function addWaterOz(uid: string, flOz: number, day: Date = new Date()): Promise<void> {
+  const id = localDateString(day)
+  await setDoc(
+    doc(db, 'users', uid, 'water', id),
+    { amount: increment(flOz), date: Timestamp.fromDate(startOfDay(day)) },
+    { merge: true }
+  )
+}
+
+export async function setWaterOz(uid: string, flOz: number, day: Date = new Date()): Promise<void> {
+  const id = localDateString(day)
+  await setDoc(
+    doc(db, 'users', uid, 'water', id),
+    { amount: flOz, date: Timestamp.fromDate(startOfDay(day)) },
+    { merge: true }
+  )
+}
+
+// MARK: - Wellness writes
+
+/**
+ * Encodes the polymorphic WellnessData back to the iOS representation —
+ * a `type` discriminator key plus type-specific sub-keys. Matches
+ * biometrics/StatsKey/Models/WellnessEntry.swift:123-193.
+ */
+function encodeWellnessData(data: WellnessData): Record<string, unknown> {
+  switch (data.kind) {
+    case 'symptom':
+      return { type: 'symptom', symptom: data.entry }
+    case 'mood':
+      return { type: 'mood', mood: data.entry }
+    case 'energy':
+      return { type: 'energy', energy: data.entry }
+    case 'bowelMovement':
+      return { type: 'bowelMovement', bowelMovement: data.entry }
+    case 'sleep':
+      return { type: 'sleep', sleepHours: data.hours, sleepQuality: data.quality }
+    case 'hydration':
+      return { type: 'hydration', hydrationOz: data.ozConsumed }
+    case 'custom':
+      return {
+        type: 'custom',
+        customLabel: data.label,
+        customValue: data.value,
+        customUnit: data.unit ?? null,
+      }
+  }
+}
+
+export async function saveWellness(uid: string, entry: WellnessEntry): Promise<void> {
+  const payload: Record<string, unknown> = {
+    id: entry.id,
+    userId: uid,
+    type: entry.type,
+    data: encodeWellnessData(entry.data),
+    date: entry.date,
+    createdAt: entry.createdAt,
+  }
+  if (entry.mealId) payload.mealId = entry.mealId
+  if (entry.notes) payload.notes = entry.notes
+
+  await setDoc(doc(db, 'users', uid, 'wellness', entry.id), payload, { merge: true })
+}
+
+export async function deleteWellness(uid: string, entryId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'wellness', entryId))
+}
+
+// MARK: - Workout writes
+
+/**
+ * Writes a workout session doc. We only write the minimum fields the manual
+ * entry form supports; other fields (route, HR samples, zones) are reserved
+ * for iOS live recordings and default to empty/zero on iOS's side.
+ */
+export async function saveWorkout(uid: string, workout: WorkoutSession): Promise<void> {
+  const payload: Record<string, unknown> = {
+    id: workout.id,
+    userId: uid,
+    title: workout.title,
+    sportType: workout.sportType,
+    startDate: workout.startDate,
+    duration: workout.duration,
+    movingTime: workout.movingTime,
+    distance: workout.distance,
+    elevationGain: workout.elevationGain,
+    elevationLoss: workout.elevationLoss,
+    calories: workout.calories,
+    averagePace: workout.averagePace,
+    bestPace: workout.bestPace,
+    averageSpeed: workout.averageSpeed,
+    maxSpeed: workout.maxSpeed,
+    averageHeartRate: workout.averageHeartRate,
+    maxHeartRate: workout.maxHeartRate,
+    averageCadence: workout.averageCadence,
+    isFavorite: workout.isFavorite,
+    relativeEffort: workout.relativeEffort,
+    gradeAdjustedPace: workout.gradeAdjustedPace,
+    photoURLs: workout.photoURLs,
+    source: workout.source,
+    isIndoor: workout.isIndoor,
+    recordingMode: workout.recordingMode,
+    createdAt: workout.createdAt,
+  }
+  if (workout.endDate) payload.endDate = workout.endDate
+  if (workout.notes) payload.notes = workout.notes
+  if (workout.perceivedEffort != null) payload.perceivedEffort = workout.perceivedEffort
+  if (workout.healthKitUUID) payload.healthKitUUID = workout.healthKitUUID
+  if (workout.structuredWorkoutId) payload.structuredWorkoutId = workout.structuredWorkoutId
+
+  await setDoc(doc(db, 'users', uid, 'workoutSessions', workout.id), payload, { merge: true })
+}
+
+export async function deleteWorkout(uid: string, workoutId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'workoutSessions', workoutId))
+}
+
+// MARK: - ID helper
+
+export function newId(): string {
+  // Firestore doesn't require a specific format for document IDs. iOS uses
+  // UUID().uuidString — crypto.randomUUID() matches that format closely enough
+  // (both are RFC 4122 strings). Fallback to Firestore auto-id if crypto is
+  // unavailable.
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID().toUpperCase()
+  }
+  return doc(collection(db, '_tmp')).id
+}
