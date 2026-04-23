@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../lib/auth'
+import { useSubscription } from '../lib/data/useSubscription'
 import type { ActivityLevel, AppFocus, BiologicalProfile, UserProfile } from '../lib/profile'
 
 const BIO_OPTIONS: { value: BiologicalProfile; label: string }[] = [
@@ -29,7 +30,8 @@ const FOCUS_OPTIONS: { value: AppFocus; label: string }[] = [
 ]
 
 export function Profile() {
-  const { profile, saveProfile, profileLoaded } = useAuth()
+  const { user, profile, saveProfile, profileLoaded } = useAuth()
+  const subState = useSubscription(user?.uid)
   const [draft, setDraft] = useState<UserProfile | null>(profile)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -159,6 +161,31 @@ export function Profile() {
           {saving ? 'Saving…' : 'Save changes'}
         </button>
         {saved && <span className="text-data text-[13px]">Saved</span>}
+      </div>
+
+      <div className="panel space-y-3">
+        <span className="card-title">Subscription</span>
+        {subState.loading ? (
+          <p className="text-text-muted text-[13px]">Loading…</p>
+        ) : (
+          <>
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-text-secondary">Tier</span>
+              <span className="text-text-primary font-medium">
+                {subState.subscription?.tier === 'pro' ? 'Pro' : 'Free'}
+              </span>
+            </div>
+            {subState.subscription?.researchTokenLimit != null && subState.subscription.researchTokenLimit > 0 && (
+              <div className="flex items-center justify-between text-[14px]">
+                <span className="text-text-secondary">Deep analysis</span>
+                <span className="text-text-primary">Enabled</span>
+              </div>
+            )}
+            <p className="text-text-muted text-[12px] mt-2">
+              Subscriptions are managed through the App Store on iOS. Web-based billing is not currently available.
+            </p>
+          </>
+        )}
       </div>
     </div>
   )

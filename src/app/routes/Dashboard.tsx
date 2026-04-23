@@ -7,6 +7,7 @@ import { useMacroTargets } from '../lib/data/useMacroTargets'
 import { useTodayWellness } from '../lib/data/useTodayWellness'
 import { useRecentWorkouts } from '../lib/data/useRecentWorkouts'
 import { useLatestGlucose } from '../lib/data/useLatestGlucose'
+import { useHealthDailyForDay } from '../lib/data/useHealthDaily'
 import { dailyTotals } from '../lib/aggregates'
 import { addWaterOz } from '../lib/writers'
 import { MacroCard } from '../components/MacroCard'
@@ -16,6 +17,7 @@ import { GlucoseCard } from '../components/GlucoseCard'
 import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
 import { WorkoutRow } from '../components/WorkoutRow'
 import { EmptyState } from '../components/EmptyState'
+import { ActivityCard } from '../components/ActivityCard'
 
 export function Dashboard() {
   const { user, profile } = useAuth()
@@ -27,6 +29,8 @@ export function Dashboard() {
   const wellnessState = useTodayWellness(uid)
   const workoutsState = useRecentWorkouts(uid, 5)
   const glucoseState = useLatestGlucose(uid)
+  const todayDate = useMemo(() => new Date(), [])
+  const healthState = useHealthDailyForDay(uid, todayDate)
 
   const totals = useMemo(() => dailyTotals(mealsState.meals), [mealsState.meals])
 
@@ -74,13 +78,12 @@ export function Dashboard() {
         </div>
       </div>
 
-      {glucoseState.reading && (
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="md:col-span-1">
-            <GlucoseCard reading={glucoseState.reading} />
-          </div>
+      <div className="grid md:grid-cols-3 gap-4">
+        <div className="md:col-span-2">
+          <ActivityCard health={healthState.health} exists={healthState.exists} />
         </div>
-      )}
+        {glucoseState.reading && <GlucoseCard reading={glucoseState.reading} />}
+      </div>
 
       <section className="panel">
         <div className="flex items-baseline justify-between mb-2">

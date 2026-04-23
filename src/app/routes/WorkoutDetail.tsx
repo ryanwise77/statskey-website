@@ -63,6 +63,22 @@ export function WorkoutDetail() {
         </div>
       )}
 
+      {workout.source === 'gps' && (
+        <div className="panel text-[13px] text-text-secondary">
+          <div className="flex items-center justify-between gap-4">
+            <span>GPS route and heart-rate data are recorded on iPhone and Apple Watch. View the full map and heart-rate trace in the StatsKey iOS app.</span>
+            <a
+              href="https://apps.apple.com/us/app/statskey/id6751132823"
+              target="_blank"
+              rel="noopener"
+              className="btn btn-secondary text-[12px] !py-1.5 !px-3 whitespace-nowrap"
+            >
+              Open on iPhone
+            </a>
+          </div>
+        </div>
+      )}
+
       {workout.photoURLs.length > 0 && (
         <div className="panel">
           <span className="card-title">Photos</span>
