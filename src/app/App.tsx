@@ -2,6 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { Login } from './routes/Login'
 import { Dashboard } from './routes/Dashboard'
 import { Profile } from './routes/Profile'
+import { History } from './routes/History'
+import { MealDetail } from './routes/MealDetail'
+import { WorkoutDetail } from './routes/WorkoutDetail'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Shell } from './components/Shell'
 import { useAuth } from './lib/auth'
@@ -29,6 +32,9 @@ export function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="history" element={<History />} />
+        <Route path="meals/:id" element={<MealDetail />} />
+        <Route path="workouts/:id" element={<WorkoutDetail />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
