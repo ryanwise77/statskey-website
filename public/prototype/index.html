@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Interactive StatsKey hardware prototype viewer showing the wearable puck, disposable cartridge, electrochemical interface, optical module, and skin-contact stack.">
+<meta name="theme-color" content="#050910">
+<link rel="canonical" href="https://statskeybiometrics.com/prototype/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<title>StatsKey Prototype Viewer</title>
+<style>
+:root {
+  --bg: #050910;
+  --panel: rgba(8, 14, 22, 0.86);
+  --panel-strong: rgba(8, 14, 22, 0.95);
+  --line: rgba(157, 205, 255, 0.15);
+  --line-strong: rgba(120, 218, 255, 0.45);
+  --ink: #eef6ff;
+  --muted: #91a5b8;
+  --soft: #c5d3e1;
+  --aqua: #7bdfff;
+  --mint: #70f0cb;
+  --amber: #ffbd68;
+  --cortisol: #ff7a5c;
+  --panel-radius: 18px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+body {
+  color: var(--ink);
+  font-family: "Barlow", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(44, 158, 255, 0.20), transparent 30%),
+    radial-gradient(circle at 88% 18%, rgba(112, 240, 203, 0.12), transparent 28%),
+    radial-gradient(circle at 50% 92%, rgba(255, 122, 92, 0.11), transparent 32%),
+    linear-gradient(145deg, #03060b 0%, #07101a 48%, #04070d 100%);
+}
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+body::before {
+  opacity: 0.12;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 112px 112px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 86%);
+}
+body::after {
+  opacity: 0.08;
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 1px, transparent 1px, transparent 4px);
+  mix-blend-mode: soft-light;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+}
+#app canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.label-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: none;
+}
+body.labels-on .label-layer {
+  display: block;
+}
+
+.panel {
+  position: fixed;
+  z-index: 3;
+  background: linear-gradient(180deg, rgba(13, 22, 34, 0.92), rgba(7, 12, 19, 0.82));
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 72px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter: blur(14px);
+}
+[hidden] { display: none !important; }
+.brand {
+  left: 18px;
+  top: 18px;
+  width: min(360px, calc(100vw - 36px));
+  padding: 14px 16px;
+  border-radius: var(--panel-radius);
+}
+.eyebrow,
+.panel-title,
+.metric-label,
+.chip,
+.button,
+.status-pill,
+.part-meta,
+.inspector-kicker {
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.eyebrow {
+  margin-bottom: 7px;
+  color: var(--mint);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+.brand h1 {
+  margin: 0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: clamp(32px, 3.5vw, 44px);
+  line-height: 0.92;
+  letter-spacing: 0.015em;
+}
+.brand p {
+  margin: 11px 0 0;
+  max-width: 54ch;
+  color: var(--soft);
+  font-size: 12px;
+  line-height: 1.48;
+}
+.brand-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 13px;
+}
+.scale-strip {
+  display: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.scale-chip {
+  min-width: 0;
+  padding: 9px 10px 8px;
+  border: 1px solid rgba(157, 205, 255, 0.13);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018)),
+    rgba(255,255,255,0.018);
+}
+.scale-chip b {
+  display: block;
+  color: #f8fcff;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 19px;
+  line-height: 1;
+}
+.scale-chip span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.chip,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.035);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+.chip::before,
+.status-pill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--aqua);
+  box-shadow: 0 0 16px rgba(123,223,255,0.55);
+}
+.chip.constrained::before { background: var(--mint); }
+.chip.estimated::before { background: var(--amber); }
+
+.toolbar {
+  right: 18px;
+  top: 18px;
+  width: min(338px, calc(100vw - 36px));
+  padding: 14px;
+  border-radius: var(--panel-radius);
+}
+.panel-title {
+  margin: 0 0 10px;
+  color: var(--aqua);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+.view-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.button,
+.part-button,
+.drawer-toggle,
+.detail-toggle {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+.button:hover,
+.part-button:hover,
+.drawer-toggle:hover,
+.detail-toggle:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  background: linear-gradient(180deg, rgba(123,223,255,0.14), rgba(255,255,255,0.04));
+}
+.button.active,
+.part-card.active .part-button {
+  border-color: rgba(112,240,203,0.55);
+  background: linear-gradient(180deg, rgba(112,240,203,0.18), rgba(123,223,255,0.06));
+  color: #f8fdff;
+}
+.button {
+  min-height: 44px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+}
+.button span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.slider-wrap {
+  display: grid;
+  gap: 8px;
+  margin-top: 13px;
+}
+.slider-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--mint);
+}
+.metrics {
+  display: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.tool-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 11px;
+}
+.mini-toggle {
+  min-height: 34px;
+  padding: 8px 10px;
+  border-radius: 11px;
+  text-align: center;
+}
+.metric {
+  min-width: 0;
+  padding: 10px 10px 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.035);
+}
+.metric-value {
+  color: #f7fbff;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 24px;
+  line-height: 1;
+}
+.metric-label {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.drawer-toggle {
+  left: 18px;
+  top: 276px;
+  z-index: 5;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--panel-strong);
+  color: var(--aqua);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.detail-toggle {
+  right: 18px;
+  bottom: 18px;
+  z-index: 8;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--panel-strong);
+  color: var(--aqua);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.parts {
+  left: 18px;
+  top: 324px;
+  bottom: 18px;
+  width: min(326px, calc(100vw - 36px));
+  padding: 14px 14px 12px;
+  border-radius: var(--panel-radius);
+  overflow: hidden;
+  transition: transform 260ms ease, opacity 260ms ease;
+}
+.parts.closed {
+  display: none !important;
+  transform: translateX(calc(-100% - 26px));
+  opacity: 0;
+  pointer-events: none;
+}
+.parts-body {
+  height: calc(100% - 30px);
+  margin-right: -5px;
+  padding-right: 5px;
+  overflow: auto;
+}
+.section-label {
+  margin: 16px 0 8px;
+  color: var(--amber);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.section-label:first-child { margin-top: 0; }
+.part-card { margin-bottom: 8px; }
+.part-button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 14px;
+  text-align: left;
+}
+.part-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #f6fbff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.part-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 0 18px currentColor;
+}
+.part-meta {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.inspector {
+  right: 18px;
+  bottom: 70px;
+  z-index: 7;
+  width: min(386px, calc(100vw - 36px));
+  max-height: min(42vh, 380px);
+  padding: 16px;
+  border-radius: var(--panel-radius);
+  overflow: auto;
+  transition: transform 260ms ease, opacity 260ms ease;
+}
+.inspector.closed {
+  display: none !important;
+  transform: translateY(calc(100% + 34px));
+  opacity: 0;
+  pointer-events: none;
+}
+.inspector-kicker {
+  color: var(--mint);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+.inspector-name {
+  margin: 5px 0 6px;
+  color: #fff;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 28px;
+  line-height: 0.98;
+}
+.inspector-desc {
+  margin: 0;
+  color: var(--soft);
+  font-size: 13px;
+  line-height: 1.48;
+}
+.inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.kv {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.035);
+}
+.kv dt {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.kv dd {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.38;
+}
+.inspector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.inspector-actions .button {
+  min-height: 38px;
+  flex: 1 1 130px;
+  text-align: center;
+}
+
+.part-label {
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+}
+.part-label-inner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px;
+  background: rgba(8, 14, 22, 0.78);
+  color: #f7fbff;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.33);
+  backdrop-filter: blur(10px);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.part-label-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--label-color);
+  box-shadow: 0 0 16px var(--label-color);
+}
+.part-label.dimension .part-label-inner {
+  border-color: rgba(255, 189, 104, 0.28);
+  background: rgba(17, 13, 8, 0.74);
+  color: #ffe4be;
+  font-family: "Rajdhani", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.foot-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 2;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(8, 14, 22, 0.68);
+  color: var(--muted);
+  backdrop-filter: blur(10px);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+@media (max-width: 1180px) {
+  .brand {
+    width: min(360px, calc(100vw - 36px));
+    padding: 14px 16px;
+  }
+  .brand h1 { font-size: 38px; }
+  .brand p,
+  .scale-strip,
+  .metrics { display: none; }
+  .brand-row { margin-top: 10px; gap: 6px; }
+  .chip { min-height: 24px; padding: 5px 8px; font-size: 9px; }
+  .toolbar { width: min(330px, calc(100vw - 36px)); padding: 14px; }
+  .inspector { width: min(360px, calc(100vw - 36px)); max-height: min(34vh, 340px); }
+  .drawer-toggle { top: 218px; }
+  .parts { top: 266px; bottom: 18px; max-height: calc(100vh - 284px); }
+}
+
+@media (max-width: 780px) {
+  .brand {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    padding: 13px 14px;
+  }
+  .brand h1 { font-size: 30px; }
+  .brand p { display: none; }
+  .brand-row { margin-top: 9px; gap: 6px; }
+  .scale-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+  .scale-chip { padding: 7px 8px 6px; border-radius: 11px; }
+  .scale-chip b { font-size: 16px; }
+  .scale-chip span { font-size: 8px; }
+  .chip { min-height: 24px; padding: 5px 8px; font-size: 9px; }
+  .toolbar {
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    padding: 10px;
+  }
+  .toolbar .panel-title,
+  .toolbar .slider-wrap,
+  .toolbar .tool-row { display: none; }
+  .view-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .button {
+    min-height: 34px;
+    padding: 7px 6px;
+    border-radius: 11px;
+    font-size: 8px;
+  }
+  .button span { display: none; }
+  .metrics { display: none; }
+  .drawer-toggle {
+    top: 286px;
+    left: 10px;
+    padding: 9px 12px;
+  }
+  .detail-toggle {
+    right: 10px;
+    bottom: 84px;
+    padding: 9px 12px;
+  }
+  .parts {
+    top: 328px;
+    left: 10px;
+    right: 10px;
+    bottom: 84px;
+    width: auto;
+    z-index: 6;
+    transform: translateY(-12px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .parts.open {
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .parts.closed {
+    transform: translateY(-12px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .inspector {
+    left: 10px;
+    right: 10px;
+    bottom: 84px;
+    width: auto;
+    max-height: min(25vh, 190px);
+    padding: 12px;
+  }
+  .inspector-name { font-size: 22px; }
+  .inspector-grid { grid-template-columns: 1fr; }
+  .foot-hint { display: none; }
+  .part-label-inner {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .brand-row { display: none; }
+  .part-label { display: none; }
+  .scale-strip { display: none; }
+  .slider-wrap { margin-top: 9px; }
+  .view-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .drawer-toggle { top: 174px; }
+  .parts { top: 216px; }
+  .detail-toggle,
+  .inspector,
+  .parts { bottom: 126px; }
+}
+</style>
+</head>
+<body>
+<div id="app" aria-label="StatsKey 3D prototype canvas"></div>
+
+<section class="panel brand" aria-label="Prototype summary">
+  <div class="eyebrow">StatsKey wearable prototype</div>
+  <h1>Product viewer</h1>
+  <p>
+    A millimeter-scale visualization of the reusable puck, replaceable electrochemical cartridge,
+    skin-contact stack, optical window, power system, and constrained versus estimated hardware.
+  </p>
+  <div class="brand-row">
+    <span class="chip constrained">Constrained parts</span>
+    <span class="chip estimated">Estimated housing</span>
+    <span class="chip">1 unit = 1 mm</span>
+  </div>
+  <div class="scale-strip" aria-label="Key modeled dimensions">
+    <div class="scale-chip"><b>42 mm</b><span>reusable puck OD</span></div>
+    <div class="scale-chip"><b>700 um</b><span>needle insertion class</span></div>
+    <div class="scale-chip"><b>10 net</b><span>pogo/electrode interface</span></div>
+  </div>
+</section>
+
+<section class="panel toolbar" aria-label="Viewer controls">
+  <h2 class="panel-title">Views</h2>
+  <div class="view-grid" id="viewGrid"></div>
+  <div class="slider-wrap">
+    <div class="slider-label">
+      <span>Stack spacing</span>
+      <span id="explodeReadout">100%</span>
+    </div>
+    <input id="explodeSlider" type="range" min="0" max="100" value="100" aria-label="Stack spacing">
+  </div>
+  <div class="tool-row" aria-label="Viewer utilities">
+    <button class="button mini-toggle" id="labelsToggle" type="button">Show labels</button>
+    <button class="button mini-toggle" id="resetView" type="button">Reset view</button>
+  </div>
+  <div class="metrics" aria-label="Model dimensions">
+    <div class="metric">
+      <div class="metric-value">42</div>
+      <div class="metric-label">mm puck OD</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">13.5</div>
+      <div class="metric-label">mm stack</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">10</div>
+      <div class="metric-label">contacts</div>
+    </div>
+  </div>
+</section>
+
+<button class="drawer-toggle panel" id="drawerToggle" type="button">Parts</button>
+<aside class="panel parts closed" id="partsDrawer" aria-label="Prototype parts">
+  <h2 class="panel-title">Modeled stack</h2>
+  <div class="parts-body" id="partsBody"></div>
+</aside>
+
+<button class="detail-toggle panel" id="detailToggle" type="button">Details</button>
+<section class="panel inspector closed" id="inspector" aria-label="Part inspector" hidden>
+  <div id="inspectorContent"></div>
+</section>
+
+<div class="foot-hint">Drag rotate | Scroll zoom | Right drag pan | Click geometry or use Labels for callouts</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const app = document.getElementById('app');
+const viewGrid = document.getElementById('viewGrid');
+const explodeSlider = document.getElementById('explodeSlider');
+const explodeReadout = document.getElementById('explodeReadout');
+const partsBody = document.getElementById('partsBody');
+const partsDrawer = document.getElementById('partsDrawer');
+const drawerToggle = document.getElementById('drawerToggle');
+const detailToggle = document.getElementById('detailToggle');
+const labelsToggle = document.getElementById('labelsToggle');
+const resetView = document.getElementById('resetView');
+const inspector = document.getElementById('inspector');
+const inspectorContent = document.getElementById('inspectorContent');
+const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
+
+const colors = {
+  shell: '#232a34',
+  pcb: '#0c7a4f',
+  gold: '#f2c354',
+  optical: '#9be7ff',
+  battery: '#cfd8e3',
+  elastomer: '#6ed6f4',
+  adhesive: '#f5f0e7',
+  skin: '#d99d7f',
+  cortisol: '#ff7a5c',
+  glucose: '#61d77e',
+  lactate: '#42bfff',
+  electrolyte: '#ffd166',
+  reference: '#d9dce4',
+  warning: '#ffbd68',
+  radio: '#78a8ff',
+  haptic: '#c2c9d3'
+};
+
+const partDefs = [
+  {
+    id: 'skin-interface',
+    label: 'Skin-contact stack',
+    section: 'Skin and adhesive',
+    color: colors.skin,
+    dims: '72 x 62 mm context pad, 0.35-0.45 mm adhesive estimate',
+    confidence: 'Estimated',
+    material: 'Skin proxy, hydrocolloid/acrylic adhesive, soft foam relief',
+    role: 'Shows the compression surface, adhesive footprint, and the clearance that the microneedles and optical window must share.',
+    risk: 'Adhesive height, sweat path, and edge lift directly affect comfort and sensor stability.'
+  },
+  {
+    id: 'cartridge-shell',
+    label: 'Disposable cartridge shell',
+    section: 'Disposable cartridge',
+    color: '#4a5360',
+    dims: '38.0 mm OD, 16.0 mm central clearance, 1.6 mm shell',
+    confidence: 'Estimated',
+    material: 'Printed prototype polymer, future molded medical polymer',
+    role: 'Keys the disposable cartridge into the puck while protecting the sensing island and optical aperture.',
+    risk: 'The keyed boss must repeatably compress the gasket without bending the flex or overloading the skin.'
+  },
+  {
+    id: 'sensor-flex',
+    label: 'Sensor flex and contact annulus',
+    section: 'Disposable cartridge',
+    color: '#1d6ccf',
+    dims: '22 x 16 mm local flex with 10 routed nets and annular contact pads',
+    confidence: 'Estimated',
+    material: 'Polyimide flex, ENIG pads, thin coverlay',
+    role: 'Routes WE1-WE8, counter, reference, and optical aperture geometry into a replaceable cartridge.',
+    risk: 'Trace spacing, passivation, and sweat isolation are as important as the chemistry itself.'
+  },
+  {
+    id: 'microneedle-array',
+    label: 'Gold microneedle array',
+    section: 'Sensing chemistry',
+    color: colors.gold,
+    dims: '33G class needles, 700 um insertion length, 8 WE plus support electrodes',
+    confidence: 'Constrained',
+    material: 'Gold-coated stainless or gold-coated microneedle substrate',
+    role: 'Provides ISF access and the working electrode surfaces for cortisol, glucose, lactate, Na, K, and pH.',
+    risk: 'Needle height, coating uniformity, and insertion mechanics dominate data quality.'
+  },
+  {
+    id: 'ring-electrodes',
+    label: 'Functional electrode rings',
+    section: 'Sensing chemistry',
+    color: colors.cortisol,
+    dims: '8 color-coded working electrode sites plus local passivation rings',
+    confidence: 'Estimated',
+    material: 'Gold WE sites with aptamer, enzyme, ISE, and IrOx surface stacks',
+    role: 'Makes each chemistry visible without implying impossible package volume or sci-fi sensor density.',
+    risk: 'Cross-talk, fouling, and reference drift require QC channels and duplicate measurements.'
+  },
+  {
+    id: 'reference-counter',
+    label: 'Reference and counter system',
+    section: 'Sensing chemistry',
+    color: colors.reference,
+    dims: 'Pt counter rail and Ag/AgCl reference rail adjacent to WE field',
+    confidence: 'Estimated',
+    material: 'Platinum counter, silver/silver-chloride reference chemistry',
+    role: 'Closes electrochemical current paths and anchors potentials for every cartridge channel.',
+    risk: 'If the shared reference drifts, every analyte can look wrong at the same time.'
+  },
+  {
+    id: 'optical-module',
+    label: 'Optical window and LED/PD module',
+    section: 'Optical and interface',
+    color: colors.optical,
+    dims: '6.0 mm window, black light baffle, two LEDs plus photodiode package',
+    confidence: 'Estimated',
+    material: 'Clear PMMA or glass window, black silicone baffle, FR4-mounted optoelectronics',
+    role: 'Adds a realistic reflectance optical channel without letting light leak through the electrochemical interface.',
+    risk: 'Stray light, skin pressure, and window contamination can swamp the optical signal.'
+  },
+  {
+    id: 'pogo-field',
+    label: 'Puck-to-cartridge contact field',
+    section: 'Optical and interface',
+    color: colors.gold,
+    dims: '10 spring contacts, 0.9 mm pins, 2.5 mm pitch class',
+    confidence: 'Constrained',
+    material: 'Gold-plated pogo pins and ENIG receiving pads',
+    role: 'Carries the eight WE nets plus counter and reference between reusable puck and disposable cartridge.',
+    risk: 'Motion opens, sweat bridging, and over-compression are first-order system failure modes.'
+  },
+  {
+    id: 'gasket-seal',
+    label: 'Compression gasket and light seal',
+    section: 'Optical and interface',
+    color: colors.elastomer,
+    dims: '32.8 mm OD gasket, 0.35 mm nominal compression layer',
+    confidence: 'Estimated',
+    material: 'Soft silicone gasket with local optical baffle',
+    role: 'Separates sweat, optical light paths, and electrical contacts while keeping the cartridge replaceable.',
+    risk: 'A small tolerance error can convert the interface from sealed to unreliable.'
+  },
+  {
+    id: 'puck-shell',
+    label: 'Reusable puck shell',
+    section: 'Reusable puck',
+    color: colors.shell,
+    dims: '42.0 mm OD, about 13.5 mm assembled stack height',
+    confidence: 'Estimated',
+    material: 'Printed prototype shell, future molded PC/ABS or medical polymer',
+    role: 'Defines the wearable envelope, cartridge pocket, electronics cavity, and skin-side pressure distribution.',
+    risk: 'The shell must protect electronics without creating hot spots or antenna shadowing.'
+  },
+  {
+    id: 'puck-pcb',
+    label: 'Rigid-flex puck PCB',
+    section: 'Reusable electronics',
+    color: colors.pcb,
+    dims: '34 x 24 mm board envelope with antenna keepout and skin-side sensor island',
+    confidence: 'Estimated',
+    material: 'Rigid-flex PCB with ENIG finish and local ground pour',
+    role: 'Places analog sensing, optical drive, BLE, power, and pogo landing features in a believable small puck.',
+    risk: 'Analog routing and RF placement need separation, shielding, and short cartridge paths.'
+  },
+  {
+    id: 'electrochem-core',
+    label: 'Electrochemical AFE module',
+    section: 'Reusable electronics',
+    color: '#0f6f49',
+    dims: '30.5 x 18.0 x 2.6 mm EmStat Pico class module',
+    confidence: 'Constrained',
+    material: 'Commercial electrochemical front end module on PCB',
+    role: 'Runs SWV, chronoamperometry, and potentiometric reads through the muxed cartridge interface.',
+    risk: 'Power duty cycle, settling, leakage, and channel switching determine whether chemistry looks trustworthy.'
+  },
+  {
+    id: 'ble-antenna',
+    label: 'MCU/BLE antenna zone',
+    section: 'Reusable electronics',
+    color: colors.radio,
+    dims: '15.5 x 10.5 x 2.0 mm BLE module plus no-copper RF keepout',
+    confidence: 'Constrained',
+    material: 'nRF52-class BLE module with ceramic/chip antenna edge zone',
+    role: 'Handles firmware scheduling, wireless transport, and the antenna volume that cannot be filled with metal.',
+    risk: 'Battery, copper, and the human body can detune the antenna if the keepout is ignored.'
+  },
+  {
+    id: 'power-stack',
+    label: 'Battery and power path',
+    section: 'Power and thermal',
+    color: colors.battery,
+    dims: '12.1 mm diameter x 4.0 mm CP1240 class cell plus 2.5 mm PMIC',
+    confidence: 'Constrained',
+    material: 'Rechargeable CoinPower cell, charger/PMIC, protected power path',
+    role: 'Shows the energy reserve and charger volume that make duty-cycled sensing necessary.',
+    risk: 'The tiny cell cannot support sloppy firmware, long optical duty cycles, or avoidable RF retries.'
+  },
+  {
+    id: 'haptic-motor',
+    label: 'Haptic coin motor',
+    section: 'Power and thermal',
+    color: colors.haptic,
+    dims: '10 mm diameter x 2.7 mm LRA/ERM class package',
+    confidence: 'Estimated',
+    material: 'Coin haptic actuator with elastomer isolation ring',
+    role: 'Adds user feedback while showing the mechanical volume and isolation it needs inside the puck.',
+    risk: 'Vibration can modulate contact resistance unless the motor is mounted away from the pogo field.'
+  },
+  {
+    id: 'thermal-zone',
+    label: 'Thermal and skin constraints',
+    section: 'Power and thermal',
+    color: colors.warning,
+    dims: 'Skin-side TMP117 class sensor plus upper-side heat sources',
+    confidence: 'Estimated',
+    material: 'Temperature IC, copper spreading, air cavity, polymer shell',
+    role: 'Separates heat-producing electronics from the skin-side temperature reference used for chemistry correction.',
+    risk: 'A thermally isolated temperature sensor can make correction worse instead of better.'
+  }
+];
+
+const sectionOrder = [
+  'Skin and adhesive',
+  'Disposable cartridge',
+  'Sensing chemistry',
+  'Optical and interface',
+  'Reusable puck',
+  'Reusable electronics',
+  'Power and thermal'
+];
+
+const views = {
+  exploded: {
+    label: 'Stack',
+    sub: 'Assembly order',
+    explode: 1,
+    camera: [118, 58, 176],
+    target: [0, 30, 0],
+    include: null
+  },
+  assembled: {
+    label: 'Worn',
+    sub: 'Wear height',
+    explode: 0,
+    camera: [50, 31, 55],
+    target: [0, 5.5, 0],
+    include: ['skin-interface','cartridge-shell','gasket-seal','puck-shell']
+  },
+  cartridge: {
+    label: 'Cartridge',
+    sub: 'Disposable',
+    explode: 0.58,
+    camera: [30, 27, 35],
+    target: [0, 4.0, 0],
+    include: ['skin-interface','cartridge-shell','sensor-flex','microneedle-array','ring-electrodes','reference-counter','optical-module','gasket-seal']
+  },
+  interface: {
+    label: 'Interface',
+    sub: 'Seal and contacts',
+    explode: 0.66,
+    camera: [27, 22, 32],
+    target: [0, 5.5, 0],
+    include: ['cartridge-shell','sensor-flex','optical-module','pogo-field','gasket-seal','puck-shell']
+  },
+  puck: {
+    label: 'Puck',
+    sub: 'Reusable core',
+    explode: 0.70,
+    camera: [34, 27, 38],
+    target: [0, 10.5, 0],
+    include: ['puck-shell','puck-pcb','electrochem-core','ble-antenna','power-stack','haptic-motor','thermal-zone','pogo-field','optical-module']
+  },
+  thermal: {
+    label: 'Thermal',
+    sub: 'Skin limits',
+    explode: 0.20,
+    camera: [42, 30, 54],
+    target: [0, 6.0, 0],
+    include: null
+  }
+};
+
+const partById = new Map(partDefs.map(part => [part.id, part]));
+const renderer = new THREE.WebGLRenderer({
+  antialias: !isMobile(),
+  alpha: true,
+  powerPreference: isMobile() ? 'low-power' : 'high-performance'
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile() ? 1.5 : 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = !isMobile();
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+app.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.className = 'label-layer';
+app.appendChild(labelRenderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050910);
+scene.fog = new THREE.Fog(0x050910, 160, 430);
+
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(...views.exploded.camera);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.075;
+controls.minDistance = 16;
+controls.maxDistance = 240;
+controls.target.set(...views.exploded.target);
+
+scene.add(new THREE.HemisphereLight(0xdcefff, 0x080b10, 0.68));
+const key = new THREE.DirectionalLight(0xffffff, 1.15);
+key.position.set(48, 72, 58);
+key.castShadow = !isMobile();
+key.shadow.mapSize.set(2048, 2048);
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x7bdfff, 0.45);
+rim.position.set(-44, 38, -34);
+scene.add(rim);
+const warm = new THREE.DirectionalLight(0xffbd68, 0.23);
+warm.position.set(28, 24, -54);
+scene.add(warm);
+
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(190, 190),
+  new THREE.MeshStandardMaterial({ color: 0x0b121a, roughness: 0.95, metalness: 0 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -2.08;
+ground.receiveShadow = true;
+scene.add(ground);
+const grid = new THREE.GridHelper(82, 82, 0x244255, 0x162431);
+grid.position.y = -2.04;
+grid.material.transparent = true;
+grid.material.opacity = 0.22;
+scene.add(grid);
+
+const root = new THREE.Group();
+scene.add(root);
+const measurementRoot = new THREE.Group();
+scene.add(measurementRoot);
+
+const partGroups = new Map();
+const interactive = [];
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const desiredCamera = new THREE.Vector3(...views.exploded.camera);
+const desiredTarget = new THREE.Vector3(...views.exploded.target);
+let cameraEase = 0;
+const state = {
+  view: 'exploded',
+  explode: views.exploded.explode,
+  selected: null,
+  labels: false,
+  spin: false
+};
+
+function viewportCameraScale() {
+  if (window.innerWidth <= 780) return 1.55;
+  if (window.innerWidth <= 1180) return 1.28;
+  return 1;
+}
+
+function frameView(view) {
+  const target = new THREE.Vector3(...view.target);
+  const cameraBase = new THREE.Vector3(...view.camera);
+  desiredTarget.copy(target);
+  desiredCamera.copy(target.clone().add(cameraBase.sub(target).multiplyScalar(viewportCameraScale())));
+  cameraEase = 1;
+}
+
+function makeMaterial(color, options = {}) {
+  const opacity = options.opacity ?? 1;
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    roughness: options.roughness ?? 0.48,
+    metalness: options.metalness ?? 0.06,
+    transparent: opacity < 1,
+    opacity,
+    emissive: options.emissive ? new THREE.Color(options.emissive) : new THREE.Color(0x000000),
+    emissiveIntensity: options.emissiveIntensity ?? 0,
+    depthWrite: opacity > 0.94
+  });
+  material.userData.baseOpacity = opacity;
+  material.userData.baseEmissive = material.emissive.clone();
+  material.userData.baseEmissiveIntensity = material.emissiveIntensity;
+  return material;
+}
+
+function roundedSlab(width, depth, height, radius, material) {
+  const shape = new THREE.Shape();
+  const hw = width / 2;
+  const hd = depth / 2;
+  const r = Math.min(radius, hw, hd);
+  shape.moveTo(-hw + r, -hd);
+  shape.lineTo(hw - r, -hd);
+  shape.quadraticCurveTo(hw, -hd, hw, -hd + r);
+  shape.lineTo(hw, hd - r);
+  shape.quadraticCurveTo(hw, hd, hw - r, hd);
+  shape.lineTo(-hw + r, hd);
+  shape.quadraticCurveTo(-hw, hd, -hw, hd - r);
+  shape.lineTo(-hw, -hd + r);
+  shape.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
+  const geometry = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: false });
+  geometry.rotateX(-Math.PI / 2);
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function disk(diameter, height, material, segments = 80) {
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(diameter / 2, diameter / 2, height, segments), material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function ring(outerDiameter, innerDiameter, height, material, segments = 96) {
+  const shape = new THREE.Shape();
+  shape.absarc(0, 0, outerDiameter / 2, 0, Math.PI * 2);
+  const hole = new THREE.Path();
+  hole.absarc(0, 0, innerDiameter / 2, 0, Math.PI * 2);
+  shape.holes.push(hole);
+  const geometry = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: segments / 4 });
+  geometry.rotateX(-Math.PI / 2);
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function torus(majorRadius, tubeRadius, material) {
+  const mesh = new THREE.Mesh(new THREE.TorusGeometry(majorRadius, tubeRadius, 14, 64), material);
+  mesh.rotation.x = Math.PI / 2;
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function addBottomed(parent, mesh, x, bottomY, z) {
+  mesh.position.set(x, bottomY, z);
+  parent.add(mesh);
+  return mesh;
+}
+
+function addCentered(parent, mesh, x, centerY, z) {
+  mesh.position.set(x, centerY, z);
+  parent.add(mesh);
+  return mesh;
+}
+
+function createPart(id, explodePosition, builder, labelPosition) {
+  const group = new THREE.Group();
+  group.userData.partId = id;
+  group.userData.base = new THREE.Vector3(0, 0, 0);
+  group.userData.explode = Array.isArray(explodePosition)
+    ? new THREE.Vector3(...explodePosition)
+    : new THREE.Vector3(0, explodePosition, 0);
+  group.userData.stack = group.userData.explode.clone();
+  builder(group);
+  addLabel(group, id, labelPosition);
+  partGroups.set(id, group);
+  interactive.push(group);
+  root.add(group);
+  return group;
+}
+
+function tagMeshes(group, id) {
+  group.traverse(obj => {
+    if (obj.isMesh) obj.userData.partId = id;
+  });
+}
+
+function addLabel(group, id, position) {
+  const part = partById.get(id);
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = 'part-label';
+  el.style.border = '0';
+  el.style.background = 'transparent';
+  el.style.padding = '0';
+  el.innerHTML = `<span class="part-label-inner"><span class="part-label-dot"></span>${part.label}</span>`;
+  el.querySelector('.part-label-dot').style.setProperty('--label-color', part.color);
+  el.addEventListener('click', event => {
+    event.stopPropagation();
+    selectPart(id);
+  });
+  const label = new CSS2DObject(el);
+  label.center.set(0.5, 1);
+  label.position.set(...position);
+  group.add(label);
+}
+
+function addSceneLabel(text, position) {
+  const el = document.createElement('div');
+  el.className = 'part-label dimension';
+  el.innerHTML = `<span class="part-label-inner">${text}</span>`;
+  const label = new CSS2DObject(el);
+  label.center.set(0.5, 1);
+  label.position.set(...position);
+  measurementRoot.add(label);
+  return label;
+}
+
+function buildScaleReferences() {
+  const scaleMat = makeMaterial(0xffbd68, { roughness: 0.34, metalness: 0.2, opacity: 0.88, emissive: 0x5f2e08, emissiveIntensity: 0.18 });
+  const ghostMat = makeMaterial(0xffbd68, { roughness: 0.6, opacity: 0.18, emissive: 0x5f2e08, emissiveIntensity: 0.12 });
+  const scale = roundedSlab(10, 0.24, 0.10, 0.04, scaleMat.clone());
+  addBottomed(measurementRoot, scale, -36, 0.58, 28);
+  [-41, -31].forEach(x => addBottomed(measurementRoot, roundedSlab(0.22, 1.4, 0.10, 0.04, scaleMat.clone()), x, 0.58, 28));
+  addSceneLabel('10 mm scale', [-36, 2.1, 28]);
+
+  const height = roundedSlab(0.22, 0.22, 13.5, 0.05, scaleMat.clone());
+  addBottomed(measurementRoot, height, 26, 0.50, -25);
+  [0.5, 14.0].forEach(y => {
+    const tick = roundedSlab(3.2, 0.18, 0.08, 0.04, scaleMat.clone());
+    tick.position.set(26, y, -25);
+    measurementRoot.add(tick);
+  });
+  addSceneLabel('13.5 mm puck stack target', [26, 15.8, -25]);
+
+  const footprint = ring(42, 38, 0.035, ghostMat, 128);
+  addBottomed(measurementRoot, footprint, 0, 0.54, 0);
+  addSceneLabel('42 mm outer diameter envelope', [0, 1.8, -24]);
+}
+
+function buildSkin(group) {
+  addBottomed(group, roundedSlab(76, 64, 2, 12, makeMaterial(0xc98972, { roughness: 0.84, opacity: 0.78 })), 0, -2, 0);
+  addBottomed(group, roundedSlab(52, 45, 0.34, 13, makeMaterial(0xf2eadf, { roughness: 0.72, opacity: 0.42 })), 0, 0.05, 0);
+  addBottomed(group, ring(30, 15, 0.08, makeMaterial(0xf8f4eb, { roughness: 0.58, opacity: 0.48 })), 0, 0.42, 0);
+  const compression = ring(42, 28, 0.06, makeMaterial(0xffbd68, { roughness: 0.6, opacity: 0.18, emissive: 0x6b3513, emissiveIntensity: 0.14 }));
+  addBottomed(group, compression, 0, 0.50, 0);
+  const pressure = disk(24, 0.035, makeMaterial(0xffbd68, { roughness: 0.72, opacity: 0.16, emissive: 0x6b3513, emissiveIntensity: 0.12 }), 80);
+  pressure.scale.set(1.18, 1, 0.72);
+  addBottomed(group, pressure, 0, 0.56, 0);
+  addBottomed(group, roundedSlab(19, 0.35, 0.04, 0.12, makeMaterial(0x70f0cb, { roughness: 0.56, opacity: 0.22, emissive: 0x0e5d47, emissiveIntensity: 0.10 })), 0, 0.62, -7.5);
+  tagMeshes(group, 'skin-interface');
+}
+
+function buildCartridgeShell(group) {
+  addBottomed(group, ring(38, 16, 1.55, makeMaterial(0x3d4652, { roughness: 0.52, opacity: 0.82 })), 0, 0.72, 0);
+  addBottomed(group, ring(33, 16, 0.75, makeMaterial(0x566272, { roughness: 0.48, opacity: 0.70 })), 0, 2.25, 0);
+  const key = roundedSlab(5.0, 2.0, 0.84, 0.5, makeMaterial(0x566272, { roughness: 0.5, opacity: 0.72 }));
+  addBottomed(group, key, 0, 2.24, -16.1);
+  [-13.8, 13.8].forEach(x => {
+    const latch = roundedSlab(3.4, 1.4, 0.42, 0.35, makeMaterial(0x6a7482, { roughness: 0.48, opacity: 0.72 }));
+    addBottomed(group, latch, x, 2.60, 10.8);
+  });
+  tagMeshes(group, 'cartridge-shell');
+}
+
+function buildSensorFlex(group) {
+  addBottomed(group, roundedSlab(22, 16, 0.18, 2.2, makeMaterial(0x1d6ccf, { roughness: 0.48, opacity: 0.82 })), 0, 0.62, 0);
+  addBottomed(group, roundedSlab(5.2, 11.5, 0.16, 1, makeMaterial(0x1d6ccf, { roughness: 0.48, opacity: 0.78 })), 0, 0.60, -12.1);
+  const traceMat = makeMaterial(0xf2c354, { roughness: 0.32, metalness: 0.7, opacity: 0.88 });
+  for (let i = -4; i <= 4; i += 2) {
+    addBottomed(group, roundedSlab(0.22, 12.6, 0.035, 0.08, traceMat.clone()), i * 0.55, 0.84, -3.5);
+  }
+  const padMat = makeMaterial(0xf2c354, { roughness: 0.28, metalness: 0.82, opacity: 0.95 });
+  for (let i = 0; i < 10; i++) {
+    const angle = (i / 10) * Math.PI * 2 + Math.PI / 10;
+    const pad = roundedSlab(1.7, 2.4, 0.06, 0.35, padMat.clone());
+    pad.rotation.y = -angle;
+    addBottomed(group, pad, Math.cos(angle) * 13.3, 2.43, Math.sin(angle) * 13.3);
+  }
+  electrodePositions().forEach(site => {
+    const via = disk(0.34, 0.05, padMat.clone(), 24);
+    via.position.set(site.x, 0.94, site.z);
+    group.add(via);
+  });
+  tagMeshes(group, 'sensor-flex');
+}
+
+function buildNeedleArray(group) {
+  addBottomed(group, roundedSlab(12, 7.2, 0.18, 1.0, makeMaterial(0xd9a936, { roughness: 0.34, metalness: 0.55, opacity: 0.88 })), 0, 0.88, 0);
+  const insertionEnvelope = disk(12.8, 0.70, makeMaterial(0xffbd68, { roughness: 0.72, opacity: 0.12, emissive: 0x6b3513, emissiveIntensity: 0.10 }), 72);
+  insertionEnvelope.scale.set(1.0, 1, 0.64);
+  insertionEnvelope.position.set(0, 0.48, 0);
+  group.add(insertionEnvelope);
+  const positions = electrodePositions();
+  positions.forEach((site, index) => {
+    const needle = new THREE.Group();
+    const shaft = disk(0.20, 0.62, makeMaterial(site.color, { roughness: 0.25, metalness: 0.52 }), 24);
+    shaft.position.y = -0.31;
+    needle.add(shaft);
+    const tip = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.018, 0.10, 0.18, 24),
+      makeMaterial(site.color, { roughness: 0.25, metalness: 0.55 })
+    );
+    tip.position.y = -0.71;
+    tip.castShadow = true;
+    needle.add(tip);
+    needle.position.set(site.x, 0.88, site.z);
+    group.add(needle);
+    if (index < 8) {
+      const relief = disk(0.52, 0.06, makeMaterial(0xf4e8c2, { roughness: 0.4, opacity: 0.82 }), 28);
+      relief.position.set(site.x, 1.08, site.z);
+      group.add(relief);
+    }
+  });
+  tagMeshes(group, 'microneedle-array');
+}
+
+function buildRingElectrodes(group) {
+  const positions = electrodePositions().slice(0, 8);
+  positions.forEach(site => {
+    const ringMesh = torus(0.40, 0.045, makeMaterial(site.color, { roughness: 0.22, metalness: 0.55, opacity: 0.96 }));
+    ringMesh.position.set(site.x, 1.18, site.z);
+    group.add(ringMesh);
+    const membrane = disk(0.54, 0.035, makeMaterial(site.color, { roughness: 0.55, opacity: 0.30, emissive: site.emissive, emissiveIntensity: 0.12 }), 32);
+    membrane.position.set(site.x, 1.21, site.z);
+    group.add(membrane);
+  });
+  tagMeshes(group, 'ring-electrodes');
+}
+
+function buildReferenceCounter(group) {
+  const pt = roundedSlab(1.0, 7.2, 0.12, 0.35, makeMaterial(0xd7dce6, { roughness: 0.24, metalness: 0.72, opacity: 0.92 }));
+  addBottomed(group, pt, -6.0, 1.13, 0);
+  const ag = roundedSlab(1.0, 7.2, 0.12, 0.35, makeMaterial(0xcfd3dc, { roughness: 0.32, metalness: 0.58, opacity: 0.92 }));
+  addBottomed(group, ag, 6.0, 1.13, 0);
+  const chloride = roundedSlab(1.45, 6.3, 0.05, 0.35, makeMaterial(0xf2f5f7, { roughness: 0.5, opacity: 0.34 }));
+  addBottomed(group, chloride, 6.0, 1.28, 0);
+  tagMeshes(group, 'reference-counter');
+}
+
+function buildOpticalModule(group) {
+  addBottomed(group, disk(6.0, 0.34, makeMaterial(0x9be7ff, { roughness: 0.04, metalness: 0.0, opacity: 0.42, emissive: 0x0a5d75, emissiveIntensity: 0.16 }), 80), 0, 1.22, 5.2);
+  addBottomed(group, ring(9.0, 6.15, 0.52, makeMaterial(0x05070a, { roughness: 0.7, opacity: 0.92 })), 0, 1.58, 5.2);
+  addBottomed(group, roundedSlab(10.5, 6.8, 0.52, 1.2, makeMaterial(0x0b7a4f, { roughness: 0.46, opacity: 0.88 })), 0, 3.18, 5.2);
+  const ledGreen = roundedSlab(1.4, 1.1, 0.34, 0.2, makeMaterial(0xb6ff92, { roughness: 0.25, emissive: 0x56ff2b, emissiveIntensity: 0.55 }), 0.2);
+  addBottomed(group, ledGreen, -2.2, 3.78, 5.2);
+  const ledIr = roundedSlab(1.4, 1.1, 0.34, 0.2, makeMaterial(0xff8062, { roughness: 0.25, emissive: 0xff452e, emissiveIntensity: 0.30 }));
+  addBottomed(group, ledIr, 2.2, 3.78, 5.2);
+  const pd = roundedSlab(1.6, 1.4, 0.34, 0.2, makeMaterial(0x151a20, { roughness: 0.3, metalness: 0.18 }));
+  addBottomed(group, pd, 0, 3.82, 2.8);
+  addBottomed(group, roundedSlab(8.5, 0.34, 0.42, 0.12, makeMaterial(0x020304, { roughness: 0.78, opacity: 0.80 })), 0, 3.72, 4.0);
+  const cone = new THREE.Mesh(
+    new THREE.ConeGeometry(4.1, 5.4, 64, 1, true),
+    makeMaterial(0x9be7ff, { roughness: 0.1, opacity: 0.09, emissive: 0x0a5d75, emissiveIntensity: 0.12 })
+  );
+  cone.rotation.x = Math.PI;
+  cone.position.set(0, 2.8, 5.2);
+  group.add(cone);
+  tagMeshes(group, 'optical-module');
+}
+
+function buildPogoField(group) {
+  const pinMat = makeMaterial(0xf2c354, { roughness: 0.22, metalness: 0.85, opacity: 0.96 });
+  const sleeveMat = makeMaterial(0xb88a26, { roughness: 0.32, metalness: 0.7, opacity: 0.82 });
+  const travelMat = makeMaterial(0xffbd68, { roughness: 0.52, opacity: 0.18, emissive: 0x6b3513, emissiveIntensity: 0.08 });
+  contactPositions().forEach(pos => {
+    const pad = disk(1.45, 0.08, pinMat.clone(), 32);
+    pad.position.set(pos.x, 2.36, pos.z);
+    group.add(pad);
+    const travel = disk(1.75, 0.58, travelMat.clone(), 32);
+    travel.position.set(pos.x, 2.78, pos.z);
+    group.add(travel);
+    const sleeve = disk(1.08, 0.22, sleeveMat.clone(), 32);
+    sleeve.position.set(pos.x, 2.72, pos.z);
+    group.add(sleeve);
+    const pin = disk(0.88, 1.22, pinMat.clone(), 32);
+    pin.position.set(pos.x, 3.32, pos.z);
+    group.add(pin);
+  });
+  const insulator = roundedSlab(17.4, 7.4, 0.32, 1.4, makeMaterial(0x161d26, { roughness: 0.64, opacity: 0.62 }));
+  addBottomed(group, insulator, 0, 2.60, 0);
+  tagMeshes(group, 'pogo-field');
+}
+
+function buildGasket(group) {
+  addBottomed(group, ring(32.8, 28.8, 0.35, makeMaterial(0x6ed6f4, { roughness: 0.58, opacity: 0.40, emissive: 0x073848, emissiveIntensity: 0.08 })), 0, 2.72, 0);
+  addBottomed(group, ring(10.2, 6.6, 0.62, makeMaterial(0x030405, { roughness: 0.72, opacity: 0.70 })), 0, 2.38, 5.2);
+  tagMeshes(group, 'gasket-seal');
+}
+
+function buildPuckShell(group) {
+  addBottomed(group, ring(42, 34.8, 1.05, makeMaterial(0x232a34, { roughness: 0.48, opacity: 0.82 })), 0, 2.95, 0);
+  addBottomed(group, ring(42, 37, 6.8, makeMaterial(0x202731, { roughness: 0.52, opacity: 0.62 })), 0, 4.02, 0);
+  addBottomed(group, ring(38, 15.5, 0.58, makeMaterial(0x111821, { roughness: 0.6, opacity: 0.72 })), 0, 2.42, 0);
+  addBottomed(group, ring(42, 38.2, 2.35, makeMaterial(0x2b333e, { roughness: 0.52, opacity: 0.62 })), 0, 9.85, 0);
+  addBottomed(group, disk(42, 1.5, makeMaterial(0x28313c, { roughness: 0.46, opacity: 0.70 }), 96), 0, 11.95, 0);
+  [-9, -3, 3, 9].forEach(x => {
+    addBottomed(group, roundedSlab(1.4, 13.8, 0.05, 0.25, makeMaterial(0x070b10, { roughness: 0.7, opacity: 0.68 })), x, 13.48, -0.4);
+  });
+  [[-14, -11], [14, -11], [-14, 11], [14, 11]].forEach(([x, z]) => {
+    addBottomed(group, ring(3.2, 1.35, 1.7, makeMaterial(0x303944, { roughness: 0.52, opacity: 0.66 }), 48), x, 4.08, z);
+  });
+  tagMeshes(group, 'puck-shell');
+}
+
+function buildPuckPcb(group) {
+  addBottomed(group, roundedSlab(34, 24, 0.82, 3.0, makeMaterial(0x0c7a4f, { roughness: 0.5, opacity: 0.88 })), 0, 4.72, 0);
+  addBottomed(group, roundedSlab(18, 12, 0.18, 1.5, makeMaterial(0x1fa978, { roughness: 0.45, opacity: 0.55 })), 7.6, 5.62, 7.1);
+  const copper = makeMaterial(0xd9a936, { roughness: 0.36, metalness: 0.62, opacity: 0.78 });
+  for (let i = -2; i <= 2; i++) {
+    addBottomed(group, roundedSlab(0.22, 18, 0.035, 0.08, copper.clone()), i * 2.1, 5.64, -1.2);
+  }
+  tagMeshes(group, 'puck-pcb');
+}
+
+function buildElectrochemCore(group) {
+  addBottomed(group, roundedSlab(29.2, 17.2, 0.55, 1.2, makeMaterial(0x0f6f49, { roughness: 0.45, opacity: 0.94 })), -1.0, 5.68, -2.4);
+  addBottomed(group, roundedSlab(27.4, 15.4, 2.05, 0.55, makeMaterial(0x11161c, { roughness: 0.38, metalness: 0.06 })), -1.0, 6.25, -2.4);
+  addBottomed(group, roundedSlab(5, 5, 1.05, 0.35, makeMaterial(0x0b0d10, { roughness: 0.34, metalness: 0.12 })), 10.0, 5.82, -4.2);
+  tagMeshes(group, 'electrochem-core');
+}
+
+function buildBleAntenna(group) {
+  addBottomed(group, roundedSlab(14.5, 9.6, 0.36, 1.0, makeMaterial(0x1f63bf, { roughness: 0.48, opacity: 0.94 })), 5.8, 6.20, 7.0);
+  addBottomed(group, roundedSlab(13.6, 8.0, 1.65, 0.45, makeMaterial(0xb7c4d4, { roughness: 0.42, metalness: 0.18 })), 5.8, 6.58, 7.0);
+  addBottomed(group, roundedSlab(14.2, 5.8, 0.08, 1.0, makeMaterial(0x78a8ff, { roughness: 0.36, opacity: 0.18, emissive: 0x12377d, emissiveIntensity: 0.28 })), 6.2, 8.34, 12.0);
+  addBottomed(group, roundedSlab(15.5, 8.2, 0.06, 1.0, makeMaterial(0x78a8ff, { roughness: 0.42, opacity: 0.10, emissive: 0x12377d, emissiveIntensity: 0.18 })), 5.9, 5.68, 8.6);
+  const antenna = new THREE.Group();
+  for (let i = 0; i < 5; i++) {
+    const line = roundedSlab(5.2, 0.18, 0.05, 0.05, makeMaterial(0xf2c354, { roughness: 0.28, metalness: 0.75, opacity: 0.86 }));
+    line.position.set(4.4 + (i % 2 ? 1.0 : -1.0), 8.43, 9.8 + i * 0.58);
+    antenna.add(line);
+  }
+  group.add(antenna);
+  tagMeshes(group, 'ble-antenna');
+}
+
+function buildPowerStack(group) {
+  const battery = disk(12.1, 4.0, makeMaterial(0xcfd8e3, { roughness: 0.36, metalness: 0.28, opacity: 0.96 }), 72);
+  battery.position.set(-9.6, 8.0, 5.6);
+  group.add(battery);
+  addBottomed(group, roundedSlab(8.2, 1.0, 0.16, 0.20, makeMaterial(0xd9a936, { roughness: 0.28, metalness: 0.70, opacity: 0.88 })), -9.6, 10.10, 5.6);
+  addBottomed(group, roundedSlab(4.2, 1.0, 0.12, 0.18, makeMaterial(0xd9a936, { roughness: 0.28, metalness: 0.70, opacity: 0.82 })), -9.6, 5.78, 5.6);
+  addBottomed(group, roundedSlab(2.5, 2.5, 0.58, 0.25, makeMaterial(0x7c4dff, { roughness: 0.34, metalness: 0.08 })), 10.8, 5.82, -7.4);
+  addBottomed(group, roundedSlab(5.8, 3.2, 0.35, 0.45, makeMaterial(0x1b222c, { roughness: 0.42 })), 9.2, 5.72, -7.4);
+  tagMeshes(group, 'power-stack');
+}
+
+function buildHaptic(group) {
+  const body = disk(10.0, 2.7, makeMaterial(0xc2c9d3, { roughness: 0.38, metalness: 0.42, opacity: 0.92 }), 64);
+  body.position.set(9.2, 7.0, 1.0);
+  group.add(body);
+  const isolator = ring(11.8, 10.2, 0.42, makeMaterial(0x11161c, { roughness: 0.65, opacity: 0.74 }));
+  addBottomed(group, isolator, 9.2, 5.58, 1.0);
+  tagMeshes(group, 'haptic-motor');
+}
+
+function buildThermal(group) {
+  addBottomed(group, roundedSlab(2.1, 2.1, 0.75, 0.25, makeMaterial(0xffbd68, { roughness: 0.38, emissive: 0x7a3309, emissiveIntensity: 0.25 })), -10.8, 4.45, -7.6);
+  const plume = new THREE.Mesh(
+    new THREE.SphereGeometry(8.5, 48, 24),
+    makeMaterial(0xff8a40, { roughness: 0.75, opacity: 0.11, emissive: 0xff6a1a, emissiveIntensity: 0.18 })
+  );
+  plume.scale.set(1.4, 0.35, 0.75);
+  plume.position.set(9.2, 7.0, -5.0);
+  group.add(plume);
+  addBottomed(group, roundedSlab(22, 12, 0.06, 2.0, makeMaterial(0x70f0cb, { roughness: 0.5, opacity: 0.13, emissive: 0x0e5d47, emissiveIntensity: 0.15 })), -7.4, 3.08, -4.0);
+  tagMeshes(group, 'thermal-zone');
+}
+
+function electrodePositions() {
+  return [
+    { name: 'WE1 cortisol', x: -3.6, z: -1.55, color: 0xff7a5c, emissive: 0x6f170d },
+    { name: 'WE2 control', x: -1.2, z: -1.55, color: 0x9aa4b2, emissive: 0x20262e },
+    { name: 'WE3 glucose', x: 1.2, z: -1.55, color: 0x61d77e, emissive: 0x0f5b24 },
+    { name: 'WE4 glucose', x: 3.6, z: -1.55, color: 0x61d77e, emissive: 0x0f5b24 },
+    { name: 'WE5 lactate', x: -3.6, z: 1.55, color: 0x42bfff, emissive: 0x0b3a60 },
+    { name: 'WE6 sodium', x: -1.2, z: 1.55, color: 0xffd166, emissive: 0x775414 },
+    { name: 'WE7 potassium', x: 1.2, z: 1.55, color: 0xf0c674, emissive: 0x6c4c12 },
+    { name: 'WE8 pH', x: 3.6, z: 1.55, color: 0xc678dd, emissive: 0x4b1d5f },
+    { name: 'Pt CE', x: -6.0, z: 0, color: 0xd9dce4, emissive: 0x22262e },
+    { name: 'Ag/AgCl RE', x: 6.0, z: 0, color: 0xcfd3dc, emissive: 0x22262e }
+  ];
+}
+
+function contactPositions() {
+  const out = [];
+  [-5, -2.5, 0, 2.5, 5].forEach(x => {
+    [-2.0, 2.0].forEach(z => out.push({ x, z }));
+  });
+  return out;
+}
+
+const stackOrder = [
+  { id: 'skin-interface', gap: 1.2 },
+  { id: 'microneedle-array', gap: 0.7 },
+  { id: 'ring-electrodes', gap: 0.55 },
+  { id: 'reference-counter', gap: 0.65 },
+  { id: 'sensor-flex', gap: 1.0 },
+  { id: 'cartridge-shell', gap: 1.1 },
+  { id: 'optical-module', gap: 1.2 },
+  { id: 'gasket-seal', gap: 0.9 },
+  { id: 'pogo-field', gap: 1.2 },
+  { id: 'puck-shell', gap: 1.6 },
+  { id: 'puck-pcb', gap: 1.0 },
+  { id: 'electrochem-core', gap: 1.0 },
+  { id: 'ble-antenna', gap: 1.0 },
+  { id: 'power-stack', gap: 1.0 },
+  { id: 'haptic-motor', gap: 1.0 }
+];
+
+function applyMeasuredStackLayout() {
+  let cursorY = -2.0;
+  stackOrder.forEach(({ id, gap }) => {
+    const group = partGroups.get(id);
+    if (!group) return;
+    group.position.set(0, 0, 0);
+    group.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(group);
+    if (box.isEmpty()) return;
+    const targetY = cursorY - box.min.y;
+    group.userData.stack = new THREE.Vector3(0, targetY, 0);
+    cursorY = box.max.y + targetY + gap;
+  });
+
+  const thermal = partGroups.get('thermal-zone');
+  if (thermal) thermal.userData.stack = new THREE.Vector3(0, 0, 0);
+}
+
+function frameMeasuredStackLayout() {
+  const bounds = new THREE.Box3();
+  stackOrder.forEach(({ id }) => {
+    const group = partGroups.get(id);
+    if (!group) return;
+    group.position.copy(group.userData.stack);
+    group.updateMatrixWorld(true);
+    bounds.expandByObject(group);
+    group.position.copy(group.userData.base);
+  });
+  if (bounds.isEmpty()) return;
+
+  const center = new THREE.Vector3();
+  const size = new THREE.Vector3();
+  bounds.getCenter(center);
+  bounds.getSize(size);
+  const distance = Math.max(size.y * 1.75, size.x * 1.35, size.z * 1.35, 96);
+  views.exploded.target = [center.x, center.y, center.z];
+  views.exploded.camera = [
+    center.x + distance * 0.52,
+    center.y + distance * 0.24,
+    center.z + distance * 0.92
+  ];
+  controls.maxDistance = Math.max(controls.maxDistance, distance * 2.4);
+}
+
+createPart('skin-interface', [0, 0, 0], buildSkin, [-18, 1.2, 21]);
+createPart('microneedle-array', [0, 1.8, 0], buildNeedleArray, [-8, 3.2, 10]);
+createPart('ring-electrodes', [0, 2.7, 0], buildRingElectrodes, [9, 3.3, 10]);
+createPart('reference-counter', [0, 3.2, 0], buildReferenceCounter, [16, 3.3, 1]);
+createPart('sensor-flex', [0, 4.4, 0], buildSensorFlex, [-18, 3.2, -16]);
+createPart('cartridge-shell', [0, 6.1, 0], buildCartridgeShell, [19, 3.8, -15]);
+createPart('optical-module', [0, 7.4, 5.2], buildOpticalModule, [-13, 7.0, 13]);
+createPart('gasket-seal', [0, 8.5, 0], buildGasket, [-17, 6.0, 3]);
+createPart('pogo-field', [0, 10.2, 0], buildPogoField, [15, 7.4, -10]);
+createPart('puck-shell', [0, 12.4, 0], buildPuckShell, [20, 16.0, 16]);
+createPart('puck-pcb', [0, 16.0, 0], buildPuckPcb, [-17, 12.5, -12]);
+createPart('electrochem-core', [0, 18.0, 0], buildElectrochemCore, [-18, 15.0, -6]);
+createPart('ble-antenna', [0, 18.6, 0], buildBleAntenna, [21, 16.0, 15]);
+createPart('power-stack', [0, 19.4, 0], buildPowerStack, [-22, 18.0, 7]);
+createPart('haptic-motor', [0, 19.2, 0], buildHaptic, [22, 17.0, 2]);
+createPart('thermal-zone', [0, 9.8, 0], buildThermal, [18, 11.5, -12]);
+applyMeasuredStackLayout();
+frameMeasuredStackLayout();
+buildScaleReferences();
+
+function buildViews() {
+  Object.entries(views).forEach(([id, view]) => {
+    const button = document.createElement('button');
+    button.className = 'button';
+    button.type = 'button';
+    button.id = `view-${id}`;
+    button.dataset.view = id;
+    button.innerHTML = `${view.label}<span>${view.sub}</span>`;
+    button.addEventListener('click', () => setView(id));
+    viewGrid.appendChild(button);
+  });
+}
+
+function buildPartList() {
+  sectionOrder.forEach(section => {
+    const sectionParts = partDefs.filter(part => part.section === section);
+    if (!sectionParts.length) return;
+    const header = document.createElement('div');
+    header.className = 'section-label';
+    header.textContent = section;
+    partsBody.appendChild(header);
+    sectionParts.forEach(part => {
+      const card = document.createElement('div');
+      card.className = 'part-card';
+      card.id = `card-${part.id}`;
+      card.innerHTML = `
+        <button class="part-button" type="button">
+          <div class="part-title"><span class="part-dot"></span>${part.label}</div>
+          <div class="part-meta">${part.confidence} | ${part.dims}</div>
+        </button>
+      `;
+      const dot = card.querySelector('.part-dot');
+      dot.style.background = part.color;
+      dot.style.color = part.color;
+      card.querySelector('button').addEventListener('click', () => {
+        selectPart(part.id);
+        if (isMobile()) partsDrawer.classList.remove('open');
+      });
+      partsBody.appendChild(card);
+    });
+  });
+}
+
+function setView(id) {
+  const view = views[id];
+  if (!view) return;
+  state.view = id;
+  state.explode = view.explode;
+  explodeSlider.value = String(Math.round(state.explode * 100));
+  frameView(view);
+  updateUi();
+  updateTransforms();
+}
+
+function selectPart(id) {
+  state.selected = id;
+  if (id && !isPartInCurrentView(id)) {
+    setView(preferredViewForPart(id));
+  }
+  if (id) {
+    setInspectorOpen(true);
+  }
+  updateUi();
+  updateTransforms();
+}
+
+function isPartInCurrentView(id) {
+  const include = views[state.view].include;
+  return !include || include.includes(id);
+}
+
+function preferredViewForPart(id) {
+  const part = partById.get(id);
+  if (!part) return 'exploded';
+  if (part.section === 'Reusable puck' || part.section === 'Reusable electronics' || part.section === 'Power and thermal') {
+    return 'puck';
+  }
+  if (part.section === 'Optical and interface') {
+    return 'interface';
+  }
+  if (part.section === 'Disposable cartridge' || part.section === 'Sensing chemistry' || part.section === 'Skin and adhesive') {
+    return 'cartridge';
+  }
+  return 'exploded';
+}
+
+function setInspectorOpen(open) {
+  inspector.hidden = !open;
+  inspector.classList.toggle('closed', !open);
+  detailToggle.textContent = open ? 'Hide details' : 'Details';
+}
+
+function setLabelsVisible(open) {
+  state.labels = open;
+  document.body.classList.toggle('labels-on', open);
+  labelsToggle.classList.toggle('active', open);
+  labelsToggle.textContent = open ? 'Hide labels' : 'Show labels';
+}
+
+function updateUi() {
+  Object.keys(views).forEach(id => {
+    document.getElementById(`view-${id}`)?.classList.toggle('active', id === state.view);
+  });
+  document.querySelectorAll('.part-card').forEach(card => card.classList.remove('active'));
+  if (state.selected) document.getElementById(`card-${state.selected}`)?.classList.add('active');
+  explodeReadout.textContent = `${Math.round(state.explode * 100)}%`;
+  renderInspector();
+}
+
+function renderInspector() {
+  if (!state.selected) {
+    inspectorContent.innerHTML = `
+      <div class="inspector-kicker">System overview | millimeter scale</div>
+      <h2 class="inspector-name">Reusable puck plus disposable cartridge</h2>
+      <p class="inspector-desc">The scene keeps the wearable envelope, electronics packages, contact field, optical path, microneedle array, and skin stack in relative scale. Use the parts drawer or labels to isolate hardware.</p>
+      <div class="inspector-grid">
+        <dl class="kv"><dt>Physical envelope</dt><dd>42 mm puck OD over a 38 mm cartridge and adhesive/skin-contact pad.</dd></dl>
+        <dl class="kv"><dt>Known dimensions</dt><dd>Battery, BLE module, AFE module, pogo pin class, and microneedle length use constrained package sizes.</dd></dl>
+        <dl class="kv"><dt>Estimated geometry</dt><dd>Housing, gasket compression, flex outline, optical baffle, and adhesive footprint are labeled estimates.</dd></dl>
+        <dl class="kv"><dt>Design priority</dt><dd>Short analog paths, sealed contacts, antenna keepout, light isolation, and skin-side thermal context.</dd></dl>
+      </div>
+      <div class="inspector-actions">
+        <button class="button" type="button" data-action="puck">Inspect puck</button>
+        <button class="button" type="button" data-action="cartridge">Inspect cartridge</button>
+      </div>
+    `;
+    inspectorContent.querySelector('[data-action="puck"]').addEventListener('click', () => setView('puck'));
+    inspectorContent.querySelector('[data-action="cartridge"]').addEventListener('click', () => setView('cartridge'));
+    return;
+  }
+  const part = partById.get(state.selected);
+  inspectorContent.innerHTML = `
+    <div class="inspector-kicker">${part.section} | ${part.confidence}</div>
+    <h2 class="inspector-name">${part.label}</h2>
+    <p class="inspector-desc">${part.role}</p>
+    <div class="inspector-grid">
+      <dl class="kv"><dt>Dimensions</dt><dd>${part.dims}</dd></dl>
+      <dl class="kv"><dt>Material</dt><dd>${part.material}</dd></dl>
+      <dl class="kv"><dt>Physics risk</dt><dd>${part.risk}</dd></dl>
+      <dl class="kv"><dt>Visualization status</dt><dd>${part.confidence === 'Constrained' ? 'Uses off-the-shelf package dimensions where available.' : 'Geometry is an engineering estimate and intentionally labeled as such.'}</dd></dl>
+    </div>
+    <div class="inspector-actions">
+      <button class="button" type="button" data-action="focus">Refocus</button>
+      <button class="button" type="button" data-action="clear">Show all</button>
+    </div>
+  `;
+  inspectorContent.querySelector('[data-action="focus"]').addEventListener('click', () => focusPart(part.id));
+  inspectorContent.querySelector('[data-action="clear"]').addEventListener('click', () => selectPart(null));
+}
+
+function updateTransforms() {
+  const include = views[state.view].include;
+  partGroups.forEach((group, id) => {
+    const part = partById.get(id);
+    const inView = !include || include.includes(id);
+    const thermalOnly = id === 'thermal-zone' && state.view !== 'thermal' && state.selected !== id && state.view !== 'puck';
+    group.visible = inView && !thermalOnly;
+    const target = state.view === 'exploded' ? group.userData.stack : group.userData.explode;
+    group.position.lerpVectors(group.userData.base, target, state.explode);
+    const selectedFactor = state.selected && state.selected !== id ? 0.16 : 1;
+    const viewFactor = state.view === 'thermal' && part.section !== 'Power and thermal' && id !== 'skin-interface' ? 0.38 : 1;
+    setGroupOpacity(group, selectedFactor * viewFactor, state.selected === id);
+  });
+}
+
+function setGroupOpacity(group, factor, selected) {
+  group.traverse(obj => {
+    if (!obj.isMesh || !obj.material) return;
+    const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+    materials.forEach(material => {
+      const baseOpacity = material.userData.baseOpacity ?? 1;
+      material.opacity = Math.max(0.035, baseOpacity * factor);
+      material.transparent = material.opacity < 0.999;
+      material.depthWrite = material.opacity > 0.94;
+      if (selected) {
+        material.emissive.copy(new THREE.Color(0x102a32));
+        material.emissiveIntensity = Math.max(material.emissiveIntensity, 0.18);
+      } else {
+        material.emissive.copy(material.userData.baseEmissive || new THREE.Color(0x000000));
+        material.emissiveIntensity = material.userData.baseEmissiveIntensity ?? 0;
+      }
+      material.needsUpdate = true;
+    });
+  });
+}
+
+function focusPart(id) {
+  const group = partGroups.get(id);
+  if (!group) return;
+  const box = new THREE.Box3().setFromObject(group);
+  const size = new THREE.Vector3();
+  const center = new THREE.Vector3();
+  box.getSize(size);
+  box.getCenter(center);
+  const distance = Math.max(size.x, size.y, size.z, 8) * (isMobile() ? 2.8 : 2.2);
+  desiredTarget.copy(center);
+  desiredCamera.copy(center.clone().add(new THREE.Vector3(distance, distance * 0.72, distance * 0.95)));
+  cameraEase = 1;
+}
+
+function handlePointerDown(event) {
+  if (event.target !== renderer.domElement) return;
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(interactive, true);
+  if (!hits.length) return;
+  let obj = hits[0].object;
+  while (obj && !obj.userData.partId) obj = obj.parent;
+  if (obj?.userData.partId) selectPart(obj.userData.partId);
+}
+
+function onResize() {
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile() ? 1.5 : 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (state.spin && !state.selected) root.rotation.y += 0.002;
+  if (cameraEase > 0) {
+    camera.position.lerp(desiredCamera, 0.075);
+    controls.target.lerp(desiredTarget, 0.075);
+    cameraEase *= 0.90;
+    if (camera.position.distanceTo(desiredCamera) < 0.12 && controls.target.distanceTo(desiredTarget) < 0.08) {
+      cameraEase = 0;
+      camera.position.copy(desiredCamera);
+      controls.target.copy(desiredTarget);
+    }
+  }
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+drawerToggle.addEventListener('click', () => {
+  if (isMobile()) {
+    const open = !partsDrawer.classList.contains('open');
+    partsDrawer.classList.toggle('open', open);
+    partsDrawer.classList.toggle('closed', !open);
+  } else {
+    partsDrawer.classList.toggle('closed');
+  }
+});
+viewGrid.addEventListener('click', event => {
+  const button = event.target.closest('[data-view]');
+  if (button) setView(button.dataset.view);
+});
+detailToggle.addEventListener('click', () => {
+  setInspectorOpen(inspector.hidden);
+});
+labelsToggle.addEventListener('click', () => {
+  setLabelsVisible(!state.labels);
+});
+resetView.addEventListener('click', () => {
+  setView(state.view);
+});
+explodeSlider.addEventListener('input', event => {
+  state.explode = Number(event.target.value) / 100;
+  updateUi();
+  updateTransforms();
+});
+renderer.domElement.addEventListener('pointerdown', handlePointerDown);
+controls.addEventListener('start', () => {
+  cameraEase = 0;
+  desiredCamera.copy(camera.position);
+  desiredTarget.copy(controls.target);
+});
+window.addEventListener('resize', onResize);
+
+buildViews();
+buildPartList();
+setLabelsVisible(false);
+setInspectorOpen(false);
+setView('exploded');
+selectPart(null);
+animate();
+
+window.statsKeyPrototype = { setView, selectPart, focusPart };
+</script>
+</body>
+</html>
