@@ -1347,22 +1347,23 @@ function buildReferenceCounter(group) {
 }
 
 function buildOpticalModule(group) {
-  addBottomed(group, disk(6.0, 0.34, makeMaterial(0x9be7ff, { roughness: 0.04, metalness: 0.0, opacity: 0.42, emissive: 0x0a5d75, emissiveIntensity: 0.16 }), 80), 0, 1.22, 5.2);
-  addBottomed(group, ring(9.0, 6.15, 0.52, makeMaterial(0x05070a, { roughness: 0.7, opacity: 0.92 })), 0, 1.58, 5.2);
-  addBottomed(group, roundedSlab(10.5, 6.8, 0.52, 1.2, makeMaterial(0x0b7a4f, { roughness: 0.46, opacity: 0.88 })), 0, 3.18, 5.2);
+  const oz = 7.4;
+  addBottomed(group, disk(6.0, 0.34, makeMaterial(0x9be7ff, { roughness: 0.04, metalness: 0.0, opacity: 0.42, emissive: 0x0a5d75, emissiveIntensity: 0.16 }), 80), 0, 1.22, oz);
+  addBottomed(group, ring(9.0, 6.15, 0.52, makeMaterial(0x05070a, { roughness: 0.7, opacity: 0.92 })), 0, 1.58, oz);
+  addBottomed(group, roundedSlab(10.5, 6.8, 0.52, 1.2, makeMaterial(0x0b7a4f, { roughness: 0.46, opacity: 0.88 })), 0, 3.18, oz);
   const ledGreen = roundedSlab(1.4, 1.1, 0.34, 0.2, makeMaterial(0xb6ff92, { roughness: 0.25, emissive: 0x56ff2b, emissiveIntensity: 0.55 }), 0.2);
-  addBottomed(group, ledGreen, -2.2, 3.78, 5.2);
+  addBottomed(group, ledGreen, -2.2, 3.78, oz);
   const ledIr = roundedSlab(1.4, 1.1, 0.34, 0.2, makeMaterial(0xff8062, { roughness: 0.25, emissive: 0xff452e, emissiveIntensity: 0.30 }));
-  addBottomed(group, ledIr, 2.2, 3.78, 5.2);
+  addBottomed(group, ledIr, 2.2, 3.78, oz);
   const pd = roundedSlab(1.6, 1.4, 0.34, 0.2, makeMaterial(0x151a20, { roughness: 0.3, metalness: 0.18 }));
-  addBottomed(group, pd, 0, 3.82, 2.8);
-  addBottomed(group, roundedSlab(8.5, 0.34, 0.42, 0.12, makeMaterial(0x020304, { roughness: 0.78, opacity: 0.80 })), 0, 3.72, 4.0);
+  addBottomed(group, pd, 0, 3.82, oz - 2.4);
+  addBottomed(group, roundedSlab(8.5, 0.34, 0.42, 0.12, makeMaterial(0x020304, { roughness: 0.78, opacity: 0.80 })), 0, 3.72, oz - 1.2);
   const cone = new THREE.Mesh(
     new THREE.ConeGeometry(4.1, 5.4, 64, 1, true),
     makeMaterial(0x9be7ff, { roughness: 0.1, opacity: 0.09, emissive: 0x0a5d75, emissiveIntensity: 0.12 })
   );
   cone.rotation.x = Math.PI;
-  cone.position.set(0, 2.8, 5.2);
+  cone.position.set(0, 2.8, oz);
   group.add(cone);
   tagMeshes(group, 'optical-module');
 }
@@ -1405,7 +1406,7 @@ function buildPuckShell(group) {
   addBottomed(group, mark(ring(42, 37, 6.8, makeMaterial(0x202731, { roughness: 0.52, opacity: 0.62 })), 'wall'), 0, 4.02, 0);
   addBottomed(group, mark(ring(38, 15.5, 0.58, makeMaterial(0x111821, { roughness: 0.6, opacity: 0.72 })), 'pocket'), 0, 2.42, 0);
   addBottomed(group, mark(ring(42, 38.2, 2.35, makeMaterial(0x2b333e, { roughness: 0.52, opacity: 0.62 })), 'top'), 0, 9.85, 0);
-  addBottomed(group, mark(disk(42, 0.78, makeMaterial(0x28313c, { roughness: 0.46, opacity: 0.88 }), 96), 'cap'), 0, 12.62, 0);
+  addBottomed(group, mark(disk(42, 0.38, makeMaterial(0x28313c, { roughness: 0.46, opacity: 0.88 }), 96), 'cap'), 0, 13.12, 0);
   [-9, -3, 3, 9].forEach(x => {
     addBottomed(group, mark(roundedSlab(1.4, 13.8, 0.05, 0.25, makeMaterial(0x070b10, { roughness: 0.7, opacity: 0.68 })), 'rib'), x, 13.48, -0.4);
   });
@@ -1433,14 +1434,14 @@ function buildElectrochemCore(group) {
 }
 
 function buildBleAntenna(group) {
-  addBottomed(group, roundedSlab(14.5, 9.6, 0.36, 1.0, makeMaterial(0x1f63bf, { roughness: 0.48, opacity: 0.94 })), 5.8, 8.55, 7.0);
-  addBottomed(group, roundedSlab(13.6, 8.0, 1.65, 0.45, makeMaterial(0xb7c4d4, { roughness: 0.42, metalness: 0.18 })), 5.8, 8.95, 7.0);
-  addBottomed(group, roundedSlab(14.2, 5.8, 0.08, 1.0, makeMaterial(0x78a8ff, { roughness: 0.36, opacity: 0.18, emissive: 0x12377d, emissiveIntensity: 0.28 })), 6.2, 10.74, 12.0);
-  addBottomed(group, roundedSlab(15.5, 8.2, 0.06, 1.0, makeMaterial(0x78a8ff, { roughness: 0.42, opacity: 0.10, emissive: 0x12377d, emissiveIntensity: 0.18 })), 5.9, 8.42, 8.6);
+  addBottomed(group, roundedSlab(14.5, 9.6, 0.36, 1.0, makeMaterial(0x1f63bf, { roughness: 0.48, opacity: 0.94 })), 5.2, 8.55, 5.8);
+  addBottomed(group, roundedSlab(13.6, 8.0, 1.65, 0.45, makeMaterial(0xb7c4d4, { roughness: 0.42, metalness: 0.18 })), 5.2, 8.95, 5.8);
+  addBottomed(group, roundedSlab(14.2, 5.8, 0.08, 1.0, makeMaterial(0x78a8ff, { roughness: 0.36, opacity: 0.18, emissive: 0x12377d, emissiveIntensity: 0.28 })), 5.8, 10.74, 9.0);
+  addBottomed(group, roundedSlab(15.5, 8.2, 0.06, 1.0, makeMaterial(0x78a8ff, { roughness: 0.42, opacity: 0.10, emissive: 0x12377d, emissiveIntensity: 0.18 })), 5.4, 8.42, 7.4);
   const antenna = new THREE.Group();
   for (let i = 0; i < 5; i++) {
     const line = roundedSlab(5.2, 0.18, 0.05, 0.05, makeMaterial(0xf2c354, { roughness: 0.28, metalness: 0.75, opacity: 0.86 }));
-    line.position.set(4.4 + (i % 2 ? 1.0 : -1.0), 10.84, 9.8 + i * 0.58);
+    line.position.set(3.9 + (i % 2 ? 1.0 : -1.0), 10.84, 8.4 + i * 0.52);
     antenna.add(line);
   }
   group.add(antenna);
@@ -1449,21 +1450,21 @@ function buildBleAntenna(group) {
 
 function buildPowerStack(group) {
   const battery = disk(12.1, 4.0, makeMaterial(0xcfd8e3, { roughness: 0.36, metalness: 0.28, opacity: 0.96 }), 72);
-  battery.position.set(-9.6, 10.45, 5.6);
+  battery.position.set(-9.6, 10.65, 5.6);
   group.add(battery);
-  addBottomed(group, roundedSlab(8.2, 1.0, 0.16, 0.20, makeMaterial(0xd9a936, { roughness: 0.28, metalness: 0.70, opacity: 0.88 })), -9.6, 12.56, 5.6);
-  addBottomed(group, roundedSlab(4.2, 1.0, 0.12, 0.18, makeMaterial(0xd9a936, { roughness: 0.28, metalness: 0.70, opacity: 0.82 })), -9.6, 8.34, 5.6);
-  addBottomed(group, roundedSlab(2.5, 2.5, 0.58, 0.25, makeMaterial(0x7c4dff, { roughness: 0.34, metalness: 0.08 })), 13.2, 5.82, 8.4);
-  addBottomed(group, roundedSlab(5.8, 3.2, 0.35, 0.45, makeMaterial(0x1b222c, { roughness: 0.42 })), 12.0, 5.72, 8.4);
+  addBottomed(group, roundedSlab(8.2, 1.0, 0.16, 0.20, makeMaterial(0xd9a936, { roughness: 0.28, metalness: 0.70, opacity: 0.88 })), -9.6, 12.76, 5.6);
+  addBottomed(group, roundedSlab(4.2, 1.0, 0.12, 0.18, makeMaterial(0xd9a936, { roughness: 0.28, metalness: 0.70, opacity: 0.82 })), -9.6, 8.54, 5.6);
+  addBottomed(group, roundedSlab(2.5, 2.5, 0.58, 0.25, makeMaterial(0x7c4dff, { roughness: 0.34, metalness: 0.08 })), 10.5, 5.82, 11.8);
+  addBottomed(group, roundedSlab(5.8, 3.2, 0.35, 0.45, makeMaterial(0x1b222c, { roughness: 0.42 })), 10.5, 5.72, 11.8);
   tagMeshes(group, 'power-stack');
 }
 
 function buildHaptic(group) {
   const body = disk(10.0, 2.7, makeMaterial(0xc2c9d3, { roughness: 0.38, metalness: 0.42, opacity: 0.92 }), 64);
-  body.position.set(9.2, 10.0, 1.0);
+  body.position.set(8.0, 10.1, -8.0);
   group.add(body);
   const isolator = ring(11.8, 10.2, 0.42, makeMaterial(0x11161c, { roughness: 0.65, opacity: 0.74 }));
-  addBottomed(group, isolator, 9.2, 8.45, 1.0);
+  addBottomed(group, isolator, 8.0, 8.6, -8.0);
   tagMeshes(group, 'haptic-motor');
 }
 
@@ -1501,6 +1502,36 @@ function contactPositions() {
     [-2.0, 2.0].forEach(z => out.push({ x, z }));
   });
   return out;
+}
+
+const packageVolumes = [
+  { id: 'afe-module', label: 'Electrochemical AFE module', min: [-14.7, 6.25, -10.1], max: [12.7, 8.30, 5.3] },
+  { id: 'ble-module', label: 'MCU/BLE module', min: [-2.05, 8.55, 1.0], max: [12.45, 10.60, 10.6] },
+  { id: 'battery', label: 'Coin cell battery', min: [-15.65, 8.54, -0.45], max: [-3.55, 12.92, 11.65] },
+  { id: 'haptic', label: 'Haptic coin motor', min: [3.0, 8.60, -13.0], max: [13.0, 11.45, -3.0] },
+  { id: 'pmic', label: 'PMIC/charger package', min: [7.6, 5.72, 10.2], max: [13.4, 6.40, 13.4] },
+  { id: 'pogo-field', label: 'Pogo contact field', min: [-5.9, 2.36, -2.9], max: [5.9, 3.94, 2.9] },
+  { id: 'optical-module', label: 'Optical module', min: [-5.3, 1.22, 4.0], max: [5.3, 4.16, 10.8] }
+];
+
+function boxesOverlap(a, b, clearance = 0.15) {
+  return a.min[0] < b.max[0] + clearance && a.max[0] + clearance > b.min[0]
+    && a.min[1] < b.max[1] + clearance && a.max[1] + clearance > b.min[1]
+    && a.min[2] < b.max[2] + clearance && a.max[2] + clearance > b.min[2];
+}
+
+function validateAssembledPackageVolumes() {
+  const collisions = [];
+  for (let i = 0; i < packageVolumes.length; i += 1) {
+    for (let j = i + 1; j < packageVolumes.length; j += 1) {
+      if (boxesOverlap(packageVolumes[i], packageVolumes[j])) {
+        collisions.push(`${packageVolumes[i].label} intersects ${packageVolumes[j].label}`);
+      }
+    }
+  }
+  if (collisions.length) {
+    console.error('StatsKey package volume collision(s):', collisions);
+  }
 }
 
 const stackOrder = [
@@ -1581,6 +1612,7 @@ createPart('ble-antenna', [0, 18.6, 0], buildBleAntenna, [21, 16.0, 15]);
 createPart('power-stack', [0, 19.4, 0], buildPowerStack, [-22, 18.0, 7]);
 createPart('haptic-motor', [0, 19.2, 0], buildHaptic, [22, 17.0, 2]);
 createPart('thermal-zone', [0, 9.8, 0], buildThermal, [18, 11.5, -12]);
+validateAssembledPackageVolumes();
 applyMeasuredStackLayout();
 frameMeasuredStackLayout();
 buildScaleReferences();
