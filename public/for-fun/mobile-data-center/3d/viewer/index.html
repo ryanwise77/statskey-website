@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Mobile Data Center 3D Viewer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script>
+  if (new URLSearchParams(window.location.search).get('embed') === '1') {
+    document.documentElement.classList.add('embed-mode');
+  }
+  if (new URLSearchParams(window.location.search).get('hero') === '1') {
+    document.documentElement.classList.add('hero-mode');
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060c12;
+    --bg-soft: rgba(10, 18, 26, 0.72);
+    --panel: rgba(13, 21, 30, 0.82);
+    --panel-strong: rgba(9, 15, 22, 0.92);
+    --line: rgba(173, 214, 255, 0.12);
+    --line-strong: rgba(111, 203, 255, 0.35);
+    --ink: #e7eff7;
+    --muted: #91a5bb;
+    --aqua: #7fd4ff;
+    --ice: #e8f8ff;
+    --mint: #79f3d2;
+    --amber: #ffba63;
+    --signal: #ff7a3d;
+    --danger: #ff625e;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(circle at 14% 12%, rgba(0, 183, 255, 0.16), transparent 26%),
+      radial-gradient(circle at 88% 22%, rgba(255, 122, 61, 0.11), transparent 24%),
+      radial-gradient(circle at 50% 90%, rgba(121, 243, 210, 0.08), transparent 26%),
+      linear-gradient(145deg, #050a11 0%, #09111a 46%, #060b12 100%);
+    color: var(--ink);
+    font-family: "Barlow", sans-serif;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.11;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 120px 120px;
+    mask-image: radial-gradient(circle at center, black, transparent 88%);
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode: soft-light;
+  }
+
+  #app {
+    position: absolute;
+    inset: 0;
+  }
+
+  .brand {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    width: min(460px, calc(100vw - 36px));
+    padding: 18px 20px 18px 20px;
+    background: linear-gradient(180deg, rgba(11, 18, 27, 0.94), rgba(9, 15, 22, 0.82));
+    border: 1px solid var(--line);
+    clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 0 100%);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+  }
+  .brand__eyebrow {
+    font-family: "Rajdhani", sans-serif;
+    letter-spacing: 0.22em;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--mint);
+    margin-bottom: 8px;
+  }
+  .brand__title {
+    margin: 0;
+    font-family: "Rajdhani", sans-serif;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .brand__subtitle {
+    margin: 10px 0 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--muted);
+    max-width: 42ch;
+  }
+  .brand__meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+  }
+  .chip::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--aqua);
+    box-shadow: 0 0 14px rgba(127,212,255,0.6);
+  }
+
+  .toolbar {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    width: min(390px, calc(100vw - 36px));
+    padding: 16px 16px 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    clip-path: polygon(24px 0, 100% 0, 100% 100%, 0 100%, 0 24px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+  }
+  .toolbar h2,
+  .inspector h2,
+  .parts h2 {
+    margin: 0 0 10px;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--aqua);
+  }
+  .view-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .tool-btn,
+  .part-btn,
+  .drawer-toggle {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
+  }
+  .tool-btn:hover,
+  .part-btn:hover,
+  .drawer-toggle:hover {
+    transform: translateY(-1px);
+    border-color: var(--line-strong);
+    background: linear-gradient(180deg, rgba(127,212,255,0.12), rgba(255,255,255,0.04));
+  }
+  .tool-btn.active,
+  .part-card.active .part-btn {
+    border-color: rgba(121,243,210,0.5);
+    background: linear-gradient(180deg, rgba(121,243,210,0.16), rgba(127,212,255,0.06));
+    color: var(--ice);
+  }
+  .tool-btn {
+    padding: 10px 11px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .slider-wrap {
+    margin-top: 12px;
+    display: grid;
+    gap: 8px;
+  }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: #79f3d2;
+  }
+  .metrics {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .metric {
+    padding: 10px 10px 8px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+  }
+  .metric__value {
+    font-family: "Rajdhani", sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--ice);
+  }
+  .metric__label {
+    margin-top: 4px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .drawer-toggle {
+    position: absolute;
+    left: 18px;
+    top: 208px;
+    z-index: 3;
+    padding: 10px 14px;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: var(--panel-strong);
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  }
+
+  .parts {
+    position: absolute;
+    left: 18px;
+    top: 252px;
+    bottom: 18px;
+    width: min(340px, calc(100vw - 36px));
+    padding: 14px 14px 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+    transform: translateX(0);
+    transition: transform 240ms ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+  }
+  .parts.closed { transform: translateX(calc(-100% - 16px)); }
+  .parts__body {
+    height: calc(100% - 28px);
+    overflow: auto;
+    padding-right: 4px;
+  }
+  .parts__body::-webkit-scrollbar { width: 8px; }
+  .parts__body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
+  .part-section {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .part-section:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .part-section h3 {
+    margin: 0 0 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+  }
+  .part-card {
+    margin-bottom: 8px;
+  }
+  .part-btn {
+    width: 100%;
+    padding: 11px 12px;
+    text-align: left;
+    position: relative;
+  }
+  .part-btn__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ice);
+  }
+  .part-btn__meta {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .part-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    flex: 0 0 auto;
+    box-shadow: 0 0 18px currentColor;
+  }
+
+  .inspector {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    width: min(420px, calc(100vw - 36px));
+    min-height: 200px;
+    padding: 16px 16px 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+  }
+  .inspector__empty {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .inspector__name {
+    margin: 0 0 8px;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 26px;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: 0.04em;
+  }
+  .inspector__desc {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .kv {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 6px 12px;
+    font-size: 12px;
+  }
+  .kv dt {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .kv dd {
+    margin: 0;
+    color: var(--ink);
+  }
+  .inspector__actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .inspector__actions .tool-btn {
+    padding: 8px 10px;
+  }
+  .detail-hidden {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .foot-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: rgba(8, 13, 20, 0.86);
+    border: 1px solid var(--line);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .part-label {
+    font-family: "Rajdhani", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ice);
+    background: rgba(6, 10, 16, 0.78);
+    border: 1px solid rgba(127,212,255,0.22);
+    padding: 4px 7px 3px;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+  }
+
+  a { color: var(--aqua); text-decoration: none; }
+
+  html.embed-mode .brand {
+    display: none;
+  }
+  html.embed-mode .toolbar {
+    top: 12px;
+    right: 12px;
+    width: min(320px, calc(100vw - 24px));
+    padding: 12px;
+    clip-path: none;
+    border-radius: 14px;
+  }
+  html.embed-mode .toolbar h2,
+  html.embed-mode .metrics,
+  html.embed-mode .foot-hint {
+    display: none;
+  }
+  html.embed-mode .view-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  html.embed-mode .tool-btn {
+    padding: 8px 9px;
+    font-size: 11px;
+  }
+  html.embed-mode .slider-wrap {
+    margin-top: 10px;
+  }
+  html.embed-mode .drawer-toggle {
+    top: 12px;
+    left: 12px;
+    padding: 9px 12px;
+    clip-path: none;
+    border-radius: 12px;
+  }
+  html.embed-mode .parts {
+    top: 58px;
+    left: 12px;
+    bottom: 12px;
+    width: min(300px, calc(100vw - 24px));
+    border-radius: 14px;
+  }
+  html.embed-mode .inspector {
+    right: 12px;
+    bottom: 12px;
+    width: min(320px, calc(100vw - 24px));
+    min-height: 0;
+    padding: 12px;
+    clip-path: none;
+    border-radius: 14px;
+  }
+  html.embed-mode .part-label {
+    display: none !important;
+  }
+
+  html.hero-mode body {
+    background:
+      radial-gradient(ellipse at 50% 58%, rgba(8,20,34,0.0), rgba(4,8,13,0.95) 72%),
+      radial-gradient(circle at 18% 14%, rgba(0,183,255,0.18), transparent 32%),
+      radial-gradient(circle at 82% 78%, rgba(255,122,61,0.12), transparent 34%),
+      linear-gradient(150deg, #050a11 0%, #08111b 50%, #05090f 100%);
+  }
+  html.hero-mode body::before,
+  html.hero-mode body::after {
+    opacity: 0.05;
+  }
+  html.hero-mode .brand,
+  html.hero-mode .toolbar,
+  html.hero-mode .drawer-toggle,
+  html.hero-mode .parts,
+  html.hero-mode .inspector,
+  html.hero-mode .foot-hint,
+  html.hero-mode .part-label {
+    display: none !important;
+  }
+  html.hero-mode #app {
+    pointer-events: none;
+  }
+  html.embed-mode .inspector h2 {
+    margin-bottom: 8px;
+  }
+  html.embed-mode .inspector__name {
+    font-size: 22px;
+  }
+  html.embed-mode .inspector__desc {
+    font-size: 12px;
+  }
+
+  @media (max-width: 1080px) {
+    .brand { width: min(380px, calc(100vw - 36px)); }
+    .toolbar { width: min(320px, calc(100vw - 36px)); }
+    .inspector { width: min(360px, calc(100vw - 36px)); }
+  }
+  @media (max-width: 780px) {
+    .brand { width: calc(100vw - 36px); }
+    .toolbar {
+      top: auto;
+      bottom: 18px;
+      left: 18px;
+      right: auto;
+      width: calc(100vw - 36px);
+    }
+    .inspector {
+      left: 18px;
+      right: 18px;
+      width: auto;
+      bottom: 228px;
+    }
+    .parts {
+      width: calc(100vw - 36px);
+    }
+    .drawer-toggle {
+      top: 214px;
+    }
+    .foot-hint {
+      display: none;
+    }
+  }
+  @media (max-width: 780px) {
+    .brand {
+      display: none;
+    }
+    .toolbar {
+      left: 12px;
+      right: 12px;
+      top: auto;
+      bottom: 12px;
+      width: auto;
+      padding: 12px;
+      clip-path: none;
+      border-radius: 14px;
+    }
+    .view-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .toolbar h2,
+    .metrics,
+    .part-label {
+      display: none !important;
+    }
+    .tool-btn {
+      padding: 9px 8px;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+    .drawer-toggle {
+      top: 12px;
+      left: 12px;
+      padding: 9px 12px;
+      clip-path: none;
+      border-radius: 12px;
+    }
+    .parts {
+      left: 12px;
+      right: 12px;
+      top: 64px;
+      bottom: 96px;
+      width: auto;
+      border-radius: 14px;
+      transform: translateY(0);
+    }
+    .parts.closed {
+      transform: translateY(calc(100% + 20px));
+    }
+    .inspector {
+      left: 12px;
+      right: 12px;
+      width: auto;
+      min-height: 0;
+      max-height: 34vh;
+      overflow: auto;
+      bottom: 96px;
+      padding: 12px;
+      clip-path: none;
+      border-radius: 14px;
+    }
+    .inspector__name {
+      font-size: 22px;
+    }
+    .kv {
+      grid-template-columns: 92px 1fr;
+      gap: 5px 10px;
+      font-size: 11px;
+    }
+  }
+  @media (max-width: 780px) and (orientation: landscape) {
+    .parts {
+      bottom: 84px;
+      max-width: 300px;
+      right: auto;
+    }
+    .inspector {
+      left: auto;
+      right: 12px;
+      width: min(320px, calc(100vw - 24px));
+      bottom: 84px;
+      max-height: 44vh;
+    }
+  }
+  @media (max-width: 780px) {
+    html.embed-mode .toolbar {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      width: auto;
+    }
+    html.embed-mode .parts {
+      top: 56px;
+      bottom: 86px;
+    }
+    html.embed-mode .inspector {
+      left: 12px;
+      right: 12px;
+      width: auto;
+      bottom: 86px;
+      max-height: 30vh;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<section class="brand">
+  <div class="brand__eyebrow">AuroraEdge AK-20</div>
+  <h1 class="brand__title">Interactive Product Viewer</h1>
+</section>
+
+<section class="toolbar">
+  <h2>Views</h2>
+  <div class="view-grid">
+    <button class="tool-btn active" id="viewExploded">System exploded</button>
+    <button class="tool-btn" id="viewAssembled">Assembled</button>
+    <button class="tool-btn" id="viewXray">X-ray racks</button>
+    <button class="tool-btn" id="viewRoofOff">Roof off</button>
+    <button class="tool-btn" id="toggleSpin">Auto spin</button>
+    <button class="tool-btn" id="showAll">Show all</button>
+  </div>
+  <div class="slider-wrap">
+    <div class="slider-label">
+      <span>Explode distance</span>
+      <span id="explodeValue">85%</span>
+    </div>
+    <input type="range" id="explodeSlider" min="0" max="100" value="85" />
+  </div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric__value">20'</div>
+      <div class="metric__label">Envelope</div>
+    </div>
+    <div class="metric">
+      <div class="metric__value">3 racks</div>
+      <div class="metric__label">Compute row</div>
+    </div>
+    <div class="metric">
+      <div class="metric__value">26 parts</div>
+      <div class="metric__label">Modeled set</div>
+    </div>
+  </div>
+</section>
+
+<button class="drawer-toggle" id="drawerToggle">☰ Parts</button>
+
+<aside class="parts" id="partsDrawer">
+  <h2>Parts</h2>
+  <div class="parts__body" id="partsBody"></div>
+</aside>
+
+<section class="inspector">
+  <h2>Inspect</h2>
+  <div class="inspector__empty" id="inspectorContent">
+    Click any part in the scene or from the parts drawer to isolate and inspect it.
+    The viewer defaults to a separated system view so every major element stays legible at real scale.
+  </div>
+</section>
+
+<div class="foot-hint">Drag rotate · Scroll zoom · Right drag pan · Click any part or part card to isolate and inspect</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://esm.sh/three@0.160.0",
+    "three/addons/": "https://esm.sh/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const params = new URLSearchParams(window.location.search);
+const EMBED = params.get('embed') === '1';
+const HERO = params.get('hero') === '1';
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobileMedia = window.matchMedia('(max-width: 780px)');
+const isCompactViewport = () => EMBED || HERO || mobileMedia.matches;
+
+const MM = 0.001;
+const dims = {
+  CONT_EXT_L: 6000,
+  CONT_EXT_W: 2400,
+  CONT_EXT_H: 2900,
+  USABLE_L: 5410,
+  USABLE_W: 2290,
+  USABLE_H: 2185,
+  USABLE_X0: 260,
+  USABLE_Z0: 55,
+  USABLE_Y0: 145,
+  FLOOR_H: 120,
+  RACK_W: 600.2,
+  RACK_D: 1092.2,
+  RACK_H: 1993.9,
+  RACK1_X: 2130,
+  RACK_GAP: 30,
+  RACK_Z: 1212.8,
+  RU: 44.45,
+  RU_BOTTOM: 90,
+  UPS_W: 380,
+  UPS_D: 1050,
+  UPS_H: 1400,
+  COOL_W: 300,
+  COOL_D: 1200,
+  COOL_H: 1950
+};
+const dimsRack2X = dims.RACK1_X + dims.RACK_W + dims.RACK_GAP;
+const dimsRack3X = dimsRack2X + dims.RACK_W + dims.RACK_GAP;
+
+const colors = {
+  Enclosure: '#8ecdf1',
+  Power: '#ffbe73',
+  Cooling: '#79f3d2',
+  'Rack 1': '#7fd4ff',
+  'Rack 2': '#91a6ff',
+  'Rack 3': '#f68fc8',
+  Connectivity: '#ffd26a'
+};
+
+const parts = [
+  {
+    id: 'reefer-shell',
+    label: "20' HC reefer shell",
+    section: 'Enclosure',
+    dims: [6000, 2400, 2900],
+    exactness: 'variant-exact',
+    sourceUrl: 'https://www.tradecorp-usa.com/products/refrigerated-containers/20-hc-thermo-king-magnum-reefer-container/',
+    sourceLabel: 'Tradecorp 20 HC Magnum+ reefer',
+    description: 'High-cube reefer envelope used as the geometry basis for the converted edge enclosure.',
+    base: [0, 0, 0],
+    explode: [0, 0, 0],
+    kind: 'shell'
+  },
+  {
+    id: 'reefer-unit',
+    label: 'Thermo King reefer unit',
+    section: 'Enclosure',
+    dims: [800, 220, 2280],
+    exactness: 'informed-approx',
+    sourceUrl: 'https://qa65-tk.corp.global/na/en/marine/refrigeration-units/magnum-plus.html',
+    sourceLabel: 'Thermo King Magnum Plus',
+    description: 'Existing reefer machine face kept in the model as the physical donor geometry for the converted shell.',
+    base: [0, 800, 280],
+    explode: [-260, 0, 0],
+    kind: 'reeferUnit'
+  },
+  {
+    id: 'raised-floor',
+    label: 'Raised access floor',
+    section: 'Enclosure',
+    dims: [1920, 1235, 120],
+    exactness: 'informed-approx',
+    sourceUrl: 'https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/',
+    sourceLabel: 'Deckro EdgeFlex B20',
+    description: 'Data-center-grade raised floor under the rack row and cold aisle. Perforated tiles supply cold air from below, solid tiles carry cabling; the slab sits on 120 mm pedestals.',
+    base: [2090, 55, 143],
+    explode: [0, -120, -40],
+    kind: 'raisedFloor'
+  },
+  {
+    id: 'aisle-containment',
+    label: 'Cold-aisle containment',
+    section: 'Enclosure',
+    dims: [1800, 1157, 1900],
+    exactness: 'informed-approx',
+    sourceUrl: 'https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/',
+    sourceLabel: 'Deckro EdgeFlex B20',
+    description: 'Full-height glass end-caps at each short end of the aisle, with an overhead glass canopy spanning the aisle at rack-top height. One sliding door at the near end is shown partway open to signal the walk-through entry. The racks themselves form the two long walls.',
+    base: [2140, 55, 263],
+    explode: [0, -240, 320],
+    kind: 'aisleContainment'
+  },
+  {
+    id: 'ups',
+    label: 'APC Easy UPS 3S 30kVA',
+    section: 'Power',
+    dims: [380, 1050, 1400],
+    exactness: 'exact',
+    sourceUrl: 'https://tecisoft.com/products/apc-by-schneider-electric-easy-ups-3s-30kva-tower-ups',
+    sourceLabel: 'APC E3SUPS30KFBS',
+    description: 'Three-phase online UPS with internal batteries, modeled at vendor dimensions.',
+    base: [780, 1295, 145],
+    explode: [-220, 180, 0],
+    kind: 'ups'
+  },
+  {
+    id: 'ats',
+    label: 'ATS panel',
+    section: 'Power',
+    dims: [600, 120, 600],
+    exactness: 'informed-approx',
+    sourceUrl: '',
+    sourceLabel: 'Equivalent 200A ATS',
+    description: 'Wall-mounted utility/generator transfer switch and distribution face.',
+    base: [540, 75, 1005],
+    explode: [-200, -100, 0],
+    kind: 'ats'
+  },
+  {
+    id: 'fm200',
+    label: 'FM-200 cylinder',
+    section: 'Power',
+    dims: [350, 350, 1500],
+    exactness: 'informed-approx',
+    sourceUrl: 'https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/',
+    sourceLabel: 'Typical 20ft clean-agent install envelope',
+    description: 'Container-sized clean-agent cylinder envelope used for physical coordination.',
+    base: [1380, 2075, 145],
+    explode: [-80, 220, 0],
+    kind: 'fm200'
+  },
+  {
+    id: 'cyberrow',
+    label: 'Stulz CyberRow CRS-042',
+    section: 'Cooling',
+    dims: [300, 1200, 1950],
+    exactness: 'variant-exact',
+    sourceUrl: 'https://www.stulz.com/products/detail/cyberrow/',
+    sourceLabel: 'Stulz CyberRow range',
+    description: 'In-row DX backup cooler modeled to the current CyberRow family envelope.',
+    base: [1800, 1212.8, 145],
+    explode: [-120, 160, 0],
+    kind: 'cyberrow'
+  },
+  {
+    id: 'economizer',
+    label: 'Economizer wall',
+    section: 'Cooling',
+    dims: [320, 2290, 2185],
+    exactness: 'informed-approx',
+    sourceUrl: 'https://weatherspark.com/y/273/Average-Weather-in-Fairbanks-Alaska-United-States-Year-Round',
+    sourceLabel: 'Fairbanks climate / direct free-air strategy',
+    description: 'Rear intake wall with filters and fan section representing the free-air economizer package.',
+    base: [5310, 55, 145],
+    explode: [160, 0, 0],
+    kind: 'intakeWall'
+  },
+  {
+    id: 'rack1',
+    label: 'Rack 1 cabinet',
+    section: 'Rack 1',
+    dims: [600.2, 1092.2, 1993.9],
+    exactness: 'exact',
+    sourceUrl: 'https://tripplite.eaton.com/42u-smartrack-standard-depth-server-rack-enclosure-cabinet-doors-side-panels~SR42UB',
+    sourceLabel: 'Tripp Lite SR42UB',
+    description: 'Rack shell housing core network, firewall, control-plane node, and primary GPU compute.',
+    base: [2130, 1212.8, 145],
+    explode: [-170, 120, 0],
+    kind: 'rack'
+  },
+  {
+    id: 'rack2',
+    label: 'Rack 2 cabinet',
+    section: 'Rack 2',
+    dims: [600.2, 1092.2, 1993.9],
+    exactness: 'exact',
+    sourceUrl: 'https://tripplite.eaton.com/42u-smartrack-standard-depth-server-rack-enclosure-cabinet-doors-side-panels~SR42UB',
+    sourceLabel: 'Tripp Lite SR42UB',
+    description: 'Rack shell housing redundant core network, firewall, control-plane node, and secondary GPU compute.',
+    base: [2760.2, 1212.8, 145],
+    explode: [0, 120, 0],
+    kind: 'rack'
+  },
+  {
+    id: 'rack3',
+    label: 'Rack 3 cabinet',
+    section: 'Rack 3',
+    dims: [600.2, 1092.2, 1993.9],
+    exactness: 'exact',
+    sourceUrl: 'https://tripplite.eaton.com/42u-smartrack-standard-depth-server-rack-enclosure-cabinet-doors-side-panels~SR42UB',
+    sourceLabel: 'Tripp Lite SR42UB',
+    description: 'Rack shell housing storage, rugged ingest compute, and out-of-band switching.',
+    base: [3390.4, 1212.8, 145],
+    explode: [170, 120, 0],
+    kind: 'rack'
+  },
+  {
+    id: 'arista-a',
+    label: 'Arista 7050CX3-A',
+    section: 'Rack 1',
+    dims: [483, 505, 44],
+    exactness: 'exact',
+    sourceUrl: 'https://www.arista.com/en/qsg-7050-series-1ru-gen3/7050-series-1ru-gen3-overview',
+    sourceLabel: 'Arista 7050 Gen 3 QSG',
+    description: 'Primary 100GbE leaf/top-of-rack switch.',
+    base: [2130 + 58, 1212.8 + 110, 145 + 90 + (42 - 1) * 44.45],
+    explode: [0, -520, 20],
+    kind: 'arista'
+  },
+  {
+    id: 'forti-a',
+    label: 'FortiGate 100F-A',
+    section: 'Rack 1',
+    dims: [432, 254, 44],
+    exactness: 'exact',
+    sourceUrl: 'https://www.fortinet.com/content/dam/fortinet/assets/data-sheets/pdf/fortigate-100f-series.pdf',
+    sourceLabel: 'Fortinet 100F datasheet',
+    description: 'Primary NGFW member of the HA pair.',
+    base: [2130 + 84, 1212.8 + 118, 145 + 90 + (41 - 1) * 44.45],
+    explode: [0, -560, 0],
+    kind: 'fortigate'
+  },
+  {
+    id: 'r660-a',
+    label: 'Dell PowerEdge R660-A',
+    section: 'Rack 1',
+    dims: [482, 822.88, 42.8],
+    exactness: 'exact',
+    sourceUrl: 'https://www.dell.com/support/manuals/en-au/oth-r660/r660_ism_pub/chassis-dimensions?guid=guid-a0d835a2-9196-4925-a76d-cecbe8ea1d1d&lang=en-us',
+    sourceLabel: 'Dell R660 chassis dimensions',
+    description: 'General-purpose control-plane and shared services node.',
+    base: [2130 + 58, 1212.8 + 150, 145 + 90 + (39 - 1) * 44.45],
+    explode: [0, -560, 0],
+    kind: 'r660'
+  },
+  {
+    id: 'r760xa-a',
+    label: 'Dell PowerEdge R760xa-A',
+    section: 'Rack 1',
+    dims: [482, 946.73, 86.8],
+    exactness: 'exact',
+    sourceUrl: 'https://www.dell.com/support/manuals/en-uk/poweredge-r760xa/r760xa_ism_pub/chassis-dimensions?guid=guid-cdc3eb0c-f34b-4a2e-a9d2-ce7774f32465&lang=en-us',
+    sourceLabel: 'Dell R760xa chassis dimensions',
+    description: 'Primary 4x L40S GPU compute node.',
+    base: [2130 + 58, 1212.8 + 128, 145 + 90 + (35 - 1) * 44.45],
+    explode: [0, -620, -20],
+    kind: 'r760'
+  },
+  {
+    id: 'arista-b',
+    label: 'Arista 7050CX3-B',
+    section: 'Rack 2',
+    dims: [483, 505, 44],
+    exactness: 'exact',
+    sourceUrl: 'https://www.arista.com/en/qsg-7050-series-1ru-gen3/7050-series-1ru-gen3-overview',
+    sourceLabel: 'Arista 7050 Gen 3 QSG',
+    description: 'Secondary 100GbE leaf/top-of-rack switch.',
+    base: [2760.2 + 58, 1212.8 + 110, 145 + 90 + (42 - 1) * 44.45],
+    explode: [0, -520, 20],
+    kind: 'arista'
+  },
+  {
+    id: 'forti-b',
+    label: 'FortiGate 100F-B',
+    section: 'Rack 2',
+    dims: [432, 254, 44],
+    exactness: 'exact',
+    sourceUrl: 'https://www.fortinet.com/content/dam/fortinet/assets/data-sheets/pdf/fortigate-100f-series.pdf',
+    sourceLabel: 'Fortinet 100F datasheet',
+    description: 'Secondary NGFW member of the HA pair.',
+    base: [2760.2 + 84, 1212.8 + 118, 145 + 90 + (41 - 1) * 44.45],
+    explode: [0, -560, 0],
+    kind: 'fortigate'
+  },
+  {
+    id: 'r660-b',
+    label: 'Dell PowerEdge R660-B',
+    section: 'Rack 2',
+    dims: [482, 822.88, 42.8],
+    exactness: 'exact',
+    sourceUrl: 'https://www.dell.com/support/manuals/en-au/oth-r660/r660_ism_pub/chassis-dimensions?guid=guid-a0d835a2-9196-4925-a76d-cecbe8ea1d1d&lang=en-us',
+    sourceLabel: 'Dell R660 chassis dimensions',
+    description: 'Redundant control-plane and shared services node.',
+    base: [2760.2 + 58, 1212.8 + 150, 145 + 90 + (39 - 1) * 44.45],
+    explode: [0, -560, 0],
+    kind: 'r660'
+  },
+  {
+    id: 'r760xa-b',
+    label: 'Dell PowerEdge R760xa-B',
+    section: 'Rack 2',
+    dims: [482, 946.73, 86.8],
+    exactness: 'exact',
+    sourceUrl: 'https://www.dell.com/support/manuals/en-uk/poweredge-r760xa/r760xa_ism_pub/chassis-dimensions?guid=guid-cdc3eb0c-f34b-4a2e-a9d2-ce7774f32465&lang=en-us',
+    sourceLabel: 'Dell R760xa chassis dimensions',
+    description: 'Secondary 4x L40S GPU compute node.',
+    base: [2760.2 + 58, 1212.8 + 128, 145 + 90 + (35 - 1) * 44.45],
+    explode: [0, -620, -20],
+    kind: 'r760'
+  },
+  {
+    id: 'oob',
+    label: 'Out-of-band switch',
+    section: 'Rack 3',
+    dims: [440, 300, 44],
+    exactness: 'informed-approx',
+    sourceUrl: '',
+    sourceLabel: '1U 48-port OOB equivalent',
+    description: 'Dedicated management fabric switch for iDRAC, PDU, and BMS networks.',
+    base: [3390.4 + 82, 1212.8 + 160, 145 + 90 + (42 - 1) * 44.45],
+    explode: [0, -520, 20],
+    kind: 'oob'
+  },
+  {
+    id: 'truenas',
+    label: 'TrueNAS H20',
+    section: 'Rack 3',
+    dims: [483, 681, 89],
+    exactness: 'exact',
+    sourceUrl: 'https://www.truenas.com/docs/files/HSeriesPUM/HSeriesPUM.pdf',
+    sourceLabel: 'TrueNAS H-Series PUM',
+    description: 'Dual-controller hybrid storage appliance.',
+    base: [3390.4 + 58, 1212.8 + 192, 145 + 90 + (39 - 1) * 44.45],
+    explode: [0, -610, 0],
+    kind: 'truenas'
+  },
+  {
+    id: 'xr7620',
+    label: 'Dell PowerEdge XR7620',
+    section: 'Rack 3',
+    dims: [482.6, 496.3, 86.8],
+    exactness: 'exact',
+    sourceUrl: 'https://www.dell.com/support/manuals/en-uk/poweredge-xr7620/xr7620_ism/chassis-dimensions?guid=guid-9b2dafe3-9045-4f26-b9d7-939c8376974b&lang=en-us',
+    sourceLabel: 'Dell XR7620 chassis dimensions',
+    description: 'Short-depth rugged edge server with 2x L4 for ingest and live inference.',
+    base: [3390.4 + 58, 1212.8 + 284, 145 + 90 + (35 - 1) * 44.45],
+    explode: [0, -620, -20],
+    kind: 'xr7620'
+  },
+  {
+    id: 'wallbox',
+    label: 'Starlink APS wall box',
+    section: 'Connectivity',
+    dims: [600, 300, 900],
+    exactness: 'informed-approx',
+    sourceUrl: 'https://starlink.com/specifications?spec=7',
+    sourceLabel: 'Starlink Performance APS and rack-mount accessories',
+    description: 'Internal wall cabinet holding fiber demarc and the dual Advanced Power Supplies.',
+    base: [4890, 175, 1285],
+    explode: [180, -120, 60],
+    kind: 'wallbox'
+  },
+  {
+    id: 'aps-a',
+    label: 'Advanced Power Supply A',
+    section: 'Connectivity',
+    dims: [310, 180, 40],
+    exactness: 'exact',
+    sourceUrl: 'https://starlink.com/specifications?spec=7',
+    sourceLabel: 'Starlink Performance APS',
+    description: 'Rack-mount capable power and telemetry unit for the first Performance dish.',
+    base: [4936, 201, 1905],
+    explode: [180, -200, 80],
+    kind: 'aps'
+  },
+  {
+    id: 'aps-b',
+    label: 'Advanced Power Supply B',
+    section: 'Connectivity',
+    dims: [310, 180, 40],
+    exactness: 'exact',
+    sourceUrl: 'https://starlink.com/specifications?spec=7',
+    sourceLabel: 'Starlink Performance APS',
+    description: 'Rack-mount capable power and telemetry unit for the second Performance dish.',
+    base: [4936, 201, 1835],
+    explode: [180, -200, 20],
+    kind: 'aps'
+  },
+  {
+    id: 'dish-a',
+    label: 'Starlink Performance dish A',
+    section: 'Connectivity',
+    dims: [609, 396, 40],
+    exactness: 'exact',
+    sourceUrl: 'https://starlink.com/specifications?spec=7',
+    sourceLabel: 'Starlink Performance Gen 3',
+    description: 'First roof-mounted high-durability phased-array antenna.',
+    base: [4400, 340, 3210],
+    explode: [0, -80, 260],
+    kind: 'dish'
+  },
+  {
+    id: 'dish-b',
+    label: 'Starlink Performance dish B',
+    section: 'Connectivity',
+    dims: [609, 396, 40],
+    exactness: 'exact',
+    sourceUrl: 'https://starlink.com/specifications?spec=7',
+    sourceLabel: 'Starlink Performance Gen 3',
+    description: 'Second roof-mounted high-durability phased-array antenna.',
+    base: [4400, 1664, 3210],
+    explode: [0, 80, 260],
+    kind: 'dish'
+  }
+];
+
+const app = document.getElementById('app');
+const scene = new THREE.Scene();
+if (HERO) {
+  scene.background = null;
+} else {
+  scene.background = new THREE.Color(0x060c12);
+  scene.fog = new THREE.Fog(0x060c12, 18, 66);
+}
+
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(10.8, 6.6, 10.5);
+
+const isMobileViewport = mobileMedia.matches;
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobileViewport, alpha: HERO, powerPreference: isMobileViewport ? 'low-power' : 'high-performance' });
+const dprCap = isMobileViewport ? 1.5 : 2;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = !isMobileViewport;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+if (HERO) renderer.setClearColor(0x000000, 0);
+app.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.inset = '0';
+labelRenderer.domElement.style.pointerEvents = 'none';
+app.appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.075;
+controls.screenSpacePanning = false;
+controls.target.set(dims.CONT_EXT_L * MM * 0.5, dims.CONT_EXT_H * MM * 0.36, dims.CONT_EXT_W * MM * 0.5);
+if (HERO) {
+  controls.enabled = false;
+  controls.autoRotate = !reducedMotion;
+  controls.autoRotateSpeed = 0.55;
+}
+
+scene.add(new THREE.HemisphereLight(0xc8dbeb, 0x071019, HERO ? 0.85 : 0.72));
+const key = new THREE.DirectionalLight(0xffffff, HERO ? 1.35 : 1.1);
+key.position.set(10, 14, 9);
+key.castShadow = !isMobileViewport;
+const shadowMapSize = isMobileViewport ? 1024 : 2048;
+key.shadow.mapSize.set(shadowMapSize, shadowMapSize);
+key.shadow.camera.left = -14;
+key.shadow.camera.right = 14;
+key.shadow.camera.top = 14;
+key.shadow.camera.bottom = -14;
+scene.add(key);
+
+const rim = new THREE.DirectionalLight(0x7fd4ff, HERO ? 0.6 : 0.35);
+rim.position.set(-8, 6, -10);
+scene.add(rim);
+
+if (HERO) {
+  const fill = new THREE.DirectionalLight(0xffba63, 0.35);
+  fill.position.set(-6, 5, 8);
+  scene.add(fill);
+}
+
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(240, 240),
+  new THREE.MeshStandardMaterial({ color: 0x101821, roughness: 1, metalness: 0 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const grid = new THREE.GridHelper(60, 60, 0x284355, 0x182430);
+grid.position.y = -0.01;
+scene.add(grid);
+
+const ghostRing = new THREE.Mesh(
+  new THREE.TorusGeometry(8.5, 0.012, 24, 240),
+  new THREE.MeshBasicMaterial({ color: 0x0f3142, transparent: true, opacity: 0.26 })
+);
+ghostRing.rotation.x = Math.PI / 2;
+ghostRing.position.y = 0.001;
+scene.add(ghostRing);
+
+const sceneRoot = new THREE.Group();
+scene.add(sceneRoot);
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const selectableMeshes = [];
+const partEntries = new Map();
+
+const initialExplode = HERO ? 0 : (EMBED ? 0.18 : (location.hash === '#assembled' ? 0 : 0.85));
+const state = {
+  explode: initialExplode,
+  targetExplode: initialExplode,
+  roofLift: 0,
+  targetRoofLift: 0,
+  xray: 0,
+  targetXray: 0,
+  autoSpin: false,
+  selectedId: null
+};
+
+let desiredCamera = camera.position.clone();
+let desiredTarget = controls.target.clone();
+let cameraMoveActive = false;
+let suppressSceneClicksUntil = 0;
+
+// Any user interaction with OrbitControls cancels the programmatic framing
+// so drag-to-rotate, scroll-to-zoom, and right-drag pan are not fought on
+// every frame by the lerp toward desiredCamera/desiredTarget.
+controls.addEventListener('start', () => { cameraMoveActive = false; });
+
+function mmBox(w, d, h) {
+  return new THREE.BoxGeometry(w * MM, h * MM, d * MM);
+}
+
+function baseMaterial(color, opacity = 1, roughness = 0.65, metalness = 0.18) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    transparent: opacity < 1,
+    opacity,
+    roughness,
+    metalness,
+    depthWrite: opacity >= 0.98
+  });
+}
+
+function makeMesh(geometry, material, ownerId, layer = 'solid') {
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData.ownerId = ownerId;
+  mesh.userData.layer = layer;
+  mesh.userData.baseOpacity = material.opacity;
+  mesh.userData.baseTransparent = material.transparent;
+  selectableMeshes.push(mesh);
+  return mesh;
+}
+
+function addBox(group, ownerId, { w, d, h, x = 0, z = 0, y = 0, color = 0xffffff, opacity = 1, roughness, metalness, layer = 'solid' }) {
+  const mesh = makeMesh(mmBox(w, d, h), baseMaterial(color, opacity, roughness ?? 0.65, metalness ?? 0.18), ownerId, layer);
+  mesh.position.set((x + w / 2) * MM, (y + h / 2) * MM, (z + d / 2) * MM);
+  group.add(mesh);
+  return mesh;
+}
+
+function addCylinder(group, ownerId, { diameter, height, x = 0, z = 0, y = 0, color = 0xffffff, opacity = 1, layer = 'solid' }) {
+  const geo = new THREE.CylinderGeometry((diameter * MM) / 2, (diameter * MM) / 2, height * MM, 40);
+  const mesh = makeMesh(geo, baseMaterial(color, opacity, 0.55, 0.2), ownerId, layer);
+  mesh.position.set((x + diameter / 2) * MM, (y + height / 2) * MM, (z + diameter / 2) * MM);
+  group.add(mesh);
+  return mesh;
+}
+
+function addRepeater(group, ownerId, options, callback) {
+  for (let i = 0; i < options.count; i++) callback(i);
+}
+
+function addLabel(group, part) {
+  const div = document.createElement('div');
+  div.className = 'part-label';
+  div.textContent = part.label;
+  const label = new CSS2DObject(div);
+  label.position.set(part.dims[0] * MM * 0.5, part.dims[2] * MM + 0.1, part.dims[1] * MM * 0.5);
+  group.add(label);
+  group.userData.label = label;
+  return label;
+}
+
+function setGroupBase(group, part) {
+  group.userData.base = new THREE.Vector3(part.base[0] * MM, part.base[2] * MM, part.base[1] * MM);
+  group.userData.explode = new THREE.Vector3(part.explode[0] * MM, part.explode[2] * MM, part.explode[1] * MM);
+}
+
+function registerPart(part, group, updateFn) {
+  setGroupBase(group, part);
+  group.userData.part = part;
+  group.userData.update = updateFn || defaultUpdate;
+  addLabel(group, part);
+  sceneRoot.add(group);
+  partEntries.set(part.id, { part, group });
+}
+
+function defaultUpdate(group) {
+  const base = group.userData.base;
+  const explode = group.userData.explode;
+  group.position.copy(base).addScaledVector(explode, state.explode);
+}
+
+function addPortGrid(group, ownerId, { x, z, y, cols, rows, portW, portH, gapX, gapY, inset = 0, color = 0x0a0b0c }) {
+  const g = new THREE.Group();
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      addBox(g, ownerId, {
+        w: portW,
+        d: 4,
+        h: portH,
+        x: x + c * (portW + gapX),
+        z: z + inset,
+        y: y + r * (portH + gapY),
+        color,
+        layer: 'detail'
+      });
+    }
+  }
+  group.add(g);
+}
+
+function addDriveBayGrid(group, ownerId, { x, z, y, cols, rows, bayW, bayH, gapX, gapY }) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      addBox(group, ownerId, {
+        w: bayW,
+        d: 8,
+        h: bayH,
+        x: x + c * (bayW + gapX),
+        z,
+        y: y + r * (bayH + gapY),
+        color: 0x101315,
+        layer: 'detail'
+      });
+      addBox(group, ownerId, {
+        w: bayW * 0.7,
+        d: 2,
+        h: bayH * 0.12,
+        x: x + c * (bayW + gapX) + bayW * 0.15,
+        z: z - 1,
+        y: y + r * (bayH + gapY) + bayH * 0.72,
+        color: 0x2a3138,
+        layer: 'detail'
+      });
+    }
+  }
+}
+
+function createShell(part) {
+  const g = new THREE.Group();
+  const wall = 6;
+
+  const floor = addBox(g, part.id, { w: dims.CONT_EXT_L, d: dims.CONT_EXT_W, h: 10, x: 0, z: 0, y: 0, color: 0x232a31, opacity: 0.26, layer: 'shell' });
+  const roof = addBox(g, part.id, { w: dims.CONT_EXT_L, d: dims.CONT_EXT_W, h: 10, x: 0, z: 0, y: dims.CONT_EXT_H - 10, color: 0xcfd7dc, opacity: 0.16, layer: 'shellRoof' });
+  const left = addBox(g, part.id, { w: dims.CONT_EXT_L, d: wall, h: dims.CONT_EXT_H, x: 0, z: 0, y: 0, color: 0xd6dadd, opacity: 0.12, layer: 'shell' });
+  const right = addBox(g, part.id, { w: dims.CONT_EXT_L, d: wall, h: dims.CONT_EXT_H, x: 0, z: dims.CONT_EXT_W - wall, y: 0, color: 0xd6dadd, opacity: 0.12, layer: 'shell' });
+  const front = addBox(g, part.id, { w: wall, d: dims.CONT_EXT_W, h: dims.CONT_EXT_H, x: 0, z: 0, y: 0, color: 0xd6dadd, opacity: 0.1, layer: 'shell' });
+  const rear = addBox(g, part.id, { w: wall, d: dims.CONT_EXT_W, h: dims.CONT_EXT_H, x: dims.CONT_EXT_L - wall, z: 0, y: 0, color: 0xd6dadd, opacity: 0.1, layer: 'shell' });
+
+  const corrugationColor = 0xb8c0c7;
+  for (let i = 0; i < 39; i++) {
+    const offset = i * 150 + 16;
+    addBox(g, part.id, { w: 80, d: 14, h: dims.CONT_EXT_H - 200, x: offset, z: 6, y: 100, color: corrugationColor, opacity: 0.13, layer: 'shell' });
+    addBox(g, part.id, { w: 80, d: 14, h: dims.CONT_EXT_H - 200, x: offset, z: dims.CONT_EXT_W - 20, y: 100, color: corrugationColor, opacity: 0.13, layer: 'shell' });
+  }
+
+  const inner = addBox(g, part.id, {
+    w: dims.USABLE_L, d: dims.USABLE_W, h: dims.USABLE_H,
+    x: dims.USABLE_X0, z: dims.USABLE_Z0, y: dims.USABLE_Y0,
+    color: 0xc3a96f, opacity: 0.08, layer: 'insulation'
+  });
+  inner.visible = true;
+
+  g.userData.shellRefs = { floor, roof, left, right, front, rear, inner };
+  registerPart(part, g, shellUpdate);
+}
+
+function shellUpdate(group) {
+  const base = group.userData.base;
+  group.position.copy(base);
+  const refs = group.userData.shellRefs;
+  const e = state.explode;
+  const roofLift = state.roofLift;
+  refs.roof.position.y = (dims.CONT_EXT_H - 5) * MM + roofLift * 1.2;
+  refs.left.position.z = (0 + 3) * MM - e * 0.35;
+  refs.right.position.z = (dims.CONT_EXT_W - 3) * MM + e * 0.35;
+  refs.front.position.x = (0 + 3) * MM - e * 0.28;
+  refs.rear.position.x = (dims.CONT_EXT_L - 3) * MM + e * 0.28;
+}
+
+function createReeferUnit(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 800, d: 220, h: 2280, x: 0, z: 0, y: 0, color: 0xe1e6ea, opacity: 0.95 });
+  addBox(g, part.id, { w: 650, d: 8, h: 1620, x: 75, z: -4, y: 210, color: 0x0f1316, opacity: 1, layer: 'detail' });
+  addBox(g, part.id, { w: 240, d: 8, h: 90, x: 280, z: -4, y: 90, color: 0x2a3138, opacity: 1, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createRaisedFloor(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 1920, d: 1235, h: 120, x: 0, z: 0, y: 0, color: 0x2f3337, opacity: 0.96, layer: 'floor' });
+  for (let tx = 0; tx < 3; tx++) {
+    for (let tz = 0; tz < 2; tz++) {
+      const solid = (tx + tz) % 2 === 0;
+      addBox(g, part.id, {
+        w: 596, d: 596, h: 2,
+        x: 8 + tx * 604, z: 8 + tz * 604, y: 118,
+        color: solid ? 0xaab6bf : 0x46525c, opacity: 0.88, layer: 'floor'
+      });
+      if (!solid) {
+        for (let px = 0; px < 3; px++) {
+          for (let pz = 0; pz < 3; pz++) {
+            addBox(g, part.id, {
+              w: 120, d: 120, h: 1,
+              x: 8 + tx * 604 + 140 + px * 150,
+              z: 8 + tz * 604 + 140 + pz * 150,
+              y: 120,
+              color: 0x0c1016, opacity: 1, layer: 'floor'
+            });
+          }
+        }
+      }
+    }
+  }
+  registerPart(part, g);
+}
+
+function createAisleContainment(part) {
+  const g = new THREE.Group();
+  const w = 1800;           // aisle length along rack row (X)
+  const d = 1157;           // aisle depth, front wall to rack face (Z)
+  const h = 1900;           // total containment height (Y)
+  const framePost = 50;
+  const frameTop = 60;
+  const threshold = 14;
+  const frameColor = 0x3d4753;
+  const glassColor = 0xbfe5ff;
+  const handleColor = 0xced7de;
+  const accent = 0x79f3d2;
+
+  // Overhead glass canopy with mullions
+  addBox(g, part.id, { w: w, d: d, h: 18, x: 0, z: 0, y: h - 18, color: 0xdce9ef, opacity: 0.14, layer: 'containment' });
+  for (let i = 0; i <= 3; i++) {
+    addBox(g, part.id, { w: 18, d: d, h: 22, x: (w - 18) * i / 3, z: 0, y: h - 24, color: frameColor, opacity: 0.95, layer: 'containment' });
+  }
+  addBox(g, part.id, { w: w, d: 22, h: 22, x: 0, z: 0, y: h - 24, color: frameColor, opacity: 0.95, layer: 'containment' });
+  addBox(g, part.id, { w: w, d: 22, h: 22, x: 0, z: d - 22, y: h - 24, color: frameColor, opacity: 0.95, layer: 'containment' });
+
+  // Walkable path highlight on the aisle floor so the corridor reads as a corridor
+  for (let i = 0; i < 8; i++) {
+    const cz = framePost + (d - 2 * framePost) * 0.42 + i * 6;
+    addBox(g, part.id, { w: w - 2 * framePost, d: 2, h: 1, x: framePost, z: cz, y: 1, color: accent, opacity: 0.18, layer: 'containment' });
+  }
+
+  // End-cap with a fully open doorway (one pane removed, other slid fully back)
+  function endCapOpen(xBase) {
+    const openingD = d - 2 * framePost;
+    const paneD = openingD / 2;
+    const paneH = h - frameTop - threshold;
+    // Side jambs full height
+    addBox(g, part.id, { w: framePost, d: framePost, h: h, x: xBase, z: 0, y: 0, color: frameColor, opacity: 0.96, layer: 'containment' });
+    addBox(g, part.id, { w: framePost, d: framePost, h: h, x: xBase, z: d - framePost, y: 0, color: frameColor, opacity: 0.96, layer: 'containment' });
+    // Head jamb
+    addBox(g, part.id, { w: framePost, d: d, h: frameTop, x: xBase, z: 0, y: h - frameTop, color: frameColor, opacity: 0.96, layer: 'containment' });
+    // Threshold plate
+    addBox(g, part.id, { w: framePost, d: openingD, h: threshold, x: xBase, z: framePost, y: 0, color: 0x606c78, opacity: 0.96, layer: 'containment' });
+    // Threshold chevron arrow pointing into the aisle (green)
+    for (let k = 0; k < 3; k++) {
+      const cx = xBase + framePost + 30 + k * 40;
+      const halfLen = 80 - k * 20;
+      addBox(g, part.id, { w: 6, d: halfLen, h: 2, x: cx, z: framePost + openingD / 2 - halfLen, y: threshold + 1, color: accent, opacity: 0.85, layer: 'containment' });
+      addBox(g, part.id, { w: 6, d: halfLen, h: 2, x: cx, z: framePost + openingD / 2,           y: threshold + 1, color: accent, opacity: 0.85, layer: 'containment' });
+    }
+    // Fixed right pane (glass)
+    addBox(g, part.id, { w: 12, d: paneD, h: paneH, x: xBase + (framePost - 12) / 2, z: framePost + paneD, y: threshold, color: glassColor, opacity: 0.16, layer: 'containment' });
+    // Left pane slid fully behind the right pane so the left half of the opening is clearly empty
+    addBox(g, part.id, { w: 12, d: paneD - 60, h: paneH, x: xBase + (framePost - 12) / 2 + 18, z: framePost + paneD + 30, y: threshold, color: glassColor, opacity: 0.16, layer: 'containment' });
+    // Door pulls
+    addBox(g, part.id, { w: 10, d: 14, h: 140, x: xBase - 2, z: framePost + paneD + 30 + (paneD - 60) * 0.8, y: 1000, color: handleColor, opacity: 0.95, layer: 'containment' });
+    addBox(g, part.id, { w: 10, d: 14, h: 140, x: xBase - 2, z: framePost + paneD + paneD * 0.35, y: 1000, color: handleColor, opacity: 0.95, layer: 'containment' });
+    // Glowing opening outline on the left half so the gap reads as a doorway at a glance
+    addBox(g, part.id, { w: 4, d: 4, h: paneH, x: xBase + framePost - 4, z: framePost, y: threshold, color: accent, opacity: 0.55, layer: 'containment' });
+    addBox(g, part.id, { w: 4, d: 4, h: paneH, x: xBase + framePost - 4, z: framePost + paneD - 4, y: threshold, color: accent, opacity: 0.55, layer: 'containment' });
+    addBox(g, part.id, { w: 4, d: paneD, h: 4, x: xBase + framePost - 4, z: framePost, y: h - frameTop, color: accent, opacity: 0.55, layer: 'containment' });
+  }
+
+  // Fully closed end-cap at the far end
+  function endCapClosed(xBase) {
+    const openingD = d - 2 * framePost;
+    const paneD = openingD / 2;
+    const paneH = h - frameTop - threshold;
+    addBox(g, part.id, { w: framePost, d: framePost, h: h, x: xBase, z: 0, y: 0, color: frameColor, opacity: 0.96, layer: 'containment' });
+    addBox(g, part.id, { w: framePost, d: framePost, h: h, x: xBase, z: d - framePost, y: 0, color: frameColor, opacity: 0.96, layer: 'containment' });
+    addBox(g, part.id, { w: framePost, d: d, h: frameTop, x: xBase, z: 0, y: h - frameTop, color: frameColor, opacity: 0.96, layer: 'containment' });
+    addBox(g, part.id, { w: framePost, d: openingD, h: threshold, x: xBase, z: framePost, y: 0, color: 0x606c78, opacity: 0.96, layer: 'containment' });
+    addBox(g, part.id, { w: 12, d: paneD, h: paneH, x: xBase + (framePost - 12) / 2, z: framePost, y: threshold, color: glassColor, opacity: 0.16, layer: 'containment' });
+    addBox(g, part.id, { w: 12, d: paneD, h: paneH, x: xBase + (framePost - 12) / 2, z: framePost + paneD, y: threshold, color: glassColor, opacity: 0.16, layer: 'containment' });
+    addBox(g, part.id, { w: 14, d: 6, h: paneH - 40, x: xBase + (framePost - 14) / 2, z: framePost + paneD - 3, y: threshold + 20, color: 0x8ea3b3, opacity: 0.85, layer: 'containment' });
+    addBox(g, part.id, { w: 10, d: 14, h: 140, x: xBase - 2, z: framePost + paneD * 0.65, y: 1000, color: handleColor, opacity: 0.95, layer: 'containment' });
+    addBox(g, part.id, { w: 10, d: 14, h: 140, x: xBase - 2, z: framePost + paneD + paneD * 0.35, y: 1000, color: handleColor, opacity: 0.95, layer: 'containment' });
+  }
+
+  endCapOpen(0);                  // near end, door open for walk-through
+  endCapClosed(w - framePost);    // far end, closed
+
+  // Scale figure standing in the aisle near the open end-cap — makes
+  // the "walk through here" intent obvious at any camera distance.
+  const figX = framePost + 240;
+  const figZ = framePost + (d - 2 * framePost) / 2 - 90;
+  const figY = threshold;
+  const bodyColor = 0x1b2a3a;
+  const hiColor = accent;
+  // Legs
+  addBox(g, part.id, { w: 60, d: 150, h: 900, x: figX,      z: figZ,       y: figY, color: bodyColor, opacity: 0.85, layer: 'containment' });
+  addBox(g, part.id, { w: 60, d: 150, h: 900, x: figX + 90, z: figZ,       y: figY, color: bodyColor, opacity: 0.85, layer: 'containment' });
+  // Torso
+  addBox(g, part.id, { w: 210, d: 190, h: 520, x: figX - 15, z: figZ - 20, y: figY + 900, color: bodyColor, opacity: 0.9, layer: 'containment' });
+  // Head
+  addBox(g, part.id, { w: 150, d: 150, h: 210, x: figX + 15, z: figZ,      y: figY + 1420, color: bodyColor, opacity: 0.92, layer: 'containment' });
+  // Safety-vest accent stripe so the figure reads as a technician
+  addBox(g, part.id, { w: 216, d: 196, h: 60, x: figX - 18, z: figZ - 23,  y: figY + 1160, color: hiColor, opacity: 0.7, layer: 'containment' });
+
+  registerPart(part, g);
+}
+
+function createUPS(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 380, d: 1050, h: 1400, x: 0, z: 0, y: 0, color: 0xf3f5f6, opacity: 0.98 });
+  addBox(g, part.id, { w: 280, d: 6, h: 920, x: 50, z: -3, y: 140, color: 0xc2c8ce, opacity: 1, layer: 'detail' });
+  addBox(g, part.id, { w: 100, d: 8, h: 40, x: 140, z: -4, y: 48, color: 0x29303b, opacity: 1, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createATS(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 600, d: 120, h: 600, x: 0, z: 0, y: 0, color: 0x505760, opacity: 0.98 });
+  addBox(g, part.id, { w: 528, d: 4, h: 516, x: 36, z: -2, y: 42, color: 0x1a2026, opacity: 1, layer: 'detail' });
+  addBox(g, part.id, { w: 36, d: 5, h: 36, x: 44, z: -2, y: 482, color: 0xc9302c, opacity: 1, layer: 'detail' });
+  addBox(g, part.id, { w: 100, d: 5, h: 300, x: 132, z: -2, y: 118, color: 0xb8bbbc, opacity: 1, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createFM200(part) {
+  const g = new THREE.Group();
+  addCylinder(g, part.id, { diameter: 350, height: 1500, x: 0, z: 0, y: 0, color: 0xb5362e });
+  addCylinder(g, part.id, { diameter: 26, height: 90, x: 180, z: 160, y: 1370, color: 0xa3a8ad });
+  addBox(g, part.id, { w: 100, d: 18, h: 28, x: 76, z: 150, y: 1422, color: 0xe1e4e7, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createCyberRow(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 300, d: 1200, h: 1950, x: 0, z: 0, y: 0, color: 0x49769d, opacity: 0.97 });
+  addBox(g, part.id, { w: 256, d: 6, h: 1740, x: 22, z: -2, y: 100, color: 0x213548, opacity: 1, layer: 'detail' });
+  for (let r = 0; r < 34; r++) {
+    addBox(g, part.id, { w: 212, d: 2, h: 18, x: 44, z: -3, y: 118 + r * 48, color: 0xb6c2cb, opacity: 0.26, layer: 'detail' });
+  }
+  registerPart(part, g);
+}
+
+function createIntakeWall(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 320, d: 2290, h: 2185, x: 0, z: 0, y: 0, color: 0xb0cadb, opacity: 0.15, layer: 'shell' });
+  addBox(g, part.id, { w: 110, d: 2200, h: 1960, x: 18, z: 45, y: 90, color: 0x2a3640, opacity: 0.95, layer: 'detail' });
+  addBox(g, part.id, { w: 70, d: 2200, h: 1700, x: 150, z: 45, y: 220, color: 0x14191d, opacity: 0.98, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createRack(part) {
+  const g = new THREE.Group();
+  const w = 600.2, d = 1092.2, h = 1993.9, post = 26;
+  const shellColor = 0x17191b;
+  addBox(g, part.id, { w, d: post, h: post, x: 0, z: 0, y: 0, color: shellColor });
+  addBox(g, part.id, { w, d: post, h: post, x: 0, z: d - post, y: 0, color: shellColor });
+  addBox(g, part.id, { w, d: post, h: post, x: 0, z: 0, y: h - post, color: shellColor });
+  addBox(g, part.id, { w, d: post, h: post, x: 0, z: d - post, y: h - post, color: shellColor });
+  for (const px of [0, w - post]) {
+    for (const pz of [0, d - post]) {
+      addBox(g, part.id, { w: post, d: post, h, x: px, z: pz, y: 0, color: shellColor });
+    }
+  }
+  const railColor = 0x8b9298;
+  addBox(g, part.id, { w: 14, d: 18, h: h - 156, x: 74, z: 92, y: 78, color: railColor, layer: 'rackShell' });
+  addBox(g, part.id, { w: 14, d: 18, h: h - 156, x: w - 88, z: 92, y: 78, color: railColor, layer: 'rackShell' });
+  addBox(g, part.id, { w: 14, d: 18, h: h - 156, x: 74, z: d - 110, y: 78, color: railColor, layer: 'rackShell' });
+  addBox(g, part.id, { w: 14, d: 18, h: h - 156, x: w - 88, z: d - 110, y: 78, color: railColor, layer: 'rackShell' });
+  const frontDoor = addBox(g, part.id, { w: w - 36, d: 4, h: h - 36, x: 18, z: -2, y: 18, color: 0x2c3135, opacity: 0.12, layer: 'rackShell' });
+  const rearDoor = addBox(g, part.id, { w: w - 36, d: 4, h: h - 36, x: 18, z: d - 2, y: 18, color: 0x2c3135, opacity: 0.08, layer: 'rackShell' });
+  for (let r = 0; r < 28; r++) {
+    addBox(g, part.id, { w: w - 100, d: 2, h: 18, x: 50, z: -3, y: 34 + r * 66, color: 0xdce7ee, opacity: 0.1, layer: 'rackShell' });
+  }
+  g.userData.rackShell = [frontDoor, rearDoor];
+  registerPart(part, g);
+}
+
+function createR760(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 482, d: 946.73, h: 86.8, x: 0, z: 0, y: 0, color: 0x111214 });
+  addBox(g, part.id, { w: 482, d: 4, h: 86.8, x: 0, z: -2, y: 0, color: 0x1e2227, layer: 'detail' });
+  addDriveBayGrid(g, part.id, { x: 12, z: -3, y: 8, cols: 4, rows: 2, bayW: 58, bayH: 30, gapX: 6, gapY: 6 });
+  addBox(g, part.id, { w: 176, d: 3, h: 68, x: 286, z: -3, y: 9, color: 0x0b0d0e, layer: 'detail' });
+  for (let c = 0; c < 8; c++) addBox(g, part.id, { w: 12, d: 3, h: 8, x: 300 + c * 18, z: -4, y: 18, color: 0x56616b, opacity: 0.85, layer: 'detail' });
+  addBox(g, part.id, { w: 36, d: 4, h: 10, x: 18, z: -4, y: 38, color: 0x00a2ff, layer: 'detail' });
+  addBox(g, part.id, { w: 10, d: 12, h: 58, x: 6, z: -10, y: 14, color: 0x7d848a, layer: 'detail' });
+  addBox(g, part.id, { w: 10, d: 12, h: 58, x: 466, z: -10, y: 14, color: 0x7d848a, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createR660(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 482, d: 822.88, h: 42.8, x: 0, z: 0, y: 0, color: 0x131416 });
+  addBox(g, part.id, { w: 482, d: 4, h: 42.8, x: 0, z: -2, y: 0, color: 0x1d2024, layer: 'detail' });
+  addDriveBayGrid(g, part.id, { x: 12, z: -3, y: 6, cols: 10, rows: 1, bayW: 29, bayH: 24, gapX: 5, gapY: 0 });
+  addBox(g, part.id, { w: 100, d: 3, h: 26, x: 368, z: -3, y: 8, color: 0x0b0d0e, layer: 'detail' });
+  addBox(g, part.id, { w: 28, d: 4, h: 6, x: 18, z: -4, y: 14, color: 0x00a2ff, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createXR7620(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 482.6, d: 496.3, h: 86.8, x: 0, z: 0, y: 0, color: 0x15171b });
+  addBox(g, part.id, { w: 482.6, d: 4, h: 86.8, x: 0, z: -2, y: 0, color: 0x1f2329, layer: 'detail' });
+  addBox(g, part.id, { w: 46, d: 10, h: 54, x: 18, z: -10, y: 16, color: 0x5d646d, layer: 'detail' });
+  addBox(g, part.id, { w: 46, d: 10, h: 54, x: 418, z: -10, y: 16, color: 0x5d646d, layer: 'detail' });
+  addDriveBayGrid(g, part.id, { x: 20, z: -3, y: 10, cols: 4, rows: 1, bayW: 52, bayH: 28, gapX: 6, gapY: 0 });
+  addBox(g, part.id, { w: 132, d: 3, h: 52, x: 274, z: -3, y: 12, color: 0x090b0d, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createTrueNAS(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 483, d: 681, h: 89, x: 0, z: 0, y: 0, color: 0x101215 });
+  addBox(g, part.id, { w: 483, d: 4, h: 89, x: 0, z: -2, y: 0, color: 0x191d21, layer: 'detail' });
+  addDriveBayGrid(g, part.id, { x: 10, z: -3, y: 10, cols: 6, rows: 2, bayW: 68, bayH: 28, gapX: 7, gapY: 6 });
+  addBox(g, part.id, { w: 12, d: 10, h: 65, x: 10, z: -10, y: 12, color: 0x7d848a, layer: 'detail' });
+  addBox(g, part.id, { w: 12, d: 10, h: 65, x: 461, z: -10, y: 12, color: 0x7d848a, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createArista(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 483, d: 505, h: 44, x: 0, z: 0, y: 0, color: 0x1a1c1f });
+  addBox(g, part.id, { w: 483, d: 4, h: 44, x: 0, z: -2, y: 0, color: 0x101214, layer: 'detail' });
+  addPortGrid(g, part.id, { x: 12, z: -3, y: 8, cols: 16, rows: 2, portW: 11, portH: 7, gapX: 8, gapY: 5 });
+  addBox(g, part.id, { w: 20, d: 3, h: 12, x: 350, z: -3, y: 8, color: 0xd0d09a, layer: 'detail' });
+  addBox(g, part.id, { w: 20, d: 3, h: 12, x: 376, z: -3, y: 8, color: 0xd0d09a, layer: 'detail' });
+  addBox(g, part.id, { w: 22, d: 3, h: 6, x: 18, z: -3, y: 30, color: 0x00a2ff, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createFortiGate(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 432, d: 254, h: 44, x: 0, z: 0, y: 0, color: 0x232628 });
+  addBox(g, part.id, { w: 432, d: 4, h: 44, x: 0, z: -2, y: 0, color: 0x15181a, layer: 'detail' });
+  addPortGrid(g, part.id, { x: 72, z: -3, y: 10, cols: 11, rows: 2, portW: 12, portH: 5, gapX: 8, gapY: 5 });
+  addBox(g, part.id, { w: 22, d: 3, h: 5, x: 18, z: -3, y: 10, color: 0xc92828, layer: 'detail' });
+  addBox(g, part.id, { w: 22, d: 3, h: 5, x: 44, z: -3, y: 10, color: 0x0ebb74, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createOOB(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 440, d: 300, h: 44, x: 0, z: 0, y: 0, color: 0x1b1d20 });
+  addBox(g, part.id, { w: 440, d: 4, h: 44, x: 0, z: -2, y: 0, color: 0x101214, layer: 'detail' });
+  addPortGrid(g, part.id, { x: 12, z: -3, y: 9, cols: 12, rows: 2, portW: 10, portH: 5, gapX: 7, gapY: 5 });
+  registerPart(part, g);
+}
+
+function createWallBox(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 600, d: 300, h: 900, x: 0, z: 0, y: 0, color: 0x0e1012 });
+  addBox(g, part.id, { w: 564, d: 4, h: 864, x: 18, z: -2, y: 18, color: 0x2a2d32, opacity: 0.9, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createAPS(part) {
+  const g = new THREE.Group();
+  addBox(g, part.id, { w: 310, d: 180, h: 40, x: 0, z: 0, y: 0, color: 0x1a1c1f });
+  addBox(g, part.id, { w: 274, d: 3, h: 22, x: 18, z: -2, y: 9, color: 0x353b41, layer: 'detail' });
+  registerPart(part, g);
+}
+
+function createDish(part) {
+  const g = new THREE.Group();
+  const geometry = new THREE.BoxGeometry(0.609, 0.04, 0.396);
+  const mesh = makeMesh(geometry, baseMaterial(0xf2f5f6, 0.98, 0.5, 0.08), part.id, 'solid');
+  mesh.position.set(0.609 / 2, 0.04 / 2, 0.396 / 2);
+  g.add(mesh);
+  const mast = makeMesh(mmBox(18, 18, 140), baseMaterial(0x778089, 1, 0.7, 0.3), part.id, 'detail');
+  mast.position.set(0.009, -0.05, 0.198);
+  g.add(mast);
+  registerPart(part, g);
+}
+
+const factoryMap = {
+  shell: createShell,
+  reeferUnit: createReeferUnit,
+  raisedFloor: createRaisedFloor,
+  aisleContainment: createAisleContainment,
+  ups: createUPS,
+  ats: createATS,
+  fm200: createFM200,
+  cyberrow: createCyberRow,
+  intakeWall: createIntakeWall,
+  rack: createRack,
+  r760: createR760,
+  r660: createR660,
+  xr7620: createXR7620,
+  truenas: createTrueNAS,
+  arista: createArista,
+  fortigate: createFortiGate,
+  oob: createOOB,
+  wallbox: createWallBox,
+  aps: createAPS,
+  dish: createDish
+};
+
+parts.forEach(part => factoryMap[part.kind](part));
+
+const partOrderBySection = parts.reduce((acc, part) => {
+  if (!acc[part.section]) acc[part.section] = [];
+  acc[part.section].push(part);
+  return acc;
+}, {});
+
+const partsBody = document.getElementById('partsBody');
+Object.entries(partOrderBySection).forEach(([section, list]) => {
+  const block = document.createElement('div');
+  block.className = 'part-section';
+  block.innerHTML = `<h3>${section}</h3>`;
+  list.forEach(part => {
+    const card = document.createElement('div');
+    card.className = 'part-card';
+    card.dataset.partId = part.id;
+    card.innerHTML = `
+      <button class="part-btn" type="button">
+        <div class="part-btn__title">
+          <span class="part-color" style="background:${colors[part.section] || '#7fd4ff'}"></span>
+          <span>${part.label}</span>
+        </div>
+        <div class="part-btn__meta">${part.dims[0]} × ${part.dims[1]} × ${part.dims[2]} mm</div>
+      </button>
+    `;
+    card.querySelector('button').addEventListener('click', () => selectPart(part.id, true));
+    block.appendChild(card);
+  });
+  partsBody.appendChild(block);
+});
+
+function updateCardState() {
+  document.querySelectorAll('.part-card').forEach(card => {
+    card.classList.toggle('active', card.dataset.partId === state.selectedId);
+  });
+}
+
+// Custom camera presets for parts whose meaning only reads from a specific
+// angle (e.g. the aisle containment only reads as "walk-in" when viewed
+// from outside the open end-cap).
+const CAMERA_PRESETS = {
+  'aisle-containment': () => {
+    // Walk-in POV: camera sits outside the near end-cap, aligned with the
+    // open left half of the doorway, looking down the length of the aisle.
+    const target = new THREE.Vector3(
+      (2140 + 900) * MM,    // mid-aisle along X
+      900 * MM,             // mid-figure height
+      (55 + 350) * MM       // centered on the open left half of the opening
+    );
+    const cam = new THREE.Vector3(
+      (2140 - 1800) * MM,   // well outside the near end-cap
+      2050 * MM,            // slightly elevated eye line
+      (55 + 350) * MM       // aligned with the open gap
+    );
+    return { target, cam };
+  },
+  'raised-floor': () => {
+    const target = new THREE.Vector3(
+      (2140 + 900) * MM,
+      250 * MM,
+      (55 + 580) * MM
+    );
+    const cam = new THREE.Vector3(
+      (2140 - 1400) * MM,
+      1400 * MM,
+      (55 + 1500) * MM
+    );
+    return { target, cam };
+  },
+};
+
+function fitCameraToPart(partId) {
+  const entry = partEntries.get(partId);
+  if (!entry) return;
+  const preset = CAMERA_PRESETS[partId];
+  if (preset) {
+    const { target, cam } = preset();
+    desiredTarget.copy(target);
+    desiredCamera.copy(cam);
+    cameraMoveActive = true;
+    return;
+  }
+  fitCameraToObject(entry.group);
+}
+
+function fitCameraToObject(object, padding = 2.2) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = new THREE.Vector3();
+  const center = new THREE.Vector3();
+  box.getSize(size);
+  box.getCenter(center);
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const distance = Math.max(2.5, maxDim * padding);
+  desiredTarget.copy(center);
+  desiredCamera.copy(center.clone().add(new THREE.Vector3(distance, distance * 0.62, distance * 0.88)));
+  cameraMoveActive = true;
+}
+
+function fitCameraToScene() {
+  fitCameraToObject(sceneRoot, 2.35);
+}
+
+const inspectorContent = document.getElementById('inspectorContent');
+const inspectorEl = document.querySelector('.inspector');
+
+function updateInspector() {
+  if (!state.selectedId) {
+    inspectorEl.style.display = isCompactViewport() ? 'none' : 'block';
+    inspectorContent.className = 'inspector__empty';
+    inspectorContent.innerHTML = `
+      Click any part in the scene or from the parts drawer to isolate and inspect it.
+      The viewer defaults to a separated system view so every major element stays legible at real scale.
+    `;
+    return;
+  }
+  inspectorEl.style.display = 'block';
+  const part = partEntries.get(state.selectedId).part;
+  inspectorContent.className = '';
+  inspectorContent.innerHTML = `
+    <h3 class="inspector__name">${part.label}</h3>
+    <p class="inspector__desc">${part.description}</p>
+    <dl class="kv">
+      <dt>Dimensions</dt><dd>${part.dims[0]} × ${part.dims[1]} × ${part.dims[2]} mm</dd>
+      <dt>Exactness</dt><dd>${part.exactness}</dd>
+      <dt>Section</dt><dd>${part.section}</dd>
+      <dt>Source</dt><dd>${part.sourceUrl ? `<a href="${part.sourceUrl}" target="_blank" rel="noreferrer">${part.sourceLabel}</a>` : part.sourceLabel}</dd>
+    </dl>
+    <div class="inspector__actions">
+      <button class="tool-btn" data-action="focus">Refocus</button>
+      <button class="tool-btn" data-action="clear">Clear isolation</button>
+    </div>
+  `;
+}
+
+// Parts whose spatial meaning only reads when the whole assembly is
+// assembled (not exploded). Selecting one of these snaps explode to 0.
+const ASSEMBLY_SNAP_PARTS = new Set(['aisle-containment', 'raised-floor']);
+
+function selectPart(partId, refocus = false) {
+  state.selectedId = partId;
+  updateCardState();
+  updateInspector();
+  if (partId && ASSEMBLY_SNAP_PARTS.has(partId)) {
+    state.targetExplode = 0;
+    state.targetRoofLift = 0;
+    state.targetXray = 0;
+  }
+  if (partId && refocus) fitCameraToPart(partId);
+}
+
+function clearSelectionState() {
+  state.selectedId = null;
+  updateCardState();
+  updateInspector();
+}
+
+function suppressSceneClicks(ms = 500) {
+  suppressSceneClicksUntil = performance.now() + ms;
+}
+
+function syncResponsiveUI() {
+  const drawer = document.getElementById('partsDrawer');
+  if (isCompactViewport()) {
+    drawer.classList.add('closed');
+  }
+  if (!state.selectedId) {
+    inspectorEl.style.display = EMBED ? 'none' : 'block';
+  }
+}
+
+inspectorContent.addEventListener('click', event => {
+  const button = event.target.closest('[data-action]');
+  if (!button) return;
+  const action = button.getAttribute('data-action');
+  if (action === 'focus' && state.selectedId) {
+    fitCameraToPart(state.selectedId);
+  }
+  if (action === 'clear') {
+    clearSelectionState();
+    fitCameraToScene();
+  }
+});
+
+const selectionHelper = new THREE.Box3Helper(new THREE.Box3(), 0x79f3d2);
+selectionHelper.visible = false;
+scene.add(selectionHelper);
+
+// Parts that are kept partially visible when something else is isolated, so
+// the viewer still reads as an enclosure rather than an object floating in
+// space. Each entry maps a selected-part id to the ids that stay lit.
+const CONTEXT_COMPANIONS = {
+  'aisle-containment': new Set(['rack1', 'rack2', 'rack3', 'raised-floor']),
+  'raised-floor':      new Set(['rack1', 'rack2', 'rack3']),
+};
+
+function applyMaterialState() {
+  const companions = state.selectedId ? (CONTEXT_COMPANIONS[state.selectedId] || null) : null;
+  partEntries.forEach(({ group, part }) => {
+    const isSelected = part.id === state.selectedId;
+    const isCompanion = companions ? companions.has(part.id) : false;
+    const fadeOthers = state.selectedId && !isSelected && !isCompanion;
+    group.traverse(obj => {
+      if (!obj.isMesh) return;
+      const baseOpacity = obj.userData.baseOpacity ?? 1;
+      let opacity = baseOpacity;
+      if (obj.userData.layer === 'shell') opacity *= THREE.MathUtils.lerp(1, 0.38, state.xray);
+      if (obj.userData.layer === 'shellRoof') opacity *= THREE.MathUtils.lerp(1, 0.18, state.xray);
+      if (obj.userData.layer === 'rackShell') opacity *= THREE.MathUtils.lerp(1, 0.18, state.xray);
+      if (obj.userData.layer === 'insulation') opacity *= THREE.MathUtils.lerp(1, 0.25, state.xray);
+      if (fadeOthers) opacity *= 0.08;
+      else if (isCompanion) opacity *= 0.35;
+      obj.material.opacity = opacity;
+      obj.material.transparent = opacity < 0.999;
+      obj.material.emissive = isSelected ? new THREE.Color(0x0f2b34) : new THREE.Color(0x000000);
+      obj.material.depthWrite = opacity > 0.2;
+    });
+
+    const label = group.userData.label;
+    if (label) {
+      label.visible = !!state.selectedId && isSelected;
+    }
+  });
+
+  if (state.selectedId) {
+    const entry = partEntries.get(state.selectedId);
+    selectionHelper.box.setFromObject(entry.group);
+    selectionHelper.visible = true;
+  } else {
+    selectionHelper.visible = false;
+  }
+}
+
+function setView(which) {
+  clearSelectionState();
+  document.querySelectorAll('.toolbar .tool-btn').forEach(btn => btn.classList.remove('active'));
+  if (which === 'exploded') {
+    state.targetExplode = 0.85;
+    state.targetRoofLift = 0;
+    state.targetXray = 0;
+    document.getElementById('viewExploded').classList.add('active');
+  }
+  if (which === 'assembled') {
+    state.targetExplode = 0;
+    state.targetRoofLift = 0;
+    state.targetXray = 0;
+    document.getElementById('viewAssembled').classList.add('active');
+  }
+  if (which === 'xray') {
+    state.targetExplode = 0.35;
+    state.targetRoofLift = 0.15;
+    state.targetXray = 1;
+    document.getElementById('viewXray').classList.add('active');
+  }
+  if (which === 'roof') {
+    state.targetExplode = 0.28;
+    state.targetRoofLift = 1;
+    state.targetXray = 0.2;
+    document.getElementById('viewRoofOff').classList.add('active');
+  }
+  document.getElementById('explodeSlider').value = Math.round(state.targetExplode * 100);
+  document.getElementById('explodeValue').textContent = `${Math.round(state.targetExplode * 100)}%`;
+  fitCameraToScene();
+}
+
+document.getElementById('viewExploded').addEventListener('click', () => { suppressSceneClicks(); setView('exploded'); });
+document.getElementById('viewAssembled').addEventListener('click', () => { suppressSceneClicks(); setView('assembled'); });
+document.getElementById('viewXray').addEventListener('click', () => { suppressSceneClicks(); setView('xray'); });
+document.getElementById('viewRoofOff').addEventListener('click', () => { suppressSceneClicks(); setView('roof'); });
+document.getElementById('showAll').addEventListener('click', () => {
+  suppressSceneClicks();
+  clearSelectionState();
+  setView('exploded');
+});
+document.getElementById('toggleSpin').addEventListener('click', e => {
+  suppressSceneClicks();
+  state.autoSpin = !state.autoSpin;
+  controls.autoRotate = state.autoSpin;
+  controls.autoRotateSpeed = 0.65;
+  e.currentTarget.classList.toggle('active', state.autoSpin);
+});
+document.getElementById('explodeSlider').addEventListener('input', e => {
+  suppressSceneClicks(250);
+  state.targetExplode = Number(e.target.value) / 100;
+  document.getElementById('explodeValue').textContent = `${e.target.value}%`;
+});
+
+document.getElementById('drawerToggle').addEventListener('click', () => {
+  suppressSceneClicks();
+  document.getElementById('partsDrawer').classList.toggle('closed');
+});
+
+renderer.domElement.addEventListener('pointerdown', event => {
+  if (performance.now() < suppressSceneClicksUntil) return;
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(selectableMeshes, false);
+  if (!hits.length) return;
+  const ownerId = hits[0].object.userData.ownerId;
+  if (ownerId) selectPart(ownerId, true);
+});
+
+function updatePartTransforms() {
+  partEntries.forEach(({ group }) => {
+    group.userData.update(group);
+  });
+
+  const shell = partEntries.get('reefer-shell').group;
+  shell.position.set(0, 0, 0);
+  partEntries.get('dish-a').group.rotation.z = THREE.MathUtils.degToRad(8);
+  partEntries.get('dish-b').group.rotation.z = THREE.MathUtils.degToRad(-8);
+}
+
+updatePartTransforms();
+syncResponsiveUI();
+updateInspector();
+updateCardState();
+if (HERO) {
+  setView('assembled');
+  const heroTarget = new THREE.Vector3(dims.CONT_EXT_L * MM * 0.5, dims.CONT_EXT_H * MM * 0.42, dims.CONT_EXT_W * MM * 0.5);
+  const heroDist = 12.5;
+  desiredTarget.copy(heroTarget);
+  desiredCamera.set(heroTarget.x + heroDist * 0.88, heroTarget.y + heroDist * 0.38, heroTarget.z + heroDist * 0.82);
+  cameraMoveActive = true;
+} else {
+  setView(
+    EMBED
+      ? 'assembled'
+      : (location.hash === '#assembled' ? 'assembled' : 'exploded')
+  );
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  syncResponsiveUI();
+});
+mobileMedia.addEventListener?.('change', syncResponsiveUI);
+
+function animate() {
+  requestAnimationFrame(animate);
+  state.explode = THREE.MathUtils.lerp(state.explode, state.targetExplode, 0.16);
+  state.roofLift = THREE.MathUtils.lerp(state.roofLift, state.targetRoofLift, 0.16);
+  state.xray = THREE.MathUtils.lerp(state.xray, state.targetXray, 0.16);
+  if (cameraMoveActive) {
+    camera.position.lerp(desiredCamera, 0.12);
+    controls.target.lerp(desiredTarget, 0.12);
+    if (camera.position.distanceTo(desiredCamera) < 0.002 &&
+        controls.target.distanceTo(desiredTarget) < 0.002) {
+      cameraMoveActive = false;
+    }
+  }
+
+  updatePartTransforms();
+  applyMaterialState();
+
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

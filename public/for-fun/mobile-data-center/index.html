@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A for-fun mobile data center concept with an interactive AuroraEdge AK-20 edge compute design, pricing model, bill of materials, and 3D viewer.">
+<link rel="canonical" href="https://statskeybiometrics.com/for-fun/mobile-data-center/">
+<title>Mobile Data Center — For Fun</title>
+<link rel="icon" href="/favicon.svg">
+<style>
+/* ---------- Design tokens matched to StatsKey ---------- */
+:root{
+  --bg:#0d1117;
+  --bg-soft:#0a0e14;
+  --surface:#111826;
+  --surface-2:#131b27;
+  --surface-3:#172031;
+  --border:#243041;
+  --border-soft:#1b2534;
+  --ink:#e6edf3;
+  --ink-2:#c9d1d9;
+  --muted:#7d8590;
+  --muted-2:#96a3b3;
+  --blue:#8fd3ff;
+  --amber:#f0c674;
+  --mint:#7ee3c0;
+  --rose:#ff8aa1;
+  --shadow:0 10px 40px rgba(0,0,0,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+code,kbd,pre{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:.92em}
+code{background:var(--surface);border:1px solid var(--border-soft);border-radius:4px;padding:1px 5px;color:var(--ink-2)}
+kbd{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--ink-2)}
+pre{background:var(--surface);border:1px solid var(--border-soft);border-radius:8px;padding:12px 14px;overflow:auto;color:var(--ink-2);line-height:1.55}
+hr{border:0;border-top:1px solid var(--border-soft);margin:28px 0}
+
+/* ---------- Layout ---------- */
+.bar{position:sticky;top:0;z-index:50;background:rgba(10,14,20,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.bar__row{display:flex;align-items:center;justify-content:space-between;padding:10px 22px;gap:14px;flex-wrap:wrap}
+.bar__brand{display:flex;align-items:center;gap:12px;font-size:14px}
+.bar__chip{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);border:1px solid var(--border);padding:3px 8px;border-radius:999px;background:var(--surface)}
+.bar__title{color:var(--ink);font-weight:700}
+.bar__meta{color:var(--muted);font-size:12px}
+.bar__actions{display:flex;gap:8px}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink-2);padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-2);border-color:#2d3a4b;color:var(--ink)}
+.btn--primary{background:var(--blue);color:#07121d;border-color:var(--blue);font-weight:700}
+.btn--primary:hover{background:#a8defd;color:#07121d}
+
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:28px;max-width:1240px;margin:0 auto;padding:28px 22px 96px}
+.toc{position:sticky;top:68px;align-self:start;max-height:calc(100vh - 96px);overflow:auto}
+.toc h4{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin:18px 0 8px}
+.toc h4:first-child{margin-top:0}
+.toc a{display:block;font-size:13px;color:var(--ink-2);padding:6px 10px;border-radius:6px;border:1px solid transparent}
+.toc a:hover{background:var(--surface);border-color:var(--border-soft);text-decoration:none;color:var(--ink)}
+.toc a.active{background:var(--surface);border-color:var(--blue);color:var(--ink)}
+
+.content{min-width:0}
+section.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:22px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+section.card>h2{font-size:20px;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em}
+section.card>h2 .n{color:var(--blue);font-weight:700;margin-right:10px}
+section.card>p.lead{color:var(--muted-2);font-size:14px;margin-bottom:14px}
+section.card h3{font-size:14px;color:var(--amber);margin:18px 0 10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+section.card p{color:var(--ink-2);margin:10px 0}
+section.card ul,section.card ol{padding-left:22px;color:var(--ink-2);margin:8px 0}
+section.card li{margin:5px 0}
+section.card strong{color:var(--ink)}
+
+/* ---------- Cinema hero ---------- */
+.cinema{position:relative;overflow:hidden;border-radius:18px;border:1px solid var(--border);margin-bottom:22px;background:linear-gradient(160deg,#0b1424 0%,#060b11 100%);min-height:clamp(520px,86vh,880px);isolation:isolate}
+.cinema__stage{position:absolute;inset:0;z-index:0;overflow:hidden}
+.cinema__stage iframe{width:100%;height:100%;border:0;display:block;background:transparent}
+.cinema__poster{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(ellipse 70% 60% at 68% 58%,rgba(143,211,255,.22),transparent 70%),
+  radial-gradient(ellipse 55% 40% at 22% 78%,rgba(240,198,116,.16),transparent 70%),
+  linear-gradient(160deg,#0d1a2b 0%,#060b13 70%,#05090f 100%);
+  background-size:cover}
+.cinema__poster::before{content:"";position:absolute;inset:0;background-image:
+  linear-gradient(rgba(143,211,255,.06) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(143,211,255,.05) 1px,transparent 1px);
+  background-size:90px 90px;mask-image:radial-gradient(ellipse at 60% 55%,rgba(0,0,0,.9),transparent 75%)}
+.cinema__poster::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(ellipse 38% 58% at 62% 58%,rgba(9,15,22,.0) 0,rgba(9,15,22,.0) 58%,rgba(9,15,22,.0) 62%,rgba(6,11,18,.0) 70%),
+  linear-gradient(180deg,transparent 0 55%,rgba(6,11,18,.35) 100%)}
+/* Hide the CSS poster once the live iframe is hydrated */
+.cinema__stage.is-live .cinema__poster{opacity:0;transition:opacity .6s ease}
+.cinema__grain{position:absolute;inset:0;pointer-events:none;z-index:1;background-image:radial-gradient(circle at 15% 15%,rgba(143,211,255,.14),transparent 42%),radial-gradient(circle at 88% 92%,rgba(240,198,116,.10),transparent 46%);mix-blend-mode:screen;opacity:.9}
+.cinema__veil{position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(180deg,rgba(6,11,18,0) 0%,rgba(6,11,18,.05) 42%,rgba(6,11,18,.72) 88%,rgba(6,11,18,.92) 100%)}
+.cinema__frame{position:absolute;inset:0;pointer-events:none;z-index:3;border:1px solid rgba(143,211,255,.06);border-radius:inherit;box-shadow:inset 0 0 80px rgba(0,0,0,.45)}
+.cinema__content{position:relative;z-index:4;display:grid;grid-template-rows:1fr auto;padding:32px 34px 28px;min-height:inherit;pointer-events:none}
+.cinema__chip-row{display:flex;gap:10px;flex-wrap:wrap;align-self:start;margin-bottom:auto;animation:cinemaFade .9s ease .05s both}
+.cinema__chip{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(9,15,22,.55);backdrop-filter:blur(6px);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
+.cinema__chip--amber{color:var(--amber);border-color:rgba(240,198,116,.4)}
+.cinema__chip--mint{color:var(--mint);border-color:rgba(126,227,192,.4)}
+.cinema__chip .dot{width:6px;height:6px;border-radius:999px;background:currentColor;box-shadow:0 0 10px currentColor}
+.cinema__headline{display:grid;gap:16px;max-width:920px}
+.cinema__eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);animation:cinemaFade 1s ease .12s both}
+.cinema__title{margin:0;font-size:clamp(34px,6.4vw,78px);line-height:.96;letter-spacing:-.025em;color:var(--ice,#e8f4ff);font-weight:700;animation:cinemaRise 1.1s cubic-bezier(.2,.8,.2,1) .18s both}
+.cinema__title em{font-style:normal;color:var(--blue);position:relative;white-space:nowrap}
+.cinema__title em::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:.55}
+.cinema__kicker{margin:0;color:var(--ink-2);font-size:clamp(14px,1.6vw,18px);line-height:1.5;max-width:62ch;animation:cinemaRise 1.1s cubic-bezier(.2,.8,.2,1) .3s both}
+.cinema__ctas{display:flex;gap:10px;flex-wrap:wrap;pointer-events:auto;margin-top:6px;animation:cinemaFade 1s ease .45s both}
+.cinema__ctas .btn{padding:10px 16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.cinema__scroll{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:4;pointer-events:none;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:6px;animation:cinemaFade 1.2s ease .9s both}
+.cinema__scroll::after{content:"";width:1px;height:28px;background:linear-gradient(180deg,var(--blue),transparent);animation:cinemaBeam 1.8s ease-in-out infinite}
+@keyframes cinemaFade{from{opacity:0}to{opacity:1}}
+@keyframes cinemaRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cinemaBeam{0%,100%{opacity:.2;transform:scaleY(.4)}50%{opacity:1;transform:scaleY(1)}}
+@media (prefers-reduced-motion: reduce){
+  .cinema__chip-row,.cinema__eyebrow,.cinema__title,.cinema__kicker,.cinema__ctas,.cinema__scroll{animation:none !important}
+  .cinema__scroll::after{animation:none}
+}
+
+/* ---------- Quick facts strip ---------- */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.fact{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.fact::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue);opacity:.7}
+.fact.fact--amber::before{background:var(--amber)}
+.fact.fact--mint::before{background:var(--mint)}
+.fact__label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:6px}
+.fact__value{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.fact__value--num{font-variant-numeric:tabular-nums}
+.fact__sub{margin-top:4px;font-size:11px;color:var(--muted-2)}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:22px}
+.spec{background:rgba(14,22,34,.6);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.spec .k{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
+.spec .v{color:var(--ink);font-size:13px;font-weight:600}
+
+/* ---------- Tables ---------- */
+.tbl-wrap{overflow:auto;border:1px solid var(--border);border-radius:10px;margin:12px 0}
+table.tbl{border-collapse:collapse;width:100%;font-size:13px}
+table.tbl th,table.tbl td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--ink-2);vertical-align:top}
+table.tbl thead th{background:var(--surface-2);color:var(--ink);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.1em;border-bottom:1px solid var(--border)}
+table.tbl tbody tr:hover{background:var(--surface-2)}
+table.tbl tbody tr:last-child td{border-bottom:0}
+table.tbl td.num,table.tbl th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.tbl .total td{background:var(--surface-3);color:var(--ink);font-weight:700}
+table.tbl .grand td{background:linear-gradient(180deg,#1a2840,#15203a);color:var(--blue);font-weight:800;font-size:14px}
+.caption{margin-top:6px;font-size:11px;color:var(--muted)}
+
+/* ---------- Block diagram ---------- */
+.diagram{background:var(--bg-soft);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:ui-monospace,monospace;color:var(--ink-2);font-size:12px;line-height:1.5;overflow:auto;white-space:pre}
+
+/* ---------- Viewer ---------- */
+.viewer-wrap{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:12px;background:#060c12;position:relative}
+.viewer-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface)}
+.viewer-bar .k{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.viewer-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end}
+.viewer-header p{margin:0;color:var(--muted-2);font-size:13px}
+.viewer-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.viewer-mobile-alt{display:none;padding:18px 16px 20px;background:linear-gradient(180deg,#0a1018,#0b121c);border-top:1px solid var(--border)}
+.viewer-mobile-alt h4{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--blue);margin-bottom:8px}
+.viewer-mobile-alt p{margin:0 0 12px;color:var(--muted-2);font-size:13px;line-height:1.55}
+.viewer-iframe{width:100%;height:min(78vh,760px);min-height:560px;border:0;display:block;background:#060c12}
+.viewer-hint{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--border);background:var(--bg-soft)}
+
+/* ---------- Filter bar for BOM ---------- */
+.bom-tools{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px;align-items:center}
+.bom-search{flex:1;min-width:220px;background:var(--bg-soft);border:1px solid var(--border);color:var(--ink);padding:8px 10px;border-radius:8px;font:inherit}
+.bom-search:focus{outline:none;border-color:var(--blue)}
+.pill{font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink-2);cursor:pointer}
+.pill.active{background:var(--blue);border-color:var(--blue);color:#07121d;font-weight:700}
+.conf{font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+.conf.high{color:var(--mint);border-color:rgba(126,227,192,.35)}
+.conf.medium{color:var(--amber);border-color:rgba(240,198,116,.35)}
+.conf.low{color:var(--rose);border-color:rgba(255,138,161,.35)}
+
+/* ---------- Utility ---------- */
+.note{border-left:3px solid var(--blue);background:linear-gradient(90deg,rgba(143,211,255,.08),transparent);padding:12px 14px;margin:14px 0;border-radius:0 8px 8px 0;font-size:13px;color:var(--ink-2)}
+.note.amber{border-left-color:var(--amber);background:linear-gradient(90deg,rgba(240,198,116,.08),transparent)}
+.note.mint{border-left-color:var(--mint);background:linear-gradient(90deg,rgba(126,227,192,.08),transparent)}
+.muted{color:var(--muted)}
+.mono{font-family:ui-monospace,monospace}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr;gap:16px;padding:16px 14px 80px}
+  .toc{position:static;max-height:none;display:flex;flex-wrap:wrap;gap:6px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+  .toc h4{width:100%;margin:8px 0 2px}
+  .toc a{padding:5px 9px;font-size:12px;background:var(--surface-2);border:1px solid var(--border-soft)}
+  .two-col,.three-col{grid-template-columns:1fr}
+  .viewer-header{grid-template-columns:1fr}
+  .viewer-actions{justify-content:flex-start}
+  .viewer-iframe{height:min(74vh,680px);min-height:520px}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cinema{min-height:clamp(480px,72vh,720px)}
+  .cinema__content{padding:22px 22px 26px}
+}
+@media (max-width:640px){
+  .bar__row{padding:9px 14px}
+  .bar__title{display:none}
+  section.card{padding:20px 18px}
+  .cinema{min-height:clamp(420px,70vh,620px);border-radius:14px}
+  .cinema__content{padding:20px 18px 22px}
+  .cinema__title{font-size:clamp(30px,10vw,46px)}
+  .cinema__scroll{display:none}
+  .viewer-bar{padding:10px 12px;align-items:flex-start}
+  .viewer-actions{width:100%}
+  .viewer-actions .btn{flex:1;justify-content:center}
+  .viewer-iframe{display:none}
+  .viewer-mobile-alt{display:block}
+  .viewer-hint{display:none}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  body{background:#fff;color:#111}
+  .bar,.toc,.viewer-wrap,.bom-tools,.bar__actions,.cinema__stage,.cinema__grain,.cinema__veil,.cinema__frame,.cinema__scroll,.cinema__ctas{display:none!important}
+  .layout{grid-template-columns:1fr;padding:0;max-width:none}
+  section.card,.cinema,.facts,.specs,.fact,.spec{box-shadow:none;border:1px solid #ddd;background:#fff;color:#111;break-inside:avoid;page-break-inside:avoid}
+  .cinema{min-height:0;padding:18px 22px;margin-bottom:18px}
+  .cinema__content{position:static;padding:0}
+  .cinema__title,.cinema__kicker,.cinema__eyebrow,.cinema__chip{color:#111}
+  .cinema__chip{background:#f7f7f7;border-color:#ddd}
+  section.card h2,section.card h3,.cinema__title{color:#111}
+  table.tbl th,table.tbl td{color:#111;border-color:#ddd}
+  a{color:#0b5fa5}
+  .fact,.spec,.diagram,.note,pre,code,kbd{background:#f7f7f7;color:#111;border-color:#ddd}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== Content ===================== -->
+<div class="shell">
+  <div class="bar">
+    <div class="bar__row">
+      <div class="bar__brand">
+        <span class="bar__chip">For Fun</span>
+        <span class="bar__title">Mobile Data Center</span>
+        <span class="bar__meta">AuroraEdge AK-20 concept</span>
+      </div>
+      <div class="bar__actions">
+        <a class="btn" href="#viewer">3D viewer</a>
+        <button class="btn" id="printBtn">Print / PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="toc" id="toc">
+      <h4>Contents</h4>
+      <a href="#cover">Cover</a>
+      <a href="#exec">1. Executive summary</a>
+      <a href="#scope">2. Scope of supply</a>
+      <a href="#tech">3. Technical highlights</a>
+      <a href="#arch">4. Architecture</a>
+      <a href="#viewer">5. 3D product viewer</a>
+      <a href="#pricing">6. Pricing</a>
+      <a href="#tco">7. TCO comparison</a>
+      <a href="#bom">8. Full BOM</a>
+      <a href="#schedule">9. Schedule</a>
+      <a href="#sla">10. SLA</a>
+      <a href="#warranty">11. Warranty &amp; support</a>
+      <a href="#assumptions">12. Assumptions &amp; exclusions</a>
+      <a href="#vehicles">13. Contract vehicles</a>
+      <a href="#why">14. Why this bid</a>
+      <a href="#poc">15. Point of contact</a>
+    </nav>
+
+    <div class="content">
+
+      <!-- Cinema hero -->
+      <header class="cinema" id="cover" aria-labelledby="cinema-title">
+        <div class="cinema__stage" aria-hidden="true">
+          <iframe data-src="/for-fun/mobile-data-center/3d/viewer/?hero=1" title="AuroraEdge AK-20 cinematic product render" tabindex="-1" aria-hidden="true"></iframe>
+          <div class="cinema__poster"></div>
+        </div>
+        <div class="cinema__grain" aria-hidden="true"></div>
+        <div class="cinema__veil" aria-hidden="true"></div>
+        <div class="cinema__frame" aria-hidden="true"></div>
+        <div class="cinema__content">
+          <div class="cinema__chip-row">
+            <span class="cinema__chip cinema__chip--amber"><span class="dot"></span>For Fun</span>
+            <span class="cinema__chip">Firm-fixed purchase</span>
+            <span class="cinema__chip cinema__chip--mint">Alaska DOT&amp;PF · Fairbanks</span>
+          </div>
+          <div class="cinema__headline">
+            <div class="cinema__eyebrow">AuroraEdge AK-20 · Formal bid</div>
+            <h1 class="cinema__title" id="cinema-title">Deployable edge data center for <em>remote-sensing Alaska</em>.</h1>
+            <p class="cinema__kicker">A 20-foot ruggedized edge compute node engineered for the Fairbanks climate and the Alaska DOT&amp;PF drone-to-decision workflow. Matches the current Galleon <code>Cruiser</code> outcome at dramatically lower 5-year cost of ownership — with the hardware owned outright by the State.</p>
+            <div class="cinema__ctas">
+              <a class="btn btn--primary" href="#viewer">Explore the 3D design ↓</a>
+              <a class="btn" href="#pricing">Pricing</a>
+              <a class="btn" href="#tco">TCO comparison</a>
+            </div>
+          </div>
+        </div>
+        <div class="cinema__scroll" aria-hidden="true">Scroll</div>
+      </header>
+
+      <!-- Quick facts strip -->
+      <div class="facts" aria-label="Program headline numbers">
+        <div class="fact"><div class="fact__label">Firm-fixed one-time</div><div class="fact__value fact__value--num">$598,000</div><div class="fact__sub">CapEx, hardware delivered</div></div>
+        <div class="fact fact--amber"><div class="fact__label">Year 1 support bundle</div><div class="fact__value fact__value--num">$73,960</div><div class="fact__sub">Premium SLA + software + Starlink</div></div>
+        <div class="fact"><div class="fact__label">5-year TCO</div><div class="fact__value fact__value--num">$959,800</div><div class="fact__sub">All-in, State owns the hardware</div></div>
+        <div class="fact fact--mint"><div class="fact__label">5-yr savings vs loaded Galleon</div><div class="fact__value fact__value--num">~$2.0M</div><div class="fact__sub">Same "minutes-to-intelligence" outcome</div></div>
+      </div>
+
+      <!-- Program facts -->
+      <div class="specs" aria-label="Program facts">
+        <div class="spec"><div class="k">Customer</div><div class="v">Alaska DOT&amp;PF</div></div>
+        <div class="spec"><div class="k">Program</div><div class="v">Cruiser replacement / expansion</div></div>
+        <div class="spec"><div class="k">Reference site</div><div class="v">Fairbanks primary · Anchorage RSL failover</div></div>
+        <div class="spec"><div class="k">Offer type</div><div class="v">Firm-fixed-price purchase</div></div>
+        <div class="spec"><div class="k">Validity</div><div class="v">90 days from issue</div></div>
+        <div class="spec"><div class="k">Delivery window</div><div class="v">16–20 weeks ARO</div></div>
+      </div>
+
+      <!-- Executive summary -->
+      <section class="card" id="exec">
+        <h2><span class="n">1</span>Executive summary</h2>
+        <p>Alaska DOT&amp;PF's stated outcome is to compress the path from drone landing to usable terrain model from <code>28 hours</code> to minutes, and to do it across the harshest operating environment in the United States.</p>
+        <p>We propose <strong>AuroraEdge AK-20</strong>, a purpose-built 20-foot edge data center engineered around three simple truths the current market is quietly overlooking:</p>
+        <ol>
+          <li>Fairbanks does not need tropical-grade refrigeration. It has roughly <code>61</code> cooling-degree-days per year, so free-air cooling can carry the load ~90% of operating hours. The current market price for a rugged containerized DC embeds DX-heavy cooling designed for the Gulf. We remove that cost.</li>
+          <li>A new one-trip <strong>insulated ISO reefer</strong> arrives from the factory already rated for <code>-40&nbsp;°F</code>, with corten steel, stainless interior, and 3-inch closed-cell foam. We use that as the enclosure rather than custom-engineering ruggedization. This alone eliminates roughly <code>$75K</code> to <code>$400K</code> of enclosure cost seen in comparable premium bids.</li>
+          <li>The photogrammetry workload does not require hyperscaler-grade GPUs. Public Pix4D, Agisoft, and ESRI benchmarks show drone imagery processing at <code>L4</code> and <code>L40S</code>-class GPUs runs comfortably; we spec <code>2</code> × Dell <code>R760xa</code> with <code>4</code> × <code>L40S</code> each (<code>8</code> L40S total) plus <code>2</code> × <code>L4</code> on a rugged ingest node, which is the right envelope for Alaska DOT&amp;PF's seasonal cadence with generous headroom.</li>
+        </ol>
+        <p>The result is a transparent, source-backed, channel-ready bid that delivers the same "minutes to intelligence" outcome Alaska DOT&amp;PF is already achieving, with a dramatically lower total cost of ownership and without vendor marketplace lock-in.</p>
+      </section>
+
+      <!-- Scope -->
+      <section class="card" id="scope">
+        <h2><span class="n">2</span>Scope of supply</h2>
+        <ul>
+          <li>One (1) <strong>AuroraEdge AK-20</strong> modular edge data center, factory-integrated, tested, and delivered to Fairbanks.</li>
+          <li>Compute, storage, networking, power, cooling, fire suppression, and physical security installed and burned in prior to shipment.</li>
+          <li>Redundant connectivity architecture: primary customer-provided fiber, two (2) <code>Starlink Performance</code> fixed-site kits for diverse backup.</li>
+          <li>Software stack based on <code>Kubernetes</code> with <code>Rancher</code>, <code>TrueNAS Enterprise</code>, <code>NetBox</code>, <code>Prometheus</code>, <code>Grafana</code>, and <code>FRRouting</code>. Operationally equivalent to Armada Edge Platform features Alaska DOT&amp;PF uses today.</li>
+          <li>Factory Acceptance Test (FAT) with a designated customer witness.</li>
+          <li>Ocean freight via <code>Matson</code> or <code>TOTE</code> to Anchorage, flatbed to Fairbanks, rigging and setting on a customer-prepared pad.</li>
+          <li>Two-engineer on-site commissioning team for five days.</li>
+          <li>Two-day on-site training plus written runbooks.</li>
+          <li>Year 1 premium support bundle.</li>
+        </ul>
+        <div class="note">Full component list with public price anchors and sources is in §8. Interactive dimensioned 3D layout is in §5. Architecture block diagram is in §4.</div>
+      </section>
+
+      <!-- Tech -->
+      <section class="card" id="tech">
+        <h2><span class="n">3</span>Technical highlights</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Area</th><th>AuroraEdge AK-20</th><th>Comparable Galleon <code>Cruiser</code></th></tr></thead>
+            <tbody>
+              <tr><td>Enclosure</td><td>Insulated ISO reefer shell, arctic-rated</td><td>Custom ruggedized 20ft container</td></tr>
+              <tr><td>Cooling</td><td>Free-air economizer primary, <code>16 kW</code> DX backup</td><td>DX-dominant year-round</td></tr>
+              <tr><td>Design PUE at Fairbanks</td><td><code>&le; 1.2</code> annualized</td><td>Typically <code>1.35</code>+</td></tr>
+              <tr><td>Compute</td><td><code>2</code> × R760xa (4× L40S each) + <code>2</code> × R660 + <code>1</code> × XR7620 (2× L4)</td><td>Configurable</td></tr>
+              <tr><td>Storage</td><td><code>TrueNAS H20</code> dual-controller HA, ZFS, <code>180 TB</code> raw hybrid</td><td>Variable</td></tr>
+              <tr><td>Networking</td><td><code>2</code> × Arista 100GbE MLAG + FortiGate 100F HA</td><td>Varies</td></tr>
+              <tr><td>Connectivity</td><td>Fiber primary + <code>2</code> × Starlink Performance diverse</td><td>Starlink primary</td></tr>
+              <tr><td>Control plane</td><td><code>Kubernetes</code> + <code>Rancher</code> + <code>Prometheus</code> + <code>Grafana</code> + <code>NetBox</code></td><td>Armada Commander / Atlas (proprietary)</td></tr>
+              <tr><td>App deployment</td><td>Standard <code>Helm</code> charts, customer-licensed apps</td><td>Armada Marketplace</td></tr>
+              <tr><td>Security</td><td>FIPS 140-3 at rest, TPM 2.0, HID access, CCTV, BMS</td><td>Similar feature set</td></tr>
+              <tr><td>Deployment time</td><td><code>16</code>–<code>20</code> weeks ARO</td><td>"Weeks, not years" (vendor claim)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Architecture -->
+      <section class="card" id="arch">
+        <h2><span class="n">4</span>Architecture</h2>
+        <p class="lead">Wire-level topology. See §5 for the dimensioned 3D layout of the enclosure and interior equipment.</p>
+        <div class="diagram" aria-label="Network block diagram">                        +-----------------------+
+                        |  Alaska DOT&amp;PF WAN    |
+                        |  Fiber (GCI / ACS)    |
+                        +-----------+-----------+
+                                    |
+                 +------------------+------------------+
+                 |                                     |
+           +-----v------+                        +-----v------+
+           | Starlink A |                        | Starlink B |
+           | Performance|                        | Performance|
+           +-----+------+                        +-----+------+
+                 |                                     |
+                 +-----------------+-------------------+
+                                   |
+                          +--------v---------+
+                          |  FortiGate 100F  |
+                          |     HA Pair      |
+                          +--------+---------+
+                                   |
+                   +---------------+----------------+
+                   |                                |
+             +-----v-----+                    +-----v-----+
+             | Arista    |  MLAG / EVPN-VXLAN | Arista    |
+             | 7050CX3-A |&lt;------------------&gt;| 7050CX3-B |
+             +-----+-----+                    +-----+-----+
+                   |                                |
+   +---------------+------------+-------------------+------------+
+   |               |            |                   |            |
++--v---+      +----v----+    +--v----+         +----v----+   +---v----+
+| R760xa|     | R760xa  |    |  R660 |         |  R660   |   | XR7620 |
+| 4×L40S|     | 4×L40S  |    | Ctrl  |         | Worker  |   |  2×L4  |
+| Node A|     | Node B  |    | Plane |         |  K8s    |   | Ingest |
++---+---+     +----+----+    +---+---+         +----+----+   +---+----+
+    |              |             |                   |            |
+    +--------------+-------------+-------------------+------------+
+                                 |
+                           +-----v------+
+                           | TrueNAS H20|
+                           | Hybrid NAS |
+                           | NFS/iSCSI/S3
+                           +------------+
+</div>
+        <div class="three-col" style="margin-top:16px">
+          <div class="note mint"><strong>Free-air first.</strong> <code>61</code> cooling-degree-days/yr at Fairbanks means the economizer carries most hours. DX is summer-peak backup only.</div>
+          <div class="note amber"><strong>Right-sized GPUs.</strong> <code>8</code> × <code>L40S</code> + <code>2</code> × <code>L4</code> matches Metashape/PIX4D public benchmarks for the Alaska drone cadence with headroom.</div>
+          <div class="note"><strong>Open control plane.</strong> <code>K8s</code> + <code>Rancher</code> + <code>Prometheus</code> + <code>Grafana</code> + <code>NetBox</code> + <code>FRR</code> replaces proprietary Commander/Atlas with standard tooling.</div>
+        </div>
+      </section>
+
+      <!-- 3D viewer -->
+      <section class="card" id="viewer">
+        <h2><span class="n">5</span>3D product viewer</h2>
+        <div class="viewer-header">
+          <p class="lead">Component-accurate model of the enclosure, racks, compute stack, cooling, power, and Starlink hardware. The inline version is a lighter preview optimized for document browsing; use fullscreen for the complete inspection workflow.</p>
+          <div class="viewer-actions">
+            <a class="btn btn--primary" href="/for-fun/mobile-data-center/3d/viewer/" target="_blank" rel="noreferrer">Open fullscreen ↗</a>
+          </div>
+        </div>
+        <div class="viewer-wrap">
+          <div class="viewer-bar">
+            <span class="k">Inline preview · real-scale · source-backed</span>
+            <span class="muted">touch / drag enabled</span>
+          </div>
+          <iframe class="viewer-iframe" data-src="/for-fun/mobile-data-center/3d/viewer/?embed=1" title="AuroraEdge AK-20 3D viewer" loading="lazy" allow="fullscreen"></iframe>
+          <div class="viewer-mobile-alt">
+            <h4>Mobile viewer</h4>
+            <p>The inline preview is intentionally simplified on smaller screens to keep the bid readable. Open the standalone viewer for the full touch experience, parts drawer, and inspection workflow.</p>
+            <div class="viewer-actions">
+              <a class="btn btn--primary" href="/for-fun/mobile-data-center/3d/viewer/" target="_blank" rel="noreferrer">Open fullscreen ↗</a>
+            </div>
+          </div>
+          <div class="viewer-hint">Inline mode trims the standalone chrome for easier reading inside the bid. On mobile, use <strong>Open fullscreen</strong> for the best experience.</div>
+        </div>
+      </section>
+
+      <!-- Pricing -->
+      <section class="card" id="pricing">
+        <h2><span class="n">6</span>Pricing</h2>
+        <p class="lead">All prices USD. Single-unit quantity. Firm-fixed purchase. Taxes, duties, and customer-site civil works excluded.</p>
+
+        <h3>6.1 Base configuration — firm-fixed purchase</h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Line</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Enclosure, power, cooling, fire, racks, physical security (factory-installed)</td><td class="num">$162,252</td></tr>
+              <tr><td>Compute, storage, networking, connectivity hardware, optics</td><td class="num">$267,482</td></tr>
+              <tr><td>Engineering, integration, FAT, documentation</td><td class="num">$96,000</td></tr>
+              <tr><td>Freight, insurance, on-site commissioning and training</td><td class="num">$50,500</td></tr>
+              <tr><td>Program contingency and pricing cushion</td><td class="num">$21,766</td></tr>
+              <tr class="grand"><td>Firm-fixed one-time price</td><td class="num">$598,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>6.2 Year 1 support and services — bundled, payable at delivery</h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Line</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Premium support: 24×7 P1, 8×5 P2/P3, 4-hr remote response, annual PM trip</td><td class="num">$49,000</td></tr>
+              <tr><td>TrueNAS Gold + Ubuntu Pro + Fortinet support renewal</td><td class="num">$12,000</td></tr>
+              <tr><td>Starlink Business Local Priority 2 TB, 2 kits, 12 months</td><td class="num">$12,960</td></tr>
+              <tr class="total"><td>Year 1 total</td><td class="num">$73,960</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>6.3 Year 2+ renewal — flat, firm, at customer option</h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Line</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Premium support</td><td class="num">$49,000</td></tr>
+              <tr><td>Software vendor support</td><td class="num">$10,000</td></tr>
+              <tr><td>Starlink 2 kits, 12 months</td><td class="num">$12,960</td></tr>
+              <tr class="total"><td>Annual renewal</td><td class="num">$71,960</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>6.4 Five-year total cost of ownership</h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Year</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Year 1 (one-time purchase $598,000 + support $73,960)</td><td class="num">$671,960</td></tr>
+              <tr><td>Year 2</td><td class="num">$71,960</td></tr>
+              <tr><td>Year 3</td><td class="num">$71,960</td></tr>
+              <tr><td>Year 4</td><td class="num">$71,960</td></tr>
+              <tr><td>Year 5</td><td class="num">$71,960</td></tr>
+              <tr class="grand"><td>5-year TCO</td><td class="num">$959,800</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted">Years 2 through 5 are at customer option; the hardware remains owned by Alaska DOT&amp;PF whether or not support is renewed.</p>
+
+        <h3>6.5 Optional premium mission-critical purchase</h3>
+        <p>For a two-site active-active configuration (Fairbanks + Anchorage DR) with expanded storage, doubled GPU capacity, 1-hour 24×7 P1 response, and a 5-year gold SLA, a firm-fixed purchase quote is available on request. Indicative one-time price <code>$1,149,000</code> plus <code>$92,000</code>/yr optional support renewal.</p>
+      </section>
+
+      <!-- TCO -->
+      <section class="card" id="tco">
+        <h2><span class="n">7</span>Side-by-side TCO comparison</h2>
+        <p>Armada's publicly reported Commander Edge bundle starts at approximately <code>$450,000</code>/yr for a single entry-level subscription deployment and is typically higher for a loaded <code>Cruiser</code> configuration similar to Alaska DOT&amp;PF's current Fairbanks unit. AuroraEdge AK-20 is a one-time purchase: Alaska DOT&amp;PF owns the hardware outright, with optional annual support renewal.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Scenario</th><th class="num">Year 1</th><th class="num">3-year</th><th class="num">5-year</th><th>Ownership</th></tr></thead>
+            <tbody>
+              <tr><td><strong>AuroraEdge AK-20 (purchase)</strong></td><td class="num">$671,960</td><td class="num">$815,880</td><td class="num">$959,800</td><td>State owns hardware</td></tr>
+              <tr><td>Armada Commander Edge (entry-level anchor, subscription)</td><td class="num">$450,000</td><td class="num">$1,350,000</td><td class="num">$2,250,000</td><td>Vendor-owned, recurring</td></tr>
+              <tr><td>Armada Commander Edge (loaded config, indicative)</td><td class="num">$600,000</td><td class="num">$1,800,000</td><td class="num">$3,000,000</td><td>Vendor-owned, recurring</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note mint">Expected 5-year savings vs the loaded Galleon comparison: approximately <strong>$2.0M</strong>, while matching or exceeding the same "minutes-to-intelligence" outcome and leaving the asset on the State's books.</div>
+      </section>
+
+      <!-- BOM -->
+      <section class="card" id="bom">
+        <h2><span class="n">8</span>Full bill of materials</h2>
+        <p class="lead">Every line item tied to a public price anchor where available. Confidence ratings reflect the quality of the public source, not the final negotiated price.</p>
+        <div class="bom-tools">
+          <input class="bom-search" id="bom-search" type="search" placeholder="Filter line items…">
+          <button class="pill active" data-filter="all">All</button>
+          <button class="pill" data-filter="Shell">Shell</button>
+          <button class="pill" data-filter="Power">Power</button>
+          <button class="pill" data-filter="Cooling">Cooling</button>
+          <button class="pill" data-filter="Racks">Racks</button>
+          <button class="pill" data-filter="Connectivity">Connectivity</button>
+          <button class="pill" data-filter="Networking">Networking</button>
+          <button class="pill" data-filter="Compute">Compute</button>
+          <button class="pill" data-filter="Storage">Storage</button>
+          <button class="pill" data-filter="Security">Security</button>
+          <button class="pill" data-filter="Logistics">Logistics</button>
+          <button class="pill" data-filter="NRE">NRE</button>
+          <button class="pill" data-filter="Y1 Support">Y1 Support</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl" id="bom-table">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th>Category</th>
+                <th>Component</th>
+                <th class="num">Qty</th>
+                <th class="num">Unit</th>
+                <th class="num">Ext.</th>
+                <th>Model / vendor</th>
+                <th>Source</th>
+                <th>Conf.</th>
+              </tr>
+            </thead>
+            <tbody id="bom-body"></tbody>
+          </table>
+        </div>
+        <p class="caption" id="bom-summary"></p>
+      </section>
+
+      <!-- Schedule -->
+      <section class="card" id="schedule">
+        <h2><span class="n">9</span>Schedule</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th style="width:120px">Week</th><th>Milestone</th></tr></thead>
+            <tbody>
+              <tr><td><code>0</code></td><td>Contract award, kickoff</td></tr>
+              <tr><td><code>0–2</code></td><td>Detailed design freeze, long-lead procurement (Dell R760xa, TrueNAS H20, Stulz cooler)</td></tr>
+              <tr><td><code>2–10</code></td><td>Enclosure retrofit and factory integration</td></tr>
+              <tr><td><code>10–12</code></td><td>Burn-in, thermal validation, failover testing</td></tr>
+              <tr><td><code>12–13</code></td><td>Factory Acceptance Test with customer witness</td></tr>
+              <tr><td><code>13–16</code></td><td>Freight to Fairbanks via Matson / TOTE + inland</td></tr>
+              <tr><td><code>16–17</code></td><td>Site acceptance, commissioning, training</td></tr>
+              <tr><td><code>17–18</code></td><td>Handover and Year 1 support commencement</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SLA -->
+      <section class="card" id="sla">
+        <h2><span class="n">10</span>Service level agreement (Year 1 standard)</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Severity</th><th>Definition</th><th>Remote response</th><th>On-site response</th><th>Resolution target</th></tr></thead>
+            <tbody>
+              <tr><td><strong>P1</strong></td><td>Production outage</td><td>1 hour, 24×7</td><td>Next available flight</td><td>24 hours</td></tr>
+              <tr><td><strong>P2</strong></td><td>Degraded service</td><td>4 business hours, 8×5</td><td>As required</td><td>3 business days</td></tr>
+              <tr><td><strong>P3</strong></td><td>Non-critical defect</td><td>8 business hours, 8×5</td><td>As required</td><td>10 business days</td></tr>
+              <tr><td><strong>P4</strong></td><td>Change request</td><td>Next business day</td><td>N/A</td><td>Scheduled release</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Includes <code>1</code> annual preventive maintenance site visit, remote patch and update cadence, and parts replacement under NBD next-flight logistics for in-state assets.</p>
+      </section>
+
+      <!-- Warranty -->
+      <section class="card" id="warranty">
+        <h2><span class="n">11</span>Warranty and support</h2>
+        <ul>
+          <li>3-year hardware warranty on Dell compute and storage via <code>Dell ProSupport Plus</code>, included.</li>
+          <li>3-year hardware warranty on Arista switches via manufacturer program, included.</li>
+          <li><code>TrueNAS H20</code> 3-year Gold support, included in Year 1 bundle, renewable.</li>
+          <li><code>FortiGate</code> FortiCare support, included in Year 1 bundle, renewable.</li>
+          <li>Shell, power, cooling, and fire suppression: 3-year limited warranty on integration workmanship.</li>
+        </ul>
+      </section>
+
+      <!-- Assumptions -->
+      <section class="card" id="assumptions">
+        <h2><span class="n">12</span>Assumptions and exclusions</h2>
+        <ul>
+          <li>Customer provides a prepared, level pad of <code>6.5 m × 3 m</code> minimum, with <code>200 A</code> 3-phase <code>480 V</code> utility drop within <code>15 m</code> and grounded to code.</li>
+          <li>Customer provides WAN interconnect (fiber) at the demarcation panel.</li>
+          <li>Site pad, civil works, permitting, and utility coordination are customer scope.</li>
+          <li>Air freight, expedited fees, and customer change orders are not included.</li>
+          <li>State of Alaska procurement preferences and small-business participation can be accommodated on request.</li>
+        </ul>
+      </section>
+
+      <!-- Contract vehicles -->
+      <section class="card" id="vehicles">
+        <h2><span class="n">13</span>Contract vehicles</h2>
+        <p>This bid can be issued as:</p>
+        <ul>
+          <li>Direct firm-fixed purchase order to AuroraEdge LLC.</li>
+          <li>Through a GSA, SEWP, or NASPO ValuePoint reseller of the customer's choice. Resellers will require a modest pass-through fee.</li>
+          <li>Through the State of Alaska's existing IT services cooperative procurement vehicles.</li>
+        </ul>
+      </section>
+
+      <!-- Why -->
+      <section class="card" id="why">
+        <h2><span class="n">14</span>Why this bid</h2>
+        <ul>
+          <li><strong>Transparent, source-backed pricing.</strong> Every line item in the BOM is tied to a public price anchor. No marketplace opacity.</li>
+          <li><strong>Right-sized for Alaska.</strong> Free-air cooling, arctic-grade enclosure from a commodity reefer supplier, and GPU density matched to the published drone workflow.</li>
+          <li><strong>Open, portable software.</strong> If Alaska DOT&amp;PF's strategy changes, the stack moves with them. No dependency on a single vendor's control plane.</li>
+          <li><strong>Faster or equal time to deliver.</strong> <code>16</code>–<code>20</code> weeks ARO matches best-in-class containerized DC timelines.</li>
+          <li><strong>Lower TCO.</strong> Even on the entry-level Armada comparison, 5-year savings exceed <code>$1.2M</code> per unit. On a loaded comparison, savings exceed <code>$2M</code>.</li>
+          <li><strong>Documented 3D design.</strong> Inspect exact dimensions, equipment footprints, and cold-aisle clearance before award via the included interactive 3D viewer (§5).</li>
+        </ul>
+      </section>
+
+      <!-- POC -->
+      <section class="card" id="poc">
+        <h2><span class="n">15</span>Point of contact</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Role</th><th>Name</th><th>Email</th></tr></thead>
+            <tbody>
+              <tr><td>Program Lead</td><td>TBD</td><td>TBD</td></tr>
+              <tr><td>Solutions Architect</td><td>TBD</td><td>TBD</td></tr>
+              <tr><td>Contracts</td><td>TBD</td><td>TBD</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top:14px">Prepared using public-source-verified pricing and published Alaska DOT&amp;PF workflow data as a public concept exercise.</p>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* Public concept page. */
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+/* --------- Deferred iframe hydration ----------
+ * Mobile browsers aggressively kill tabs that spawn multiple WebGL contexts,
+ * so we only hydrate the embedded 3D viewers on capable devices and we only
+ * run the hero iframe while it is actually on screen. */
+(function(){
+  const mobileMedia = window.matchMedia("(max-width: 780px)");
+  function canHydrate(iframe){
+    if (!iframe) return false;
+    if (mobileMedia.matches) return false;
+    return true;
+  }
+  function hydrateIfEligible(iframe){
+    if (!canHydrate(iframe)) return;
+    if (iframe.dataset.src && !iframe.src){
+      iframe.src = iframe.dataset.src;
+      const stage = iframe.closest(".cinema__stage");
+      if (stage) stage.classList.add("is-live");
+    }
+  }
+  function unhydrate(iframe){
+    if (!iframe || !iframe.src) return;
+    iframe.removeAttribute("src");
+    const stage = iframe.closest(".cinema__stage");
+    if (stage) stage.classList.remove("is-live");
+  }
+  const hero = document.querySelector(".cinema__stage iframe");
+  const section5 = document.querySelector(".viewer-iframe");
+  // Hydrate eligible frames immediately; the observer below only unhydrates
+  // the hero when it scrolls out of view to conserve resources.
+  hydrateIfEligible(hero);
+  hydrateIfEligible(section5);
+  if ("IntersectionObserver" in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) hydrateIfEligible(e.target);
+        else if (e.target === hero) unhydrate(e.target);
+      });
+    }, { rootMargin: "200px 0px" });
+    if (hero) io.observe(hero);
+    if (section5) io.observe(section5);
+  }
+  mobileMedia.addEventListener?.("change", () => {
+    [hero, section5].forEach(f => {
+      if (mobileMedia.matches) unhydrate(f);
+      else hydrateIfEligible(f);
+    });
+  });
+})();
+
+/* --------- TOC active section ---------- */
+const tocLinks = Array.from(document.querySelectorAll(".toc a"));
+const sections = tocLinks.map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean);
+const io = new IntersectionObserver(entries => {
+  entries.forEach(ent => {
+    if (!ent.isIntersecting) return;
+    const id = "#"+ent.target.id;
+    tocLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === id));
+  });
+}, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+sections.forEach(s => io.observe(s));
+
+/* --------- BOM data + render ---------- */
+const BOM = [
+  {s:"Shell",c:"Enclosure",d:"20ft HC one-trip insulated reefer container with Thermo King Magnum Plus (cooling unit removed / repurposed)",q:1,u:24750,e:24750,mv:"Equipment Depot 20FT New Refrigerated ISO Reefer",url:"https://www.equipmentsdepot.com/product/20ft-new-refrigerated-shipping-container/",conf:"high"},
+  {s:"Shell",c:"Enclosure retrofit",d:"Remove factory reefer coil / compressor, structural reinforcement, dielectric floor coat, RAL 7035 repaint",q:1,u:12000,e:12000,mv:"Internal fabrication",url:"",conf:"medium"},
+  {s:"Shell",c:"Enclosure",d:"Raised-floor pedestal system with perforated tiles, cold-aisle containment and door frames",q:1,u:8500,e:8500,mv:"Tate FreeAxez equivalent",url:"https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/",conf:"medium"},
+  {s:"Shell",c:"Fire suppression",d:"FM-200 clean agent system with 20ft-rated cylinder, nozzles, VESDA early warning, control panel",q:1,u:12000,e:12000,mv:"Kidde / Fike equivalent",url:"https://www.deckro.net/product/deckro-edgeflex-b20-20-ft-standard-container-data-center/",conf:"medium"},
+  {s:"Shell",c:"Lighting / interior",d:"LED fixtures, emergency egress lights, service outlets, ground bus, structured cable trays, signage",q:1,u:6500,e:6500,mv:"Commodity",url:"",conf:"medium"},
+  {s:"Power",c:"UPS",d:"Easy UPS 3S 30kVA 400V online double conversion, 3-phase, integrated batteries",q:1,u:17232,e:17232,mv:"APC E3SUPS30KFBS",url:"https://esaitech.com/products/apc-by-schneider-e3sups30kfbs-electric-easy-ups-3s-30kva-tower-ups",conf:"high"},
+  {s:"Power",c:"Distribution",d:"200A 3-phase ATS with utility + generator inputs, surge suppression",q:1,u:6800,e:6800,mv:"Eaton ATC-900 equivalent",url:"",conf:"medium"},
+  {s:"Power",c:"Distribution",d:"Main distribution panel w/ main breaker, branch circuits, monitoring CTs, lightning protection",q:1,u:9500,e:9500,mv:"Schneider Square D equivalent",url:"",conf:"medium"},
+  {s:"Power",c:"PDU",d:"Metered switched 3-phase 30A rack PDU with network management card",q:6,u:895,e:5370,mv:"APC AP8865",url:"",conf:"medium"},
+  {s:"Cooling",c:"Primary cooling",d:"Stulz CyberRow CRS-042 DX in-row precision cooler 16kW R410A 300mm wide VS EC compressor",q:1,u:22000,e:22000,mv:"Stulz CRS-042",url:"https://ecpwr.com/products/cooling/inrow-cooling/stulz-cyberrow/",conf:"medium"},
+  {s:"Cooling",c:"Free-air economizer",d:"Dampers, VS intake/exhaust fans, MERV-13 filters, snow/dust baffles, differential-pressure controls, mixing plenum",q:1,u:18000,e:18000,mv:"Custom integration",url:"https://weatherspark.com/y/273/Average-Weather-in-Fairbanks-Alaska-United-States-Year-Round",conf:"high"},
+  {s:"Cooling",c:"Controls",d:"BMS controller with temp/humidity/dew-point/leak telemetry + automatic DX/economizer changeover",q:1,u:4500,e:4500,mv:"Carel pCO equivalent",url:"",conf:"medium"},
+  {s:"Racks",c:"Rack",d:"42U 600mm × 1070mm deep server rack with containment baffles, cable management, side panels",q:3,u:1200,e:3600,mv:"Tripp Lite SR42UB equivalent",url:"",conf:"medium"},
+  {s:"Connectivity",c:"Satellite",d:"Starlink Performance fixed-site kit (APS + Performance antenna)",q:2,u:1999,e:3998,mv:"Starlink Business Performance",url:"https://starlink.com/business/fixed-site",conf:"high"},
+  {s:"Connectivity",c:"Satellite service",d:"Starlink Local Priority 2TB service, 12 months × 2 kits",q:24,u:540,e:12960,mv:"Starlink Business",url:"https://starlink.com/business/fixed-site",conf:"high"},
+  {s:"Connectivity",c:"Fiber",d:"Fiber interconnect: SM LC patch panel, outdoor drop, demarcation termination, diverse entry boresight",q:1,u:2000,e:2000,mv:"Commodity",url:"",conf:"medium"},
+  {s:"Networking",c:"Core switch",d:"32-port 100GbE ToR switch, front-to-rear airflow, dual AC PSU",q:2,u:10017,e:20034,mv:"Arista DCS-7050CX3-32S-F",url:"https://itprice.com/arista-price-list/7050x3.html",conf:"medium"},
+  {s:"Networking",c:"Out of band",d:"48-port 1GbE management switch with dedicated OOB VLAN capability",q:1,u:3500,e:3500,mv:"Arista 7010T equivalent",url:"",conf:"medium"},
+  {s:"Networking",c:"Firewall",d:"Next-generation firewall HA pair with segmentation, VPN, IDS",q:1,u:8000,e:8000,mv:"Fortinet FortiGate 100F HA",url:"",conf:"medium"},
+  {s:"Networking",c:"Optics / cabling",d:"QSFP28 100G SR transceivers, SFP+ 10G, SM fiber patch, DACs, structured cabling",q:1,u:6000,e:6000,mv:"Commodity",url:"",conf:"medium"},
+  {s:"Compute",c:"GPU compute",d:"AI compute node — 2× Xeon Platinum 8452Y, 256GB DDR5, 2× 3.84TB NVMe, 4× NVIDIA L40S 48GB",q:2,u:47600,e:95200,mv:"Dell PowerEdge R760xa",url:"https://marketplace-admin.uvation.com/dell-poweredge-r760xa-2x-xeon-platinum-4x-nvidia-l40s.html",conf:"high"},
+  {s:"Compute",c:"General compute",d:"General-purpose 1U — 2× Xeon Gold, 256GB RAM, dual SSD boot, dual 25GbE",q:2,u:14000,e:28000,mv:"Dell PowerEdge R660",url:"https://www.dell.com/en-us/shop/servers-storage-and-networking/poweredge-xr7620-rack-server/spd/poweredge-xr7620/pe_xr7620_16789_vi_vp",conf:"medium"},
+  {s:"Compute",c:"Rugged edge",d:"Rugged 2U edge server — Xeon Scalable, 128GB, dual SSD boot, 2× NVIDIA L4",q:1,u:31541.71,e:31541.71,mv:"Dell PowerEdge XR7620 + 2× L4",url:"https://www.dell.com/en-us/shop/servers-storage-and-networking/poweredge-xr7620-rack-server/spd/poweredge-xr7620/pe_xr7620_16789_vi_vp",conf:"high"},
+  {s:"Storage",c:"Primary NAS",d:"TrueNAS H20 dual-controller hybrid — 10× 18TB NL-SAS, 2× 3.2TB NVMe read cache, 1× 16GB write cache, Y1 Gold",q:1,u:69209,e:69209,mv:"iXsystems TrueNAS H20 Quick Ship 180TB",url:"https://www.novatech.co.uk/promo/truenas-h-series",conf:"medium"},
+  {s:"Security",c:"Access control",d:"HID card reader, strike lock, REX sensor, audit-logged controller",q:1,u:2500,e:2500,mv:"HID Global",url:"",conf:"medium"},
+  {s:"Security",c:"Surveillance",d:"4× indoor/outdoor PoE cameras with NVR, 30-day retention",q:1,u:4500,e:4500,mv:"Axis Communications",url:"",conf:"medium"},
+  {s:"Security",c:"Intrusion / env",d:"Door contacts, motion, vibration, smoke, water, temp/humidity sensors with central controller",q:1,u:4500,e:4500,mv:"Commodity BMS",url:"",conf:"medium"},
+  {s:"Logistics",c:"Freight",d:"Factory → Fairbanks: road to West Coast, Matson/TOTE to Anchorage, flatbed to Fairbanks",q:1,u:12000,e:12000,mv:"Matson / TOTE",url:"https://www.matson.com/our-services/alaska-service.html",conf:"medium"},
+  {s:"Logistics",c:"Insurance",d:"Marine + inland transit insurance + rigging insurance on arrival",q:1,u:3500,e:3500,mv:"Commercial broker",url:"",conf:"medium"},
+  {s:"NRE",c:"Engineering",d:"Architecture design, electrical/cooling/structural engineering, documentation package",q:1,u:35000,e:35000,mv:"In-house engineering",url:"",conf:"high"},
+  {s:"NRE",c:"Factory integration",d:"600 labor hours @ $75/hr for rack and stack, cable mgmt, power commissioning, thermal testing, burn-in",q:1,u:45000,e:45000,mv:"In-house integration",url:"",conf:"high"},
+  {s:"NRE",c:"Factory acceptance",d:"FAT with customer rep — full-load thermal test, failover validation, doc hand-off",q:1,u:8000,e:8000,mv:"In-house",url:"",conf:"high"},
+  {s:"NRE",c:"Documentation",d:"Engineering drawings, BMS schematics, electrical one-lines, runbooks, as-built package",q:1,u:8000,e:8000,mv:"In-house",url:"",conf:"high"},
+  {s:"NRE",c:"Site activation",d:"2-engineer team on-site Fairbanks 5 days — commission, integrate with RSL, validate connectivity + photogrammetry",q:1,u:25000,e:25000,mv:"In-house",url:"",conf:"high"},
+  {s:"NRE",c:"Training",d:"2-day on-site training for Alaska DOT&PF remote sensing + IT staff, written runbooks",q:1,u:10000,e:10000,mv:"In-house",url:"",conf:"high"},
+  {s:"Y1 Support",c:"Support",d:"Year 1 premium — 24×7 P1, 8×5 P2/P3, 4-hr remote, next-flight on-site, annual PM trip",q:1,u:49000,e:49000,mv:"In-house",url:"",conf:"high"},
+  {s:"Y1 Support",c:"Software",d:"TrueNAS Enterprise Gold + Ubuntu Pro (all nodes) + Fortinet support renewal",q:1,u:12000,e:12000,mv:"iXsystems / Canonical / Fortinet",url:"",conf:"medium"},
+  {s:"Y1 Support",c:"Optional software",d:"Agisoft Metashape Pro floating node license (customer may provide)",q:1,u:3499,e:3499,mv:"Agisoft",url:"https://agisoft.com/downloads/system-requirements",conf:"high"},
+];
+
+const money = n => "$" + Number(n).toLocaleString("en-US", {minimumFractionDigits: Number.isInteger(n)?0:2, maximumFractionDigits:2});
+function hostOf(u){ try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return ""} }
+
+function renderBom(filter, query){
+  const body = document.getElementById("bom-body");
+  const q = (query||"").trim().toLowerCase();
+  const rows = BOM.filter(r => (filter==="all"||r.s===filter) && (!q || (r.c+" "+r.d+" "+r.mv).toLowerCase().includes(q)));
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td><strong>${r.s}</strong></td>
+      <td>${r.c}</td>
+      <td>${r.d}</td>
+      <td class="num">${r.q}</td>
+      <td class="num">${money(r.u)}</td>
+      <td class="num">${money(r.e)}</td>
+      <td>${r.mv}</td>
+      <td>${r.url?`<a href="${r.url}" target="_blank" rel="noreferrer">${hostOf(r.url)}</a>`:"<span class=\"muted\">—</span>"}</td>
+      <td><span class="conf ${r.conf}">${r.conf}</span></td>
+    </tr>
+  `).join("");
+
+  const sum = rows.reduce((a,b)=>a+b.e,0);
+  document.getElementById("bom-summary").textContent =
+    `${rows.length} line item${rows.length===1?"":"s"} shown · subtotal of visible rows: ${money(sum)}. Full Year-1 all-in firm-fixed quoted price is $672,000 (includes program contingency).`;
+}
+
+document.querySelectorAll(".pill").forEach(p => {
+  p.addEventListener("click", () => {
+    document.querySelectorAll(".pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    renderBom(p.dataset.filter, document.getElementById("bom-search").value);
+  });
+});
+document.getElementById("bom-search").addEventListener("input", e => {
+  const active = document.querySelector(".pill.active")?.dataset.filter || "all";
+  renderBom(active, e.target.value);
+});
+renderBom("all","");
+</script>
+</body>
+</html>

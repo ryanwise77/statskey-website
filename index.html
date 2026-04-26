@@ -3,156 +3,267 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StatsKey</title>
-    <meta name="description" content="The future of entropy management. AI-powered nutrition and biometric intelligence — compiled into a model unique to you." />
+    <title>StatsKey | Nutrition, Biometrics, and Metabolic Intelligence</title>
+    <meta name="description" content="StatsKey turns meals, workouts, glucose, sleep, hydration, and wellness data into a personal intelligence layer for your body." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body class="antialiased">
-
-    <!-- NAV -->
-    <nav id="nav" class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-transparent transition-all duration-500" style="background:rgba(0,0,0,0.6)">
-      <div class="max-w-[1080px] mx-auto px-8 h-11 flex items-center justify-between">
-        <a href="#" class="font-display font-semibold text-[14px] tracking-[-0.01em] text-text-primary/80 hover:text-text-primary transition-colors">StatsKey</a>
-        <div class="hidden md:flex items-center gap-8 text-[12px] text-text-muted">
-          <a href="#features" class="hover:text-text-primary transition-colors">Features</a>
-          <a href="#flow" class="hover:text-text-primary transition-colors">Flow</a>
-          <a href="/app" class="hover:text-text-primary transition-colors">Sign in</a>
-          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="text-text-secondary hover:text-text-primary transition-colors">Get the app</a>
+    <nav id="nav" class="site-nav">
+      <div class="site-nav__inner">
+        <a href="#" class="site-brand" aria-label="StatsKey home">
+          <span class="site-brand__mark"></span>
+          <span>StatsKey</span>
+        </a>
+        <div class="site-nav__links" aria-label="Primary navigation">
+          <a href="#platform">Platform</a>
+          <a href="#intelligence">Intelligence</a>
+          <a href="#flow">Flow</a>
+          <a href="#for-fun">For Fun</a>
+          <a href="/prototype/">Prototype</a>
+          <a href="/app">Sign in</a>
         </div>
-        <button id="mobile-menu-btn" class="md:hidden text-text-muted" aria-label="Menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+        <a class="site-nav__cta" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
+        <button id="mobile-menu-btn" class="site-menu-btn" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
         </button>
       </div>
-      <div id="mobile-menu" class="md:hidden hidden border-t border-white/[0.06]" style="background:rgba(0,0,0,0.95)">
-        <div class="px-8 py-5 space-y-4 text-[15px]">
-          <a href="#features" class="block text-text-secondary hover:text-text-primary transition-colors">Features</a>
-          <a href="#flow" class="block text-text-secondary hover:text-text-primary transition-colors">Flow</a>
-          <a href="/app" class="block text-text-secondary hover:text-text-primary transition-colors">Sign in</a>
-          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="block text-text-primary font-medium">Get the app</a>
-        </div>
+      <div id="mobile-menu" class="site-mobile-menu hidden">
+        <a href="#platform">Platform</a>
+        <a href="#intelligence">Intelligence</a>
+        <a href="#flow">Flow</a>
+        <a href="#for-fun">For Fun</a>
+        <a href="/prototype/">Prototype</a>
+        <a href="/app">Sign in</a>
+        <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
       </div>
     </nav>
 
-    <!-- ============================== HERO ============================== -->
-    <section class="relative min-h-screen flex items-center justify-center px-8">
-      <div class="absolute inset-0 glow-hero"></div>
-      <div class="relative z-10 w-full max-w-[1080px] mx-auto text-center">
-        <h1 class="font-display text-[clamp(3.2rem,8.5vw,6.5rem)] font-bold tracking-[-0.045em] leading-[0.92] mb-6">
-          Your body is<br/>a dataset.
-        </h1>
-        <p class="text-text-secondary text-[clamp(1.05rem,2vw,1.25rem)] leading-[1.55] max-w-[480px] mx-auto mb-10">
-          Instant AI nutrition records, biometric health data, and glucose — together in one place.
-        </p>
-        <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="cta-link inline-flex items-center gap-1.5 text-accent text-[17px] font-medium">
-          Get the app <span class="arrow">&rarr;</span>
-        </a>
-        <p class="text-text-muted text-[13px] mt-3">Free for one month, then $0.99/mo</p>
-      </div>
-    </section>
-
-    <!-- ========================== STATEMENT ============================= -->
-    <section class="relative min-h-[70vh] flex items-center justify-center px-8">
-      <div class="absolute inset-0 glow-statement"></div>
-      <div class="relative z-10 w-full max-w-[720px] mx-auto text-center">
-        <p class="gradient-text font-display text-[clamp(1.5rem,3.4vw,2.2rem)] font-medium tracking-[-0.02em] leading-[1.35] reveal">
-          Most health apps give you numbers. StatsKey compiles them — 50+ nutrients, biometrics, activity, sleep, GI health — into a single coherent model of how your body works and what drives it.
-        </p>
-      </div>
-    </section>
-
-    <!-- ========================== FEATURES ============================== -->
-    <section id="features" class="relative py-32 sm:py-40 px-8">
-      <div class="w-full max-w-[1080px] mx-auto">
-        <h2 class="font-display text-[clamp(2rem,4.5vw,3.4rem)] font-bold tracking-[-0.035em] text-center mb-20 reveal">
-          Built for precision.
-        </h2>
-
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          <div class="glass p-8 sm:p-10 text-center reveal reveal-stagger-1">
-            <h3 class="font-display font-semibold text-[16px] sm:text-[17px] mb-2.5">Photo, Text, Barcode, Label</h3>
-            <p class="text-text-secondary text-[14px] sm:text-[15px] leading-relaxed">Four ways to record. Snap a photo, type naturally, scan a barcode, or photograph a label. AI extracts 50+ nutrients per meal.</p>
-          </div>
-          <div class="glass p-8 sm:p-10 text-center reveal reveal-stagger-2">
-            <h3 class="font-display font-semibold text-[16px] sm:text-[17px] mb-2.5">CGM Integration</h3>
-            <p class="text-text-secondary text-[14px] sm:text-[15px] leading-relaxed">Dexcom G7, Stelo, Abbott Libre, Nightscout. Maps each meal to your real glucose response — baseline, peak, iAUC.</p>
-          </div>
-          <div class="glass p-8 sm:p-10 text-center reveal reveal-stagger-3">
-            <h3 class="font-display font-semibold text-[16px] sm:text-[17px] mb-2.5">Personal Glycemic Index</h3>
-            <p class="text-text-secondary text-[14px] sm:text-[15px] leading-relaxed">Your glucose response to a banana is different from everyone else's. StatsKey builds a model unique to your metabolism.</p>
-          </div>
-          <div class="glass p-8 sm:p-10 text-center reveal reveal-stagger-1">
-            <h3 class="font-display font-semibold text-[16px] sm:text-[17px] mb-2.5">Health Correlation</h3>
-            <p class="text-text-secondary text-[14px] sm:text-[15px] leading-relaxed">Track energy, mood, sleep, and GI health. The correlation engine links foods to how you feel — statistically, not anecdotally.</p>
-          </div>
-          <div class="glass p-8 sm:p-10 text-center reveal reveal-stagger-2">
-            <h3 class="font-display font-semibold text-[16px] sm:text-[17px] mb-2.5">Clinical Reports</h3>
-            <p class="text-text-secondary text-[14px] sm:text-[15px] leading-relaxed">Generate combined nutrition + CGM reports for your physician. Real data. Real patterns. Not estimates.</p>
-          </div>
-          <div class="glass p-8 sm:p-10 text-center reveal reveal-stagger-3">
-            <h3 class="font-display font-semibold text-[16px] sm:text-[17px] mb-2.5">Adaptive Intelligence</h3>
-            <p class="text-text-secondary text-[14px] sm:text-[15px] leading-relaxed">Calibrates your BMR from 30 days of real metabolic data via Apple Health. Targets that adapt with you, not generic formulas.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================= FLOW =============================== -->
-    <section id="flow" class="relative py-32 sm:py-40 px-8">
-      <div class="absolute inset-0 glow-flow"></div>
-      <div class="relative z-10 w-full max-w-[1080px] mx-auto text-center">
-        <h2 class="font-display text-[clamp(2rem,4.5vw,3.4rem)] font-bold tracking-[-0.035em] mb-4 reveal">
-          Flow
-        </h2>
-        <p class="text-text-secondary text-[15px] sm:text-base leading-relaxed max-w-[480px] mx-auto mb-14 reveal d1">
-          Powered by Gemini. Queries your entire personal dataset — nutrition, biometrics, activity, metabolic response — and surfaces patterns only visible when all your data is connected.
-        </p>
-        <div class="flow-card max-w-[560px] mx-auto p-6 sm:p-8 space-y-4 text-left reveal d2">
-          <div class="flex items-center gap-2">
-            <span class="w-[5px] h-[5px] rounded-full bg-data pulse-subtle"></span>
-            <span class="text-[11px] font-mono text-text-muted tracking-wider uppercase">Flow</span>
-          </div>
-          <div class="flex justify-end">
-            <div class="bg-white/[0.05] rounded-[16px] rounded-br-[4px] px-4 py-3 text-[14px] text-text-primary/90 max-w-[300px]">
-              Why did my glucose crash overnight last Tuesday?
+    <main>
+      <section class="hero-section">
+        <div class="hero-orb hero-orb--blue"></div>
+        <div class="hero-orb hero-orb--data"></div>
+        <div class="page-shell hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow reveal">Personal health intelligence</div>
+            <h1 class="hero-title reveal d1">Your body is a living dataset. StatsKey makes it legible.</h1>
+            <p class="hero-lede reveal d2">
+              Capture nutrition in seconds, connect biometrics, and ask Flow what is actually driving your energy, glucose, training, sleep, and recovery.
+            </p>
+            <div class="hero-actions reveal d3">
+              <a class="button button--primary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
+              <a class="button button--secondary" href="#platform">Explore platform</a>
             </div>
+            <div class="hero-note reveal d3">Free for one month. Then $0.99/mo. Cancel anytime.</div>
           </div>
-          <div class="flex justify-start">
-            <div class="border border-white/[0.06] rounded-[16px] rounded-bl-[4px] px-4 py-3 text-[14px] text-text-secondary leading-relaxed max-w-[400px]">
-              Your dinner at 8:47 PM had 94g carbs with only 12g fat. Meals above 80g carbs with under 20g fat correlate with overnight drops below 60 mg/dL <span class="text-data font-medium">83% of the time</span>.
+
+          <div class="command-card reveal d2" aria-label="StatsKey data model preview">
+            <div class="command-card__top">
+              <div>
+                <div class="panel-label">Metabolic model</div>
+                <div class="command-card__title">Today, compiled</div>
+              </div>
+              <span class="live-pill"><span></span> Live inputs</span>
+            </div>
+            <div class="score-ring" aria-hidden="true">
+              <div class="score-ring__inner">
+                <span>83</span>
+                <small>readiness</small>
+              </div>
+            </div>
+            <div class="signal-grid">
+              <div class="signal-card">
+                <span>Protein</span>
+                <strong>118g</strong>
+                <em>+22g to target</em>
+              </div>
+              <div class="signal-card">
+                <span>Glucose peak</span>
+                <strong>131</strong>
+                <em>smooth response</em>
+              </div>
+              <div class="signal-card">
+                <span>Water</span>
+                <strong>2.4L</strong>
+                <em>on pace</em>
+              </div>
+              <div class="signal-card">
+                <span>Training</span>
+                <strong>47m</strong>
+                <em>zone 2 base</em>
+              </div>
+            </div>
+            <div class="insight-strip">
+              <span class="insight-strip__dot"></span>
+              Dinner patterns with 30g+ fiber correlate with flatter overnight glucose this week.
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ============================== CTA =============================== -->
-    <section id="download" class="relative min-h-[80vh] flex items-center justify-center px-8">
-      <div class="absolute inset-0 glow-cta"></div>
-      <div class="relative z-10 w-full max-w-[1080px] mx-auto text-center">
-        <h2 class="font-display text-[clamp(2.4rem,6vw,4.2rem)] font-bold tracking-[-0.04em] leading-[0.95] mb-6 reveal">
-          Measure what matters.
-        </h2>
-        <p class="text-text-secondary text-[17px] mb-2 reveal d1">Free for one month. Then $0.99/mo.</p>
-        <p class="text-text-muted text-[13px] mb-10 reveal d1">Everything included. Cancel anytime.</p>
-        <div class="reveal d2">
-          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="cta-link inline-flex items-center gap-1.5 text-accent text-[17px] font-medium">
-            Get the app <span class="arrow">&rarr;</span>
-          </a>
+      <section class="statement-section">
+        <div class="page-shell">
+          <p class="statement-text reveal">
+            Most health products store records. StatsKey builds a private operating model of you: meals, micronutrients, CGM, activity, sleep, hydration, symptoms, training, and the decisions that connect them.
+          </p>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ============================ FOOTER ============================== -->
-    <footer class="border-t border-white/[0.04] py-8 px-8">
-      <div class="max-w-[1080px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-text-muted">
+      <section id="platform" class="section-block">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="eyebrow">The platform</div>
+            <h2>Designed for the messy reality of human data.</h2>
+            <p>Fast capture at the edge, structured records underneath, and a clean interface for the patterns that matter.</p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card feature-card--large reveal reveal-stagger-1">
+              <div class="feature-icon">01</div>
+              <h3>Record with ease.</h3>
+              <p>Photo, text, barcode, and label capture turn food into 50+ nutrients without slowing you down.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-2">
+              <div class="feature-icon">02</div>
+              <h3>Connect the signals.</h3>
+              <p>Meals, glucose, workouts, hydration, sleep, GI health, mood, and energy live in one model.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-3">
+              <div class="feature-icon">03</div>
+              <h3>Make it clinical when needed.</h3>
+              <p>Generate nutrition, CGM, and wellness reports that are built from real records instead of averages.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-4">
+              <div class="feature-icon">04</div>
+              <h3>Adapt targets over time.</h3>
+              <p>Metabolic targets can move with Apple Health activity, training load, and recent intake behavior.</p>
+            </article>
+            <article class="feature-card feature-card--accent reveal reveal-stagger-5">
+              <div class="feature-icon">05</div>
+              <h3>Measure response, not just intake.</h3>
+              <p>Personal glycemic context turns the same banana, workout, or late meal into a signal unique to you.</p>
+            </article>
+          </div>
+
+          <div class="exercise-note reveal d2">
+            <div class="exercise-note__label">Exercise recording</div>
+            <p>
+              Track runs, walks, rides, swims, hikes, trail runs, mountain and road cycling, rowing, elliptical, stair stepper, yoga, pilates, strength, HIIT, CrossFit, basketball, soccer, tennis, golf, volleyball, skiing, snowboarding, surfing, skateboarding, paddleboarding, kayaking, climbing, dance, martial arts, boxing, and other workouts. GPS sessions can include route maps, distance, moving time, pace, speed, elevation, calories, heart-rate samples and zones, cadence, splits, segments, weather, perceived effort, notes, and photos.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="intelligence" class="section-block section-block--split">
+        <div class="page-shell intelligence-grid">
+          <div class="section-heading reveal">
+            <div class="eyebrow">Intelligence layer</div>
+            <h2>From diary to decision system.</h2>
+            <p>StatsKey is built around the idea that health data is only useful when it can explain what changed and what to try next.</p>
+          </div>
+
+          <div class="timeline-panel reveal d2">
+            <div class="timeline-row">
+              <span>08:12</span>
+              <div>
+                <strong>Breakfast scanned</strong>
+                <p>43g protein, 11g fiber, 620mg sodium.</p>
+              </div>
+            </div>
+            <div class="timeline-row">
+              <span>10:04</span>
+              <div>
+                <strong>Glucose response mapped</strong>
+                <p>Peak +24 mg/dL, back to baseline in 72 minutes.</p>
+              </div>
+            </div>
+            <div class="timeline-row">
+              <span>14:38</span>
+              <div>
+                <strong>Training logged</strong>
+                <p>Moderate load. Recovery target increased tonight.</p>
+              </div>
+            </div>
+            <div class="timeline-row timeline-row--active">
+              <span>Now</span>
+              <div>
+                <strong>Flow insight ready</strong>
+                <p>Higher potassium days are tracking with better morning energy.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="flow" class="section-block">
+        <div class="page-shell flow-layout">
+          <div class="flow-copy reveal">
+            <div class="eyebrow">Flow</div>
+            <h2>Ask better questions of your own data.</h2>
+            <p>Flow queries the connected model behind StatsKey so nutrition, training, and biometrics can be understood together.</p>
+          </div>
+          <div class="flow-card flow-card--premium reveal d2">
+            <div class="chat-message chat-message--user">Why did my glucose crash overnight last Tuesday?</div>
+            <div class="chat-message chat-message--ai">
+              Your dinner at 8:47 PM had 94g carbs with only 12g fat. Meals above 80g carbs with under 20g fat correlate with overnight drops below 60 mg/dL <strong>83% of the time</strong> in your recent records.
+            </div>
+            <div class="chat-tools">
+              <span>nutrition</span>
+              <span>CGM</span>
+              <span>sleep</span>
+              <span>training</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="for-fun" class="section-block">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="eyebrow">For Fun</div>
+            <h2>Public experiments from the lab.</h2>
+            <p>Side quests, product concepts, and interactive prototypes that show the way StatsKey thinks about systems.</p>
+          </div>
+
+          <div class="lab-grid">
+            <a href="/for-fun/mobile-data-center/" class="lab-card reveal reveal-stagger-1">
+              <span>Mobile Data Center</span>
+              <h3>AuroraEdge AK-20</h3>
+              <p>A containerized edge compute concept with a public bid model, bill of materials, and 3D viewer.</p>
+            </a>
+            <a href="/prototype/" class="lab-card lab-card--bright reveal reveal-stagger-2">
+              <span>Prototype</span>
+              <h3>StatsKey Hardware Viewer</h3>
+              <p>An interactive look at the reusable puck and disposable sensing cartridge concept behind StatsKey.</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="download" class="cta-section">
+        <div class="page-shell cta-card reveal">
+          <div>
+            <div class="eyebrow">Start measuring what matters</div>
+            <h2>Build the model your body has been asking for.</h2>
+            <p>Get a month free, then keep everything for $0.99/mo.</p>
+          </div>
+          <a class="button button--primary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="page-shell site-footer__inner">
         <span>StatsKey &copy; 2026</span>
-        <div class="flex items-center gap-5">
-          <a href="https://statskeybiometrics.com/support" class="hover:text-text-secondary transition-colors">Support</a>
-          <a href="https://statskeybiometrics.com/privacy" class="hover:text-text-secondary transition-colors">Privacy</a>
-          <a href="https://statskeybiometrics.com/terms" class="hover:text-text-secondary transition-colors">Terms</a>
+        <div>
+          <a href="#for-fun">For Fun</a>
+          <a href="/prototype/">Prototype</a>
+          <a href="https://statskeybiometrics.com/support">Support</a>
+          <a href="https://statskeybiometrics.com/privacy">Privacy</a>
+          <a href="https://statskeybiometrics.com/terms">Terms</a>
         </div>
       </div>
     </footer>

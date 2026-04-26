@@ -25,9 +25,15 @@ window.addEventListener('scroll', () => {
 
 const menuBtn = document.getElementById('mobile-menu-btn')
 const mobileMenu = document.getElementById('mobile-menu')
-menuBtn?.addEventListener('click', () => mobileMenu.classList.toggle('hidden'))
+menuBtn?.addEventListener('click', () => {
+  mobileMenu.classList.toggle('hidden')
+  menuBtn.setAttribute('aria-expanded', String(!mobileMenu.classList.contains('hidden')))
+})
 mobileMenu?.querySelectorAll('a').forEach((link) => {
-  link.addEventListener('click', () => mobileMenu.classList.add('hidden'))
+  link.addEventListener('click', () => {
+    mobileMenu.classList.add('hidden')
+    menuBtn?.setAttribute('aria-expanded', 'false')
+  })
 })
 
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
