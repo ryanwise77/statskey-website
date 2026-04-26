@@ -63,6 +63,7 @@ export interface FoodItem {
   geminiExplanation?: string
   createdAt: Date
   updatedAt: Date
+  consumedAt?: Date
 }
 
 // MARK: - Meal
@@ -200,6 +201,48 @@ export interface WellnessEntry {
   notes?: string
   date: Date
   createdAt: Date
+}
+
+// MARK: - SubstanceEntry (users/{uid}/substances)
+
+export type SubstanceKind =
+  | 'nicotine'
+  | 'cannabis'
+  | 'alcohol'
+  | 'caffeine'
+  | 'psychedelic'
+  | 'other'
+
+export type SubstanceMethod =
+  | 'smoke'
+  | 'vape'
+  | 'edible'
+  | 'drink'
+  | 'oral'
+  | 'sublingual'
+  | 'nasal'
+  | 'chew'
+  | 'pouch'
+  | 'patch'
+  | 'pill'
+  | 'tincture'
+  | 'topical'
+  | 'injection'
+  | 'other'
+
+export interface SubstanceEntry {
+  id: string
+  userId: string
+  kind: SubstanceKind
+  name?: string
+  method?: SubstanceMethod
+  amount?: number
+  unit?: string
+  notes?: string
+  isPrivate: boolean
+  date: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 // MARK: - WorkoutSession (users/{uid}/workoutSessions)

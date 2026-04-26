@@ -13,6 +13,7 @@ import { localDateString, startOfDay } from './firestore'
 import type {
   FoodItem,
   Meal,
+  SubstanceEntry,
   WellnessData,
   WellnessEntry,
   WorkoutSession,
@@ -47,6 +48,7 @@ export function encodeFoodItem(item: FoodItem): Record<string, unknown> {
   if (item.lastUsed) out.lastUsed = item.lastUsed
   if (item.notes) out.notes = item.notes
   if (item.geminiExplanation) out.geminiExplanation = item.geminiExplanation
+  if (item.consumedAt) out.consumedAt = item.consumedAt
   return out
 }
 
@@ -75,6 +77,24 @@ export async function saveMeal(uid: string, meal: Meal): Promise<void> {
 
 export async function deleteMeal(uid: string, mealId: string): Promise<void> {
   await deleteDoc(doc(db, 'users', uid, 'meals', mealId))
+}
+
+export async function saveFoodToLibrary(uid: string, food: FoodItem): Promise<void> {
+  const now = new Date()
+  await setDoc(
+    doc(db, 'users', uid, 'foodLibrary', food.id),
+    encodeFoodItem({
+      ...food,
+      useCount: food.useCount + 1,
+      lastUsed: now,
+      updatedAt: now,
+    }),
+    { merge: true }
+  )
+}
+
+export async function saveDailyItem(uid: string, item: FoodItem): Promise<void> {
+  await setDoc(doc(db, 'users', uid, 'dailyItems', item.id), encodeFoodItem(item), { merge: true })
 }
 
 /**
@@ -148,6 +168,28 @@ export async function saveWellness(uid: string, entry: WellnessEntry): Promise<v
 
 export async function deleteWellness(uid: string, entryId: string): Promise<void> {
   await deleteDoc(doc(db, 'users', uid, 'wellness', entryId))
+}
+
+// MARK: - Substance writes
+
+export async function saveSubstanceEntry(uid: string, entry: SubstanceEntry): Promise<void> {
+  const now = new Date()
+  const payload: Record<string, unknown> = {
+    id: entry.id,
+    userId: uid,
+    kind: entry.kind,
+    isPrivate: entry.isPrivate,
+    date: entry.date,
+    createdAt: entry.createdAt,
+    updatedAt: now,
+  }
+  if (entry.name) payload.name = entry.name
+  if (entry.method) payload.method = entry.method
+  if (entry.amount != null) payload.amount = entry.amount
+  if (entry.unit) payload.unit = entry.unit
+  if (entry.notes) payload.notes = entry.notes
+
+  await setDoc(doc(db, 'users', uid, 'substances', entry.id), payload, { merge: true })
 }
 
 // MARK: - Workout writes

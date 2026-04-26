@@ -84,6 +84,7 @@ export function decodeFoodItem(raw: Raw, idFallback: string): FoodItem {
     geminiExplanation: str(raw.geminiExplanation),
     createdAt: toDateOrNow(raw.createdAt),
     updatedAt: toDateOrNow(raw.updatedAt),
+    consumedAt: toDate(raw.consumedAt),
   }
 }
 
