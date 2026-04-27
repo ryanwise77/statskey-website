@@ -1,9 +1,12 @@
-import { useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '../../lib/auth'
 import { analyzeNutritionInput, filesToBase64 } from '../../lib/ai/geminiNutrition'
 import { useFoodLibrary } from '../../lib/data/useFoodLibrary'
 import { newId, saveFoodToLibrary, saveMeal } from '../../lib/writers'
 import type { AnalysisMode, FoodItem, FoodSource, ItemCategory, Meal } from '../../lib/types'
+
+type LibrarySubTab = 'foods' | 'meals'
+type LibraryFilter = 'saved' | 'recents' | 'favorites'
 
 interface Draft {
   id: string
@@ -47,7 +50,13 @@ const NUTRIENT_FIELDS = [
 
 export function MealLogForm({ onSaved }: { onSaved: () => void }) {
   const { user } = useAuth()
-  const { items: libraryItems, loading: libraryLoading, error: libraryError } = useFoodLibrary(user?.uid)
+  const {
+    items: libraryItems,
+    meals: libraryMeals,
+    savedItems: librarySavedItems,
+    loading: libraryLoading,
+    error: libraryError,
+  } = useFoodLibrary(user?.uid)
   const now = new Date()
   const [inputMode, setInputMode] = useState<InputMode>('aiSearch')
   const [mealName, setMealName] = useState('')
@@ -60,6 +69,8 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
   const [photoHint, setPhotoHint] = useState('')
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [librarySearch, setLibrarySearch] = useState('')
+  const [librarySubTab, setLibrarySubTab] = useState<LibrarySubTab>('foods')
+  const [libraryFilter, setLibraryFilter] = useState<LibraryFilter>('saved')
   const [analyzing, setAnalyzing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -160,6 +171,25 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
     appendAnalyzed([{ ...item, id: newId(), source: 'library', createdAt: new Date(), updatedAt: new Date() }])
   }
 
+  function addMealFromLibrary(meal: Meal) {
+    if (meal.items.length === 0) {
+      setError('That meal has no items.')
+      return
+    }
+    if (!mealName.trim() && meal.name) setMealName(meal.name)
+    const drafts = meal.items.map((item) =>
+      itemToDraft({
+        ...item,
+        id: newId(),
+        source: 'library',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+    )
+    setItems((prev) => (prev.length === 1 && isBlank(prev[0]) ? drafts : [...prev, ...drafts]))
+    setError(null)
+  }
+
   async function save() {
     if (!user) return
     if (items.every((it) => !it.name.trim())) {
@@ -247,9 +277,16 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
           librarySearch={librarySearch}
           setLibrarySearch={setLibrarySearch}
           libraryItems={libraryItems}
+          librarySavedItems={librarySavedItems}
+          libraryMeals={libraryMeals}
           libraryLoading={libraryLoading}
           libraryError={libraryError}
+          librarySubTab={librarySubTab}
+          setLibrarySubTab={setLibrarySubTab}
+          libraryFilter={libraryFilter}
+          setLibraryFilter={setLibraryFilter}
           onAddLibraryItem={addFromLibrary}
+          onAddLibraryMeal={addMealFromLibrary}
         />
       </div>
 
@@ -405,9 +442,16 @@ function InputModePanel({
   librarySearch,
   setLibrarySearch,
   libraryItems,
+  librarySavedItems,
+  libraryMeals,
   libraryLoading,
   libraryError,
+  librarySubTab,
+  setLibrarySubTab,
+  libraryFilter,
+  setLibraryFilter,
   onAddLibraryItem,
+  onAddLibraryMeal,
 }: {
   mode: InputMode
   query: string
@@ -424,45 +468,34 @@ function InputModePanel({
   librarySearch: string
   setLibrarySearch: (value: string) => void
   libraryItems: FoodItem[]
+  librarySavedItems: FoodItem[]
+  libraryMeals: Meal[]
   libraryLoading: boolean
   libraryError: string | null
+  librarySubTab: LibrarySubTab
+  setLibrarySubTab: (tab: LibrarySubTab) => void
+  libraryFilter: LibraryFilter
+  setLibraryFilter: (filter: LibraryFilter) => void
   onAddLibraryItem: (item: FoodItem) => void
+  onAddLibraryMeal: (meal: Meal) => void
 }) {
   if (mode === 'library') {
-    const filtered = libraryItems
-      .filter((item) => item.name.toLowerCase().includes(librarySearch.trim().toLowerCase()))
-      .slice(0, 8)
     return (
-      <div className="space-y-3">
-        <Field label="Search library">
-          <input
-            className="input"
-            placeholder="Saved foods, meals, supplements..."
-            value={librarySearch}
-            onChange={(e) => setLibrarySearch(e.target.value)}
-          />
-        </Field>
-        {libraryLoading && <p className="text-text-muted text-[13px]">Loading library...</p>}
-        {libraryError && <div className="error-banner">{libraryError}</div>}
-        {!libraryLoading && filtered.length === 0 && (
-          <p className="text-text-muted text-[13px]">No saved foods found.</p>
-        )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {filtered.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className="text-left rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 hover:bg-white/[0.05]"
-              onClick={() => onAddLibraryItem(item)}
-            >
-              <span className="text-text-primary text-[13px] font-medium">{item.name}</span>
-              <span className="block text-text-muted text-[11px]">
-                {item.servingSize} {item.servingUnit}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      <LibraryPanel
+        librarySearch={librarySearch}
+        setLibrarySearch={setLibrarySearch}
+        libraryItems={libraryItems}
+        librarySavedItems={librarySavedItems}
+        libraryMeals={libraryMeals}
+        libraryLoading={libraryLoading}
+        libraryError={libraryError}
+        librarySubTab={librarySubTab}
+        setLibrarySubTab={setLibrarySubTab}
+        libraryFilter={libraryFilter}
+        setLibraryFilter={setLibraryFilter}
+        onAddLibraryItem={onAddLibraryItem}
+        onAddLibraryMeal={onAddLibraryMeal}
+      />
     )
   }
 
@@ -549,6 +582,226 @@ function InputModePanel({
       </button>
     </div>
   )
+}
+
+function LibraryPanel({
+  librarySearch,
+  setLibrarySearch,
+  libraryItems,
+  librarySavedItems,
+  libraryMeals,
+  libraryLoading,
+  libraryError,
+  librarySubTab,
+  setLibrarySubTab,
+  libraryFilter,
+  setLibraryFilter,
+  onAddLibraryItem,
+  onAddLibraryMeal,
+}: {
+  librarySearch: string
+  setLibrarySearch: (value: string) => void
+  libraryItems: FoodItem[]
+  librarySavedItems: FoodItem[]
+  libraryMeals: Meal[]
+  libraryLoading: boolean
+  libraryError: string | null
+  librarySubTab: LibrarySubTab
+  setLibrarySubTab: (tab: LibrarySubTab) => void
+  libraryFilter: LibraryFilter
+  setLibraryFilter: (filter: LibraryFilter) => void
+  onAddLibraryItem: (item: FoodItem) => void
+  onAddLibraryMeal: (meal: Meal) => void
+}) {
+  const search = librarySearch.trim().toLowerCase()
+  const savedNames = useMemo(
+    () => new Set(librarySavedItems.map((it) => it.name.toLowerCase())),
+    [librarySavedItems]
+  )
+
+  const filteredFoods = useMemo(() => {
+    let result = libraryItems
+    if (libraryFilter === 'favorites') {
+      result = result.filter((item) => item.isFavorite)
+    } else if (libraryFilter === 'recents') {
+      result = result.slice(0, 20)
+    }
+    if (search) {
+      result = result.filter(
+        (item) =>
+          item.name.toLowerCase().includes(search) ||
+          (item.brand?.toLowerCase().includes(search) ?? false)
+      )
+    }
+    return result
+  }, [libraryItems, libraryFilter, search])
+
+  const filteredMeals = useMemo(() => {
+    let result = libraryMeals
+    if (libraryFilter === 'favorites') {
+      result = result.filter((meal) => meal.isFavorite)
+    } else if (libraryFilter === 'recents') {
+      result = result.slice(0, 20)
+    }
+    if (search) {
+      result = result.filter(
+        (meal) =>
+          (meal.name?.toLowerCase().includes(search) ?? false) ||
+          meal.items.some((item) => item.name.toLowerCase().includes(search))
+      )
+    }
+    return result
+  }, [libraryMeals, libraryFilter, search])
+
+  return (
+    <div className="space-y-3">
+      <div className="tab-strip">
+        {(['foods', 'meals'] as LibrarySubTab[]).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            className={librarySubTab === tab ? 'active' : ''}
+            onClick={() => setLibrarySubTab(tab)}
+          >
+            {tab === 'foods' ? 'Foods' : 'Meals'}
+          </button>
+        ))}
+      </div>
+
+      <div className="tab-strip">
+        {(['saved', 'recents', 'favorites'] as LibraryFilter[]).map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            className={libraryFilter === filter ? 'active' : ''}
+            onClick={() => setLibraryFilter(filter)}
+          >
+            {filter === 'saved' ? 'Saved' : filter === 'recents' ? 'Recents' : 'Favorites'}
+          </button>
+        ))}
+      </div>
+
+      <Field label="Search foods">
+        <input
+          className="input"
+          placeholder="Search by name or brand..."
+          value={librarySearch}
+          onChange={(e) => setLibrarySearch(e.target.value)}
+        />
+      </Field>
+
+      {libraryLoading && <p className="text-text-muted text-[13px]">Loading library...</p>}
+      {libraryError && <div className="error-banner">{libraryError}</div>}
+
+      {!libraryLoading && librarySubTab === 'foods' && (
+        <FoodResults
+          foods={filteredFoods}
+          savedNames={savedNames}
+          onAdd={onAddLibraryItem}
+        />
+      )}
+
+      {!libraryLoading && librarySubTab === 'meals' && (
+        <MealResults meals={filteredMeals} onAdd={onAddLibraryMeal} />
+      )}
+    </div>
+  )
+}
+
+function FoodResults({
+  foods,
+  savedNames,
+  onAdd,
+}: {
+  foods: FoodItem[]
+  savedNames: Set<string>
+  onAdd: (item: FoodItem) => void
+}) {
+  if (foods.length === 0) {
+    return (
+      <p className="text-text-muted text-[13px]">
+        No foods match. Log a meal or save foods to your library to populate this list.
+      </p>
+    )
+  }
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-auto">
+      {foods.map((item) => {
+        const calories = item.nutrients.calories ?? 0
+        const isSaved = savedNames.has(item.name.toLowerCase())
+        return (
+          <button
+            key={item.id}
+            type="button"
+            className="text-left rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 hover:bg-white/[0.05]"
+            onClick={() => onAdd(item)}
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-text-primary text-[13px] font-medium truncate">
+                {item.isFavorite ? '\u2665 ' : ''}
+                {item.name}
+              </span>
+              <span className="text-text-secondary text-[12px] tabular-nums">
+                {Math.round(calories)} cal
+              </span>
+            </div>
+            <div className="text-text-muted text-[11px] mt-1 flex items-center gap-1.5 flex-wrap">
+              {item.brand && <span>{item.brand}</span>}
+              {item.brand && <span>&middot;</span>}
+              <span>
+                {formatNumber(item.servingSize)} {item.servingUnit}
+              </span>
+              {!isSaved && (
+                <span className="text-text-secondary">&middot; from meals</span>
+              )}
+            </div>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function MealResults({ meals, onAdd }: { meals: Meal[]; onAdd: (meal: Meal) => void }) {
+  if (meals.length === 0) {
+    return <p className="text-text-muted text-[13px]">No meals in the last 30 days.</p>
+  }
+  return (
+    <div className="grid grid-cols-1 gap-2 max-h-80 overflow-auto">
+      {meals.map((meal) => {
+        const calories = meal.items.reduce(
+          (sum, item) => sum + (item.nutrients.calories ?? 0),
+          0
+        )
+        return (
+          <button
+            key={meal.id}
+            type="button"
+            className="text-left rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 hover:bg-white/[0.05]"
+            onClick={() => onAdd(meal)}
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-text-primary text-[13px] font-medium truncate">
+                {meal.name?.trim() || meal.items[0]?.name || 'Meal'}
+              </span>
+              <span className="text-text-secondary text-[12px] tabular-nums">
+                {Math.round(calories * meal.multiplier)} cal
+              </span>
+            </div>
+            <div className="text-text-muted text-[11px] mt-1">
+              {meal.items.length} {meal.items.length === 1 ? 'item' : 'items'} &middot;{' '}
+              {meal.date.toLocaleDateString([], { month: 'short', day: 'numeric' })}
+            </div>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function formatNumber(value: number): string {
+  if (Number.isInteger(value)) return String(value)
+  return value.toFixed(1).replace(/\.0$/, '')
 }
 
 function PhotoInput({ capture, onFiles }: { capture?: boolean; onFiles: (files: File[]) => void }) {
