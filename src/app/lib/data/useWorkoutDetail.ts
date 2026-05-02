@@ -11,7 +11,16 @@ export interface WorkoutDetailState {
   notFound: boolean
 }
 
-export function useWorkoutDetail(uid: string | undefined, workoutId: string | undefined): WorkoutDetailState {
+/**
+ * Subscribe to a workout session document. `ownerUid` is the workout's owner
+ * (which may be the viewer themselves or a friend) — the firestore rules in
+ * biometrics/firestore.rules:69-78 allow friends to read both the session
+ * and its `attachments/*` subdocs.
+ */
+export function useWorkoutDetail(
+  ownerUid: string | undefined,
+  workoutId: string | undefined
+): WorkoutDetailState {
   const [state, setState] = useState<WorkoutDetailState>({
     workout: null,
     loading: true,
@@ -20,13 +29,13 @@ export function useWorkoutDetail(uid: string | undefined, workoutId: string | un
   })
 
   useEffect(() => {
-    if (!uid || !workoutId) {
+    if (!ownerUid || !workoutId) {
       setState({ workout: null, loading: false, error: null, notFound: false })
       return
     }
 
     const unsub = onSnapshot(
-      doc(db, 'users', uid, 'workoutSessions', workoutId),
+      doc(db, 'users', ownerUid, 'workoutSessions', workoutId),
       (snap) => {
         if (!snap.exists()) {
           setState({ workout: null, loading: false, error: null, notFound: true })
@@ -38,7 +47,7 @@ export function useWorkoutDetail(uid: string | undefined, workoutId: string | un
       (err) => setState({ workout: null, loading: false, error: err.message, notFound: false })
     )
     return () => unsub()
-  }, [uid, workoutId])
+  }, [ownerUid, workoutId])
 
   return state
 }

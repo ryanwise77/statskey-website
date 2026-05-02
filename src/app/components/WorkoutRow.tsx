@@ -36,7 +36,10 @@ export function WorkoutRow({ workout }: WorkoutRowProps) {
   const duration = workout.duration > 0 ? formatDuration(workout.duration) : undefined
 
   return (
-    <Link to={`/workouts/${workout.id}`} className="workout-row hover:bg-white/[0.02] transition-colors px-3 -mx-3 rounded-md">
+    <Link
+      to={`/workouts/${workout.userId}/${workout.id}`}
+      className="workout-row hover:bg-white/[0.02] transition-colors px-3 -mx-3 rounded-md"
+    >
       <div>
         <div className="workout-title">{workout.title || workout.sportType || 'Workout'}</div>
         <div className="workout-sub">

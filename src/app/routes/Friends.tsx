@@ -5,7 +5,7 @@ import { useFriends, type Friend } from '../lib/data/useFriends'
 import { useActivityFeed } from '../lib/data/useActivityFeed'
 import { useConversations } from '../lib/data/useMessages'
 import { deleteFriendship, sendFriendRequest } from '../lib/writers'
-import { WorkoutRow } from '../components/WorkoutRow'
+import { ActivityFeedCard } from '../components/ActivityFeedCard'
 import { EmptyState } from '../components/EmptyState'
 
 type Tab = 'feed' | 'friends' | 'messages'
@@ -46,29 +46,41 @@ export function Friends() {
 function FeedTab({ uid }: { uid?: string }) {
   const { items, loading, error } = useActivityFeed(uid, 30)
 
-  return (
-    <div className="panel">
-      {loading ? (
+  if (loading) {
+    return (
+      <div className="panel">
         <p className="text-text-muted text-[13px]">Loading feed…</p>
-      ) : error ? (
+      </div>
+    )
+  }
+  if (error) {
+    return (
+      <div className="panel">
         <div className="error-banner">{error}</div>
-      ) : items.length === 0 ? (
+      </div>
+    )
+  }
+  if (items.length === 0) {
+    return (
+      <div className="panel">
         <EmptyState
           title="No feed activity yet"
-          subtitle="When your friends log workouts, they'll show up here."
+          subtitle="Log a workout or add some friends and their activity will show up here."
         />
-      ) : (
-        <div>
-          {items.map(({ workout, friend }) => (
-            <div key={`${workout.userId}-${workout.id}`} className="py-2 border-b border-white/[0.04] last:border-0">
-              <div className="text-[11px] text-text-muted mb-1">
-                {friend?.social.displayName || friend?.social.username || friend?.social.email || workout.userId.slice(0, 8)}
-              </div>
-              <WorkoutRow workout={workout} />
-            </div>
-          ))}
-        </div>
-      )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      {items.map(({ workout, friend, isCurrentUser }) => (
+        <ActivityFeedCard
+          key={`${workout.userId}-${workout.id}`}
+          workout={workout}
+          friend={friend}
+          isCurrentUser={isCurrentUser}
+        />
+      ))}
     </div>
   )
 }

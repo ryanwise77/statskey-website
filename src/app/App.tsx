@@ -44,7 +44,7 @@ export function App() {
         <Route path="messages/:uid" element={<MessageThread />} />
         <Route path="history" element={<History />} />
         <Route path="meals/:id" element={<MealDetail />} />
-        <Route path="workouts/:id" element={<WorkoutDetail />} />
+        <Route path="workouts/:ownerUid/:id" element={<WorkoutDetail />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

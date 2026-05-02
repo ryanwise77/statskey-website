@@ -32,7 +32,7 @@ export function useRecentWorkouts(uid: string | undefined, max = 5): WorkoutsSta
     const unsub = onSnapshot(
       q,
       (snap) => {
-        const workouts = snap.docs.map((d) => decodeWorkout(d.data() as Record<string, unknown>, d.id))
+        const workouts = snap.docs.map((d) => decodeWorkout(d.data() as Record<string, unknown>, d.id, uid))
         setState({ workouts, loading: false, error: null })
       },
       (err) => setState({ workouts: [], loading: false, error: err.message })

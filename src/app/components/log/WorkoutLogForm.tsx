@@ -73,6 +73,8 @@ export function WorkoutLogForm({ onSaved }: { onSaved: () => void }) {
         isIndoor,
         recordingMode: 'standard',
         createdAt: new Date(),
+        routeCoordinates: [],
+        splits: [],
       }
       await saveWorkout(user.uid, workout)
       onSaved()

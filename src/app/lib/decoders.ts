@@ -3,6 +3,7 @@ import type {
   AnalysisMode,
   BowelMovementEntry,
   BristolType,
+  CadenceSample,
   EnergyEntry,
   FoodItem,
   FoodSource,
@@ -10,10 +11,15 @@ import type {
   GlucoseResponse,
   GlucoseSource,
   GlucoseTrend,
+  HeartRateSample,
+  HeartRateZoneDistribution,
   ItemCategory,
   MacroTargets,
   Meal,
   MoodEntry,
+  PaceZoneDistribution,
+  RoutePoint,
+  Split,
   StoolColor,
   SymptomEntry,
   WaterDoc,
@@ -258,10 +264,121 @@ export function decodeWellness(raw: Raw, id: string): WellnessEntry | undefined 
 
 // MARK: - WorkoutSession
 
-export function decodeWorkout(raw: Raw, id: string): WorkoutSession {
+export function decodeRoutePoint(raw: Raw): RoutePoint | undefined {
+  const lat = num(raw.latitude)
+  const lon = num(raw.longitude)
+  if (lat == null || lon == null) return undefined
+  return {
+    latitude: lat,
+    longitude: lon,
+    altitude: num(raw.altitude) ?? 0,
+    timestamp: toDateOrNow(raw.timestamp),
+    speed: num(raw.speed) ?? 0,
+    heartRate: num(raw.heartRate),
+  }
+}
+
+export function decodeRoutePoints(v: unknown): RoutePoint[] {
+  if (!Array.isArray(v)) return []
+  const out: RoutePoint[] = []
+  for (const item of v) {
+    const r = asRaw(item)
+    if (!r) continue
+    const p = decodeRoutePoint(r)
+    if (p) out.push(p)
+  }
+  return out
+}
+
+function decodeSplit(raw: Raw, idx: number): Split {
+  return {
+    id: str(raw.id) ?? `split-${idx}`,
+    number: num(raw.number) ?? idx + 1,
+    distance: num(raw.distance) ?? 0,
+    duration: num(raw.duration) ?? 0,
+    pace: num(raw.pace) ?? 0,
+    elevationGain: num(raw.elevationGain) ?? 0,
+    elevationLoss: num(raw.elevationLoss) ?? 0,
+    averageHeartRate: num(raw.averageHeartRate),
+    averageCadence: num(raw.averageCadence),
+  }
+}
+
+function decodeSplits(v: unknown): Split[] {
+  if (!Array.isArray(v)) return []
+  return v
+    .map((it, idx) => {
+      const r = asRaw(it)
+      return r ? decodeSplit(r, idx) : undefined
+    })
+    .filter((s): s is Split => s != null)
+}
+
+function decodeHRSamples(v: unknown): HeartRateSample[] {
+  if (!Array.isArray(v)) return []
+  const out: HeartRateSample[] = []
+  for (const it of v) {
+    const r = asRaw(it)
+    if (!r) continue
+    const bpm = num(r.bpm)
+    if (bpm == null) continue
+    out.push({ bpm, timestamp: toDateOrNow(r.timestamp) })
+  }
+  return out
+}
+
+function decodeCadenceSamples(v: unknown): CadenceSample[] {
+  if (!Array.isArray(v)) return []
+  const out: CadenceSample[] = []
+  for (const it of v) {
+    const r = asRaw(it)
+    if (!r) continue
+    const spm = num(r.spm)
+    if (spm == null) continue
+    out.push({ spm, timestamp: toDateOrNow(r.timestamp) })
+  }
+  return out
+}
+
+function decodeHRZones(raw: unknown): HeartRateZoneDistribution | undefined {
+  const r = asRaw(raw)
+  if (!r) return undefined
+  const z1 = num(r.zone1Seconds) ?? 0
+  const z2 = num(r.zone2Seconds) ?? 0
+  const z3 = num(r.zone3Seconds) ?? 0
+  const z4 = num(r.zone4Seconds) ?? 0
+  const z5 = num(r.zone5Seconds) ?? 0
+  if (z1 + z2 + z3 + z4 + z5 === 0) return undefined
+  return { zone1Seconds: z1, zone2Seconds: z2, zone3Seconds: z3, zone4Seconds: z4, zone5Seconds: z5 }
+}
+
+function decodePaceZones(raw: unknown): PaceZoneDistribution | undefined {
+  const r = asRaw(raw)
+  if (!r) return undefined
+  const easy = num(r.easySeconds) ?? 0
+  const moderate = num(r.moderateSeconds) ?? 0
+  const tempo = num(r.tempoSeconds) ?? 0
+  const threshold = num(r.thresholdSeconds) ?? 0
+  const sprint = num(r.sprintSeconds) ?? 0
+  if (easy + moderate + tempo + threshold + sprint === 0) return undefined
+  return {
+    easySeconds: easy,
+    moderateSeconds: moderate,
+    tempoSeconds: tempo,
+    thresholdSeconds: threshold,
+    sprintSeconds: sprint,
+  }
+}
+
+/**
+ * Decode a workout document. Pass `userIdFallback` (the owner uid from the
+ * Firestore path) when iterating per-user collections so that workouts without
+ * an explicit `userId` field still link correctly to /workouts/:owner/:id.
+ */
+export function decodeWorkout(raw: Raw, id: string, userIdFallback?: string): WorkoutSession {
   return {
     id,
-    userId: str(raw.userId) ?? '',
+    userId: str(raw.userId) ?? userIdFallback ?? '',
     title: str(raw.title) ?? '',
     sportType: str(raw.sportType) ?? 'running',
     startDate: toDateOrNow(raw.startDate),
@@ -291,5 +408,21 @@ export function decodeWorkout(raw: Raw, id: string): WorkoutSession {
     structuredWorkoutId: str(raw.structuredWorkoutId),
     recordingMode: str(raw.recordingMode) ?? 'standard',
     createdAt: toDateOrNow(raw.createdAt),
+    routeCoordinates: decodeRoutePoints(raw.routeCoordinates),
+    splits: decodeSplits(raw.splits),
+    heartRateZones: decodeHRZones(raw.heartRateZones),
+    paceZones: decodePaceZones(raw.paceZones),
+  }
+}
+
+export interface WorkoutSamplesPayload {
+  heartRateSamples: HeartRateSample[]
+  cadenceSamples: CadenceSample[]
+}
+
+export function decodeSamplesPayload(raw: Raw): WorkoutSamplesPayload {
+  return {
+    heartRateSamples: decodeHRSamples(raw.heartRateSamples),
+    cadenceSamples: decodeCadenceSamples(raw.cadenceSamples),
   }
 }

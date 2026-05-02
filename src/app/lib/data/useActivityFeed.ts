@@ -14,7 +14,10 @@ import { useFriends, type Friend } from './useFriends'
 
 export interface ActivityFeedItem {
   workout: WorkoutSession
+  /** The friend whose workout this is. Undefined when the item belongs to the
+   *  current user (so the card can render a "You" badge). */
   friend?: Friend
+  isCurrentUser: boolean
 }
 
 export interface ActivityFeedState {
@@ -24,9 +27,14 @@ export interface ActivityFeedState {
 }
 
 /**
- * Synthesizes a feed from friends' workoutSessions via a collection-group
- * query. Matches biometrics/StatsKey/Services/DatabaseService.swift:965-989.
- * Firestore's `in` operator is capped at 30 — we chunk here too.
+ * Synthesizes a feed from the current user's workouts plus their friends'.
+ * Mirrors `loadFeed` in biometrics/StatsKey/Views/Friends/ActivityFeedView.swift,
+ * which combines `fetchWorkoutSessions(userId:)` + `fetchFriendWorkouts`.
+ *
+ * Firestore's `in` operator is capped at 30 — so we chunk the friend uids.
+ * The current user's workouts are queried in the same chunked query when
+ * possible (added to the first chunk) to keep this to a single round trip
+ * per chunk.
  */
 export function useActivityFeed(uid: string | undefined, max = 20): ActivityFeedState {
   const { friends, loading: friendsLoading } = useFriends(uid)
@@ -38,19 +46,17 @@ export function useActivityFeed(uid: string | undefined, max = 20): ActivityFeed
       return
     }
     if (friendsLoading) return
-    if (friends.length === 0) {
-      setState({ items: [], loading: false, error: null })
-      return
-    }
 
     let cancelled = false
     setState((s) => ({ ...s, loading: true, error: null }))
 
     ;(async () => {
       try {
-        const uids = friends.map((f) => f.uid)
+        const friendUids = friends.map((f) => f.uid)
+        const allUids = [uid, ...friendUids]
+
         const chunks: string[][] = []
-        for (let i = 0; i < uids.length; i += 30) chunks.push(uids.slice(i, i + 30))
+        for (let i = 0; i < allUids.length; i += 30) chunks.push(allUids.slice(i, i + 30))
 
         const results: WorkoutSession[] = []
         for (const chunk of chunks) {
@@ -73,6 +79,7 @@ export function useActivityFeed(uid: string | undefined, max = 20): ActivityFeed
         const items: ActivityFeedItem[] = trimmed.map((w) => ({
           workout: w,
           friend: friends.find((f) => f.uid === w.userId),
+          isCurrentUser: w.userId === uid,
         }))
         setState({ items, loading: false, error: null })
       } catch (e) {
