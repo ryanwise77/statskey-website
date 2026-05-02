@@ -27,7 +27,7 @@ function ownerName(workout: WorkoutSession, friend: Friend | undefined, isCurren
   )
 }
 
-function displayTitle(workout: WorkoutSession): string {
+export function displayTitle(workout: WorkoutSession): string {
   if (workout.title) return workout.title
   const hour = workout.startDate.getHours()
   let timeOfDay = 'Night'
@@ -39,8 +39,6 @@ function displayTitle(workout: WorkoutSession): string {
 
 export function ActivityFeedCard({ workout, friend, isCurrentUser }: ActivityFeedCardProps) {
   const accent = sportAccentColor(workout.sportType)
-  const route = workout.routeCoordinates
-  const canShowMap = sportUsesGPS(workout.sportType) && !workout.isIndoor && route.length >= 2
 
   return (
     <Link
@@ -73,10 +71,22 @@ export function ActivityFeedCard({ workout, friend, isCurrentUser }: ActivityFee
         <div className="text-[11px] text-text-muted whitespace-nowrap">{formatRelative(workout.startDate)}</div>
       </div>
 
-      {canShowMap && <RouteMap route={route} color={accent} height={160} preview />}
-
-      <MetricsRow workout={workout} />
+      <WorkoutCardBody workout={workout} accent={accent} />
     </Link>
+  )
+}
+
+/** Reusable map preview + metrics row, shared between the friend feed card
+ *  and the personal "my workouts" card. */
+export function WorkoutCardBody({ workout, accent }: { workout: WorkoutSession; accent: string }) {
+  const route = workout.routeCoordinates
+  const canShowMap = sportUsesGPS(workout.sportType) && !workout.isIndoor && route.length >= 2
+
+  return (
+    <>
+      {canShowMap && <RouteMap route={route} color={accent} height={160} preview />}
+      <MetricsRow workout={workout} />
+    </>
   )
 }
 
@@ -115,10 +125,10 @@ function MetricsRow({ workout }: { workout: WorkoutSession }) {
   )
 }
 
-function SportIcon({ sportType, color }: { sportType: string; color: string }) {
+export function SportIcon({ sportType, color, size = 16 }: { sportType: string; color: string; size?: number }) {
   const path = sportPathD(sportType)
   return (
-    <svg viewBox="0 0 24 24" width="16" height="16" fill={color} aria-hidden="true">
+    <svg viewBox="0 0 24 24" width={size} height={size} fill={color} aria-hidden="true">
       <path d={path} />
     </svg>
   )

@@ -15,7 +15,7 @@ import { WaterCard } from '../components/WaterCard'
 import { FiberCard } from '../components/FiberCard'
 import { GlucoseCard } from '../components/GlucoseCard'
 import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
-import { WorkoutRow } from '../components/WorkoutRow'
+import { WorkoutCard } from '../components/WorkoutCard'
 import { EmptyState } from '../components/EmptyState'
 import { ActivityCard } from '../components/ActivityCard'
 
@@ -110,21 +110,24 @@ export function Dashboard() {
         )}
       </section>
 
-      <section className="panel">
-        <div className="flex items-baseline justify-between mb-2">
+      <section className="space-y-3">
+        <div className="flex items-baseline justify-between">
           <h2 className="card-title">Recent workouts</h2>
           <Link to="/history" className="link text-[12px]">All →</Link>
         </div>
         {workoutsState.loading ? (
-          <p className="text-text-muted text-[13px]">Loading…</p>
-        ) : workoutsState.workouts.length === 0 ? (
-          <EmptyState title="No workouts yet" subtitle="Runs, rides, and other sessions you log on iOS appear here." />
-        ) : (
-          <div>
-            {workoutsState.workouts.map((w) => (
-              <WorkoutRow key={w.id} workout={w} />
-            ))}
+          <div className="panel">
+            <p className="text-text-muted text-[13px]">Loading…</p>
           </div>
+        ) : workoutsState.workouts.length === 0 ? (
+          <div className="panel">
+            <EmptyState
+              title="No workouts yet"
+              subtitle="Runs, rides, and other sessions you log on iOS appear here."
+            />
+          </div>
+        ) : (
+          workoutsState.workouts.map((w) => <WorkoutCard key={w.id} workout={w} />)
         )}
       </section>
     </div>

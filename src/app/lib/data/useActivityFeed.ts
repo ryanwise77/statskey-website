@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  collection,
   collectionGroup,
   limit,
   orderBy,
@@ -15,7 +16,7 @@ import { useFriends, type Friend } from './useFriends'
 export interface ActivityFeedItem {
   workout: WorkoutSession
   /** The friend whose workout this is. Undefined when the item belongs to the
-   *  current user (so the card can render a "You" badge). */
+   *  current user. */
   friend?: Friend
   isCurrentUser: boolean
 }
@@ -23,7 +24,14 @@ export interface ActivityFeedItem {
 export interface ActivityFeedState {
   items: ActivityFeedItem[]
   loading: boolean
+  /** Set when the *own* workout query failed; the entire feed is empty in
+   *  this case so we surface the message. */
   error: string | null
+  /** Set when the friend collection-group query failed (typically a
+   *  permissions error if the firestore rules haven't been updated to allow
+   *  collection-group reads on workoutSessions). The user's own workouts
+   *  still render — we just don't have friend activity to merge in. */
+  friendError: string | null
 }
 
 /**
@@ -31,60 +39,103 @@ export interface ActivityFeedState {
  * Mirrors `loadFeed` in biometrics/StatsKey/Views/Friends/ActivityFeedView.swift,
  * which combines `fetchWorkoutSessions(userId:)` + `fetchFriendWorkouts`.
  *
- * Firestore's `in` operator is capped at 30 — so we chunk the friend uids.
- * The current user's workouts are queried in the same chunked query when
- * possible (added to the first chunk) to keep this to a single round trip
- * per chunk.
+ * Uses two queries on purpose:
+ *   1. A regular per-user collection query at users/{uid}/workoutSessions.
+ *      This always works under the existing rules (isOwner).
+ *   2. A collection-group query filtered by friend uids. This requires a
+ *      collection-group rule (`/{path=**}/workoutSessions/{sessionId}`).
+ *
+ * (1) and (2) run in parallel and are merged. If (2) fails (e.g., rules
+ * haven't been deployed), the user still sees their own activity from (1).
  */
 export function useActivityFeed(uid: string | undefined, max = 20): ActivityFeedState {
   const { friends, loading: friendsLoading } = useFriends(uid)
-  const [state, setState] = useState<ActivityFeedState>({ items: [], loading: true, error: null })
+  const [state, setState] = useState<ActivityFeedState>({
+    items: [],
+    loading: true,
+    error: null,
+    friendError: null,
+  })
 
   useEffect(() => {
     if (!uid) {
-      setState({ items: [], loading: false, error: null })
+      setState({ items: [], loading: false, error: null, friendError: null })
       return
     }
     if (friendsLoading) return
 
     let cancelled = false
-    setState((s) => ({ ...s, loading: true, error: null }))
+    setState((s) => ({ ...s, loading: true, error: null, friendError: null }))
 
     ;(async () => {
-      try {
-        const friendUids = friends.map((f) => f.uid)
-        const allUids = [uid, ...friendUids]
+      // Fetch own workouts directly. This is the "I want to see my latest
+      // run" path the user actually cares about; we never want to drop it
+      // due to a downstream friend-feed failure.
+      const ownPromise = (async () => {
+        const q = query(
+          collection(db, 'users', uid, 'workoutSessions'),
+          orderBy('startDate', 'desc'),
+          limit(max)
+        )
+        const snap = await getDocs(q)
+        return snap.docs.map((d) =>
+          decodeWorkout(d.data() as Record<string, unknown>, d.id, uid)
+        )
+      })()
 
+      // Fetch friend workouts via collection group, chunked by 30 (Firestore's
+      // `in` cap). Friend uids only — including our own here would not change
+      // the result and would still hit the same collection-group rule.
+      const friendUids = friends.map((f) => f.uid)
+      const friendPromise = (async (): Promise<WorkoutSession[]> => {
+        if (friendUids.length === 0) return []
         const chunks: string[][] = []
-        for (let i = 0; i < allUids.length; i += 30) chunks.push(allUids.slice(i, i + 30))
-
-        const results: WorkoutSession[] = []
-        for (const chunk of chunks) {
-          const q = query(
-            collectionGroup(db, 'workoutSessions'),
-            where('userId', 'in', chunk),
-            orderBy('startDate', 'desc'),
-            limit(max)
-          )
-          const snap = await getDocs(q)
-          for (const d of snap.docs) {
-            results.push(decodeWorkout(d.data() as Record<string, unknown>, d.id))
-          }
+        for (let i = 0; i < friendUids.length; i += 30) {
+          chunks.push(friendUids.slice(i, i + 30))
         }
+        const chunkResults = await Promise.all(
+          chunks.map(async (chunk) => {
+            const q = query(
+              collectionGroup(db, 'workoutSessions'),
+              where('userId', 'in', chunk),
+              orderBy('startDate', 'desc'),
+              limit(max)
+            )
+            const snap = await getDocs(q)
+            return snap.docs.map((d) =>
+              decodeWorkout(d.data() as Record<string, unknown>, d.id)
+            )
+          })
+        )
+        return chunkResults.flat()
+      })()
 
-        results.sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
-        const trimmed = results.slice(0, max)
+      const [ownResult, friendResult] = await Promise.allSettled([ownPromise, friendPromise])
+      if (cancelled) return
 
-        if (cancelled) return
-        const items: ActivityFeedItem[] = trimmed.map((w) => ({
-          workout: w,
-          friend: friends.find((f) => f.uid === w.userId),
-          isCurrentUser: w.userId === uid,
-        }))
-        setState({ items, loading: false, error: null })
-      } catch (e) {
-        if (!cancelled) setState({ items: [], loading: false, error: e instanceof Error ? e.message : String(e) })
-      }
+      const ownWorkouts = ownResult.status === 'fulfilled' ? ownResult.value : []
+      const friendWorkouts = friendResult.status === 'fulfilled' ? friendResult.value : []
+
+      const ownError =
+        ownResult.status === 'rejected'
+          ? errorMessage(ownResult.reason)
+          : null
+      const friendError =
+        friendResult.status === 'rejected'
+          ? errorMessage(friendResult.reason)
+          : null
+
+      const all = [...ownWorkouts, ...friendWorkouts]
+      all.sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+      const trimmed = all.slice(0, max)
+
+      const items: ActivityFeedItem[] = trimmed.map((w) => ({
+        workout: w,
+        friend: friends.find((f) => f.uid === w.userId),
+        isCurrentUser: w.userId === uid,
+      }))
+
+      setState({ items, loading: false, error: ownError, friendError })
     })()
 
     return () => {
@@ -93,4 +144,8 @@ export function useActivityFeed(uid: string | undefined, max = 20): ActivityFeed
   }, [uid, friendsLoading, friends, max])
 
   return state
+}
+
+function errorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e)
 }

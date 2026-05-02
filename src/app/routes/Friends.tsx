@@ -44,7 +44,7 @@ export function Friends() {
 }
 
 function FeedTab({ uid }: { uid?: string }) {
-  const { items, loading, error } = useActivityFeed(uid, 30)
+  const { items, loading, error, friendError } = useActivityFeed(uid, 30)
 
   if (loading) {
     return (
@@ -53,34 +53,32 @@ function FeedTab({ uid }: { uid?: string }) {
       </div>
     )
   }
-  if (error) {
-    return (
-      <div className="panel">
-        <div className="error-banner">{error}</div>
-      </div>
-    )
-  }
-  if (items.length === 0) {
-    return (
-      <div className="panel">
-        <EmptyState
-          title="No feed activity yet"
-          subtitle="Log a workout or add some friends and their activity will show up here."
-        />
-      </div>
-    )
-  }
 
   return (
     <div className="space-y-3">
-      {items.map(({ workout, friend, isCurrentUser }) => (
-        <ActivityFeedCard
-          key={`${workout.userId}-${workout.id}`}
-          workout={workout}
-          friend={friend}
-          isCurrentUser={isCurrentUser}
-        />
-      ))}
+      {error && <div className="error-banner">{error}</div>}
+      {friendError && (
+        <div className="text-text-muted text-[12px] px-1">
+          Couldn't load friends' activity ({friendError}). Showing your activity below.
+        </div>
+      )}
+      {items.length === 0 && !error ? (
+        <div className="panel">
+          <EmptyState
+            title="No feed activity yet"
+            subtitle="Log a workout or add some friends and their activity will show up here."
+          />
+        </div>
+      ) : (
+        items.map(({ workout, friend, isCurrentUser }) => (
+          <ActivityFeedCard
+            key={`${workout.userId}-${workout.id}`}
+            workout={workout}
+            friend={friend}
+            isCurrentUser={isCurrentUser}
+          />
+        ))
+      )}
     </div>
   )
 }

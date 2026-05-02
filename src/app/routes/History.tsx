@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '../lib/auth'
 import {
   useMealsHistory,
@@ -8,7 +8,7 @@ import {
 import { addDays } from '../lib/firestore'
 import { dailyTotals } from '../lib/aggregates'
 import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
-import { WorkoutRow } from '../components/WorkoutRow'
+import { WorkoutCard } from '../components/WorkoutCard'
 import { EmptyState } from '../components/EmptyState'
 import type { Meal, WellnessEntry } from '../lib/types'
 
@@ -62,13 +62,15 @@ export function History() {
         </div>
       </div>
 
-      <div className="panel">
-        {tab === 'meals' && <MealsHistory uid={uid} start={start} end={end} />}
-        {tab === 'workouts' && <WorkoutsHistory uid={uid} start={start} end={end} />}
-        {tab === 'wellness' && <WellnessHistory uid={uid} start={start} end={end} />}
-      </div>
+      {tab === 'meals' && <PanelWrap><MealsHistory uid={uid} start={start} end={end} /></PanelWrap>}
+      {tab === 'workouts' && <WorkoutsHistory uid={uid} start={start} end={end} />}
+      {tab === 'wellness' && <PanelWrap><WellnessHistory uid={uid} start={start} end={end} /></PanelWrap>}
     </div>
   )
+}
+
+function PanelWrap({ children }: { children: ReactNode }) {
+  return <div className="panel">{children}</div>
 }
 
 function groupByDay<T extends { date: Date }>(items: T[]): Map<string, T[]> {
@@ -130,9 +132,9 @@ function WorkoutsHistory({ uid, start, end }: { uid?: string; start: Date; end: 
   if (workouts.length === 0) return <EmptyState title="No workouts in this range" />
 
   return (
-    <div>
+    <div className="space-y-3">
       {workouts.map((w) => (
-        <WorkoutRow key={w.id} workout={w} />
+        <WorkoutCard key={w.id} workout={w} />
       ))}
     </div>
   )
