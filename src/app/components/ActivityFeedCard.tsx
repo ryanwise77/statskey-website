@@ -9,6 +9,7 @@ import {
   type WorkoutSession,
 } from '../lib/types'
 import { formatDistance, formatDuration, formatPace, formatRelative } from '../lib/format'
+import { useWorkoutRoute } from '../lib/data/useWorkoutRoute'
 import { RouteMap } from './RouteMap'
 
 interface ActivityFeedCardProps {
@@ -77,10 +78,22 @@ export function ActivityFeedCard({ workout, friend, isCurrentUser }: ActivityFee
 }
 
 /** Reusable map preview + metrics row, shared between the friend feed card
- *  and the personal "my workouts" card. */
+ *  and the personal "my workouts" card. Falls back to fetching the route
+ *  attachment when the inline `routeCoordinates` field is empty — matches
+ *  the iOS feed card's `loadRouteIfNeeded`, and is what makes maps show up
+ *  for HealthKit-synced workouts where the attachment exists but the inline
+ *  field on the session doc is empty. */
 export function WorkoutCardBody({ workout, accent }: { workout: WorkoutSession; accent: string }) {
-  const route = workout.routeCoordinates
-  const canShowMap = sportUsesGPS(workout.sportType) && !workout.isIndoor && route.length >= 2
+  const isGpsSport = sportUsesGPS(workout.sportType) && !workout.isIndoor
+  const inline = workout.routeCoordinates
+
+  // Only spin up the attachment fetch when the sport uses GPS and the inline
+  // route is empty — for cycling or any inline-rich workout this is a no-op.
+  const shouldFetchAttachment = isGpsSport && inline.length < 2
+  const { route: fetched } = useWorkoutRoute(shouldFetchAttachment ? workout : null)
+
+  const route = inline.length >= 2 ? inline : fetched
+  const canShowMap = isGpsSport && route.length >= 2
 
   return (
     <>
