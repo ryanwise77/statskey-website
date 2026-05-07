@@ -21,11 +21,11 @@
           <a href="#platform">Platform</a>
           <a href="#intelligence">Intelligence</a>
           <a href="#flow">Flow</a>
-          <a href="#for-fun">For Fun</a>
-          <a href="/prototype/">Prototype</a>
-          <a href="/app">Sign in</a>
+          <a href="#hardware">Hardware</a>
+          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">iOS app</a>
+          <a href="/app/login">Sign in</a>
         </div>
-        <a class="site-nav__cta" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
+        <a class="site-nav__cta" href="/app/signup">Sign up</a>
         <button id="mobile-menu-btn" class="site-menu-btn" aria-label="Open menu" aria-expanded="false">
           <span></span>
           <span></span>
@@ -35,10 +35,10 @@
         <a href="#platform">Platform</a>
         <a href="#intelligence">Intelligence</a>
         <a href="#flow">Flow</a>
-        <a href="#for-fun">For Fun</a>
-        <a href="/prototype/">Prototype</a>
-        <a href="/app">Sign in</a>
-        <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
+        <a href="#hardware">Hardware</a>
+        <a href="/app/login">Sign in</a>
+        <a href="/app/signup">Sign up</a>
+        <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
       </div>
     </nav>
 
@@ -51,11 +51,40 @@
             <div class="eyebrow reveal">Personal health intelligence</div>
             <h1 class="hero-title reveal d1">Your body is a living dataset. StatsKey makes it legible.</h1>
             <p class="hero-lede reveal d2">
-              Capture nutrition in seconds, connect biometrics, and ask Flow what is actually driving your energy, glucose, training, sleep, and recovery.
+              Capture nutrition in seconds, connect biometrics, and ask AI what is actually driving your energy, glucose, training, sleep, and recovery.
             </p>
+            <div class="hero-mini-model reveal d2" aria-label="StatsKey visual preview">
+              <div class="hero-mini-card">
+                <span>Nutrition model</span>
+                <b>50+</b>
+                <div class="hero-mini-chart">
+                  <svg viewBox="0 0 180 42" aria-hidden="true">
+                    <path d="M14 28 L48 19 L82 24 L118 13 L158 17" fill="none" stroke="#30d5c8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="hero-mini-card">
+                <span>Biometric response</span>
+                <b>131</b>
+                <div class="hero-mini-chart">
+                  <svg viewBox="0 0 180 42" aria-hidden="true">
+                    <path d="M18 26 C45 8 68 12 90 22 S132 34 162 14" fill="none" stroke="#6e8eff" stroke-width="4" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="hero-mini-card">
+                <span>Flow insight</span>
+                <b>Live</b>
+                <div class="hero-mini-chart">
+                  <svg viewBox="0 0 180 42" aria-hidden="true">
+                    <circle cx="42" cy="21" r="7" fill="#30d5c8"/><circle cx="90" cy="21" r="7" fill="#6e8eff"/><circle cx="138" cy="21" r="7" fill="#9b7cff"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
             <div class="hero-actions reveal d3">
-              <a class="button button--primary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
-              <a class="button button--secondary" href="#platform">Explore platform</a>
+              <a class="button button--primary" href="/app/signup">Sign up free</a>
+              <a class="button button--secondary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
             </div>
             <div class="hero-note reveal d3">Free for one month. Then $0.99/mo. Cancel anytime.</div>
           </div>
@@ -220,24 +249,29 @@
         </div>
       </section>
 
-      <section id="for-fun" class="section-block">
+      <section id="hardware" class="section-block">
         <div class="page-shell">
           <div class="section-heading reveal">
-            <div class="eyebrow">For Fun</div>
-            <h2>Public experiments from the lab.</h2>
-            <p>Side quests, product concepts, and interactive prototypes that show the way StatsKey thinks about systems.</p>
+            <div class="eyebrow">Hardware</div>
+            <h2>Hardware</h2>
+            <p>Hardware is the product platform. CPM is the potassium-specific monitor prototype. The product viewer is the full-screen hardware render.</p>
           </div>
 
           <div class="lab-grid">
-            <a href="/for-fun/mobile-data-center/" class="lab-card reveal reveal-stagger-1">
+            <a href="/cpbm/" class="lab-card reveal reveal-stagger-1">
+              <span>CPBM</span>
+              <h3>CPBM</h3>
+              <p>The wearable hardware layer: reusable puck, disposable cartridge, phone-facing readings, and interactive product viewer.</p>
+            </a>
+            <a href="/cpm/" class="lab-card lab-card--bright reveal reveal-stagger-2">
+              <span>In Progress</span>
+              <h3>CPM / K1 Potassium</h3>
+              <p>A standalone potassium monitor with an interactive viewer, triplicate K+ cartridge, dual-reference QC, and fail-closed validation gates.</p>
+            </a>
+            <a href="/for-fun/mobile-data-center/" class="lab-card reveal reveal-stagger-3">
               <span>Mobile Data Center</span>
               <h3>AuroraEdge AK-20</h3>
               <p>A containerized edge compute concept with a public bid model, bill of materials, and 3D viewer.</p>
-            </a>
-            <a href="/prototype/" class="lab-card lab-card--bright reveal reveal-stagger-2">
-              <span>Prototype</span>
-              <h3>StatsKey Hardware Viewer</h3>
-              <p>An interactive look at the reusable puck and disposable sensing cartridge concept behind StatsKey.</p>
             </a>
           </div>
         </div>
@@ -250,7 +284,10 @@
             <h2>Build the model your body has been asking for.</h2>
             <p>Get a month free, then keep everything for $0.99/mo.</p>
           </div>
-          <a class="button button--primary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the app</a>
+          <div class="cta-card__actions">
+            <a class="button button--primary" href="/app/signup">Sign up free</a>
+            <a class="button button--secondary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+          </div>
         </div>
       </section>
     </main>
@@ -259,8 +296,7 @@
       <div class="page-shell site-footer__inner">
         <span>StatsKey &copy; 2026</span>
         <div>
-          <a href="#for-fun">For Fun</a>
-          <a href="/prototype/">Prototype</a>
+          <a href="#hardware">Hardware</a>
           <a href="https://statskeybiometrics.com/support">Support</a>
           <a href="https://statskeybiometrics.com/privacy">Privacy</a>
           <a href="https://statskeybiometrics.com/terms">Terms</a>

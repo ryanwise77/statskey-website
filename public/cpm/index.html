@@ -1,0 +1,1989 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CPM is a continuous potassium monitor prototype: measurable physics, a defined accuracy bar, evidence-based clinical demand, transparent costs, and a fundable validation path.">
+  <meta name="theme-color" content="#02050a">
+  <link rel="canonical" href="https://statskeybiometrics.com/cpm/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>CPM | Continuous Potassium Monitoring Prototype</title>
+  <style>
+    :root {
+      --bg: #02050a;
+      --panel: rgba(255, 255, 255, 0.052);
+      --panel-strong: rgba(255, 255, 255, 0.082);
+      --line: rgba(255, 255, 255, 0.12);
+      --line-strong: rgba(105, 245, 216, 0.42);
+      --ink: #f5fbff;
+      --soft: #c4d0da;
+      --muted: #84919e;
+      --dim: #55616e;
+      --mint: #69f5d8;
+      --cyan: #72d7ff;
+      --blue: #7894ff;
+      --violet: #a77cff;
+      --amber: #ffc86b;
+      --red: #ff6a7a;
+      --green: #41d688;
+      --shadow: 0 28px 100px rgba(0, 0, 0, 0.48);
+      --font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: "Space Grotesk", Inter, sans-serif;
+      --mono: "JetBrains Mono", "SF Mono", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(114, 215, 255, 0.19), transparent 28rem),
+        radial-gradient(circle at 88% 12%, rgba(105, 245, 216, 0.12), transparent 30rem),
+        radial-gradient(circle at 50% 64%, rgba(167, 124, 255, 0.12), transparent 34rem),
+        linear-gradient(180deg, #030812 0%, #02050a 48%, #000 100%);
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px);
+      background-size: 76px 76px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.9), transparent 78%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(2,5,10,0.72), transparent 18%, transparent 82%, rgba(2,5,10,0.76)),
+        radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.64) 86%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--mint); color: #02100d; }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(2, 5, 10, 0.7);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+    }
+
+    .nav__inner {
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand,
+    .nav__links,
+    .status-chip,
+    .button,
+    .eyebrow,
+    .micro-label {
+      font-family: var(--mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(245,251,255,0.94);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .brand__mark {
+      width: 20px;
+      height: 20px;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 70% 30%, #fff 0 8%, transparent 9%),
+        linear-gradient(135deg, var(--mint), var(--cyan) 46%, var(--violet));
+      box-shadow: 0 0 28px rgba(105,245,216,0.42);
+    }
+
+    .nav__links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: rgba(196, 208, 218, 0.78);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .nav__links a { transition: color 180ms ease; }
+    .nav__links a:hover { color: var(--ink); }
+
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      padding: 138px 0 88px;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      width: min(76vw, 960px);
+      height: min(76vw, 960px);
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      border: 1px solid rgba(105,245,216,0.08);
+      box-shadow: inset 0 0 120px rgba(114,215,255,0.045);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr);
+      align-items: center;
+      gap: clamp(34px, 7vw, 90px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--mint);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 18px currentColor;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      letter-spacing: -0.055em;
+      line-height: 0.94;
+    }
+
+    h1 {
+      max-width: 780px;
+      font-size: clamp(3.05rem, 5.9vw, 5.8rem);
+      font-weight: 700;
+    }
+
+    h2 {
+      max-width: 780px;
+      font-size: clamp(2.5rem, 5.3vw, 5.4rem);
+      font-weight: 700;
+    }
+
+    h3 {
+      font-size: clamp(1.45rem, 2.2vw, 2.2rem);
+      font-weight: 650;
+    }
+
+    .lede {
+      max-width: 680px;
+      margin-top: 26px;
+      color: var(--soft);
+      font-size: clamp(1.05rem, 1.65vw, 1.34rem);
+      line-height: 1.64;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255,255,255,0.055);
+      font-size: 10px;
+      font-weight: 700;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(105,245,216,0.44);
+      background: rgba(105,245,216,0.08);
+    }
+
+    .button--primary {
+      color: #03110e;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--mint), var(--cyan));
+      box-shadow: 0 18px 58px rgba(105,245,216,0.18);
+    }
+
+    .button--primary:hover {
+      background: linear-gradient(135deg, #8fffe8, #8fe1ff);
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.035);
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .status-chip::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 16px rgba(255,200,107,0.48);
+    }
+
+    .status-chip--research::before { background: var(--mint); box-shadow: 0 0 16px rgba(105,245,216,0.48); }
+    .status-chip--locked::before { background: var(--red); box-shadow: 0 0 16px rgba(255,106,122,0.42); }
+
+    .hero-mini-renders {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 760px;
+      margin-top: 24px;
+    }
+
+    .mini-render {
+      min-height: 128px;
+      padding: 13px;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 86% 0%, rgba(105,245,216,0.17), transparent 9rem),
+        linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.026));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
+    }
+
+    .mini-render b {
+      display: block;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 32px;
+      line-height: 1;
+      letter-spacing: -0.055em;
+    }
+
+    .mini-render span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font: 700 9px/1.45 var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mini-trend {
+      position: relative;
+      height: 42px;
+      margin-top: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.055);
+      overflow: hidden;
+    }
+
+    .mini-trend svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .device-card {
+      position: relative;
+      min-height: 650px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 36px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(105,245,216,0.14), transparent 34%),
+        radial-gradient(circle at 70% 76%, rgba(120,148,255,0.16), transparent 42%),
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .device-card::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(255,255,255,0.065);
+      border-radius: 26px;
+      pointer-events: none;
+    }
+
+    .device-stage {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      perspective: 1100px;
+    }
+
+    .k1-assembly {
+      position: relative;
+      width: min(78%, 420px);
+      aspect-ratio: 1;
+      transform-style: preserve-3d;
+      transform: rotateX(58deg) rotateZ(-28deg);
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .layer {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 18px 70px rgba(0,0,0,0.28);
+    }
+
+    .layer--reader {
+      width: 74%;
+      height: 74%;
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255,255,255,0.22), transparent 8%),
+        radial-gradient(circle at 62% 64%, rgba(105,245,216,0.12), transparent 30%),
+        linear-gradient(145deg, #1c222b, #090d13 70%);
+      border: 1px solid rgba(255,255,255,0.16);
+      transform: translate(-50%, -50%) translateZ(78px);
+    }
+
+    .layer--gasket {
+      width: 67%;
+      height: 67%;
+      border: 18px solid rgba(5,8,12,0.82);
+      background: transparent;
+      transform: translate(-50%, -50%) translateZ(48px);
+      box-shadow: 0 0 36px rgba(105,245,216,0.08);
+    }
+
+    .layer--cartridge {
+      width: 70%;
+      height: 70%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(114,215,255,0.11), transparent 32%),
+        linear-gradient(145deg, #182130, #0a0f17);
+      border: 1px solid rgba(255,255,255,0.12);
+      transform: translate(-50%, -50%) translateZ(10px);
+    }
+
+    .layer--hydrogel {
+      width: 36%;
+      height: 36%;
+      background: rgba(114,215,255,0.42);
+      border: 1px solid rgba(162,238,255,0.54);
+      transform: translate(-50%, -50%) translateZ(24px);
+      filter: blur(0.1px);
+    }
+
+    .layer--adhesive {
+      width: 82%;
+      height: 82%;
+      background: rgba(255,221,160,0.22);
+      border: 1px solid rgba(255,221,160,0.35);
+      transform: translate(-50%, -50%) translateZ(-16px);
+    }
+
+    .sensor {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.42);
+      transform: translateZ(38px);
+      display: grid;
+      place-items: center;
+      color: rgba(1,10,9,0.92);
+      font: 700 8px/1 var(--mono);
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 30px rgba(105,245,216,0.18);
+    }
+
+    .sensor--k1 { left: 34%; top: 43%; background: var(--green); }
+    .sensor--k2 { left: 46%; top: 35%; background: #32b974; }
+    .sensor--blank { left: 58%; top: 35%; background: #8995a1; }
+    .sensor--ref { left: 70%; top: 43%; background: #d9eeff; }
+
+    .needle-field {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 74px;
+      height: 74px;
+      transform: translate(-50%, -50%) translateZ(-34px);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+
+    .needle-field span {
+      width: 7px;
+      height: 22px;
+      border-radius: 999px 999px 3px 3px;
+      background: linear-gradient(180deg, #f0f5f8, #78828d);
+      transform: rotateX(65deg);
+      opacity: 0.92;
+    }
+
+    .trace-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 46%;
+      height: 46%;
+      border: 2px dashed rgba(255,200,107,0.78);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) translateZ(42px);
+    }
+
+    .device-readout {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      background: rgba(2,5,10,0.48);
+    }
+
+    .micro-label {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--display);
+      font-size: 28px;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .warning-banner {
+      border: 1px solid rgba(255,200,107,0.26);
+      border-radius: 24px;
+      padding: 18px 20px;
+      background:
+        radial-gradient(circle at 4% 0%, rgba(255,200,107,0.2), transparent 26rem),
+        rgba(255,200,107,0.055);
+      color: #ffe1a4;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .render-stack {
+      position: relative;
+      min-height: 680px;
+      display: grid;
+      place-items: center;
+      perspective: 1200px;
+    }
+
+    .render-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .render-shot {
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      padding: 14px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(105,245,216,0.13), transparent 22rem),
+        linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.026));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
+    }
+
+    .render-shot .phone-screen {
+      min-height: 560px;
+    }
+
+    .render-shot__caption {
+      margin-top: 14px;
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .viewer-frame {
+      height: min(760px, 82vh);
+      min-height: 560px;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      overflow: hidden;
+      background: #05080d;
+    }
+
+    .viewer-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .monitor-visual {
+      position: relative;
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+      perspective: 1100px;
+      border-radius: 26px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(105,245,216,0.16), transparent 18rem),
+        linear-gradient(180deg, rgba(2,5,10,0.52), rgba(2,5,10,0.22));
+    }
+
+    .monitor-visual .k1-assembly {
+      width: min(72%, 330px);
+    }
+
+    .monitor-copy {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .monitor-row {
+      display: grid;
+      grid-template-columns: 12px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.22);
+      font-size: 12px;
+    }
+
+    .monitor-row i {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--mint);
+    }
+
+    .monitor-row:nth-child(2) i { background: var(--cyan); }
+    .monitor-row:nth-child(3) i { background: var(--amber); }
+    .monitor-row:nth-child(4) i { background: var(--red); }
+
+    .phone-render {
+      position: absolute;
+      width: min(310px, 74vw);
+      min-height: 620px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 42px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(105,245,216,0.18), transparent 24rem),
+        linear-gradient(180deg, #111821, #05080d 62%, #030407);
+      box-shadow:
+        0 34px 100px rgba(0,0,0,0.52),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .phone-render--main {
+      z-index: 3;
+      transform: rotateY(-10deg) rotateX(4deg) translateZ(46px);
+    }
+
+    .phone-render--left {
+      z-index: 2;
+      opacity: 0.66;
+      transform: translateX(-165px) translateY(42px) rotateY(22deg) rotateZ(-4deg) scale(0.78);
+      filter: saturate(0.92);
+    }
+
+    .phone-render--right {
+      z-index: 1;
+      opacity: 0.72;
+      transform: translateX(174px) translateY(56px) rotateY(-24deg) rotateZ(5deg) scale(0.76);
+      filter: saturate(0.92);
+    }
+
+    .phone-screen {
+      min-height: 590px;
+      border-radius: 31px;
+      padding: 18px;
+      background:
+        radial-gradient(circle at 18% 4%, rgba(105,245,216,0.18), transparent 18rem),
+        linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+      color: #10141a;
+      overflow: hidden;
+    }
+
+    .phone-screen--dark {
+      background:
+        radial-gradient(circle at 16% 8%, rgba(105,245,216,0.22), transparent 18rem),
+        linear-gradient(180deg, #101820 0%, #05080d 100%);
+      color: #eef6ff;
+    }
+
+    .render-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .render-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.06);
+      color: #58616d;
+      font: 700 9px/1 var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .phone-screen--dark .render-pill {
+      background: rgba(255,255,255,0.08);
+      color: rgba(238,246,255,0.68);
+    }
+
+    .render-hero {
+      padding: 16px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 78% 16%, rgba(105,245,216,0.32), transparent 9rem),
+        #ffffff;
+      box-shadow: 0 18px 40px rgba(31,41,55,0.08);
+    }
+
+    .phone-screen--dark .render-hero {
+      background:
+        radial-gradient(circle at 78% 16%, rgba(105,245,216,0.20), transparent 9rem),
+        rgba(255,255,255,0.07);
+      box-shadow: none;
+    }
+
+    .render-label {
+      color: #64748b;
+      font: 800 10px/1 var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .phone-screen--dark .render-label {
+      color: rgba(238,246,255,0.58);
+    }
+
+    .k-value {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .k-value strong {
+      font-family: var(--display);
+      font-size: 58px;
+      line-height: 0.9;
+      letter-spacing: -0.07em;
+    }
+
+    .k-value span {
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .phone-screen--dark .k-value span {
+      color: rgba(238,246,255,0.58);
+    }
+
+    .state-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 13px;
+      color: #475569;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .phone-screen--dark .state-line {
+      color: rgba(238,246,255,0.72);
+    }
+
+    .state-badge {
+      flex-shrink: 0;
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: #ff9500;
+      color: white;
+      font: 800 10px/1 var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .trend-card {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 22px;
+      background: #ffffff;
+      box-shadow: 0 18px 40px rgba(31,41,55,0.07);
+    }
+
+    .phone-screen--dark .trend-card {
+      background: rgba(255,255,255,0.07);
+      box-shadow: none;
+    }
+
+    .trend-chart {
+      position: relative;
+      height: 118px;
+      margin-top: 12px;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(148,163,184,0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148,163,184,0.16) 1px, transparent 1px);
+      background-size: 100% 33%, 25% 100%;
+    }
+
+    .trend-chart svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .render-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .render-row {
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px;
+      border-radius: 16px;
+      background: rgba(15,23,42,0.055);
+      font-size: 12px;
+    }
+
+    .phone-screen--dark .render-row {
+      background: rgba(255,255,255,0.07);
+    }
+
+    .render-dot {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(0,191,165,0.13);
+      color: #008b7a;
+      font-weight: 900;
+    }
+
+    .phone-screen--dark .render-dot {
+      color: var(--mint);
+      background: rgba(105,245,216,0.12);
+    }
+
+    .render-row b {
+      display: block;
+      font-size: 12px;
+    }
+
+    .render-row small {
+      display: block;
+      margin-top: 2px;
+      color: #64748b;
+      font-size: 10px;
+    }
+
+    .phone-screen--dark .render-row small {
+      color: rgba(238,246,255,0.56);
+    }
+
+    .confidence-ring {
+      width: 86px;
+      height: 86px;
+      display: grid;
+      place-items: center;
+      margin: 18px auto;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, #fff 0 56%, transparent 57%),
+        conic-gradient(var(--mint) 0 62%, rgba(148,163,184,0.25) 62% 100%);
+      color: #111827;
+      font: 900 22px/1 var(--display);
+      letter-spacing: -0.05em;
+    }
+
+    .section {
+      padding: clamp(76px, 10vw, 136px) 0;
+      position: relative;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.62fr);
+      gap: 36px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .section-head p {
+      color: var(--soft);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .risk-pill {
+      min-height: 112px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      background: rgba(0,0,0,0.22);
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .risk-pill b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .vision-grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 14px;
+    }
+
+    .card,
+    .wide-card,
+    .timeline,
+    .signal-panel {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.026));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
+    }
+
+    .card {
+      min-height: 270px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      right: -58px;
+      bottom: -58px;
+      width: 160px;
+      height: 160px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(105,245,216,0.15), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card:nth-child(2)::after { background: radial-gradient(circle, rgba(114,215,255,0.16), transparent 70%); }
+    .card:nth-child(3)::after { background: radial-gradient(circle, rgba(167,124,255,0.15), transparent 70%); }
+
+    .card-number {
+      color: var(--mint);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+    }
+
+    .card h3 {
+      margin-top: 30px;
+    }
+
+    .card p,
+    .wide-card p,
+    .timeline p,
+    .signal-panel p {
+      margin-top: 14px;
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .wide-card {
+      padding: clamp(26px, 4.4vw, 48px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .wide-card--mint {
+      background:
+        radial-gradient(circle at 14% 8%, rgba(105,245,216,0.16), transparent 32rem),
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+    }
+
+    .stack-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .stack-row {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 13px 0;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .stack-row b {
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .stack-row span {
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .timeline {
+      padding: 26px;
+    }
+
+    .phase {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 14px;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .phase:last-child { border-bottom: 0; }
+
+    .phase__dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #03110e;
+      background: linear-gradient(135deg, var(--mint), var(--cyan));
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .phase h3 {
+      font-size: 22px;
+      letter-spacing: -0.035em;
+      line-height: 1.08;
+    }
+
+    .phase p { margin-top: 6px; }
+
+    .signal-panel {
+      padding: 26px;
+      background:
+        radial-gradient(circle at 74% 10%, rgba(120,148,255,0.14), transparent 23rem),
+        linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.026));
+    }
+
+    .signal-map {
+      display: grid;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .signal {
+      display: grid;
+      grid-template-columns: 12px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .signal i {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 18px currentColor;
+    }
+
+    .signal:nth-child(2) i { background: var(--cyan); }
+    .signal:nth-child(3) i { background: var(--amber); }
+    .signal:nth-child(4) i { background: var(--violet); }
+    .signal:nth-child(5) i { background: var(--red); }
+
+    .signal b {
+      font-size: 13px;
+    }
+
+    .signal span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .evidence-grid,
+    .cost-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .evidence-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .cost-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .evidence-card,
+    .cost-card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 86% 0%, rgba(114,215,255,0.11), transparent 18rem),
+        linear-gradient(180deg, rgba(255,255,255,0.068), rgba(255,255,255,0.026));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .evidence-card h3,
+    .cost-card h3 {
+      font-size: 25px;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .evidence-card p,
+    .cost-card p {
+      margin-top: 12px;
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .source-link {
+      display: inline-flex;
+      margin-top: 16px;
+      color: var(--mint);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .cost-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .cost-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .cost-line b {
+      color: var(--ink);
+      font-weight: 650;
+    }
+
+    .cost-line span {
+      color: var(--mint);
+      font-family: var(--mono);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .truth-table {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .truth-cell {
+      min-height: 145px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .truth-cell b {
+      display: block;
+      font-family: var(--display);
+      font-size: 22px;
+      letter-spacing: -0.04em;
+    }
+
+    .truth-cell span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .claim-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .claim {
+      padding: 20px;
+      border-radius: 22px;
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .claim h3 {
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .claim--no {
+      border-color: rgba(255,106,122,0.22);
+      background: rgba(255,106,122,0.055);
+    }
+
+    .claim--yes {
+      border-color: rgba(105,245,216,0.22);
+      background: rgba(105,245,216,0.055);
+    }
+
+    .footer-cta {
+      padding: 0 0 98px;
+    }
+
+    .footer-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 28px;
+      align-items: center;
+      border-radius: 34px;
+      padding: clamp(28px, 5vw, 56px);
+      background:
+        radial-gradient(circle at 8% 14%, rgba(105,245,216,0.16), transparent 36rem),
+        radial-gradient(circle at 90% 20%, rgba(120,148,255,0.16), transparent 34rem),
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.032));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .footer-card p {
+      max-width: 760px;
+      margin-top: 16px;
+      color: var(--soft);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .site-footer {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 26px 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .site-footer .shell {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .site-footer nav {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .reveal {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 900ms cubic-bezier(0.22,1,0.36,1), transform 900ms cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .d1 { transition-delay: 0.08s; }
+    .d2 { transition-delay: 0.16s; }
+    .d3 { transition-delay: 0.24s; }
+
+    @keyframes float {
+      0%, 100% { transform: rotateX(58deg) rotateZ(-28deg) translateY(0); }
+      50% { transform: rotateX(58deg) rotateZ(-28deg) translateY(-14px); }
+    }
+
+    @media (max-width: 900px) {
+      .nav__links { display: none; }
+      .hero-grid,
+      .section-head,
+      .vision-grid,
+      .footer-card {
+        grid-template-columns: 1fr;
+      }
+      .render-stack {
+        min-height: 720px;
+      }
+      .device-card { min-height: 590px; }
+      .hero-mini-renders {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        max-width: 900px;
+        font-size: clamp(2.85rem, 8.2vw, 4.8rem);
+      }
+      .card-grid,
+      .risk-grid,
+      .evidence-grid,
+      .cost-grid,
+      .truth-table,
+      .render-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      .hero { min-height: auto; padding: 104px 0 66px; }
+      h1 { font-size: clamp(2.9rem, 14vw, 4.35rem); }
+      .hero-actions .button { width: 100%; }
+      .hero-mini-renders {
+        grid-template-columns: 1fr;
+      }
+      .render-stack { min-height: 980px; }
+      .phone-render {
+        position: relative;
+        width: min(100%, 320px);
+        min-height: 590px;
+        margin: 0 auto 18px;
+      }
+      .phone-render--main,
+      .phone-render--left,
+      .phone-render--right {
+        transform: none;
+        opacity: 1;
+      }
+      .device-card { min-height: 560px; border-radius: 28px; }
+      .device-readout,
+      .card-grid,
+      .risk-grid,
+      .evidence-grid,
+      .cost-grid,
+      .render-gallery,
+      .truth-table,
+      .claim-grid {
+        grid-template-columns: 1fr;
+      }
+      .metric { min-height: auto; }
+      .stack-row { grid-template-columns: 1fr; gap: 6px; }
+      .cost-line { grid-template-columns: 1fr; }
+      .section { padding: 74px 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="Primary navigation">
+    <div class="shell nav__inner">
+      <a class="brand" href="/" aria-label="StatsKey home">
+        <span class="brand__mark"></span>
+        <span>StatsKey / CPM</span>
+      </a>
+      <div class="nav__links">
+        <a href="#architecture">Product</a>
+        <a href="/cpm/viewer/">Viewer</a>
+        <a href="#care-gap">Care gap</a>
+        <a href="#accuracy">Accuracy</a>
+        <a href="#applications">Applications</a>
+        <a href="#mortality">Mortality</a>
+        <a href="#hospital">Hospital</a>
+        <a href="#economics">Economics</a>
+        <a href="#validation">Validation</a>
+        <a href="#boundaries">Boundaries</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow reveal">Continuous potassium monitoring</div>
+          <div class="hero-mini-renders reveal d2" aria-label="CPM signal preview">
+            <div class="mini-render">
+              <span>Disposable</span>
+              <b>K1/K2/K3</b>
+              <div class="mini-trend">
+                <svg viewBox="0 0 180 42" aria-hidden="true">
+                  <circle cx="45" cy="21" r="14" fill="none" stroke="#69f5d8" stroke-width="4"/><circle cx="90" cy="21" r="14" fill="none" stroke="#72d7ff" stroke-width="4"/><circle cx="135" cy="21" r="14" fill="none" stroke="#ffc86b" stroke-width="4"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mini-render">
+              <span>Reusable reader</span>
+              <b>2x RE</b>
+              <div class="mini-trend">
+                <svg viewBox="0 0 180 42" aria-hidden="true">
+                  <path d="M18 30 H162" stroke="rgba(255,255,255,.18)" stroke-width="6" stroke-linecap="round"/><path d="M34 30 L74 18 L116 24 L148 12" fill="none" stroke="#69f5d8" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="mini-render">
+              <span>Output rule</span>
+              <b>Fail closed</b>
+              <div class="mini-trend">
+                <svg viewBox="0 0 180 42" aria-hidden="true">
+                  <rect x="32" y="9" width="116" height="24" rx="12" fill="rgba(255,255,255,.08)"/><circle cx="54" cy="21" r="6" fill="#69f5d8"/><circle cx="90" cy="21" r="6" fill="#ffc86b"/><circle cx="126" cy="21" r="6" fill="#ff6a7a"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <h1 class="reveal d1">A continuous potassium monitor for high-risk cardiac, renal, and post-acute populations.</h1>
+          <p class="lede reveal d2">
+            Triplicate K+ ion-selective electrodes, dual Ag/AgCl references, and a fail-closed reader. The underlying electrochemistry is measurable today; the deliverable is a validated trend monitor that triggers earlier confirmatory blood testing in patients where intermittent laboratory monitoring has documented gaps.
+          </p>
+          <div class="hero-actions reveal d3">
+            <a class="button button--primary" href="/cpm/viewer/">Open 3D viewer</a>
+            <a class="button" href="#economics">Unit economics</a>
+          </div>
+          <div class="status-row reveal d3" aria-label="Project status">
+            <span class="status-chip status-chip--research">Research stage</span>
+            <span class="status-chip">Pre-validation</span>
+            <span class="status-chip status-chip--locked">Not a medical device</span>
+          </div>
+        </div>
+
+        <aside class="device-card reveal d2" aria-label="Live CPM monitor render">
+          <div class="device-stage" aria-hidden="true">
+            <div class="k1-assembly">
+              <div class="layer layer--adhesive"></div>
+              <div class="layer layer--cartridge"></div>
+              <div class="layer layer--hydrogel"></div>
+              <div class="trace-ring"></div>
+              <div class="sensor sensor--k1">K+</div>
+              <div class="sensor sensor--k2">K2</div>
+              <div class="sensor sensor--blank">BL</div>
+              <div class="sensor sensor--ref">RE</div>
+              <div class="needle-field">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="layer layer--gasket"></div>
+              <div class="layer layer--reader"></div>
+            </div>
+          </div>
+          <div class="device-readout">
+            <div class="metric">
+              <div class="micro-label">Disposable</div>
+              <strong>K1/K2/K3</strong>
+              <span>triplicate K+ ISEs</span>
+            </div>
+            <div class="metric">
+              <div class="micro-label">Reusable</div>
+              <strong>Dual RE</strong>
+              <span>reference drift sentinel</span>
+            </div>
+            <div class="metric">
+              <div class="micro-label">Required</div>
+              <strong>QC</strong>
+              <span>fail closed when invalid</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="architecture" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Product architecture</div>
+            <h2 class="reveal d1">Three components, one analyte, one output rule.</h2>
+          </div>
+          <p class="reveal d2">
+            CPM is a single-analyte device by design: redundant K+ chemistry, calibrated electronics, and a fail-closed output rule that suppresses results outside defined confidence bounds.
+          </p>
+        </div>
+
+        <div class="card-grid">
+          <article class="card reveal">
+            <div class="card-number">01 / DISPOSABLE</div>
+            <h3>Skin-contact K+ cartridge</h3>
+            <p>K1/K2/K3 valinomycin ion-selective electrodes, an ionophore-free blank for drift control, dual Ag/AgCl references, hydrogel wet island, and a guard ring for contact diagnostics.</p>
+          </article>
+          <article class="card reveal d1">
+            <div class="card-number">02 / REUSABLE</div>
+            <h3>Guarded reader module</h3>
+            <p>Femtoamp-input buffer, 24-bit ADC, optional impedance AFE for hydration check, temperature, BLE radio, wearable PMIC, and sealed pogo interface to the cartridge pads.</p>
+          </article>
+          <article class="card reveal d2">
+            <div class="card-number">03 / OUTPUT</div>
+            <h3>Fail-closed by design</h3>
+            <p>The monitor reports a potassium trend only when slope, drift, reference stability, triplicate agreement, contact, and calibration age all pass defined thresholds. Otherwise output is suppressed and a confirmatory blood test is indicated.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="viewer" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Hardware viewer</div>
+            <h2 class="reveal d1">Interactive layer-by-layer device model.</h2>
+          </div>
+          <p class="reveal d2">
+            Skin interface, hydrogel, microneedle access, K+ membranes, dual references, guard ring, contact pads, and the reader analog island.
+          </p>
+        </div>
+        <div class="hero-actions" style="margin-top:0;margin-bottom:18px">
+          <a class="button button--primary" href="/cpm/viewer/">Open full-screen viewer</a>
+        </div>
+        <div class="viewer-frame"><iframe src="/cpm/viewer/" title="CPM interactive potassium monitor viewer"></iframe></div>
+      </div>
+    </section>
+
+    <section id="care-gap" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Current care gap</div>
+            <h2 class="reveal d1">The critical window is managed with intermittent potassium checks.</h2>
+          </div>
+          <p class="reveal d2">
+            The highest-yield first application is post-discharge HFrEF patients on potassium-altering therapy: a narrow medication-safety and arrhythmia-risk workflow during the 30- to 90-day vulnerable phase after heart-failure hospitalization.
+          </p>
+        </div>
+
+        <article class="wide-card wide-card--mint reveal">
+          <div class="truth-table">
+            <div class="truth-cell"><b>~30%</b><span>Heart-failure patients readmitted within 3 months after discharge in vulnerable-phase literature.</span></div>
+            <div class="truth-cell"><b>~10%</b><span>Mortality can approach 10% during the same vulnerable period.</span></div>
+            <div class="truth-cell"><b>46.5%</b><span>No serum potassium test within 7 days after MRA initiation among eligible HFrEF patients in a multicenter cohort.</span></div>
+            <div class="truth-cell"><b>13.6%</b><span>No serum potassium test within 30 days after MRA initiation among patients not hospitalized, dead, or disenrolled.</span></div>
+          </div>
+          <div class="stack-list">
+            <div class="stack-row"><b>Current workflow</b><span>Discharge potassium is checked, medications are adjusted, the patient goes home, then potassium and creatinine are rechecked on a schedule that depends on follow-up availability, patient adherence, transportation, and lab ordering.</span></div>
+            <div class="stack-row"><b>Known gap</b><span>Guidelines call for close potassium and renal-function monitoring after MRA initiation and during medication changes, but real-world follow-through is incomplete. A patient can drift for days before the next lab.</span></div>
+            <div class="stack-row"><b>What RPM misses</b><span>Remote HF programs commonly track weight, symptoms, blood pressure, heart rate, and sometimes device data. These can detect congestion but do not directly measure the electrolyte variable that determines arrhythmia risk and medication safety.</span></div>
+            <div class="stack-row"><b>Precise intervention</b><span>CPM-HF is a 30-day post-discharge electrolyte telemetry service: baseline lab at discharge, one 7-day cartridge at a time, trend dashboard, and escalation only when the K+ trend crosses a predefined confirmation threshold.</span></div>
+            <div class="stack-row"><b>Clinical action</b><span>Alert does not dose potassium. It triggers a potassium/creatinine/magnesium check, medication review, and clinician-directed adjustment of diuretic, supplement, MRA, RAASi, or binder strategy.</span></div>
+          </div>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10484190/" target="_blank" rel="noopener">HF vulnerable phase</a>
+          <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCHEARTFAILURE.113.000709" target="_blank" rel="noopener" style="margin-left:16px">MRA monitoring gap</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12502459/" target="_blank" rel="noopener" style="margin-left:16px">HF remote monitoring</a>
+        </article>
+
+        <div class="evidence-grid" style="margin-top:14px">
+          <article class="evidence-card reveal">
+            <h3>Beachhead product</h3>
+            <p>CPM-HF 30: reader, four 7-day cartridges, patient onboarding, clinician dashboard, and escalation protocol for post-discharge HFrEF patients on loop diuretics, thiazide add-ons, MRA/RAASi titration, CKD, diabetes, ischemic cardiomyopathy, prior arrhythmia, or ICD history.</p>
+          </article>
+          <article class="evidence-card reveal d1">
+            <h3>Confirmation thresholds</h3>
+            <p>Trigger confirmatory blood testing when trend estimates approach the cardiac safety floor: projected K+ below 4.0 mmol/L, fall of at least 0.5 mmol/L from baseline, rapid directional decline, or low-confidence sensor state during high-risk medication changes.</p>
+          </article>
+          <article class="evidence-card reveal d2">
+            <h3>Demand solved</h3>
+            <p>Clinicians already need potassium data to safely titrate diuretics, MRA, RAASi, supplements, and binders. CPM changes the timing: from scheduled or symptom-driven labs to data-triggered confirmation during the highest-risk window.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="accuracy" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Analytical performance</div>
+            <h2 class="reveal d1">Directional accuracy is the realistic target. The underlying physics supports it.</h2>
+          </div>
+          <p class="reveal d2">
+            CPM is not designed to replace a single-point blood draw for diagnosis. It is designed to detect directional potassium movement reliably enough to trigger a confirmatory blood test earlier than current intermittent care permits.
+          </p>
+        </div>
+
+        <article class="wide-card wide-card--mint reveal">
+          <div class="truth-table">
+            <div class="truth-cell"><b>61.5 mV</b><span>Theoretical Nernst slope per decade of K+ activity at body temperature for a monovalent ion.</span></div>
+            <div class="truth-cell"><b>3.6 mV</b><span>Voltage difference between 4.0 and 3.5 mmol/L K+, the standard hypokalemia threshold.</span></div>
+            <div class="truth-cell"><b>7.7 mV</b><span>Voltage difference between 4.0 and 3.0 mmol/L K+, associated with substantial arrhythmia risk in cardiac patients.</span></div>
+            <div class="truth-cell"><b>&plusmn;0.3 mmol/L</b><span>CLIA potassium acceptance limit (&asymp;&plusmn;2 mV near 4 mmol/L). Reference benchmark for analytical performance.</span></div>
+          </div>
+
+          <div class="stack-list">
+            <div class="stack-row"><b>Reference standard</b><span>Hospital point-of-care analyzers (iSTAT family) report potassium CV &lt;2% with clinically acceptable agreement to central laboratory measurement. CPM is paired against this reference.</span></div>
+            <div class="stack-row"><b>Published microneedle K+ performance</b><span>Microneedle K+ patches in literature demonstrate Nernstian slopes of 55-58 mV/decade, drift of approximately 0.35 mV/h, and 24 h cytotoxicity-safe wear. A calibration-free design (r-WEAR) reported 0.12 mV/h drift over 12 h and 4-day on-body operation without recalibration.</span></div>
+            <div class="stack-row"><b>CPM performance targets</b><span>Trend bias &plusmn;0.3-0.5 mmol/L vs. paired laboratory potassium over 24-hour windows; direction accuracy &ge;95% for moves &ge;0.5 mmol/L; time-to-flag measured in minutes versus hours for outpatient laboratory turnaround.</span></div>
+            <div class="stack-row"><b>Limitation</b><span>The device is not intended for standalone absolute potassium measurement. Clinical value derives from the trend between confirmation labs, not from replacing them.</span></div>
+          </div>
+
+          <a class="source-link" href="https://doi.org/10.1021/acs.analchem.8b04877" target="_blank" rel="noopener">Microneedle K+ patch</a>
+          <a class="source-link" href="https://pubmed.ncbi.nlm.nih.gov/39260101/" target="_blank" rel="noopener" style="margin-left:16px">r-WEAR drift &amp; 4-day wear</a>
+          <a class="source-link" href="https://www.annclinlabsci.org/content/32/3/231.full" target="_blank" rel="noopener" style="margin-left:16px">iSTAT K+ CV</a>
+          <a class="source-link" href="https://www.cms.gov/files/document/qso-24-15-clia.pdf" target="_blank" rel="noopener" style="margin-left:16px">CLIA limit</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="applications" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Clinical applications</div>
+            <h2 class="reveal d1">Six scenarios where earlier potassium signal would change the next clinical decision.</h2>
+          </div>
+          <p class="reveal d2">
+            Each scenario reflects a documented gap in intermittent laboratory testing, an established arrhythmia or mortality pathway in published evidence, and a clinical action that a trend alert would advance in time.
+          </p>
+        </div>
+
+        <div class="evidence-grid">
+          <article class="evidence-card reveal">
+            <h3>Post-discharge heart failure on diuretics</h3>
+            <p>Patients on furosemide &plusmn; thiazide may drift below 4.0 mmol/L between scheduled clinic visits. Arrhythmia and 30-day readmission risk increase steeply below 3.5 mmol/L. A trend alert prompts a confirmatory lab before clinical decompensation.</p>
+            <a class="source-link" href="https://www.jacc.org/doi/10.1016/j.jacc.2020.04.021" target="_blank" rel="noopener">JACC review</a>
+          </article>
+          <article class="evidence-card reveal d1">
+            <h3>Acute myocardial infarction, days 1-3</h3>
+            <p>STEMI cohort (n=8,624) demonstrated an adjusted odds ratio of 1.90 for ventricular fibrillation prior to primary PCI in hypokalemic patients. Diuretic-induced K+ decline superimposed on ischemic myocardium is an established reentrant arrhythmia substrate; an in-bed trend alert reduces time to bedside POC potassium measurement and correction.</p>
+            <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7070188/" target="_blank" rel="noopener">JAHA cohort</a>
+          </article>
+          <article class="evidence-card reveal d2">
+            <h3>DKA recovery on insulin infusion</h3>
+            <p>Insulin shifts K+ intracellularly. Serum potassium can fall in excess of 1 mmol/L within the first 6-12 hours of treatment, and standard q2-4 h sampling can miss the trough. Continuous trend output detects the descent between scheduled draws.</p>
+          </article>
+          <article class="evidence-card reveal">
+            <h3>MRA and RAASi initiation</h3>
+            <p>Initiation of spironolactone, eplerenone, and ACEi/ARB therapy in HFrEF requires K+ assessment at week 1 and weeks 2-4. Published data document poor real-world adherence to this schedule. A trend monitor closes the between-lab interval.</p>
+            <a class="source-link" href="https://jamanetwork.com/journals/jama/fullarticle/2468884" target="_blank" rel="noopener">JAMA: MRA monitoring</a>
+          </article>
+          <article class="evidence-card reveal d1">
+            <h3>ICU refeeding and volume shifts</h3>
+            <p>A 506-patient ICU study (12,099 measurements) reported an odds ratio of 5.4 for 28-day mortality in the highest quartile of potassium variability. A computerized continuous protocol reduced hypokalemia incidence from 2.4% to 1.7% and hyperkalemia from 7.4% to 4.8%. CPM implements equivalent surveillance with a sensor in place of manual sampling.</p>
+            <a class="source-link" href="https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0310046" target="_blank" rel="noopener">PLOS ICU</a>
+            <a class="source-link" href="https://link.springer.com/article/10.1186/1472-6947-10-5" target="_blank" rel="noopener" style="margin-left:16px">ICU protocol</a>
+          </article>
+          <article class="evidence-card reveal d2">
+            <h3>ICD recipients with declining potassium</h3>
+            <p>Long-QT and structurally vulnerable myocardium tolerate hypokalemia poorly. A trend alert at &ldquo;below 4.0 mmol/L and declining&rdquo; in an outpatient ICD recipient establishes a window for potassium replacement before appropriate or inappropriate device therapy is delivered.</p>
+          </article>
+        </div>
+
+        <article class="wide-card reveal" style="margin-top:14px">
+          <div class="eyebrow">Target patient populations</div>
+          <h3>Where a validated CPM provides the highest clinical value.</h3>
+          <div class="risk-grid">
+            <div class="risk-pill"><b>HF</b>Heart-failure patients on loop or thiazide diuretics, particularly during MRA or RAASi titration.</div>
+            <div class="risk-pill"><b>CAD/MI</b>Coronary disease and post-MI patients with vulnerable myocardium.</div>
+            <div class="risk-pill"><b>EP</b>Long-QT, ICD, and recurrent-arrhythmia patients.</div>
+            <div class="risk-pill"><b>HTN</b>Hypertension on potassium-wasting diuretics.</div>
+            <div class="risk-pill"><b>GI</b>Vomiting, diarrhea, laxative use, bowel preparation.</div>
+            <div class="risk-pill"><b>Sport/heat</b>Endurance athletes and heat-exposed workers with substantial sweat loss.</div>
+            <div class="risk-pill"><b>ICU/Post-op</b>Critical care patients with rapid fluid, insulin, refeeding, or renal shifts.</div>
+            <div class="risk-pill"><b>Renal/Adrenal</b>Kidney, adrenal, and tubular disorders associated with potassium wasting.</div>
+            <div class="risk-pill"><b>Endocrine</b>Insulin users, DKA recovery, and patients with substantial glucose-insulin shifts.</div>
+            <div class="risk-pill"><b>Nutrition</b>Hypomagnesemia, alcohol use disorder, malnutrition, refeeding risk.</div>
+            <div class="risk-pill"><b>Polypharmacy</b>Patients on medications affecting potassium balance or QT interval.</div>
+            <div class="risk-pill"><b>Principle</b>Greater cardiac fragility or faster potassium shifts warrant more conservative confirmation rules.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="hospital" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Hospital variant</div>
+            <h2 class="reveal d1">Same chemistry, different physical constraints, higher analytical headroom.</h2>
+          </div>
+          <p class="reveal d2">
+            The wearable form factor is bounded by microneedle access, battery, and multi-day skin tolerance. A bedside variant operates without those constraints and is positioned as a continuous-trend complement to existing point-of-care analyzers.
+          </p>
+        </div>
+
+        <article class="wide-card wide-card--mint reveal">
+          <div class="stack-list">
+            <div class="stack-row"><b>Form factor</b><span>Tethered cartridge in a bedside cradle with larger reference reservoirs, extended fluid path, and on-demand 1-point recalibration. Single-use cartridge replaced per patient or per shift.</span></div>
+            <div class="stack-row"><b>Sample source</b><span>Either dermal ISF via a microneedle pod for ambulatory step-down, or a small drawn sample from existing arterial or venous lines. Removes wear-time and battery constraints.</span></div>
+            <div class="stack-row"><b>Analytical headroom</b><span>Matched references, thermostatted membranes, periodic blank measurement, and bedside-driven recalibration support tighter drift control. Targeted performance approaches iSTAT-class CV &lt;2% on trend.</span></div>
+            <div class="stack-row"><b>Use cases</b><span>ICU titration of insulin and diuretics; post-cardiac-surgery step-down; DKA recovery; refeeding protocols; MRA and RAASi initiation; transplant induction; dialysis transition.</span></div>
+            <div class="stack-row"><b>Workflow positioning</b><span>Point-of-care analyzers measure single time points. The hospital variant provides continuous trend data between samples, replicating computerized continuous-protocol benefit with sensor-based surveillance.</span></div>
+          </div>
+          <a class="source-link" href="https://link.springer.com/article/10.1186/1472-6947-10-5" target="_blank" rel="noopener">Continuous K+ protocol</a>
+          <a class="source-link" href="https://www.annclinlabsci.org/content/32/3/231.full" target="_blank" rel="noopener" style="margin-left:16px">iSTAT POC accuracy</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="mortality" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Mortality model</div>
+            <h2 class="reveal d1">The evidence supports a mortality-risk pool, not a claimed lives-saved number.</h2>
+          </div>
+          <p class="reveal d2">
+            The first target population sits inside a large, high-mortality post-discharge window where potassium instability is mechanistically and clinically relevant. Specific lives-saved figures require the paired monitoring and outcome data the validation program is designed to produce.
+          </p>
+        </div>
+
+        <article class="wide-card wide-card--mint reveal">
+          <div class="truth-table">
+            <div class="truth-cell"><b>~1.09M / yr</b><span>Estimated annual U.S. heart-failure hospitalizations in a national cardiovascular hospitalization cost analysis.</span></div>
+            <div class="truth-cell"><b>up to ~10%</b><span>Mortality can approach 10% during the 3-month vulnerable phase after acute HF discharge.</span></div>
+            <div class="truth-cell"><b>~109k / yr</b><span>Approximate broad vulnerable-phase mortality pool if 1.09M discharges are multiplied by 10% risk.</span></div>
+            <div class="truth-cell"><b>unknown</b><span>Fraction directly preventable by potassium trend monitoring; this is the outcome study CPM must earn.</span></div>
+          </div>
+          <div class="stack-list">
+            <div class="stack-row"><b>What the number means</b><span>~109,000 is not a CPM lives-saved claim. It is an upper-bound estimate of deaths occurring in the broad post-discharge HF vulnerable phase, before restricting to HFrEF, diuretics, MRA/RAASi titration, CKD, diabetes, ischemic disease, arrhythmia, or ICD history.</span></div>
+            <div class="stack-row"><b>Why potassium belongs in the model</b><span>HF literature reports risk rising below about 4.0 mmol/L and steeply below 3.5 mmol/L; hypokalemia is a recognized trigger for ventricular arrhythmia and sudden cardiac death, especially in structurally vulnerable hearts.</span></div>
+            <div class="stack-row"><b>Why monitoring is the intervention</b><span>After MRA initiation in HFrEF, 46.5% of eligible patients had no serum potassium measurement within 7 days and 13.6% remained untested at 30 days. CPM addresses a known monitoring failure, not an unknown clinical workflow.</span></div>
+            <div class="stack-row"><b>Conservative hypothesis</b><span>For every 100,000 high-risk post-discharge HF patients monitored, if 10-20% of expected deaths are materially electrolyte/medication-linked and CPM-enabled earlier confirmation prevents 5-10% of those, the modeled opportunity is roughly 50-200 potentially avoidable deaths. This is a hypothesis to validate, not a clinical claim.</span></div>
+            <div class="stack-row"><b>Study endpoint</b><span>The validation program should measure time-to-confirmatory potassium test, time below 4.0 mmol/L, urgent hypo/hyperkalemia detections, medication changes prompted by CPM, ED visits, HF readmissions, ICD therapies, and all-cause mortality.</span></div>
+          </div>
+          <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCOUTCOMES.123.009999" target="_blank" rel="noopener">HF hospitalization volume</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10484190/" target="_blank" rel="noopener" style="margin-left:16px">Vulnerable-phase mortality</a>
+          <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCHEARTFAILURE.113.000709" target="_blank" rel="noopener" style="margin-left:16px">MRA monitoring gap</a>
+          <a class="source-link" href="https://www.jacc.org/doi/10.1016/j.jacc.2020.04.021" target="_blank" rel="noopener" style="margin-left:16px">K+ risk in HF</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6234658/" target="_blank" rel="noopener" style="margin-left:16px">Hypokalemia arrhythmia mechanism</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="economics" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Unit economics</div>
+            <h2 class="reveal d1">Cartridge wear targets one week, not one day.</h2>
+          </div>
+          <p class="reveal d2">
+            Daily replacement is unnecessary at the design level. Published microneedle glucose patches operate continuously for 14 days, and calibration-free K+ ISE designs have demonstrated 4 days on-body without recalibration. CPM targets 7-day cartridges with site rotation, consistent with established CGM use patterns.
+          </p>
+        </div>
+
+        <div class="cost-grid">
+          <article class="cost-card reveal">
+            <h3>Disposable cartridge (prototype BOM)</h3>
+            <div class="cost-list">
+              <div class="cost-line"><b>Medical adhesive, liner, release layers</b><span>$0.20-$0.80</span></div>
+              <div class="cost-line"><b>Hydrogel wet island</b><span>$0.20-$1.50</span></div>
+              <div class="cost-line"><b>Microneedle access array</b><span>$2-$12</span></div>
+              <div class="cost-line"><b>Polyimide flex, ENIG pads, carrier</b><span>$1.50-$6</span></div>
+              <div class="cost-line"><b>K+ membranes, references, blank, QC</b><span>$0.50-$3</span></div>
+              <div class="cost-line"><b>Sterile pouch, assembly, calibration, yield loss</b><span>$1-$8</span></div>
+              <div class="cost-line"><b>Subtotal per cartridge</b><span>$5-$31</span></div>
+              <div class="cost-line"><b>Target wear per cartridge</b><span>7-14 days</span></div>
+            </div>
+          </article>
+          <article class="cost-card reveal d1">
+            <h3>Reusable reader (one-time)</h3>
+            <div class="cost-list">
+              <div class="cost-line"><b>Custom PCB / rigid-flex assembly</b><span>$3-$15</span></div>
+              <div class="cost-line"><b>Electrometer, ADC, mux, temp, PMIC, BLE</b><span>$12-$35</span></div>
+              <div class="cost-line"><b>Battery, contacts, gasket, shell, seal</b><span>$6-$27</span></div>
+              <div class="cost-line"><b>Firmware load, calibration, factory test</b><span>$5-$25</span></div>
+              <div class="cost-line"><b>Subtotal per reader</b><span>$26-$102</span></div>
+              <div class="cost-line"><b>Mature COGS target</b><span>post-validation</span></div>
+              <div class="cost-line"><b>Bench validation equipment</b><span>capital, not per unit</span></div>
+            </div>
+          </article>
+        </div>
+
+        <article class="wide-card wide-card--mint reveal" style="margin-top:14px">
+          <div class="eyebrow">Investment thesis</div>
+          <h2>A single avoided heart-failure hospitalization offsets multiple patient-years of monitoring.</h2>
+          <div class="truth-table">
+            <div class="truth-cell"><b>~4 / month</b><span>Cartridges per patient at 7-day target wear, with site rotation modeled on established CGM use.</span></div>
+            <div class="truth-cell"><b>$46-$226</b><span>First-month per-patient cost (reader plus four cartridges) at prototype BOM ranges.</span></div>
+            <div class="truth-cell"><b>$20-$124</b><span>Subsequent monthly per-patient cost (four cartridges only).</span></div>
+            <div class="truth-cell"><b>$18,000</b><span>Mean U.S. heart-failure hospitalization cost (Circulation: CQO, NIS 2012-2018).</span></div>
+          </div>
+          <div class="stack-list">
+            <div class="stack-row"><b>Annualized</b><span>Approximately $240-$1,488 in cartridges per patient-year plus a one-time reader. A single avoided HF hospitalization offsets 12-75 patient-years of monitoring at prototype cost.</span></div>
+            <div class="stack-row"><b>Initial market</b><span>Heart-failure programs, post-MI follow-up clinics, device clinics, dialysis units, and value-based payers exposed to readmission and arrhythmia hospitalization risk.</span></div>
+            <div class="stack-row"><b>Beachhead segment</b><span>CPM-HF 30: HFrEF patients on potassium-altering therapy during the first 30 days after discharge, expanding to 90 days for persistent medication titration or recurrent instability.</span></div>
+            <div class="stack-row"><b>Hospital arm</b><span>Hospital variant priced as a per-shift consumable, paired with point-of-care analyzers for confirmation. Reduces a portion of routine q2-4 h venipunctures during high-risk windows (ICU, DKA, post-op, MRA initiation).</span></div>
+            <div class="stack-row"><b>Use of capital</b><span>Bench characterization (slope, drift, interference); sterile cartridge fabrication; 7- to 14-day wear validation; paired-comparator studies against laboratory potassium; preparation of the evidence package required for the next financing round and regulatory engagement.</span></div>
+          </div>
+          <a class="source-link" href="https://doi.org/10.1016/j.cardfail.2023.07.006" target="_blank" rel="noopener">HFSA prevalence</a>
+          <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCOUTCOMES.123.009999" target="_blank" rel="noopener" style="margin-left:16px">CVD hospitalization costs</a>
+          <a class="source-link" href="https://pubmed.ncbi.nlm.nih.gov/37956637/" target="_blank" rel="noopener" style="margin-left:16px">14-day microneedle precedent</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="validation" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow reveal">Validation path</div>
+            <h2 class="reveal d1">Four phases between prototype and a clinically defensible product.</h2>
+          </div>
+          <p class="reveal d2">
+            Each phase produces evidence that retires a specific technical or clinical risk. No phase is bypassed to advance the product narrative.
+          </p>
+        </div>
+
+        <div class="timeline reveal">
+          <div class="phase">
+            <div class="phase__dot">P0</div>
+            <div>
+              <h3>Bench sensor characterization</h3>
+              <p>K+ ISE slope, linear range, temperature response, Na+/NH4+/pH interference, and performance in artificial interstitial fluid prior to any wear.</p>
+            </div>
+          </div>
+          <div class="phase">
+            <div class="phase__dot">P1</div>
+            <div>
+              <h3>Redundancy and reference stability</h3>
+              <p>K1/K2/K3 agreement, blank-control stability, dual Ag/AgCl reference drift, hydration and contact diagnostics, and post-run calibration verification.</p>
+            </div>
+          </div>
+          <div class="phase">
+            <div class="phase__dot">P2</div>
+            <div>
+              <h3>Wearable build and characterization</h3>
+              <p>Sterile disposable cartridge and reusable reader assembled and characterized after bench drift, interference, sealing, and wet-interface results meet defined thresholds.</p>
+            </div>
+          </div>
+          <div class="phase">
+            <div class="phase__dot">P3</div>
+            <div>
+              <h3>Paired-comparator study</h3>
+              <p>Investigator-led prototype testing and small-cohort evaluations comparing CPM trend output to laboratory serum, plasma, or blood-gas potassium under a defined protocol.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="boundaries" class="section">
+      <div class="shell">
+        <article class="wide-card reveal">
+          <div class="eyebrow">Disclosures</div>
+          <h2>Claims are bounded by present evidence.</h2>
+          <p>
+            Laboratory potassium remains the reference standard. Every statement on this page reflects what the current prototype can defend with available data.
+          </p>
+          <div class="claim-grid">
+            <div class="claim claim--no">
+              <h3>Does not claim</h3>
+              <p>Serum replacement, hypokalemia or hyperkalemia diagnosis, medication dosing guidance, cardiac arrest prevention, validated home self-testing, or finished medical-device status.</p>
+            </div>
+            <div class="claim claim--yes">
+              <h3>Does claim</h3>
+              <p>A potassium-specific monitor architecture with measurable underlying physics, a defined analytical performance target, redundant chemistry, fail-closed output rules, and a fundable validation path for high-risk patient populations.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="footer-cta">
+      <div class="shell">
+        <div class="footer-card reveal">
+          <div>
+            <div class="eyebrow">Use of funds</div>
+            <h2>Capital funds the evidence package, not a launch.</h2>
+            <p>
+              Initial capital supports bench characterization (slope, drift, interference, reference stability), sterile cartridge fabrication, 7- to 14-day wear validation, and a paired-comparator study against laboratory potassium under a defined protocol. Successful completion produces the evidence required for regulatory engagement and the next financing round.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <a class="button button--primary" href="/cpm/viewer/">Open 3D viewer</a>
+            <a class="button" href="/">Back to StatsKey</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <span>CPM is a research-stage prototype. Not a medical device.</span>
+      <nav aria-label="Footer navigation">
+        <a href="/">Home</a>
+        <a href="/prototype/">Product Viewer</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible')
+          revealObserver.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.08, rootMargin: '0px 0px -8px 0px' })
+
+    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el))
+  </script>
+</body>
+</html>

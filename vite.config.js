@@ -5,7 +5,14 @@ import react from '@vitejs/plugin-react'
 // Mirror production Vercel rewrites for extension-less paths during `vite dev`
 // so the embedded bid viewer iframe and clean URLs behave the same locally.
 const DEV_REWRITES = {
+  '/cpbm': '/cpbm.html',
+  '/cpbm/': '/cpbm/index.html',
+  '/cpm': '/cpm.html',
+  '/cpm/': '/cpm/index.html',
+  '/cpm/viewer': '/cpm/viewer/index.html',
+  '/cpm/viewer/': '/cpm/viewer/index.html',
   '/prototype': '/prototype.html',
+  '/prototype/': '/prototype/index.html',
   '/bid/alaska-dotpf': '/bid/alaska-dotpf.html',
   '/bid/3d/viewer': '/bid/3d/viewer.html',
 }
@@ -18,7 +25,11 @@ function devRewritePlugin() {
         if (!req.url) return next()
         const [path, qs] = req.url.split('?')
         const target = DEV_REWRITES[path]
-        if (target) req.url = qs ? `${target}?${qs}` : target
+        if (target) {
+          req.url = qs ? `${target}?${qs}` : target
+        } else if (path === '/app' || path.startsWith('/app/')) {
+          req.url = qs ? `/app.html?${qs}` : '/app.html'
+        }
         next()
       })
     },

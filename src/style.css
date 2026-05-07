@@ -264,6 +264,62 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.62;
 }
 
+.hero-mini-model {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 680px;
+  margin-top: 24px;
+}
+
+.hero-mini-card {
+  min-height: 124px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 82% 0%, rgba(48, 213, 200, 0.16), transparent 9rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.026));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+.hero-mini-card span {
+  display: block;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.hero-mini-card b {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 30px;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.hero-mini-chart {
+  position: relative;
+  height: 42px;
+  margin-top: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+  overflow: hidden;
+}
+
+.hero-mini-chart svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -752,7 +808,7 @@ a { color: inherit; text-decoration: none; }
 
 .lab-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -807,6 +863,13 @@ a { color: inherit; text-decoration: none; }
 
 .cta-card h2 {
   max-width: 760px;
+}
+
+.cta-card__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .site-footer {
@@ -881,6 +944,10 @@ a { color: inherit; text-decoration: none; }
 
   .hero-copy {
     max-width: 760px;
+  }
+
+  .hero-mini-model {
+    grid-template-columns: 1fr;
   }
 
   .command-card {
