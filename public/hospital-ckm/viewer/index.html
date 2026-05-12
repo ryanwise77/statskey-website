@@ -111,55 +111,85 @@ function setVisibilityForView(){
 function build(){
   root.clear(); objectById.clear();
   const exploded=activeView==="exploded";
-  const y=exploded?{reader:62,cassette:8,strip:24,pump:38,flow:38,fluid:-14,waste:-38,standard:-36,mount:82}:{reader:44,cassette:0,strip:7,pump:16,flow:16,fluid:-13,waste:-25,standard:-23,mount:64};
-  // Bedrail and reader
-  box("mount",[160,18,22],[0,y.mount,0],"#242d34",.92,.08);
-  cyl("mount",18,34,[-76,y.mount-22,0],"#1c252c",.9,.08,"z");
-  box("reader-shell",[170,112,42],[0,y.reader,0],"#111820",.36,.08);
-  box("display",[70,4,50],[-36,y.reader+22,0],"#1a2a33",.95,.08);
-  box("display",[58,4.4,36],[-36,y.reader+24,0],"#0b3a42",.96,.08);
-  box("afe",[7,2,7],[36,y.reader+16,-26],"#18212a",1,.1);
-  box("buffer",[6,2,4.9],[49,y.reader+16,-26],"#18212a",1,.1);
-  box("adc",[3.5,1.2,3.5],[60,y.reader+16,-26],"#18212a",1,.1);
-  box("mcu",[25,3,18],[44,y.reader+16,16],"#234d85",1,.08);
-  box("psu",[28,9,16],[72,y.reader+16,16],"#30343a",1,.08);
-  // Cassette and electrode strip
-  box("cassette",[120,14,44],[0,y.cassette,0],"#bfeaf4",.28,.04);
-  box("main-channel",[88,4,6],[0,y.cassette+1,0],"#4ea3ff",.58,.04);
-  tube("main-channel",[-44,y.cassette+1,0],[44,y.cassette+1,0],3.0,"#4ea3ff",.55);
-  box("sensor-strip",[33.8,.5,10.2],[-6,y.strip,-10],"#f0f2f4",.95,.05);
-  cyl("k1",4,.35,[-18,y.strip+.6,-10],"#36d399",1,.08);
-  cyl("k2",4,.35,[-8,y.strip+.6,-10],"#2fbf78",1,.08);
-  cyl("k3",4,.35,[2,y.strip+.6,-10],"#70f0cb",1,.08);
-  cyl("ref-a",3.8,.35,[13,y.strip+.6,-10],"#d9eeff",1,.08);
-  cyl("ref-b",3.8,.35,[22,y.strip+.6,-10],"#8fd3ff",1,.08);
-  cyl("blank",3.8,.35,[31,y.strip+.6,-10],"#8995a1",1,.08);
-  box("ref-a",[18,2,4],[13,y.strip+1.8,-21],"#d9eeff",.75,.04);
-  box("ref-b",[18,2,4],[22,y.strip+4.2,-21],"#8fd3ff",.75,.04);
-  // Flow components
-  box("flow-sensor",[48,8.9,15.5],[-68,y.flow,0],"#132530",.95,.08);
-  box("pump",[30,3.8,15],[-68,y.pump,28],"#26313a",.95,.08);
-  box("valve-bank",[30,9,18],[-28,y.pump,30],"#1b242b",.96,.08);
-  box("pressure-a",[10.54,3.53,8.1],[-46,y.cassette+9,18],"#f4f1e8",.95,.06);
-  box("pressure-b",[10.54,3.53,8.1],[46,y.cassette+9,18],"#f4f1e8",.95,.06);
-  for(const x of [-56,56,-8,8]) cyl("fittings",4,10,[x,y.cassette+1,27],"#d7dde3",.95,.08,"z");
-  box("stopcock",[38,12,24],[62,y.fluid,34],"#e6eef4",.9,.06);
-  // Standards and waste
-  box("standard",[18,24,10],[-38,y.standard,-44],"#ffbd68",.58,.04);
-  box("standard",[18,24,10],[-14,y.standard,-44],"#ffbd68",.38,.04);
-  box("waste",[40,36,26],[42,y.waste,-44],"#dcecf2",.25,.04);
-  // Tubing paths
-  tube("fittings",[-112,y.fluid,0],[-92,y.fluid,0],2.2,"#dbe6e8",.9);
-  tube("flow-sensor",[-92,y.fluid,0],[-68,y.flow,0],2.2,"#dbe6e8",.9);
-  tube("fittings",[-44,y.cassette+1,0],[-92,y.fluid,0],2.0,"#ff5a52",.72);
-  tube("fittings",[44,y.cassette+1,0],[112,y.fluid,0],2.0,"#ff5a52",.72);
-  tube("standard",[-38,y.standard,-44],[-28,y.pump,30],1.5,"#ffbd68",.75);
-  tube("waste",[20,y.cassette+1,-12],[42,y.waste,-44],1.8,"#bfeaf4",.55);
-  tube("pump",[-68,y.pump,28],[-44,y.cassette+1,0],1.6,"#30d5c8",.65);
-  tube("valve-bank",[-28,y.pump,30],[-14,y.standard,-44],1.4,"#ffbd68",.65);
+  const lift = exploded ? 34 : 0;
+  const cassetteY = 0;
+  const top = cassetteY + 7;
+  const channelY = cassetteY + 1.1;
+  const stripY = top + 0.5 + lift * 0.35;
+  const shellY = 36 + lift;
+  const boardY = shellY + 2;
+  const rearZ = -18;
+  const frontZ = 18;
+  const railY = 12 + lift * 0.55;
+  const portY = cassetteY + 1.1;
+
+  // Bedrail, shell, and cassette cradle: the reader physically captures the cassette from above.
+  box("mount",[168,18,18],[0,shellY+42,-58],"#242d34",.92,.08);
+  cyl("mount",15,34,[-78,shellY+22,-58],"#1c252c",.9,.08,"z");
+  box("reader-shell",[170,42,112],[0,shellY,0],"#111820",.34,.08);
+  box("reader-shell",[132,8,7],[0,railY,28],"#16232b",.72,.08);
+  box("reader-shell",[132,8,7],[0,railY,-28],"#16232b",.72,.08);
+  box("reader-shell",[8,12,58],[-66,railY,0],"#16232b",.72,.08);
+  box("reader-shell",[8,12,58],[66,railY,0],"#16232b",.72,.08);
+
+  // Disposable cassette is the geometric anchor. It sits between the reader rails.
+  box("cassette",[120,14,44],[0,cassetteY,0],"#bfeaf4",.28,.04);
+  box("main-channel",[88,4,6],[0,channelY,0],"#4ea3ff",.44,.04);
+  tube("main-channel",[-44,channelY,0],[44,channelY,0],3.0,"#4ea3ff",.46);
+
+  // End-face ports and short rigid connector bosses align with the cassette channel.
+  cyl("fittings",4,12,[-66,portY,0],"#d7dde3",.95,.08,"x");
+  cyl("fittings",4,12,[66,portY,0],"#d7dde3",.95,.08,"x");
+  cyl("fittings",3.2,10,[-28,portY,25],"#d7dde3",.95,.08,"z");
+  cyl("fittings",3.2,10,[28,portY,25],"#d7dde3",.95,.08,"z");
+
+  // Chemistry strip is seated on the top face in the wet bay; membrane disks sit on the strip, not in free space.
+  box("sensor-strip",[33.8,.5,10.2],[-4,stripY,rearZ],"#f0f2f4",.95,.05);
+  cyl("k1",2.0,.45,[-17,stripY+.45,rearZ],"#36d399",1,.08);
+  cyl("k2",2.0,.45,[-9,stripY+.45,rearZ],"#2fbf78",1,.08);
+  cyl("k3",2.0,.45,[-1,stripY+.45,rearZ],"#70f0cb",1,.08);
+  cyl("ref-a",2.0,.45,[8,stripY+.45,rearZ],"#d9eeff",1,.08);
+  cyl("ref-b",2.0,.45,[16,stripY+.45,rearZ],"#8fd3ff",1,.08);
+  cyl("blank",2.0,.45,[24,stripY+.45,rearZ],"#8995a1",1,.08);
+  box("ref-a",[16,2,3.2],[8,stripY+2.2,rearZ-8],"#d9eeff",.75,.04);
+  box("ref-b",[16,2,3.2],[16,stripY+4.4,rearZ-8],"#8fd3ff",.75,.04);
+
+  // Pressure diaphragms are mounted on the cassette top, directly above upstream/downstream channel zones.
+  box("pressure-a",[10.54,3.53,8.1],[-38,top+2.0,frontZ],"#f4f1e8",.95,.06);
+  box("pressure-b",[10.54,3.53,8.1],[38,top+2.0,frontZ],"#f4f1e8",.95,.06);
+
+  // Reader internals stay inside the transparent reader shell envelope.
+  box("display",[70,4,50],[-38,shellY+23,0],"#1a2a33",.95,.08);
+  box("display",[58,4.4,36],[-38,shellY+25,0],"#0b3a42",.96,.08);
+  box("reader-shell",[128,1.4,78],[18,boardY-4,0],"#0c6e41",.62,.05);
+  box("flow-sensor",[48,8.9,15.5],[-54,boardY,-24],"#132530",.95,.08);
+  box("pump",[30,3.8,15],[-54,boardY+10,12],"#26313a",.95,.08);
+  box("valve-bank",[30,9,18],[-16,boardY+8,12],"#1b242b",.96,.08);
+  box("afe",[7,2,7],[26,boardY+3,-27],"#18212a",1,.1);
+  box("buffer",[6,2,4.9],[38,boardY+3,-27],"#18212a",1,.1);
+  box("adc",[3.5,1.2,3.5],[48,boardY+3,-27],"#18212a",1,.1);
+  box("mcu",[25,3,18],[32,boardY+3,22],"#234d85",1,.08);
+  box("psu",[28,9,16],[66,boardY+5,20],"#30343a",1,.08);
+
+  // Calibration reservoirs and waste cartridge attach to the disposable cassette sidewall.
+  box("standard",[18,24,10],[-42,cassetteY-1,-35],"#ffbd68",.58,.04);
+  box("standard",[18,24,10],[-18,cassetteY-1,-35],"#ffbd68",.38,.04);
+  box("waste",[34,28,22],[48,cassetteY-2,-35],"#dcecf2",.25,.04);
+  box("stopcock",[38,12,24],[74,cassetteY+3,24],"#e6eef4",.9,.06);
+
+  // Tubing is routed around the assembly perimeter instead of through component bodies.
+  tube("fittings",[-112,portY,0],[-72,portY,0],2.1,"#dbe6e8",.9);
+  tube("fittings",[72,portY,0],[112,portY,0],2.1,"#dbe6e8",.9);
+  tube("flow-sensor",[-72,portY,0],[-54,boardY,-24],1.6,"#dbe6e8",.76);
+  tube("flow-sensor",[-54,boardY,-24],[-66,portY,0],1.6,"#dbe6e8",.76);
+  tube("standard",[-42,cassetteY-1,-35],[-28,portY,25],1.3,"#ffbd68",.72);
+  tube("standard",[-18,cassetteY-1,-35],[-16,boardY+8,12],1.3,"#ffbd68",.58);
+  tube("pump",[-54,boardY+10,12],[-28,portY,25],1.4,"#30d5c8",.68);
+  tube("valve-bank",[-16,boardY+8,12],[28,portY,25],1.4,"#30d5c8",.68);
+  tube("waste",[28,portY,25],[48,cassetteY-2,-35],1.6,"#bfeaf4",.58);
   if(activeView==="validation"){
-    box("standard",[32,12,22],[-98,8,-52],"#ffbd68",.45);
-    box("waste",[44,24,28],[92,-4,-50],"#dcecf2",.22);
+    box("standard",[32,12,22],[-104,-18,-44],"#ffbd68",.45);
+    box("waste",[44,24,28],[104,-18,-44],"#dcecf2",.22);
   }
   setVisibilityForView();
 }
