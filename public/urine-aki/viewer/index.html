@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Urine AKI U1 Prototype Viewer</title>
+<style>
+:root{
+  --bg:#071012;
+  --panel:#0f1b1e;
+  --panel2:#152427;
+  --ink:#eef7f8;
+  --muted:#9db0b5;
+  --line:rgba(255,255,255,.13);
+  --cyan:#30d5c8;
+  --blue:#4ea3ff;
+  --amber:#ffb020;
+  --red:#ff5a52;
+  --green:#36d399;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.stage{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:minmax(360px,.9fr) minmax(520px,1.1fr);
+  gap:28px;
+  align-items:center;
+  padding:34px clamp(24px,4vw,70px);
+}
+.copy{max-width:560px}
+.eyebrow{
+  display:inline-flex;
+  padding:7px 11px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--cyan);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+h1{
+  margin:18px 0 12px;
+  font-size:clamp(38px,5vw,66px);
+  line-height:.95;
+  letter-spacing:-.06em;
+}
+.lead{
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.55;
+}
+.cards{display:grid;gap:12px;margin-top:26px}
+.card{
+  display:grid;
+  grid-template-columns:42px 1fr;
+  gap:12px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--panel);
+}
+.num{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:rgba(48,213,200,.12);
+  color:var(--cyan);
+  font-weight:900;
+}
+.card b{display:block;margin-bottom:4px}
+.card span{color:var(--muted);font-size:13px;line-height:1.45}
+.device{
+  width:min(720px,100%);
+  min-height:520px;
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:28px;
+  background:linear-gradient(180deg,var(--panel),#0a1416);
+  overflow:hidden;
+  padding:28px;
+}
+.rail{
+  position:absolute;
+  left:36px;
+  right:36px;
+  top:58px;
+  height:22px;
+  border-radius:14px;
+  background:#222e32;
+}
+.reader{
+  position:absolute;
+  top:95px;
+  left:50%;
+  transform:translateX(-50%);
+  width:330px;
+  height:142px;
+  border-radius:32px;
+  background:#05090a;
+  border:1px solid rgba(255,255,255,.22);
+  padding:18px;
+}
+.screen{
+  height:70px;
+  border-radius:18px;
+  background:#102226;
+  border:1px solid rgba(255,255,255,.12);
+  padding:12px;
+}
+.screen-top{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:800}
+.screen-value{font-size:27px;font-weight:900;margin-top:4px;color:var(--green)}
+.leds{display:flex;gap:12px;margin-top:14px;justify-content:center}
+.led{width:54px;height:10px;border-radius:999px}
+.cassette{
+  position:absolute;
+  top:270px;
+  left:50%;
+  transform:translateX(-50%);
+  width:430px;
+  height:116px;
+  border-radius:26px;
+  background:rgba(205,239,246,.18);
+  border:1px solid rgba(205,239,246,.55);
+}
+.channel{
+  position:absolute;
+  left:42px;
+  right:42px;
+  top:52px;
+  height:14px;
+  border-radius:999px;
+  background:rgba(78,163,255,.55);
+}
+.bubble{
+  position:absolute;
+  left:112px;
+  top:28px;
+  width:70px;
+  height:34px;
+  border-radius:14px;
+  background:rgba(238,247,248,.65);
+}
+.chem{
+  position:absolute;
+  right:88px;
+  top:22px;
+  width:112px;
+  height:38px;
+  border-radius:14px;
+  background:rgba(48,213,200,.42);
+  border:1px solid rgba(48,213,200,.72);
+}
+.pads{position:absolute;right:74px;bottom:17px;display:flex;gap:9px}
+.pad{width:13px;height:18px;border-radius:3px;background:#e8b84b}
+.pressure{
+  position:absolute;
+  bottom:18px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:rgba(255,255,255,.72);
+}
+.pressure.left{left:48px}
+.pressure.right{left:346px}
+.tube{
+  position:absolute;
+  top:323px;
+  height:14px;
+  background:#dbe6e8;
+  border-radius:999px;
+}
+.tube.in{left:28px;right:calc(50% + 214px)}
+.tube.out{left:calc(50% + 214px);right:88px}
+.bagline{
+  position:absolute;
+  top:337px;
+  right:116px;
+  width:12px;
+  height:70px;
+  border-radius:999px;
+  background:#dbe6e8;
+}
+.bag{
+  position:absolute;
+  right:72px;
+  bottom:34px;
+  width:100px;
+  height:135px;
+  border-radius:20px;
+  background:rgba(222,244,248,.2);
+  border:1px solid rgba(222,244,248,.45);
+}
+.urine{
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:10px;
+  height:46px;
+  border-radius:0 0 13px 13px;
+  background:rgba(255,176,32,.45);
+}
+.label{
+  position:absolute;
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(7,16,18,.82);
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+}
+.l1{top:89px;left:78px}
+.l2{top:246px;left:112px}
+.l3{top:406px;left:112px}
+.l4{top:410px;right:200px}
+.l5{top:282px;right:84px}
+@media (max-width:980px){
+  .stage{grid-template-columns:1fr}
+  .device{min-height:560px}
+}
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="copy">
+    <div class="eyebrow">CBM Urine AKI U1</div>
+    <h1>Artifact-aware urine output plus renal-response chemistry.</h1>
+    <p class="lead">
+      U1 is a Foley drainline add-on for ICU and OR patients: a disposable urine cassette with a reusable bedside reader.
+      The first job is trustworthy continuous urine output; the second is optional urine electrolyte excretion context.
+    </p>
+    <div class="cards">
+      <div class="card"><div class="num">1</div><div><b>Closed disposable cassette</b><span>Urine-contacting path stays disposable. Reusable electronics never touch fluid.</span></div></div>
+      <div class="card"><div class="num">2</div><div><b>Flow with artifact detection</b><span>Pressure, optical, bubble, and tilt signals separate true oliguria from kinks, airlocks, bag lifts, and dependent loops.</span></div></div>
+      <div class="card"><div class="num">3</div><div><b>Side-stream chemistry</b><span>Na, K, Cl, NH4, pH, and temperature feed excretion-rate trends after flow is validated.</span></div></div>
+    </div>
+  </section>
+  <section class="device" aria-label="U1 device architecture diagram">
+    <div class="rail"></div>
+    <div class="label l1">bedrail reader</div>
+    <div class="reader">
+      <div class="screen">
+        <div class="screen-top"><span>VALID FLOW</span><span>84 kg</span></div>
+        <div class="screen-value">0.42 ml/kg/h</div>
+      </div>
+      <div class="leds">
+        <div class="led" style="background:var(--green)"></div>
+        <div class="led" style="background:var(--blue)"></div>
+        <div class="led" style="background:var(--amber)"></div>
+      </div>
+    </div>
+    <div class="tube in"></div>
+    <div class="tube out"></div>
+    <div class="cassette">
+      <div class="channel"></div>
+      <div class="bubble"></div>
+      <div class="chem"></div>
+      <div class="pressure left"></div>
+      <div class="pressure right"></div>
+      <div class="pads"><span class="pad"></span><span class="pad"></span><span class="pad"></span><span class="pad"></span><span class="pad"></span><span class="pad"></span></div>
+    </div>
+    <div class="bagline"></div>
+    <div class="bag"><div class="urine"></div></div>
+    <div class="label l2">flow cassette</div>
+    <div class="label l3">Foley inlet</div>
+    <div class="label l4">collection bag</div>
+    <div class="label l5">chemistry cell</div>
+  </section>
+</main>
+</body>
+</html>

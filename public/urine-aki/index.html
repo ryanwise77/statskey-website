@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Urine AKI U1 is an early-research hardware prototype for artifact-aware ICU urine-output monitoring and renal-response chemistry.">
+  <meta name="theme-color" content="#071012">
+  <link rel="canonical" href="https://statskeybiometrics.com/urine-aki/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Urine AKI U1 | Early Research Hardware Prototype</title>
+  <style>
+    :root {
+      --bg: #071012;
+      --panel: rgba(255,255,255,.058);
+      --panel-strong: rgba(255,255,255,.09);
+      --line: rgba(255,255,255,.12);
+      --ink: #eef7f8;
+      --soft: #b8c9ce;
+      --muted: #7f9399;
+      --cyan: #30d5c8;
+      --blue: #4ea3ff;
+      --amber: #ffb020;
+      --green: #36d399;
+      --red: #ff5a52;
+      --font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: "Space Grotesk", Inter, sans-serif;
+      --mono: "JetBrains Mono", "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg); color: var(--ink); font-family: var(--font); scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(48,213,200,.18), transparent 28rem),
+        radial-gradient(circle at 88% 18%, rgba(78,163,255,.15), transparent 30rem),
+        linear-gradient(180deg, #071012 0%, #04090b 48%, #000 100%);
+      line-height: 1.5;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.88), transparent 76%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 30;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(7,16,18,.72);
+      backdrop-filter: blur(24px) saturate(160%);
+    }
+    .nav__inner { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand, .nav__links, .eyebrow, .button, .micro { font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; }
+    .brand__mark { width: 20px; height: 20px; border-radius: 8px; background: radial-gradient(circle at 70% 30%, #fff 0 8%, transparent 9%), linear-gradient(135deg, var(--cyan), var(--blue)); }
+    .nav__links { display: flex; align-items: center; gap: 22px; color: rgba(184,201,206,.78); font-size: 10px; font-weight: 600; }
+    .hero { min-height: 100svh; padding: 132px 0 80px; display: grid; align-items: center; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(420px, .9fr); gap: clamp(36px, 7vw, 86px); align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px; color: var(--cyan); font-size: 11px; font-weight: 700; }
+    .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 18px currentColor; }
+    h1, h2, h3 { font-family: var(--display); letter-spacing: -.055em; line-height: .94; }
+    h1 { max-width: 900px; font-size: clamp(3.2rem, 6.2vw, 6.4rem); font-weight: 700; }
+    h2 { max-width: 840px; font-size: clamp(2.3rem, 5vw, 4.9rem); font-weight: 700; }
+    h3 { font-size: clamp(1.4rem, 2vw, 2rem); }
+    .lede { max-width: 720px; margin-top: 26px; color: var(--soft); font-size: clamp(1.05rem, 1.55vw, 1.24rem); line-height: 1.65; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(255,255,255,.055); font-size: 10px; font-weight: 800; }
+    .button--primary { color: #03110e; border-color: transparent; background: linear-gradient(135deg, var(--cyan), #8fd3ff); }
+    .research-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 22px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,176,32,.28);
+      border-radius: 999px;
+      background: rgba(255,176,32,.075);
+      color: #ffd38a;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .preview {
+      min-height: 620px;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    }
+    .preview iframe { width: 100%; height: 620px; border: 0; display: block; }
+    .section { padding: clamp(76px, 10vw, 132px) 0; }
+    .section-head { display: grid; grid-template-columns: minmax(0, .9fr) minmax(320px, .62fr); gap: 36px; align-items: end; margin-bottom: 34px; }
+    .section-head p, .card p, .wide p { color: var(--soft); font-size: 15px; line-height: 1.72; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card, .wide {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.026));
+    }
+    .card-number { color: var(--cyan); font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+    .card h3 { margin-top: 30px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 24px; }
+    .stat { min-height: 142px; padding: 16px; border: 1px solid rgba(255,255,255,.08); border-radius: 20px; background: rgba(0,0,0,.2); }
+    .stat b { display: block; font-family: var(--display); font-size: 28px; line-height: 1; letter-spacing: -.04em; }
+    .stat span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .viewer-frame { height: min(760px, 82vh); min-height: 560px; border: 1px solid var(--line); border-radius: 34px; overflow: hidden; background: #05090a; }
+    .viewer-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .stack-list { display: grid; gap: 10px; margin-top: 24px; }
+    .stack-row { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: start; padding: 13px 0; border-top: 1px solid rgba(255,255,255,.07); }
+    .stack-row b { color: var(--ink); font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+    .stack-row span { color: var(--soft); font-size: 14px; line-height: 1.65; }
+    footer { border-top: 1px solid rgba(255,255,255,.07); padding: 26px 0; color: var(--muted); font-size: 12px; }
+    footer .shell { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+    @media (max-width: 940px) {
+      .nav__links { display: none; }
+      .hero-grid, .section-head, .grid, .stat-grid { grid-template-columns: 1fr; }
+      .stack-row { grid-template-columns: 1fr; gap: 6px; }
+      h1 { font-size: clamp(3rem, 13vw, 5rem); }
+      .preview iframe { height: 720px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="Primary navigation">
+    <div class="shell nav__inner">
+      <a class="brand" href="/" aria-label="StatsKey home"><span class="brand__mark"></span><span>Urine AKI U1</span></a>
+      <div class="nav__links"><a href="#thesis">Thesis</a><a href="#hardware">Hardware</a><a href="#workflow">Workflow</a><a href="#validation">Validation</a><a href="/cpbm/">CPBM</a><a href="/cpm/">CPM</a></div>
+    </div>
+  </nav>
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow">Early research hardware</div>
+          <h1>Artifact-aware urine output for earlier AKI review.</h1>
+          <p class="lede">Urine AKI U1 is an early-research Foley-drainline prototype: continuous urine output first, line-artifact detection second, and optional urine electrolyte/pH excretion context only after flow is trustworthy.</p>
+          <div class="research-banner"><strong>Research status:</strong> concept render and build package only. Not a medical device, not sterile, not diagnostic, and not for patient care.</div>
+          <div class="actions">
+            <a class="button button--primary" href="/urine-aki/viewer/">Open hardware render</a>
+            <a class="button" href="/urine-aki/app/">Open bedside mockup</a>
+          </div>
+        </div>
+        <aside class="preview" aria-label="Urine AKI hardware preview">
+          <iframe src="/urine-aki/viewer/" title="Urine AKI U1 hardware render"></iframe>
+        </aside>
+      </div>
+    </section>
+
+    <section id="thesis" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Why this problem</div><h2>AKI monitoring already depends on urine output. The workflow is the gap.</h2></div>
+          <p>KDIGO AKI staging includes urine-output windows, but real ICUs still rely on intermittent manual reads and artifact-prone drainlines. U1 aims to make the existing signal continuous, weight-normalized, and invalid-window aware.</p>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><b>UO first</b><span>Continuous ml/kg/h is the product core. Chemistry is optional context, not the first claim.</span></div>
+          <div class="stat"><b>Fail closed</b><span>Kinks, airlocks, bag lifts, and disconnections suppress clinical staging instead of triggering false AKI alerts.</span></div>
+          <div class="stat"><b>Closed path</b><span>The urine-contacting cassette is disposable. Reusable electronics stay outside the wet path.</span></div>
+          <div class="stat"><b>ICU ROI</b><span>Earlier review, less manual charting, fewer missed oliguria windows, and structured event logs.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="hardware" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Rendered prototype</div><h2>Disposable flow cassette plus reusable bedside reader.</h2></div>
+          <p>The render shows the U1 architecture: Foley inlet, flow cassette, pressure/bubble/tilt diagnostics, side-stream chemistry chamber, reusable reader, and collection-bag path.</p>
+        </div>
+        <div class="viewer-frame"><iframe src="/urine-aki/viewer/" title="Urine AKI U1 hardware render"></iframe></div>
+      </div>
+    </section>
+
+    <section id="workflow" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Clinical surface</div><h2>Separate line problems from kidney problems.</h2></div>
+          <p>The bedside mockup prioritizes measurement validity. If the line is kinked, lifted, bubbling, disconnected, or being emptied, U1 asks for a line fix before it shows AKI staging.</p>
+        </div>
+        <div class="viewer-frame"><iframe src="/urine-aki/app/" title="Urine AKI U1 bedside surface mockup"></iframe></div>
+      </div>
+    </section>
+
+    <section id="validation" class="section">
+      <div class="shell">
+        <article class="wide">
+          <div class="eyebrow">Build path</div>
+          <h2>Only build after the bench gates pass.</h2>
+          <div class="stack-list">
+            <div class="stack-row"><b>Bench truth</b><span>Controlled pump profiles, load-cell collection reference, artificial urine, and simulated artifacts across 0-500 ml/h.</span></div>
+            <div class="stack-row"><b>Artifact gate</b><span>Detect or invalidate kinks, clamps, dependent loops, airlocks, bag lifts, bag emptying, disconnections, and flush/sample events.</span></div>
+            <div class="stack-row"><b>KDIGO logic</b><span>Calculate rolling ml/kg/h windows only from valid samples. Invalid windows never count as oliguria or anuria.</span></div>
+            <div class="stack-row"><b>Chemistry gate</b><span>Na/K/Cl/NH4/pH channels remain research context until reference stability, calibration, matrix effects, and excretion-rate math pass.</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="shell">
+      <span>StatsKey &copy; 2026</span>
+      <nav><a href="/">Home</a><a href="/cpbm/">CPBM</a><a href="/cpm/">CPM</a><a href="/urine-aki/viewer/">Viewer</a></nav>
+    </div>
+  </footer>
+</body>
+</html>

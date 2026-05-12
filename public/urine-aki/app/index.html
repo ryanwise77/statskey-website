@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Urine AKI U1 Bedside Surface Mockup</title>
+<style>
+:root{
+  --bg:#071012;
+  --panel:#0d191c;
+  --phone:#f8fafb;
+  --ink:#0b1114;
+  --muted:#687982;
+  --soft:#eef4f5;
+  --line:#d9e3e6;
+  --cyan:#0fbfb3;
+  --blue:#2378ff;
+  --green:#16a34a;
+  --amber:#f59e0b;
+  --red:#ef4444;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:#eef7f8;
+  font-family:Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.stage{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:minmax(320px,.9fr) minmax(360px,1fr);
+  gap:40px;
+  align-items:center;
+  justify-items:center;
+  padding:34px clamp(24px,5vw,76px);
+}
+.context{max-width:560px}
+.eyebrow{
+  display:inline-flex;
+  padding:7px 11px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  color:#7ee6dd;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+h1{
+  margin:18px 0 12px;
+  max-width:560px;
+  font-size:clamp(36px,5vw,64px);
+  line-height:.95;
+  letter-spacing:-.06em;
+}
+.lead{color:#a8b8bd;font-size:17px;line-height:1.55}
+.principles{display:grid;gap:10px;margin-top:25px}
+.principle{
+  padding:14px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:18px;
+  background:var(--panel);
+}
+.principle b{display:block;margin-bottom:4px}
+.principle span{display:block;color:#9dafb4;font-size:13px;line-height:1.45}
+.phone-wrap{
+  width:292px;
+  height:590px;
+  position:relative;
+}
+.phone{
+  position:absolute;
+  inset:0;
+  border-radius:54px;
+  padding:10px;
+  background:#05080a;
+  border:1px solid rgba(255,255,255,.2);
+}
+.screen{
+  height:100%;
+  overflow:hidden;
+  border-radius:38px;
+  background:var(--phone);
+  color:var(--ink);
+  position:relative;
+}
+.status{
+  height:32px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 18px;
+  font-size:11px;
+  font-weight:850;
+}
+.notch{
+  position:absolute;
+  top:8px;
+  left:50%;
+  transform:translateX(-50%);
+  width:92px;
+  height:18px;
+  border-radius:0 0 14px 14px;
+  background:#05080a;
+}
+.content{
+  height:calc(100% - 32px);
+  overflow:auto;
+  padding:12px 16px 22px;
+}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin:8px 0 14px}
+.title span{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.title b{display:block;font-size:19px;margin-top:2px}
+.pill{
+  padding:6px 9px;
+  border-radius:999px;
+  background:#dcfce7;
+  color:#166534;
+  font-size:11px;
+  font-weight:900;
+}
+.hero{
+  border-radius:28px;
+  padding:18px;
+  background:#e8f8f6;
+  border:1px solid #ccecea;
+}
+.hero-label{font-size:11px;color:#4f6f73;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.flow{display:flex;align-items:end;gap:6px;margin-top:8px}
+.flow strong{font-size:43px;line-height:.9;letter-spacing:-.05em}
+.flow span{color:#53666c;font-size:13px;font-weight:800;padding-bottom:4px}
+.bar{
+  height:10px;
+  border-radius:999px;
+  background:#d8e8ea;
+  overflow:hidden;
+  margin-top:16px;
+}
+.bar div{height:100%;width:42%;background:var(--amber)}
+.hero-note{font-size:12px;line-height:1.4;color:#53666c;margin-top:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.tile{
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:white;
+  padding:12px;
+}
+.tile span{display:block;font-size:11px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.tile b{display:block;margin-top:5px;font-size:20px}
+.section-title{margin:17px 0 9px;font-size:13px;font-weight:900;color:#34454b}
+.alert{
+  display:grid;
+  grid-template-columns:8px 1fr;
+  gap:10px;
+  padding:11px 12px;
+  border-radius:17px;
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  margin-bottom:9px;
+}
+.stripe{width:8px;border-radius:999px;background:var(--amber)}
+.alert b{display:block;font-size:13px}
+.alert span{display:block;color:#71523a;font-size:12px;line-height:1.35;margin-top:3px}
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:11px 0;
+  border-bottom:1px solid #e8eef0;
+}
+.row:last-child{border-bottom:0}
+.row span{font-size:13px;color:#4e6268}
+.row b{font-size:13px}
+.chem{
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:white;
+  padding:12px;
+}
+.chem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chem-item{
+  padding:9px 7px;
+  border-radius:14px;
+  background:var(--soft);
+  text-align:center;
+}
+.chem-item span{display:block;font-size:10px;color:var(--muted);font-weight:850}
+.chem-item b{display:block;font-size:13px;margin-top:3px}
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="context">
+    <div class="eyebrow">Bedside clinical surface</div>
+    <h1>Separate line problems from kidney problems.</h1>
+    <p class="lead">
+      The interface is built around validity first: if the drainline is kinked, lifted, bubbling, disconnected,
+      or being emptied, U1 suppresses clinical staging and asks the nurse to fix the measurement.
+    </p>
+    <div class="principles">
+      <div class="principle"><b>Clinical utility first</b><span>Rolling ml/kg/h windows map to KDIGO urine-output criteria only when data is valid.</span></div>
+      <div class="principle"><b>Artifact-aware alerts</b><span>Device and line alerts outrank AKI review alerts because invalid flow should not stage disease.</span></div>
+      <div class="principle"><b>Chemistry as context</b><span>Na, K, Cl, NH4, and pH support diuretic and hemodynamic-response interpretation after flow is trusted.</span></div>
+    </div>
+  </section>
+  <section class="phone-wrap" aria-label="phone mockup">
+    <div class="phone">
+      <div class="screen">
+        <div class="notch"></div>
+        <div class="status"><span>9:41</span><span>U1</span></div>
+        <div class="content">
+          <div class="topbar">
+            <div class="title"><span>ICU Bed 12</span><b>Renal Monitor</b></div>
+            <div class="pill">valid</div>
+          </div>
+          <div class="hero">
+            <div class="hero-label">Current urine output</div>
+            <div class="flow"><strong>0.42</strong><span>ml/kg/h</span></div>
+            <div class="bar"><div></div></div>
+            <div class="hero-note">Below 0.5 ml/kg/h for 2h 18m. Not yet KDIGO stage window. Weight: 84 kg.</div>
+          </div>
+          <div class="grid">
+            <div class="tile"><span>6h valid</span><b>96%</b></div>
+            <div class="tile"><span>6h avg</span><b>0.51</b></div>
+            <div class="tile"><span>Volume</span><b>258 ml</b></div>
+            <div class="tile"><span>Line</span><b>clear</b></div>
+          </div>
+          <div class="section-title">Priority Review</div>
+          <div class="alert">
+            <div class="stripe"></div>
+            <div><b>Watch oliguria trend</b><span>Continue monitoring. Clinical review if low-output window reaches 6 hours or anuria begins.</span></div>
+          </div>
+          <div class="section-title">Line Diagnostics</div>
+          <div class="tile">
+            <div class="row"><span>Pressure delta</span><b>normal</b></div>
+            <div class="row"><span>Bubble/airlock</span><b>none</b></div>
+            <div class="row"><span>Bag handling</span><b>none</b></div>
+          </div>
+          <div class="section-title">Chemistry Context</div>
+          <div class="chem">
+            <div class="chem-grid">
+              <div class="chem-item"><span>Na</span><b>64</b></div>
+              <div class="chem-item"><span>K</span><b>38</b></div>
+              <div class="chem-item"><span>Cl</span><b>72</b></div>
+              <div class="chem-item"><span>NH4</span><b>18</b></div>
+              <div class="chem-item"><span>pH</span><b>6.1</b></div>
+              <div class="chem-item"><span>QC</span><b>pass</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
