@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Hospital CKM prototype viewer showing an inline potassium monitoring flow cell for ICU, dialysis, and CRRT workflows.">
+<meta name="description" content="Hospital CKM prototype viewer showing inline potassium monitoring architecture for ICU, dialysis, and CRRT workflows.">
 <meta name="theme-color" content="#071012">
 <link rel="canonical" href="https://statskeybiometrics.com/hospital-ckm/viewer/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,47 +11,61 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <title>Hospital CKM Viewer</title>
 <style>
-:root{--bg:#071012;--panel:#0d191c;--line:rgba(255,255,255,.13);--ink:#eef7f8;--soft:#b8c9ce;--muted:#82969d;--cyan:#30d5c8;--blue:#4ea3ff;--amber:#ffb020;--green:#36d399;--red:#ff5a52;--display:"Space Grotesk",Inter,sans-serif;--mono:"JetBrains Mono",monospace;--font:Inter,system-ui,sans-serif}
+:root{--bg:#071012;--panel:#0d191c;--line:rgba(255,255,255,.13);--ink:#eef7f8;--soft:#b8c9ce;--muted:#82969d;--cyan:#30d5c8;--blue:#4ea3ff;--amber:#ffb020;--green:#36d399;--red:#ff5a52;--violet:#9b7cff;--display:"Space Grotesk",Inter,sans-serif;--mono:"JetBrains Mono",monospace;--font:Inter,system-ui,sans-serif}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--font)}body{background:radial-gradient(circle at 18% 10%,rgba(48,213,200,.18),transparent 30rem),radial-gradient(circle at 86% 20%,rgba(78,163,255,.16),transparent 28rem),linear-gradient(145deg,#071012,#030608 62%,#000)}
-.stage{min-height:100vh;display:grid;grid-template-columns:minmax(340px,.82fr) minmax(560px,1.18fr);gap:34px;align-items:center;padding:34px clamp(24px,4vw,70px)}
-.copy{max-width:560px}.eyebrow{display:inline-flex;padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:var(--cyan);font:800 12px var(--mono);letter-spacing:.09em;text-transform:uppercase}h1{margin:18px 0 12px;font-family:var(--display);font-size:clamp(38px,5vw,68px);line-height:.95;letter-spacing:-.06em}.lead{color:var(--soft);font-size:17px;line-height:1.6}.cards{display:grid;gap:12px;margin-top:26px}.card{display:grid;grid-template-columns:42px 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.052)}.num{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(48,213,200,.12);color:var(--cyan);font-weight:900}.card b{display:block;margin-bottom:4px}.card span{color:var(--muted);font-size:13px;line-height:1.45}
-.device{width:min(820px,100%);min-height:560px;position:relative;border:1px solid var(--line);border-radius:30px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));overflow:hidden;padding:28px}.rail{position:absolute;left:34px;right:34px;top:56px;height:16px;border-radius:999px;background:#263238}.monitor{position:absolute;left:50%;top:94px;transform:translateX(-50%);width:360px;height:170px;border-radius:30px;background:#04080a;border:1px solid rgba(255,255,255,.22);padding:18px}.screen{height:92px;border-radius:20px;background:#102226;border:1px solid rgba(255,255,255,.12);padding:14px}.screen-top{display:flex;justify-content:space-between;color:var(--muted);font:800 11px var(--mono);letter-spacing:.08em}.screen-value{margin-top:7px;color:var(--green);font-size:36px;font-weight:900;letter-spacing:-.04em}.screen-value span{font-size:14px;color:var(--soft);letter-spacing:0}.ports{display:flex;gap:12px;justify-content:center;margin-top:16px}.port{width:62px;height:12px;border-radius:999px}.flow-cell{position:absolute;left:50%;top:305px;transform:translateX(-50%);width:500px;height:126px;border-radius:32px;background:rgba(205,239,246,.15);border:1px solid rgba(205,239,246,.55)}.channel{position:absolute;left:44px;right:44px;top:55px;height:18px;border-radius:999px;background:rgba(78,163,255,.5)}.blood{position:absolute;left:54px;width:155px;top:58px;height:12px;border-radius:999px;background:rgba(255,90,82,.68)}.dialysate{position:absolute;right:54px;width:155px;top:58px;height:12px;border-radius:999px;background:rgba(48,213,200,.58)}.sensor{position:absolute;top:26px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.42);display:grid;place-items:center;font:900 11px var(--mono);color:#05100e}.s1{left:124px;background:var(--green)}.s2{left:182px;background:#2fbf78}.s3{left:240px;background:#70f0cb}.ref{left:300px;background:#d9eeff;color:#08131a}.blank{left:358px;background:#8995a1;color:#08131a}.cal{position:absolute;left:190px;bottom:22px;width:120px;height:22px;border-radius:999px;background:rgba(255,176,32,.45);border:1px solid rgba(255,176,32,.8)}.tube{position:absolute;top:361px;height:16px;border-radius:999px;background:#dbe6e8}.tube.in{left:30px;right:calc(50% + 250px)}.tube.out{left:calc(50% + 250px);right:30px}.pump{position:absolute;left:50px;top:320px;width:88px;height:74px;border-radius:22px;background:#111b20;border:1px solid var(--line)}.pump:after{content:"";position:absolute;left:23px;top:16px;width:38px;height:38px;border:5px solid var(--blue);border-radius:50%}.bag{position:absolute;right:58px;bottom:48px;width:112px;height:126px;border-radius:20px;background:rgba(222,244,248,.16);border:1px solid rgba(222,244,248,.45)}.bag:after{content:"waste / return";position:absolute;left:14px;right:14px;bottom:18px;color:var(--muted);font:800 10px var(--mono);text-align:center;text-transform:uppercase}.label{position:absolute;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(7,16,18,.82);color:var(--muted);font:800 12px var(--font)}.l1{top:84px;left:70px}.l2{top:276px;left:165px}.l3{top:406px;left:86px}.l4{top:442px;right:58px}.l5{top:285px;right:154px}.l6{top:332px;left:48px}
-@media(max-width:980px){.stage{grid-template-columns:1fr}.device{min-height:600px}}
+.stage{min-height:100vh;display:grid;grid-template-columns:minmax(340px,.78fr) minmax(620px,1.22fr);gap:34px;align-items:center;padding:34px clamp(24px,4vw,70px)}
+.copy{max-width:580px}.eyebrow{display:inline-flex;padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:var(--cyan);font:800 12px var(--mono);letter-spacing:.09em;text-transform:uppercase}h1{margin:18px 0 12px;font-family:var(--display);font-size:clamp(38px,5vw,68px);line-height:.95;letter-spacing:-.06em}.lead{color:var(--soft);font-size:17px;line-height:1.6}.cards{display:grid;gap:12px;margin-top:26px}.card{display:grid;grid-template-columns:42px 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.052)}.num{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(48,213,200,.12);color:var(--cyan);font-weight:900}.card b{display:block;margin-bottom:4px}.card span{color:var(--muted);font-size:13px;line-height:1.45}
+.device{width:min(900px,100%);min-height:640px;position:relative;border:1px solid var(--line);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));overflow:hidden;padding:28px}.rail{position:absolute;left:34px;right:34px;top:50px;height:16px;border-radius:999px;background:#263238}.monitor{position:absolute;left:50%;top:84px;transform:translateX(-50%);width:386px;height:186px;border-radius:32px;background:#04080a;border:1px solid rgba(255,255,255,.22);padding:18px}.screen{height:106px;border-radius:22px;background:#102226;border:1px solid rgba(255,255,255,.12);padding:14px}.screen-top{display:flex;justify-content:space-between;color:var(--muted);font:800 11px var(--mono);letter-spacing:.08em}.screen-value{margin-top:8px;color:var(--green);font-size:38px;font-weight:900;letter-spacing:-.04em}.screen-value span{font-size:14px;color:var(--soft);letter-spacing:0}.screen-sub{margin-top:3px;color:var(--muted);font-size:12px}.ports{display:flex;gap:12px;justify-content:center;margin-top:16px}.port{width:62px;height:12px;border-radius:999px}.flow-cell{position:absolute;left:50%;top:322px;transform:translateX(-50%);width:548px;height:148px;border-radius:34px;background:rgba(205,239,246,.15);border:1px solid rgba(205,239,246,.55)}.channel{position:absolute;left:44px;right:44px;top:66px;height:18px;border-radius:999px;background:rgba(78,163,255,.44)}.blood{position:absolute;left:58px;width:176px;top:69px;height:12px;border-radius:999px;background:rgba(255,90,82,.7)}.dialysate{position:absolute;right:58px;width:176px;top:69px;height:12px;border-radius:999px;background:rgba(48,213,200,.58)}.sensor{position:absolute;top:27px;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.42);display:grid;place-items:center;font:900 11px var(--mono);color:#05100e}.s1{left:112px;background:var(--green)}.s2{left:169px;background:#2fbf78}.s3{left:226px;background:#70f0cb}.ref1{left:286px;background:#d9eeff;color:#08131a}.ref2{left:343px;background:#8fd3ff;color:#08131a}.blank{left:400px;background:#8995a1;color:#08131a}.cal{position:absolute;left:196px;bottom:24px;width:156px;height:24px;border-radius:999px;background:rgba(255,176,32,.45);border:1px solid rgba(255,176,32,.8)}.cal:after{content:"onboard standard";position:absolute;inset:0;display:grid;place-items:center;font:800 9px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#fff2c7}.tube{position:absolute;height:16px;border-radius:999px;background:#dbe6e8}.tube.main-in{top:390px;left:30px;right:calc(50% + 274px)}.tube.main-out{top:390px;left:calc(50% + 274px);right:30px}.tube.sample{top:528px;left:170px;width:360px;background:rgba(255,90,82,.55)}.tube.dial{top:556px;left:170px;width:360px;background:rgba(48,213,200,.46)}.pump{position:absolute;left:50px;top:344px;width:88px;height:74px;border-radius:22px;background:#111b20;border:1px solid var(--line)}.pump:after{content:"";position:absolute;left:23px;top:16px;width:38px;height:38px;border:5px solid var(--blue);border-radius:50%}.standard{position:absolute;left:58px;bottom:50px;width:96px;height:116px;border-radius:22px;background:rgba(255,176,32,.14);border:1px solid rgba(255,176,32,.45)}.standard:before{content:"KCl STD";position:absolute;left:0;right:0;top:18px;text-align:center;font:900 12px var(--mono);color:#ffd38a}.standard:after{content:"4.0 / 6.0";position:absolute;left:0;right:0;bottom:22px;text-align:center;font:800 11px var(--mono);color:var(--muted)}.waste{position:absolute;right:58px;bottom:50px;width:112px;height:132px;border-radius:20px;background:rgba(222,244,248,.16);border:1px solid rgba(222,244,248,.45)}.waste:after{content:"return / waste";position:absolute;left:14px;right:14px;bottom:18px;color:var(--muted);font:800 10px var(--mono);text-align:center;text-transform:uppercase}.mini{position:absolute;left:50%;transform:translateX(-50%);bottom:42px;width:310px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.metric{padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(0,0,0,.25)}.metric b{display:block;font-family:var(--display);font-size:20px;line-height:1}.metric span{display:block;margin-top:5px;color:var(--muted);font-size:10px;line-height:1.25}.label{position:absolute;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(7,16,18,.82);color:var(--muted);font:800 12px var(--font)}.l1{top:76px;left:70px}.l2{top:292px;left:154px}.l3{top:435px;left:76px}.l4{top:476px;right:58px}.l5{top:300px;right:146px}.l6{top:356px;left:48px}.l7{bottom:176px;left:64px}.l8{bottom:188px;left:240px}
+@media(max-width:1040px){.stage{grid-template-columns:1fr}.device{min-height:700px}.tube.sample,.tube.dial{display:none}}
 </style>
 </head>
 <body>
 <main class="stage">
   <section class="copy">
     <div class="eyebrow">Hospital CKM</div>
-    <h1>Bedside potassium monitoring without wearable constraints.</h1>
-    <p class="lead">Hospital CKM is the treatment-grade branch: a closed inline flow-cell for ICU, dialysis, CRRT, and step-down workflows. It is separate from Wearable CKM, which trends dermal ISF and triggers confirmatory labs.</p>
+    <h1>Closed-loop potassium surveillance for high-acuity care.</h1>
+    <p class="lead">This is the hospital branch of continuous potassium monitoring: a disposable flow-cell and reusable bedside reader for CRRT/dialysis, drawn-line micro-samples, and eventual inline blood workflows.</p>
     <div class="cards">
-      <div class="card"><div class="num">1</div><div><b>Direct fluid path</b><span>Blood, dialysate, ultrafiltrate, or drawn-line micro-samples avoid the wearable ISF-to-serum equivalence problem.</span></div></div>
-      <div class="card"><div class="num">2</div><div><b>Hospital calibration</b><span>Large reference reservoirs, thermostatted membranes, onboard standards, and paired POC/lab checks support tighter drift control.</span></div></div>
-      <div class="card"><div class="num">3</div><div><b>Clinical positioning</b><span>Continuous potassium trend between blood gas or lab samples; not a blind autonomous dosing system.</span></div></div>
+      <div class="card"><div class="num">1</div><div><b>Direct matrix</b><span>Dialysate, effluent, or drawn blood samples reduce the wearable ISF-to-serum problem.</span></div></div>
+      <div class="card"><div class="num">2</div><div><b>Calibration loop</b><span>Onboard standards, blank, dual references, temperature, bubble, pressure, and flow diagnostics drive fail-closed output.</span></div></div>
+      <div class="card"><div class="num">3</div><div><b>Protocol trigger</b><span>The reader prompts confirmation or protocol review; it never autonomously doses potassium.</span></div></div>
     </div>
   </section>
   <section class="device" aria-label="Hospital CKM prototype diagram">
     <div class="rail"></div>
     <div class="label l1">bedside reader</div>
     <div class="monitor">
-      <div class="screen"><div class="screen-top"><span>VALIDATED TREND</span><span>QC PASS</span></div><div class="screen-value">4.3 <span>mmol/L K+</span></div></div>
+      <div class="screen">
+        <div class="screen-top"><span>VALIDATED TREND</span><span>QC PASS</span></div>
+        <div class="screen-value">4.3 <span>mmol/L K+</span></div>
+        <div class="screen-sub">rate -0.2 mmol/L/hr · confirm if &lt;4.0 projected</div>
+      </div>
       <div class="ports"><span class="port" style="background:var(--green)"></span><span class="port" style="background:var(--blue)"></span><span class="port" style="background:var(--amber)"></span></div>
     </div>
     <div class="pump"></div>
-    <div class="tube in"></div>
-    <div class="tube out"></div>
+    <div class="tube main-in"></div>
+    <div class="tube main-out"></div>
+    <div class="tube sample"></div>
+    <div class="tube dial"></div>
     <div class="flow-cell">
       <div class="channel"></div><div class="blood"></div><div class="dialysate"></div>
-      <div class="sensor s1">K1</div><div class="sensor s2">K2</div><div class="sensor s3">K3</div><div class="sensor ref">RE</div><div class="sensor blank">BL</div>
+      <div class="sensor s1">K1</div><div class="sensor s2">K2</div><div class="sensor s3">K3</div><div class="sensor ref1">RE</div><div class="sensor ref2">RE2</div><div class="sensor blank">BL</div>
       <div class="cal"></div>
     </div>
-    <div class="bag"></div>
-    <div class="label l2">inline flow cell</div>
+    <div class="standard"></div>
+    <div class="waste"></div>
+    <div class="mini">
+      <div class="metric"><b>&lt;2%</b><span>POC benchmark target</span></div>
+      <div class="metric"><b>3x K</b><span>redundant ISE channels</span></div>
+      <div class="metric"><b>Fail</b><span>closed on QC drift</span></div>
+    </div>
+    <div class="label l2">disposable flow-cell</div>
     <div class="label l3">arterial / venous / CRRT line</div>
     <div class="label l4">return or waste path</div>
-    <div class="label l5">onboard standard</div>
+    <div class="label l5">K1 / K2 / K3 + refs</div>
     <div class="label l6">micro-pump / valve</div>
+    <div class="label l7">KCl standard reservoir</div>
+    <div class="label l8">sample and dialysate paths</div>
   </section>
 </main>
 </body>

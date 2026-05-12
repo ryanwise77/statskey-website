@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Hospital CKM is a research-stage continuous potassium monitoring prototype for ICU, dialysis, CRRT, and step-down workflows.">
-  <meta name="theme-color" content="#071012">
+  <meta name="description" content="Hospital CKM is a research-stage continuous potassium monitoring prototype for ICU, dialysis, CRRT, DKA, insulin, and post-cardiac-surgery workflows.">
+  <meta name="theme-color" content="#050b0e">
   <link rel="canonical" href="https://statskeybiometrics.com/hospital-ckm/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,15 +12,139 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>Hospital CKM | Continuous Potassium Monitoring Prototype</title>
   <style>
-    :root{--bg:#071012;--panel:rgba(255,255,255,.058);--line:rgba(255,255,255,.12);--ink:#eef7f8;--soft:#b8c9ce;--muted:#7f9399;--cyan:#30d5c8;--blue:#4ea3ff;--amber:#ffb020;--green:#36d399;--display:"Space Grotesk",Inter,sans-serif;--mono:"JetBrains Mono",monospace;--font:Inter,system-ui,sans-serif}
-    *{box-sizing:border-box;margin:0;padding:0}html{background:var(--bg);color:var(--ink);font-family:var(--font);scroll-behavior:smooth;-webkit-font-smoothing:antialiased}body{min-height:100vh;overflow-x:hidden;background:radial-gradient(circle at 14% 10%,rgba(48,213,200,.18),transparent 28rem),radial-gradient(circle at 88% 18%,rgba(78,163,255,.15),transparent 30rem),linear-gradient(180deg,#071012 0%,#04090b 48%,#000 100%);line-height:1.5}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(180deg,rgba(0,0,0,.88),transparent 76%)}a{color:inherit;text-decoration:none}.shell{width:min(1180px,calc(100% - 40px));margin:0 auto}.nav{position:fixed;inset:0 0 auto;z-index:30;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(7,16,18,.72);backdrop-filter:blur(24px) saturate(160%)}.nav__inner{height:62px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand,.nav__links,.eyebrow,.button{font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase}.brand{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700}.brand__mark{width:20px;height:20px;border-radius:8px;background:radial-gradient(circle at 70% 30%,#fff 0 8%,transparent 9%),linear-gradient(135deg,var(--cyan),var(--blue))}.nav__links{display:flex;align-items:center;gap:22px;color:rgba(184,201,206,.78);font-size:10px;font-weight:600}.hero{min-height:100svh;padding:132px 0 80px;display:grid;align-items:center}.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,.9fr);gap:clamp(36px,7vw,86px);align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;color:var(--cyan);font-size:11px;font-weight:700}.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 18px currentColor}h1,h2,h3{font-family:var(--display);letter-spacing:-.055em;line-height:.94}h1{max-width:900px;font-size:clamp(3.2rem,6.2vw,6.4rem);font-weight:700}h2{max-width:840px;font-size:clamp(2.3rem,5vw,4.9rem);font-weight:700}h3{font-size:clamp(1.4rem,2vw,2rem)}.lede{max-width:720px;margin-top:26px;color:var(--soft);font-size:clamp(1.05rem,1.55vw,1.24rem);line-height:1.65}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.055);font-size:10px;font-weight:800}.button--primary{color:#03110e;border-color:transparent;background:linear-gradient(135deg,var(--cyan),#8fd3ff)}.research-banner{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:12px 14px;border:1px solid rgba(255,176,32,.28);border-radius:999px;background:rgba(255,176,32,.075);color:#ffd38a;font-size:13px;line-height:1.35}.preview{min-height:620px;border:1px solid var(--line);border-radius:34px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))}.preview iframe{width:100%;height:620px;border:0;display:block}.section{padding:clamp(76px,10vw,132px) 0}.section-head{display:grid;grid-template-columns:minmax(0,.9fr) minmax(320px,.62fr);gap:36px;align-items:end;margin-bottom:34px}.section-head p,.card p,.wide p{color:var(--soft);font-size:15px;line-height:1.72}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card,.wide{border:1px solid var(--line);border-radius:28px;padding:24px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.026))}.card-number{color:var(--cyan);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase}.card h3{margin-top:30px}.viewer-frame{height:min(760px,82vh);min-height:560px;border:1px solid var(--line);border-radius:34px;overflow:hidden;background:#05090a}.viewer-frame iframe{width:100%;height:100%;border:0;display:block}.stack-list{display:grid;gap:10px;margin-top:24px}.stack-row{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:start;padding:13px 0;border-top:1px solid rgba(255,255,255,.07)}.stack-row b{color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}.stack-row span{color:var(--soft);font-size:14px;line-height:1.65}footer{border-top:1px solid rgba(255,255,255,.07);padding:26px 0;color:var(--muted);font-size:12px}footer .shell{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}footer nav{display:flex;gap:18px;flex-wrap:wrap}@media(max-width:940px){.nav__links{display:none}.hero-grid,.section-head,.grid{grid-template-columns:1fr}.stack-row{grid-template-columns:1fr;gap:6px}h1{font-size:clamp(3rem,13vw,5rem)}.preview iframe{height:720px}}
+    :root {
+      --bg: #050b0e;
+      --panel: rgba(255,255,255,.058);
+      --panel-strong: rgba(255,255,255,.09);
+      --line: rgba(255,255,255,.12);
+      --line-strong: rgba(48,213,200,.38);
+      --ink: #eef7f8;
+      --soft: #b9cacf;
+      --muted: #7f9399;
+      --dim: #52666c;
+      --cyan: #30d5c8;
+      --blue: #4ea3ff;
+      --violet: #9b7cff;
+      --amber: #ffb020;
+      --green: #36d399;
+      --red: #ff5a52;
+      --font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: "Space Grotesk", Inter, sans-serif;
+      --mono: "JetBrains Mono", "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg); color: var(--ink); font-family: var(--font); scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(48,213,200,.18), transparent 28rem),
+        radial-gradient(circle at 88% 14%, rgba(78,163,255,.16), transparent 30rem),
+        radial-gradient(circle at 50% 58%, rgba(155,124,255,.08), transparent 38rem),
+        linear-gradient(180deg, #071012 0%, #04080a 52%, #000 100%);
+      line-height: 1.5;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.9), transparent 78%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 40;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(5,11,14,.74);
+      backdrop-filter: blur(24px) saturate(160%);
+    }
+    .nav__inner { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand, .nav__links, .eyebrow, .button, .micro, .status-chip { font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; }
+    .brand__mark { width: 20px; height: 20px; border-radius: 8px; background: radial-gradient(circle at 70% 30%, #fff 0 8%, transparent 9%), linear-gradient(135deg, var(--cyan), var(--blue), var(--violet)); }
+    .nav__links { display: flex; align-items: center; gap: 18px; color: rgba(185,202,207,.76); font-size: 10px; font-weight: 600; }
+    .hero { min-height: 100svh; padding: 132px 0 82px; display: grid; align-items: center; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, .92fr) minmax(430px, 1.08fr); gap: clamp(36px, 7vw, 86px); align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px; color: var(--cyan); font-size: 11px; font-weight: 700; }
+    .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 18px currentColor; }
+    h1, h2, h3 { font-family: var(--display); letter-spacing: -.055em; line-height: .94; }
+    h1 { max-width: 900px; font-size: clamp(3.25rem, 6.4vw, 6.7rem); font-weight: 700; }
+    h2 { max-width: 880px; font-size: clamp(2.25rem, 5vw, 4.9rem); font-weight: 700; }
+    h3 { font-size: clamp(1.38rem, 2.1vw, 2rem); }
+    .lede { max-width: 720px; margin-top: 26px; color: var(--soft); font-size: clamp(1.05rem, 1.55vw, 1.25rem); line-height: 1.68; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(255,255,255,.055); font-size: 10px; font-weight: 800; }
+    .button--primary { color: #03110e; border-color: transparent; background: linear-gradient(135deg, var(--cyan), #8fd3ff); }
+    .status-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+    .status-chip { display: inline-flex; align-items: center; min-height: 30px; padding: 0 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.045); font-size: 10px; font-weight: 700; }
+    .status-chip--research { color: #ffd38a; border-color: rgba(255,176,32,.28); background: rgba(255,176,32,.075); }
+    .status-chip--locked { color: #baf7eb; border-color: rgba(48,213,200,.28); background: rgba(48,213,200,.075); }
+    .hero-panel {
+      position: relative;
+      min-height: 650px;
+      border: 1px solid var(--line);
+      border-radius: 36px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.026));
+    }
+    .hero-panel iframe { width: 100%; height: 650px; border: 0; display: block; }
+    .section { padding: clamp(76px, 10vw, 132px) 0; }
+    .section-head { display: grid; grid-template-columns: minmax(0, .92fr) minmax(320px, .62fr); gap: 36px; align-items: end; margin-bottom: 34px; }
+    .section-head p, .card p, .wide p, .evidence-card p { color: var(--soft); font-size: 15px; line-height: 1.72; }
+    .grid, .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .two-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .card, .wide, .evidence-card {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.026));
+    }
+    .wide--mint { border-color: rgba(48,213,200,.2); background: radial-gradient(circle at 8% 0%, rgba(48,213,200,.12), transparent 28rem), linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.026)); }
+    .card-number { color: var(--cyan); font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+    .card h3, .evidence-card h3 { margin-top: 26px; }
+    .truth-table { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 24px; }
+    .truth-cell { min-height: 142px; padding: 16px; border: 1px solid rgba(255,255,255,.08); border-radius: 20px; background: rgba(0,0,0,.22); }
+    .truth-cell b { display: block; font-family: var(--display); font-size: 28px; line-height: 1; letter-spacing: -.04em; }
+    .truth-cell span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .stack-list { display: grid; gap: 10px; margin-top: 24px; }
+    .stack-row { display: grid; grid-template-columns: 154px 1fr; gap: 14px; align-items: start; padding: 13px 0; border-top: 1px solid rgba(255,255,255,.07); }
+    .stack-row b { color: var(--ink); font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+    .stack-row span { color: var(--soft); font-size: 14px; line-height: 1.65; }
+    .viewer-frame { height: min(800px, 84vh); min-height: 600px; border: 1px solid var(--line); border-radius: 34px; overflow: hidden; background: #05090a; }
+    .viewer-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .source-link { display: inline-flex; margin-top: 16px; margin-right: 16px; color: var(--cyan); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .roadmap { display: grid; gap: 12px; counter-reset: step; }
+    .roadmap-step { position: relative; padding: 22px 22px 22px 64px; border: 1px solid var(--line); border-radius: 24px; background: rgba(255,255,255,.046); }
+    .roadmap-step::before { counter-increment: step; content: counter(step); position: absolute; left: 20px; top: 20px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 999px; background: rgba(48,213,200,.13); color: var(--cyan); font-weight: 900; }
+    .roadmap-step b { display: block; margin-bottom: 6px; font-family: var(--display); font-size: 22px; letter-spacing: -.04em; }
+    .roadmap-step span { color: var(--soft); font-size: 14px; line-height: 1.6; }
+    footer { border-top: 1px solid rgba(255,255,255,.07); padding: 26px 0; color: var(--muted); font-size: 12px; }
+    footer .shell { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+    @media (max-width: 980px) {
+      .nav__links { display: none; }
+      .hero-grid, .section-head, .grid, .card-grid, .two-grid, .truth-table { grid-template-columns: 1fr; }
+      .stack-row { grid-template-columns: 1fr; gap: 6px; }
+      h1 { font-size: clamp(3rem, 13vw, 5rem); }
+      .hero-panel iframe { height: 760px; }
+    }
   </style>
 </head>
 <body>
   <nav class="nav" aria-label="Primary navigation">
     <div class="shell nav__inner">
       <a class="brand" href="/" aria-label="StatsKey home"><span class="brand__mark"></span><span>Hospital CKM</span></a>
-      <div class="nav__links"><a href="#difference">Difference</a><a href="#hardware">Hardware</a><a href="#validation">Validation</a><a href="/ckm/">Wearable CKM</a><a href="/urine-aki/">Urine AKI</a></div>
+      <div class="nav__links">
+        <a href="#why">Why</a><a href="#architecture">Architecture</a><a href="#sample-paths">Sample paths</a><a href="#viewer">Viewer</a><a href="#workflow">Workflow</a><a href="#validation">Validation</a><a href="#shipping">Shipping plan</a><a href="/ckm/">Wearable CKM</a>
+      </div>
     </div>
   </nav>
   <main>
@@ -28,27 +152,191 @@
       <div class="shell hero-grid">
         <div>
           <div class="eyebrow">Hospital continuous potassium monitoring</div>
-          <h1>A hospital-grade CKM is not the wearable.</h1>
-          <p class="lede">Hospital CKM uses a closed inline flow cell or drawn-line micro-sample path for ICU, dialysis, CRRT, DKA, insulin, and post-cardiac-surgery workflows. It is built for treatment-grade trend surveillance between blood gas or laboratory checks.</p>
-          <div class="research-banner"><strong>Research status:</strong> prototype render and architecture only. Not a medical device, not sterile, and not for patient care.</div>
-          <div class="actions"><a class="button button--primary" href="/hospital-ckm/viewer/">Open hospital viewer</a><a class="button" href="/ckm/">Compare Wearable CKM</a></div>
+          <h1>Hospital CKM is the potassium product for treatment-grade urgency.</h1>
+          <p class="lede">Wearable CKM is the outpatient trend monitor. Hospital CKM is a separate bedside system: a closed inline flow-cell or drawn-line micro-sample path built for ICU, dialysis, CRRT, DKA, insulin, and post-cardiac-surgery workflows where potassium moves faster than scheduled labs.</p>
+          <div class="actions">
+            <a class="button button--primary" href="/hospital-ckm/viewer/">Open hospital viewer</a>
+            <a class="button" href="#shipping">Build to shipment</a>
+            <a class="button" href="/ckm/">Compare Wearable CKM</a>
+          </div>
+          <div class="status-row" aria-label="Project status">
+            <span class="status-chip status-chip--research">Research-stage prototype</span>
+            <span class="status-chip">Hospital workflow</span>
+            <span class="status-chip status-chip--locked">Not a medical device</span>
+          </div>
         </div>
-        <aside class="preview" aria-label="Hospital CKM preview"><iframe src="/hospital-ckm/viewer/" title="Hospital CKM hardware render"></iframe></aside>
+        <aside class="hero-panel" aria-label="Hospital CKM preview"><iframe src="/hospital-ckm/viewer/" title="Hospital CKM hardware render"></iframe></aside>
       </div>
     </section>
-    <section id="difference" class="section">
+
+    <section id="why" class="section">
       <div class="shell">
-        <div class="section-head"><div><div class="eyebrow">Differentiation</div><h2>Wearable CKM trends ISF. Hospital CKM measures near the clinical fluid path.</h2></div><p>The wearable product is an outpatient, lab-confirmation trigger. The hospital product is a bedside surveillance module meant to sit beside existing POC analyzers and line-based workflows.</p></div>
-        <div class="grid">
-          <article class="card"><div class="card-number">01 / SAMPLE</div><h3>Direct fluid advantage.</h3><p>Blood, dialysate, CRRT, or controlled micro-samples reduce the ISF-to-serum validation burden that limits wearable claims.</p></article>
-          <article class="card"><div class="card-number">02 / CALIBRATION</div><h3>Hospital-grade controls.</h3><p>Larger references, thermostatted membranes, onboard standards, blank cycles, and paired blood-gas checks create analytical headroom.</p></article>
-          <article class="card"><div class="card-number">03 / WORKFLOW</div><h3>Between-sample trend.</h3><p>The claim is not autonomous dosing. It is faster recognition of dangerous potassium movement between scheduled samples.</p></article>
+        <div class="section-head">
+          <div><div class="eyebrow">Why this product</div><h2>ICU potassium is already managed as a continuous-risk variable. The data is still intermittent.</h2></div>
+          <p>Potassium variability is associated with mortality in critical illness. Computerized potassium protocols reduce time outside target ranges and reduce hypo/hyperkalemia events. Hospital CKM turns that protocol logic into a sensor-backed surveillance product.</p>
+        </div>
+        <article class="wide wide--mint">
+          <div class="truth-table">
+            <div class="truth-cell"><b>206,987</b><span>Potassium measurements in a 10,451-patient ICU analysis linking potassium level, variability, and mortality.</span></div>
+            <div class="truth-cell"><b>23.3% → 19.9%</b><span>In-hospital mortality change reported after computerized potassium control protocol implementation.</span></div>
+            <div class="truth-cell"><b>9.2% → 3.9%</b><span>Time below 3.5 mmol/L after protocolized potassium control in critical-care data.</span></div>
+            <div class="truth-cell"><b>&lt;2% CV</b><span>Reported potassium reproducibility benchmark for i-STAT point-of-care analyzer studies.</span></div>
+          </div>
+          <div class="stack-list">
+            <div class="stack-row"><b>Clinical pain</b><span>ICU teams respond to scheduled BMPs, blood gases, alarms, insulin shifts, CRRT prescriptions, diuretics, arrhythmias, and post-op physiology. Dangerous K+ movement can happen between samples.</span></div>
+            <div class="stack-row"><b>Product thesis</b><span>Hospital CKM does not replace blood gas analyzers. It watches the interval between them and triggers earlier confirmation, protocol action, or line/circuit review.</span></div>
+            <div class="stack-row"><b>Utilitarian ROI</b><span>The highest-value wedge is where the patient already has vascular access, dialysis/CRRT flow, or frequent lab sampling, and where a missed potassium trajectory changes the next hour of care.</span></div>
+          </div>
+          <a class="source-link" href="https://ccforum.biomedcentral.com/articles/10.1186/s13054-014-0720-9" target="_blank" rel="noopener">ICU K+ variability</a>
+          <a class="source-link" href="https://link.springer.com/article/10.1186/1472-6947-10-5" target="_blank" rel="noopener">Computerized protocol</a>
+          <a class="source-link" href="https://www.annclinlabsci.org/content/32/3/231.full" target="_blank" rel="noopener">i-STAT benchmark</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="architecture" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Product architecture</div><h2>A closed disposable flow-cell with hospital-grade calibration controls.</h2></div>
+          <p>The hospital version should not inherit wearable constraints. It gets a bigger cartridge, larger reference reservoir, calibration standard, temperature control, stronger diagnostics, and a bedrail reader with EHR-ready logs.</p>
+        </div>
+        <div class="card-grid">
+          <article class="card"><div class="card-number">01 / DISPOSABLE</div><h3>Inline K+ flow-cell</h3><p>Single-patient closed cassette with K1/K2/K3 valinomycin ISEs, blank control, dual references, temperature, pressure, bubble detection, and standard/calibration loop.</p></article>
+          <article class="card"><div class="card-number">02 / REUSABLE</div><h3>Bedside reader</h3><p>Guarded electrometer front end, 24-bit ADC, fluidic valve/pump control, optical/bubble checks, heating block, local display, battery backup, and network export.</p></article>
+          <article class="card"><div class="card-number">03 / OUTPUT</div><h3>Protocol trigger</h3><p>Reports validated K+ trend, drift/QC state, rate of change, and confirmatory-test trigger. It never acts as autonomous potassium dosing.</p></article>
         </div>
       </div>
     </section>
-    <section id="hardware" class="section"><div class="shell"><div class="section-head"><div><div class="eyebrow">Rendered prototype</div><h2>Closed flow-cell cartridge plus bedside reader.</h2></div><p>The viewer renders the hospital CKM stack: micro-pump/valve, K1/K2/K3 electrodes, reference and blank controls, onboard standard path, reusable reader, and return/waste pathway.</p></div><div class="viewer-frame"><iframe src="/hospital-ckm/viewer/" title="Hospital CKM viewer"></iframe></div></div></section>
-    <section id="validation" class="section"><div class="shell"><article class="wide"><div class="eyebrow">Validation path</div><h2>Build toward POC/lab agreement, not wearable convenience.</h2><div class="stack-list"><div class="stack-row"><b>Bench</b><span>KCl standards, whole-blood simulants, dialysate/CRRT matrices, temperature sweeps, protein/fouling challenges, and flow artifacts.</span></div><div class="stack-row"><b>Comparator</b><span>Paired i-STAT, blood gas, central lab, and dialysis-machine chemistry where available.</span></div><div class="stack-row"><b>Safety</b><span>Closed disposable path, hemolysis/clotting/fouling checks, pressure drop, infection-control review, and fail-closed output.</span></div><div class="stack-row"><b>Use cases</b><span>Insulin/DKA potassium shifts, CRRT, dialysis transition, post-cardiac-surgery monitoring, diuretic titration, refeeding, transplant induction.</span></div></div></article></div></section>
+
+    <section id="sample-paths" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Sample paths</div><h2>Three deployment modes, one measurement stack.</h2></div>
+          <p>Hospital CKM should be designed as a modular fluidic platform so the same sensor stack can be proven in the easiest matrix first, then advanced toward higher-acuity blood-contacting use.</p>
+        </div>
+        <div class="grid">
+          <article class="evidence-card"><div class="card-number">PATH A</div><h3>Dialysate / CRRT effluent</h3><p>Lowest blood-contact risk. Tracks potassium exchange and prescription response around CRRT/dialysis workflows. Best first hospital feasibility path.</p></article>
+          <article class="evidence-card"><div class="card-number">PATH B</div><h3>Drawn-line micro-sample</h3><p>Small periodic samples from arterial/venous access into a disposable measurement loop, then waste. Enables direct blood potassium trend without leaving sensor in the bloodstream.</p></article>
+          <article class="evidence-card"><div class="card-number">PATH C</div><h3>True inline blood</h3><p>Highest clinical immediacy, highest burden: hemocompatibility, clotting, hemolysis, pressure drop, sterilization, line integration, and regulatory review.</p></article>
+        </div>
+        <article class="wide" style="margin-top:14px">
+          <div class="stack-list">
+            <div class="stack-row"><b>Recommended start</b><span>Build Path A first: dialysate/CRRT/effluent and controlled blood-simulant rigs. It proves continuous electrolyte sensing without needing a first prototype in the blood path.</span></div>
+            <div class="stack-row"><b>Clinical expansion</b><span>Move to drawn-line micro-samples after bench performance and cassette sterility/containment are stable. True inline blood is the accuracy north star, not the first build.</span></div>
+          </div>
+          <a class="source-link" href="https://jsss.copernicus.org/articles/9/251/2020/" target="_blank" rel="noopener">In-line CRRT electrolytes</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9827043/" target="_blank" rel="noopener">CRRT electrolyte disturbances</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="viewer" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Rendered prototype</div><h2>Inspect the bedside CKM architecture.</h2></div>
+          <p>The viewer shows the bedrail reader, disposable flow-cell, K-channel stack, reference/blank controls, onboard standard, micro-pump/valve, and return/waste pathway.</p>
+        </div>
+        <div class="actions" style="margin-top:0;margin-bottom:18px"><a class="button button--primary" href="/hospital-ckm/viewer/">Open full-screen viewer</a></div>
+        <div class="viewer-frame"><iframe src="/hospital-ckm/viewer/" title="Hospital CKM viewer"></iframe></div>
+      </div>
+    </section>
+
+    <section id="workflow" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Workflow</div><h2>The buyer is not buying a sensor. They are buying faster potassium control.</h2></div>
+          <p>Hospital CKM should sit inside existing care pathways: blood gas confirmation, CRRT/dialysis prescription, insulin protocols, diuretic titration, telemetry, and medication review.</p>
+        </div>
+        <div class="two-grid">
+          <article class="wide">
+            <h3>Clinical jobs</h3>
+            <div class="stack-list">
+              <div class="stack-row"><b>DKA / insulin</b><span>Watch rapid intracellular K+ shifts between scheduled BMPs and blood gases.</span></div>
+              <div class="stack-row"><b>CRRT / dialysis</b><span>Track potassium exchange and dialysate/replacement-fluid prescription response.</span></div>
+              <div class="stack-row"><b>Cardiac surgery</b><span>Detect drift during post-bypass recovery, diuresis, insulin infusion, and arrhythmia risk windows.</span></div>
+              <div class="stack-row"><b>ICU protocol</b><span>Provide continuous surveillance that triggers a confirmatory sample or protocol escalation sooner.</span></div>
+            </div>
+          </article>
+          <article class="wide">
+            <h3>Hard UI rules</h3>
+            <div class="stack-list">
+              <div class="stack-row"><b>Green</b><span>Validated trend, QC pass, recent comparator, stable references, in-range temperature.</span></div>
+              <div class="stack-row"><b>Amber</b><span>Trend usable but confirmation recommended: drift rising, calibration aging, rapid K+ movement.</span></div>
+              <div class="stack-row"><b>Red</b><span>Urgent clinical review: confirmed dangerous trajectory or discordance with comparator.</span></div>
+              <div class="stack-row"><b>Gray</b><span>Withhold output: clot/bubble/flow artifact, reference failure, calibration failure, hemolysis suspicion.</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="validation" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Validation gates</div><h2>Hospital CKM only ships if it earns trust against existing analyzers.</h2></div>
+          <p>The hospital bar is higher than the wearable bar. The product must prove analytical performance, hemocompatibility or safe sample isolation, workflow fit, alarm discipline, and clinical usefulness.</p>
+        </div>
+        <article class="wide wide--mint">
+          <div class="stack-list">
+            <div class="stack-row"><b>Analytical</b><span>K+ slope, bias, precision, drift, hysteresis, temperature response, protein/fouling response, matrix effect, and calibration recovery across 2.0-9.0 mmol/L.</span></div>
+            <div class="stack-row"><b>Comparator</b><span>Dense paired samples against blood gas, i-STAT/POC, central lab, and dialysis/CRRT machine chemistry where applicable.</span></div>
+            <div class="stack-row"><b>Fluidic</b><span>No leaks, no unsafe pressure drop, bubble/clot detection, no hemolysis above accepted thresholds, and no blood-contacting reusable part.</span></div>
+            <div class="stack-row"><b>Software</b><span>Fail-closed state machine, audit log, calibration age, comparator age, alarm thresholds, and no autonomous dosing recommendation.</span></div>
+            <div class="stack-row"><b>Human factors</b><span>Nurse installation, sterile boundary, line-change workflow, alarm comprehension, and clinician response must pass simulation before patient feasibility.</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="economics" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Hospital economics</div><h2>The wedge is high-acuity beds where missed potassium drift is expensive.</h2></div>
+          <p>This is not a consumer subscription. It is a per-patient disposable plus bedside reader platform for units already paying for blood gas cartridges, dialysis consumables, ICU telemetry, and adverse-event prevention.</p>
+        </div>
+        <div class="truth-table">
+          <div class="truth-cell"><b>Reader</b><span>Reusable bedside module: analog front end, pump/valves, display, network export, battery backup.</span></div>
+          <div class="truth-cell"><b>Cassette</b><span>Single-patient disposable flow-cell with electrodes, references, fluid path, calibration reservoir, sterile packaging.</span></div>
+          <div class="truth-cell"><b>Use cases</b><span>DKA, CRRT, dialysis transition, post-cardiac surgery, transplant induction, refeeding, high-risk arrhythmia beds.</span></div>
+          <div class="truth-cell"><b>Value</b><span>Earlier confirmation, fewer hours out of range, fewer unnecessary samples, better protocol adherence.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="shipping" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Build to shipment</div><h2>Make the shortest path to a useful hospital pilot.</h2></div>
+          <p>The right sequence is not "build everything." It is retire the hardest unknowns in the order that creates a credible hospital feasibility package.</p>
+        </div>
+        <div class="roadmap">
+          <div class="roadmap-step"><b>Bench CKM flow-cell</b><span>Build a transparent cassette with K1/K2/K3, reference, blank, temperature, pressure, bubble, and standard-loop ports. Test in KCl standards, dialysate, artificial plasma, and protein/fouling matrices.</span></div>
+          <div class="roadmap-step"><b>CRRT/dialysate feasibility</b><span>Prove continuous K+ tracking in dialysate/effluent-like matrices before blood-contacting designs. Show response to prescription-like potassium changes.</span></div>
+          <div class="roadmap-step"><b>Micro-sample blood loop</b><span>Move to drawn-line sample loops with waste capture. Compare against blood gas/i-STAT/central lab and quantify hemolysis, clotting, drift, and calibration recovery.</span></div>
+          <div class="roadmap-step"><b>Simulation pilot</b><span>Run ICU nurse and physician simulations: setup, alarm interpretation, comparator prompts, protocol response, and EHR-style event review.</span></div>
+          <div class="roadmap-step"><b>Observational hospital study</b><span>No care-driving claims. Collect paired comparator data, alarm logs, setup time, false alarms, and clinician response to trend information.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="boundaries" class="section">
+      <div class="shell">
+        <article class="wide">
+          <div class="eyebrow">Boundaries</div>
+          <h2>What Hospital CKM does and does not claim.</h2>
+          <div class="two-grid" style="margin-top:24px">
+            <div class="card"><div class="card-number">DOES CLAIM</div><h3>Research architecture</h3><p>A physically plausible hospital potassium trend monitor architecture with direct fluid access, redundant K+ sensing, onboard calibration, comparator-first validation, and fail-closed workflow.</p></div>
+            <div class="card"><div class="card-number">DOES NOT CLAIM</div><h3>Clinical readiness</h3><p>No diagnosis, no autonomous dosing, no replacement of blood gas/lab potassium, no sterile patient use, no mortality reduction claim until analytical and clinical studies prove it.</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
   </main>
-  <footer><div class="shell"><span>StatsKey &copy; 2026</span><nav><a href="/">Home</a><a href="/ckm/">Wearable CKM</a><a href="/hospital-ckm/viewer/">Viewer</a></nav></div></footer>
+  <footer>
+    <div class="shell">
+      <span>Hospital CKM is a research-stage prototype. Not a medical device.</span>
+      <nav><a href="/">Home</a><a href="/ckm/">Wearable CKM</a><a href="/urine-aki/">Urine AKI</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
+    </div>
+  </footer>
 </body>
 </html>
