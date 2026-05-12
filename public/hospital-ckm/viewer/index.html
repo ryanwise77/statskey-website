@@ -3,70 +3,182 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Hospital CKM prototype viewer showing inline potassium monitoring architecture for ICU, dialysis, and CRRT workflows.">
-<meta name="theme-color" content="#071012">
+<meta name="description" content="Interactive Hospital CKM 3D BOM viewer with orderable components, modeled dimensions, and validation risks.">
+<meta name="theme-color" content="#0d1117">
 <link rel="canonical" href="https://statskeybiometrics.com/hospital-ckm/viewer/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<title>Hospital CKM Viewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<title>Hospital CKM 3D BOM Viewer</title>
 <style>
-:root{--bg:#071012;--panel:#0d191c;--line:rgba(255,255,255,.13);--ink:#eef7f8;--soft:#b8c9ce;--muted:#82969d;--cyan:#30d5c8;--blue:#4ea3ff;--amber:#ffb020;--green:#36d399;--red:#ff5a52;--violet:#9b7cff;--display:"Space Grotesk",Inter,sans-serif;--mono:"JetBrains Mono",monospace;--font:Inter,system-ui,sans-serif}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--font)}body{background:radial-gradient(circle at 18% 10%,rgba(48,213,200,.18),transparent 30rem),radial-gradient(circle at 86% 20%,rgba(78,163,255,.16),transparent 28rem),linear-gradient(145deg,#071012,#030608 62%,#000)}
-.stage{min-height:100vh;display:grid;grid-template-columns:minmax(340px,.78fr) minmax(620px,1.22fr);gap:34px;align-items:center;padding:34px clamp(24px,4vw,70px)}
-.copy{max-width:580px}.eyebrow{display:inline-flex;padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:var(--cyan);font:800 12px var(--mono);letter-spacing:.09em;text-transform:uppercase}h1{margin:18px 0 12px;font-family:var(--display);font-size:clamp(38px,5vw,68px);line-height:.95;letter-spacing:-.06em}.lead{color:var(--soft);font-size:17px;line-height:1.6}.cards{display:grid;gap:12px;margin-top:26px}.card{display:grid;grid-template-columns:42px 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.052)}.num{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(48,213,200,.12);color:var(--cyan);font-weight:900}.card b{display:block;margin-bottom:4px}.card span{color:var(--muted);font-size:13px;line-height:1.45}
-.device{width:min(900px,100%);min-height:640px;position:relative;border:1px solid var(--line);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));overflow:hidden;padding:28px}.rail{position:absolute;left:34px;right:34px;top:50px;height:16px;border-radius:999px;background:#263238}.monitor{position:absolute;left:50%;top:84px;transform:translateX(-50%);width:386px;height:186px;border-radius:32px;background:#04080a;border:1px solid rgba(255,255,255,.22);padding:18px}.screen{height:106px;border-radius:22px;background:#102226;border:1px solid rgba(255,255,255,.12);padding:14px}.screen-top{display:flex;justify-content:space-between;color:var(--muted);font:800 11px var(--mono);letter-spacing:.08em}.screen-value{margin-top:8px;color:var(--green);font-size:38px;font-weight:900;letter-spacing:-.04em}.screen-value span{font-size:14px;color:var(--soft);letter-spacing:0}.screen-sub{margin-top:3px;color:var(--muted);font-size:12px}.ports{display:flex;gap:12px;justify-content:center;margin-top:16px}.port{width:62px;height:12px;border-radius:999px}.flow-cell{position:absolute;left:50%;top:322px;transform:translateX(-50%);width:548px;height:148px;border-radius:34px;background:rgba(205,239,246,.15);border:1px solid rgba(205,239,246,.55)}.channel{position:absolute;left:44px;right:44px;top:66px;height:18px;border-radius:999px;background:rgba(78,163,255,.44)}.blood{position:absolute;left:58px;width:176px;top:69px;height:12px;border-radius:999px;background:rgba(255,90,82,.7)}.dialysate{position:absolute;right:58px;width:176px;top:69px;height:12px;border-radius:999px;background:rgba(48,213,200,.58)}.sensor{position:absolute;top:27px;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.42);display:grid;place-items:center;font:900 11px var(--mono);color:#05100e}.s1{left:112px;background:var(--green)}.s2{left:169px;background:#2fbf78}.s3{left:226px;background:#70f0cb}.ref1{left:286px;background:#d9eeff;color:#08131a}.ref2{left:343px;background:#8fd3ff;color:#08131a}.blank{left:400px;background:#8995a1;color:#08131a}.cal{position:absolute;left:196px;bottom:24px;width:156px;height:24px;border-radius:999px;background:rgba(255,176,32,.45);border:1px solid rgba(255,176,32,.8)}.cal:after{content:"onboard standard";position:absolute;inset:0;display:grid;place-items:center;font:800 9px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#fff2c7}.tube{position:absolute;height:16px;border-radius:999px;background:#dbe6e8}.tube.main-in{top:390px;left:30px;right:calc(50% + 274px)}.tube.main-out{top:390px;left:calc(50% + 274px);right:30px}.tube.sample{top:528px;left:170px;width:360px;background:rgba(255,90,82,.55)}.tube.dial{top:556px;left:170px;width:360px;background:rgba(48,213,200,.46)}.pump{position:absolute;left:50px;top:344px;width:88px;height:74px;border-radius:22px;background:#111b20;border:1px solid var(--line)}.pump:after{content:"";position:absolute;left:23px;top:16px;width:38px;height:38px;border:5px solid var(--blue);border-radius:50%}.standard{position:absolute;left:58px;bottom:50px;width:96px;height:116px;border-radius:22px;background:rgba(255,176,32,.14);border:1px solid rgba(255,176,32,.45)}.standard:before{content:"KCl STD";position:absolute;left:0;right:0;top:18px;text-align:center;font:900 12px var(--mono);color:#ffd38a}.standard:after{content:"4.0 / 6.0";position:absolute;left:0;right:0;bottom:22px;text-align:center;font:800 11px var(--mono);color:var(--muted)}.waste{position:absolute;right:58px;bottom:50px;width:112px;height:132px;border-radius:20px;background:rgba(222,244,248,.16);border:1px solid rgba(222,244,248,.45)}.waste:after{content:"return / waste";position:absolute;left:14px;right:14px;bottom:18px;color:var(--muted);font:800 10px var(--mono);text-align:center;text-transform:uppercase}.mini{position:absolute;left:50%;transform:translateX(-50%);bottom:42px;width:310px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.metric{padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(0,0,0,.25)}.metric b{display:block;font-family:var(--display);font-size:20px;line-height:1}.metric span{display:block;margin-top:5px;color:var(--muted);font-size:10px;line-height:1.25}.label{position:absolute;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(7,16,18,.82);color:var(--muted);font:800 12px var(--font)}.l1{top:76px;left:70px}.l2{top:292px;left:154px}.l3{top:435px;left:76px}.l4{top:476px;right:58px}.l5{top:300px;right:146px}.l6{top:356px;left:48px}.l7{bottom:176px;left:64px}.l8{bottom:188px;left:240px}
-@media(max-width:1040px){.stage{grid-template-columns:1fr}.device{min-height:700px}.tube.sample,.tube.dial{display:none}}
+:root{--bg:#0d1117;--panel:rgba(10,14,20,.94);--line:#243041;--ink:#eef6ff;--soft:#c5d3e1;--muted:#91a5b8;--aqua:#8fd3ff;--mint:#70f0cb;--amber:#ffbd68;--danger:#ff7a85}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Barlow,ui-sans-serif,system-ui,sans-serif}
+body{background:radial-gradient(circle at 18% 12%,rgba(44,158,255,.16),transparent 30%),radial-gradient(circle at 88% 18%,rgba(112,240,203,.10),transparent 28%),linear-gradient(145deg,#03060b 0%,#07101a 48%,#04070d 100%)}
+#canvas{display:block;width:100vw;height:100vh;touch-action:none}
+.panel{position:fixed;z-index:3;background:linear-gradient(180deg,rgba(13,22,34,.92),rgba(7,12,19,.84));border:1px solid var(--line);backdrop-filter:blur(14px)}
+.brand{left:18px;top:18px;width:min(318px,calc(100vw - 36px));padding:12px 14px;border-radius:18px}
+.back{display:inline-flex;gap:7px;margin-bottom:10px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;text-decoration:none}
+.eyebrow,.panel-title,.button,.chip,.type,.source-link{letter-spacing:.13em;text-transform:uppercase}.eyebrow{color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700}.brand h1{margin:4px 0 0;font-family:Rajdhani,sans-serif;font-size:32px;line-height:.92}.brand p{margin:9px 0 0;color:var(--soft);font-size:11px;line-height:1.45}
+.brand-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chip{display:inline-flex;gap:7px;align-items:center;min-height:28px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.035);font-size:10px;font-weight:700}.chip:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--aqua)}.chip.safe:before{background:var(--mint)}.chip.warn:before{background:var(--amber)}
+.toolbar{right:18px;top:18px;width:min(300px,calc(100vw - 36px));padding:14px;border-radius:18px}.panel-title{margin:0 0 10px;color:var(--aqua);font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700}.views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.button{appearance:none;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.055);color:var(--ink);padding:9px 10px;font:700 11px Rajdhani,sans-serif;cursor:pointer}.button.active{background:rgba(112,240,203,.14);border-color:rgba(112,240,203,.55);color:#f8fffd}
+.parts-panel{left:18px;bottom:18px;width:min(390px,calc(100vw - 36px));max-height:34vh;overflow:auto;padding:14px;border-radius:18px}.part-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.part-button{appearance:none;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.045);color:var(--soft);padding:8px 9px;text-align:left;font:700 11px Rajdhani,sans-serif;letter-spacing:.06em;cursor:pointer}.part-button.active{border-color:rgba(112,240,203,.65);background:rgba(112,240,203,.12);color:#f8fffd}.part-button span{display:block;margin-top:2px;color:var(--muted);font:600 10px Barlow,sans-serif;letter-spacing:0;text-transform:none}
+.inspector{right:18px;bottom:18px;width:min(455px,calc(100vw - 36px));max-height:48vh;overflow:auto;padding:16px;border-radius:18px}.type{color:var(--amber);font-size:10px;font-weight:700}.title{margin-top:4px;font-family:Rajdhani,sans-serif;font-size:27px;font-weight:700;line-height:1}.inspector p{margin:8px 0 0;color:var(--soft);font-size:12px;line-height:1.5}.inspector b{color:var(--ink)}.source-link{display:inline-flex;margin-top:12px;color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700}.hint{position:fixed;left:18px;bottom:calc(34vh + 38px);z-index:2;color:var(--muted);font-size:11px;background:rgba(10,14,20,.72);border:1px solid var(--line);border-radius:999px;padding:9px 12px}
+@media(max-width:760px){.toolbar{top:auto;bottom:18px;left:18px;right:auto}.inspector,.parts-panel{display:none}.hint{display:none}.brand{max-height:44vh;overflow:auto}}
 </style>
 </head>
 <body>
-<main class="stage">
-  <section class="copy">
-    <div class="eyebrow">Hospital CKM</div>
-    <h1>Closed-loop potassium surveillance for high-acuity care.</h1>
-    <p class="lead">This is the hospital branch of continuous potassium monitoring: a disposable flow-cell and reusable bedside reader for CRRT/dialysis, drawn-line micro-samples, and eventual inline blood workflows.</p>
-    <div class="cards">
-      <div class="card"><div class="num">1</div><div><b>Direct matrix</b><span>Dialysate, effluent, or drawn blood samples reduce the wearable ISF-to-serum problem.</span></div></div>
-      <div class="card"><div class="num">2</div><div><b>Calibration loop</b><span>Onboard standards, blank, dual references, temperature, bubble, pressure, and flow diagnostics drive fail-closed output.</span></div></div>
-      <div class="card"><div class="num">3</div><div><b>Protocol trigger</b><span>The reader prompts confirmation or protocol review; it never autonomously doses potassium.</span></div></div>
-    </div>
-  </section>
-  <section class="device" aria-label="Hospital CKM prototype diagram">
-    <div class="rail"></div>
-    <div class="label l1">bedside reader</div>
-    <div class="monitor">
-      <div class="screen">
-        <div class="screen-top"><span>VALIDATED TREND</span><span>QC PASS</span></div>
-        <div class="screen-value">4.3 <span>mmol/L K+</span></div>
-        <div class="screen-sub">rate -0.2 mmol/L/hr · confirm if &lt;4.0 projected</div>
-      </div>
-      <div class="ports"><span class="port" style="background:var(--green)"></span><span class="port" style="background:var(--blue)"></span><span class="port" style="background:var(--amber)"></span></div>
-    </div>
-    <div class="pump"></div>
-    <div class="tube main-in"></div>
-    <div class="tube main-out"></div>
-    <div class="tube sample"></div>
-    <div class="tube dial"></div>
-    <div class="flow-cell">
-      <div class="channel"></div><div class="blood"></div><div class="dialysate"></div>
-      <div class="sensor s1">K1</div><div class="sensor s2">K2</div><div class="sensor s3">K3</div><div class="sensor ref1">RE</div><div class="sensor ref2">RE2</div><div class="sensor blank">BL</div>
-      <div class="cal"></div>
-    </div>
-    <div class="standard"></div>
-    <div class="waste"></div>
-    <div class="mini">
-      <div class="metric"><b>&lt;2%</b><span>POC benchmark target</span></div>
-      <div class="metric"><b>3x K</b><span>redundant ISE channels</span></div>
-      <div class="metric"><b>Fail</b><span>closed on QC drift</span></div>
-    </div>
-    <div class="label l2">disposable flow-cell</div>
-    <div class="label l3">arterial / venous / CRRT line</div>
-    <div class="label l4">return or waste path</div>
-    <div class="label l5">K1 / K2 / K3 + refs</div>
-    <div class="label l6">micro-pump / valve</div>
-    <div class="label l7">KCl standard reservoir</div>
-    <div class="label l8">sample and dialysate paths</div>
-  </section>
-</main>
+<canvas id="canvas"></canvas>
+<section class="panel brand">
+  <a class="back" href="/hospital-ckm/">Back to Hospital CKM</a>
+  <div class="eyebrow">3D BOM viewer</div>
+  <h1>Hospital CKM</h1>
+  <p>One modeled unit equals one millimeter. Click any part for source, exact modeled dimensions, function, and validation risk.</p>
+  <div class="brand-row"><span class="chip safe">Orderable parts</span><span class="chip warn">Custom cassette</span><span class="chip">1 mm scale</span></div>
+</section>
+<section class="panel toolbar"><h2 class="panel-title">Views</h2><div class="views" id="views"></div></section>
+<section class="panel parts-panel"><h2 class="panel-title">Parts</h2><div class="part-list" id="partList"></div></section>
+<section class="panel inspector" id="inspector"></section>
+<div class="hint">Drag to rotate · Scroll to zoom · Click a part</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const parts = [
+  {id:"cassette",name:"Disposable flow-cell cassette",type:"custom disposable",exact:"Custom CNC/SLA prototype; future injection-molded COC/COP or medical PC",dims:"120 x 44 x 14 mm modeled cassette body; 3.0 mm main channel; 0.7 mL active cell volume",detail:"Closed single-patient cartridge carrying the sample channel, electrode bay, pressure diaphragms, calibration loop, and optical bubble window.",risk:"Must prove no leaks, no stagnant blood pockets, no unsafe pressure drop, sterilization compatibility, and no reusable wet path.",source:"Custom fabrication / Protolabs / local CNC",href:"https://www.protolabs.com/services/cnc-machining/"},
+  {id:"main-channel",name:"Main sample channel",type:"fluid path",exact:"Modeled channel inside disposable cassette",dims:"86 mm long x 3.0 mm ID equivalent; 0.61 mL main-channel volume",detail:"Primary path for dialysate/effluent or drawn-line micro-sample over the K+ sensing zone.",risk:"Geometry must prevent bubbles, clots, and dead zones from being mistaken for potassium movement.",source:"Custom cassette geometry",href:"/hospital-ckm/"},
+  {id:"sensor-strip",name:"Printed electrode strip",type:"chemistry substrate",exact:"Metrohm DropSens DRP-110-U75 carbon screen-printed electrode family",dims:"33.8 x 10.2 x 0.5 mm commercial substrate; 4 mm carbon working electrode",detail:"Development substrate for K+ ISE membrane, reference/blank experiments, and early urine/dialysate/blood-simulant validation.",risk:"Commercial strip is a bench substrate; production cassette needs custom electrode geometry and lot release.",source:"Metrohm DropSens DRP-110",href:"https://metrohm-dropsens.com/products/electrodes/screen-printed-electrodes/screen-printed-carbon-electrode-110/"},
+  {id:"k1",name:"K1 potassium ISE",type:"chemistry",exact:"Valinomycin K+ membrane using Sigma V0627 / Selectophore cocktail 99373 class chemistry",dims:"4.0 mm modeled membrane disk on printed electrode pad",detail:"Primary potassium-selective channel producing open-circuit potential versus reference.",risk:"Requires selectivity testing against Na+, NH4+, proteins, pH, temperature, and dialysate/blood matrices.",source:"MilliporeSigma valinomycin",href:"https://www.sigmaaldrich.com/US/en/product/sigma/v0627"},
+  {id:"k2",name:"K2 potassium ISE",type:"chemistry",exact:"Duplicate valinomycin K+ ISE; separate membrane lot or lane preferred",dims:"4.0 mm modeled membrane disk",detail:"Redundant K+ channel for agreement and drift rejection.",risk:"Duplicate only helps if process independence exposes failures rather than repeating them.",source:"MilliporeSigma potassium ionophore cocktail",href:"https://www.sigmaaldrich.com/US/en/product/sial/99373"},
+  {id:"k3",name:"K3 potassium ISE",type:"chemistry",exact:"Third valinomycin K+ ISE for majority-vote QC",dims:"4.0 mm modeled membrane disk",detail:"Tie-breaker channel for early validation and high-risk clinical contexts.",risk:"Adds cost and fluidic footprint; must reduce false output, not just add complexity.",source:"Selectophore membrane reagents",href:"https://www.sigmaaldrich.com/US/en/products/chemistry-and-biochemicals/analytical-chemistry/ionophores"},
+  {id:"ref-a",name:"Reference A",type:"reference",exact:"Ag/AgCl reference with chloride reservoir; Creative Materials 113-09 / 126-49 ink family for prototype printing",dims:"5.2 mm modeled pad plus 18 x 4 x 2 mm reservoir block",detail:"Primary potentiometric reference path.",risk:"Reference drift is the central accuracy failure mode; must be independently monitored.",source:"Creative Materials Ag/AgCl inks",href:"https://www.creativematerials.com/products/ag-agcl-inks/"},
+  {id:"ref-b",name:"Reference B",type:"reference",exact:"Independent Ag/AgCl reference sentinel",dims:"5.2 mm modeled pad plus separate 18 x 4 x 2 mm reservoir block",detail:"Detects reference drift before clinical interpretation is shown.",risk:"Needs enough independence to expose reference failure without excessive sample volume.",source:"Creative Materials Ag/AgCl inks",href:"https://www.creativematerials.com/products/ag-agcl-inks/"},
+  {id:"blank",name:"Blank / non-ionophore control",type:"QC chemistry",exact:"Non-ionophore polymer membrane on printed electrode",dims:"4.0 mm modeled control disk",detail:"Catches membrane-independent drift, protein fouling, bubble wetting artifacts, and reference movement.",risk:"Must be hidden from clinical interpretation and treated only as QC.",source:"Custom membrane control",href:"/hospital-ckm/"},
+  {id:"flow-sensor",name:"Liquid flow sensor",type:"orderable sensor",exact:"Sensirion SLF3S-0600F liquid flow sensor",dims:"48.0 x 15.5 x 8.9 mm; 1/4-28 flat-bottom ports; up to +/-2 mL/min",detail:"Measures micro-sample or dialysate flow through the cassette for valid sample refresh and excretion/kinetics calculations.",risk:"Not a sterile disposable by itself; production design must isolate reusable sensor or use disposable fluidic boundary.",source:"Sensirion SLF3S-0600F",href:"https://sensirion.com/products/catalog/SLF3S-0600F"},
+  {id:"pump",name:"Micro-pump",type:"orderable actuator",exact:"Bartels mp6 piezoelectric diaphragm micropump",dims:"30.0 x 15.0 x 3.8 mm without connectors; 0-8 mL/min liquid; ~30 uL internal volume",detail:"Pulls calibration standard or micro-sample through the measurement loop in the bench and drawn-line prototype.",risk:"Pump must not hemolyze samples or contaminate clinical fluid path; may remain on reusable side only if isolated.",source:"Bartels mp6",href:"https://bartels-mikrotechnik.de/support-center/mp6-micropumps-series-datasheet/"},
+  {id:"valve-bank",name:"Microfluidic valve bank",type:"orderable actuator",exact:"Lee Company LHD 2-way / 3-way solenoid valve family",dims:"7 mm valve class; 2.5-4.5 g; 26-94 uL internal volume depending configuration",detail:"Switches sample, waste, and onboard calibration standard paths.",risk:"Dead volume, leakage, hold power, and cleanability determine whether it belongs in reusable or disposable path.",source:"Lee LHD valves",href:"https://www.theleeco.com/product/lhd-series-3-way-control-solenoid-valve/"},
+  {id:"pressure-a",name:"Pressure sensor A",type:"orderable sensor",exact:"TE Connectivity MEAS 1620 AAMI-compliant disposable pressure sensor family",dims:"10.54 x 8.10 x 3.53 mm; -50 to 300 mmHg",detail:"Upstream pressure diagnostic for occlusion, clot, bubble, and unsafe line pressure.",risk:"Clinical path requires disposable sterile pressure interface or approved pressure transducer integration.",source:"TE MEAS 1620",href:"https://www.te.com/en/product-CAT-BLPS0030.html"},
+  {id:"pressure-b",name:"Pressure sensor B",type:"orderable sensor",exact:"TE Connectivity MEAS 1620 AAMI-compliant disposable pressure sensor family",dims:"10.54 x 8.10 x 3.53 mm; -50 to 300 mmHg",detail:"Downstream pressure diagnostic and delta-pressure validation.",risk:"False pressure readings can suppress valid data or miss occlusion.",source:"TE MEAS 1620",href:"https://www.te.com/en/product-CAT-BLPS0030.html"},
+  {id:"fittings",name:"1/4-28 fluidic fittings",type:"orderable fluidics",exact:"IDEX Health & Science 1/4-28 flat-bottom PEEK fittings / nuts family",dims:"Modeled as 8 mm OD x 10 mm long port bodies; real SKU dimensions vary",detail:"Connects sample, standard, waste, and dialysate tubing to the prototype cassette.",risk:"Dimensions must be locked to selected SKU before machining the cassette.",source:"IDEX 1/4-28 fittings",href:"https://idex-hs.com/store/product-detail/flangeless_fitting_natural_peek_1_4_28_flat_bottom_for_1_8_od"},
+  {id:"stopcock",name:"Clinical stopcock / manifold",type:"orderable fluidics",exact:"Qosina 3-way stopcock family, e.g. 99762 / 99520-3",dims:"Modeled envelope 38 x 24 x 12 mm; final dimensions per selected SKU",detail:"Bench and simulation manifold for sample/waste/standard routing.",risk:"Clinical use needs selected part drawings, pressure rating, biocompatibility, and sterile packaging.",source:"Qosina stopcocks",href:"https://www.qosina.com/categories/stopcocks-manifolds/stopcocks"},
+  {id:"reader-shell",name:"Bedside reader shell",type:"custom reusable",exact:"Custom sealed reader enclosure, prototype SLA/CNC, future molded PC/ABS",dims:"170 x 112 x 42 mm modeled shell with bedrail flange",detail:"Reusable housing for display, electronics, pump/valve control, isolated pressure couplers, and network/power ports.",risk:"Must survive cleaning, drops, cable strain, fluid ingress, and hospital electrical safety review.",source:"Custom fabrication",href:"https://www.protolabs.com/services/3d-printing/"},
+  {id:"display",name:"Touch display",type:"orderable display",exact:"Adafruit 2.8 inch TFT LCD touchscreen breakout, product 1770 / ILI9341 family",dims:"Modeled PCB 70 x 50 x 6 mm; 2.8 inch 240 x 320 display",detail:"Prototype bedside status display for trend, QC, comparator age, and confirm-test prompts.",risk:"Production version needs medical UI, cleaning, brightness, and alarm/human-factors validation.",source:"Adafruit product 1770",href:"https://www.adafruit.com/product/1770"},
+  {id:"afe",name:"Electrochemical AFE",type:"orderable electronics",exact:"Analog Devices AD5940 electrochemical / impedance AFE",dims:"LFCSP 7 x 7 mm or WLCSP 3.6 x 4.2 mm; modeled 7 x 7 mm",detail:"Supports impedance, diagnostics, and electrochemical characterization in the reusable reader.",risk:"May not be the primary high-Z potentiometric path without external electrometer buffering.",source:"Analog Devices AD5940",href:"https://www.analog.com/en/products/ad5940.html"},
+  {id:"buffer",name:"Electrometer buffer",type:"orderable electronics",exact:"Texas Instruments LMP7721 3 fA input-bias op amp",dims:"8-pin SOIC 4.9 x 6.0 mm",detail:"High-impedance buffer for K+ ISE/reference nodes before ADC.",risk:"Requires guarded PCB layout, low-leakage assembly, and cleaning process validation.",source:"TI LMP7721",href:"https://www.ti.com/product/LMP7721"},
+  {id:"adc",name:"Precision ADC",type:"orderable electronics",exact:"Texas Instruments ADS1220 24-bit ADC",dims:"VQFN 3.5 x 3.5 x 0.9 mm modeled",detail:"Digitizes buffered potentiometric channels and temperature/reference diagnostics.",risk:"Noise and leakage budget must support clinically useful mV resolution.",source:"TI ADS1220",href:"https://www.ti.com/product/ADS1220"},
+  {id:"mcu",name:"MCU / network module",type:"orderable electronics",exact:"ESP32-S3 module or Nordic nRF52840 gateway module for prototype",dims:"Modeled module 18 x 25 x 3 mm",detail:"Runs state machine, logs data, handles local network export, display, and alarms.",risk:"Hospital production needs cybersecurity, isolation, update policy, and EMR integration.",source:"Espressif ESP32-S3",href:"https://www.espressif.com/en/products/socs/esp32-s3"},
+  {id:"psu",name:"Power module",type:"orderable electronics",exact:"Medical-grade external 5 V supply plus internal isolated DC/DC prototype module",dims:"Modeled 28 x 16 x 9 mm internal module",detail:"Powers sensors, valves, display, and analog front end with isolated rails.",risk:"Production system must meet IEC 60601 electrical safety and leakage-current requirements.",source:"CUI / medical power modules",href:"https://www.cui.com/catalog/power/dc-dc-converters"},
+  {id:"standard",name:"KCl calibration reservoirs",type:"orderable consumable",exact:"NIST-traceable KCl standards, Thermo Orion 921906 class plus custom cartridge reservoirs",dims:"Two modeled reservoirs, 18 x 10 x 24 mm each; 0.8 mL each",detail:"Onboard low/high K+ checks for one-point/two-point validation and drift recovery.",risk:"Reservoir leaching, evaporation, shelf life, and accidental mixing must be validated.",source:"Thermo Orion potassium standard",href:"https://www.thermofisher.com/order/catalog/product/921906"},
+  {id:"waste",name:"Waste / return capture",type:"disposable fluidics",exact:"Custom waste return or waste-capture path; bag/tube set selected by clinical mode",dims:"Modeled 40 x 26 x 36 mm waste cartridge plus 2 mm ID tube",detail:"Captures calibration and drawn-line waste, or routes safe return path in non-blood modes.",risk:"Blood mode likely requires waste capture; return path requires far higher safety validation.",source:"Custom disposable set",href:"/hospital-ckm/"},
+  {id:"mount",name:"Bedrail mount",type:"custom reusable",exact:"Custom clamp for ICU rail / pole mount; prototype printed or machined",dims:"Modeled 160 x 18 x 22 mm rail and 36 mm clamp boss",detail:"Mounts reader without cluttering line management.",risk:"Must not pull lines, block access, or fail cleaning/drop tests.",source:"Custom fabrication",href:"https://www.protolabs.com/services/cnc-machining/"}
+];
+const partById = new Map(parts.map(p=>[p.id,p]));
+const views = {
+  assembled:{label:"Assembled",camera:[126,82,136],target:[0,10,0]},
+  exploded:{label:"Exploded",camera:[150,102,164],target:[0,22,0]},
+  fluidics:{label:"Fluidics",camera:[116,58,118],target:[0,0,-4]},
+  chemistry:{label:"Chemistry",camera:[58,44,62],target:[0,-6,-8]},
+  reader:{label:"Reader",camera:[90,68,96],target:[0,34,0]},
+  validation:{label:"Validation",camera:[138,80,152],target:[2,14,10]}
+};
+let activeView="assembled"; let activePart="cassette";
+const objectById = new Map();
+const canvas=document.getElementById("canvas");
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0d1117);
+const camera=new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 1000);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
+const controls=new OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
+scene.add(new THREE.AmbientLight(0xffffff,.62)); const key=new THREE.DirectionalLight(0xffffff,.86); key.position.set(80,110,70); scene.add(key); const fill=new THREE.DirectionalLight(0x8fd3ff,.28); fill.position.set(-80,30,-70); scene.add(fill);
+const root=new THREE.Group(); scene.add(root);
+function mat(hex, opacity=1, metal=.06){return new THREE.MeshStandardMaterial({color:new THREE.Color(hex),roughness:.54,metalness:metal,transparent:opacity<1,opacity,depthWrite:opacity>=.62,side:THREE.DoubleSide});}
+function remember(id,obj){obj.userData.partId=id; if(!objectById.has(id)) objectById.set(id,[]); objectById.get(id).push(obj); return obj;}
+function box(id,size,pos,hex,opacity=1,metal=.06){const m=remember(id,new THREE.Mesh(new THREE.BoxGeometry(...size),mat(hex,opacity,metal))); m.position.set(...pos); root.add(m); return m;}
+function cyl(id,r,h,pos,hex,opacity=1,metal=.06,axis="y"){const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,80),mat(hex,opacity,metal))); if(axis==="x")m.rotation.z=Math.PI/2; if(axis==="z")m.rotation.x=Math.PI/2; m.position.set(...pos); root.add(m); return m;}
+function tube(id,start,end,r,hex,opacity=.9){const mid=new THREE.Vector3((start[0]+end[0])/2,(start[1]+end[1])/2,(start[2]+end[2])/2); const dir=new THREE.Vector3(end[0]-start[0],end[1]-start[1],end[2]-start[2]); const len=dir.length(); const geom=new THREE.CylinderGeometry(r,r,len,48); const mesh=remember(id,new THREE.Mesh(geom,mat(hex,opacity,.04))); mesh.position.copy(mid); mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); root.add(mesh); return mesh;}
+function labelPlate(id,text,pos){const plate=box(id,[16,.8,5],pos,"#142029",.86); return plate;}
+function setVisibilityForView(){
+  const include={
+    assembled:null,
+    exploded:null,
+    fluidics:["cassette","main-channel","flow-sensor","pump","valve-bank","pressure-a","pressure-b","fittings","stopcock","standard","waste"],
+    chemistry:["cassette","main-channel","sensor-strip","k1","k2","k3","ref-a","ref-b","blank","standard"],
+    reader:["reader-shell","display","afe","buffer","adc","mcu","psu","mount","pump","valve-bank"],
+    validation:["cassette","main-channel","sensor-strip","k1","k2","k3","ref-a","ref-b","blank","flow-sensor","pump","valve-bank","pressure-a","pressure-b","standard","waste"]
+  }[activeView];
+  if(!include)return;
+  for(const [id,objs] of objectById) objs.forEach(o=>o.visible=include.includes(id));
+}
+function build(){
+  root.clear(); objectById.clear();
+  const exploded=activeView==="exploded";
+  const y=exploded?{reader:62,cassette:8,strip:24,pump:38,flow:38,fluid:-14,waste:-38,standard:-36,mount:82}:{reader:44,cassette:0,strip:7,pump:16,flow:16,fluid:-13,waste:-25,standard:-23,mount:64};
+  // Bedrail and reader
+  box("mount",[160,18,22],[0,y.mount,0],"#242d34",.92,.08);
+  cyl("mount",18,34,[-76,y.mount-22,0],"#1c252c",.9,.08,"z");
+  box("reader-shell",[170,112,42],[0,y.reader,0],"#111820",.36,.08);
+  box("display",[70,4,50],[-36,y.reader+22,0],"#1a2a33",.95,.08);
+  box("display",[58,4.4,36],[-36,y.reader+24,0],"#0b3a42",.96,.08);
+  box("afe",[7,2,7],[36,y.reader+16,-26],"#18212a",1,.1);
+  box("buffer",[6,2,4.9],[49,y.reader+16,-26],"#18212a",1,.1);
+  box("adc",[3.5,1.2,3.5],[60,y.reader+16,-26],"#18212a",1,.1);
+  box("mcu",[25,3,18],[44,y.reader+16,16],"#234d85",1,.08);
+  box("psu",[28,9,16],[72,y.reader+16,16],"#30343a",1,.08);
+  // Cassette and electrode strip
+  box("cassette",[120,14,44],[0,y.cassette,0],"#bfeaf4",.28,.04);
+  box("main-channel",[88,4,6],[0,y.cassette+1,0],"#4ea3ff",.58,.04);
+  tube("main-channel",[-44,y.cassette+1,0],[44,y.cassette+1,0],3.0,"#4ea3ff",.55);
+  box("sensor-strip",[33.8,.5,10.2],[-6,y.strip,-10],"#f0f2f4",.95,.05);
+  cyl("k1",4,.35,[-18,y.strip+.6,-10],"#36d399",1,.08);
+  cyl("k2",4,.35,[-8,y.strip+.6,-10],"#2fbf78",1,.08);
+  cyl("k3",4,.35,[2,y.strip+.6,-10],"#70f0cb",1,.08);
+  cyl("ref-a",3.8,.35,[13,y.strip+.6,-10],"#d9eeff",1,.08);
+  cyl("ref-b",3.8,.35,[22,y.strip+.6,-10],"#8fd3ff",1,.08);
+  cyl("blank",3.8,.35,[31,y.strip+.6,-10],"#8995a1",1,.08);
+  box("ref-a",[18,2,4],[13,y.strip+1.8,-21],"#d9eeff",.75,.04);
+  box("ref-b",[18,2,4],[22,y.strip+4.2,-21],"#8fd3ff",.75,.04);
+  // Flow components
+  box("flow-sensor",[48,8.9,15.5],[-68,y.flow,0],"#132530",.95,.08);
+  box("pump",[30,3.8,15],[-68,y.pump,28],"#26313a",.95,.08);
+  box("valve-bank",[30,9,18],[-28,y.pump,30],"#1b242b",.96,.08);
+  box("pressure-a",[10.54,3.53,8.1],[-46,y.cassette+9,18],"#f4f1e8",.95,.06);
+  box("pressure-b",[10.54,3.53,8.1],[46,y.cassette+9,18],"#f4f1e8",.95,.06);
+  for(const x of [-56,56,-8,8]) cyl("fittings",4,10,[x,y.cassette+1,27],"#d7dde3",.95,.08,"z");
+  box("stopcock",[38,12,24],[62,y.fluid,34],"#e6eef4",.9,.06);
+  // Standards and waste
+  box("standard",[18,24,10],[-38,y.standard,-44],"#ffbd68",.58,.04);
+  box("standard",[18,24,10],[-14,y.standard,-44],"#ffbd68",.38,.04);
+  box("waste",[40,36,26],[42,y.waste,-44],"#dcecf2",.25,.04);
+  // Tubing paths
+  tube("fittings",[-112,y.fluid,0],[-92,y.fluid,0],2.2,"#dbe6e8",.9);
+  tube("flow-sensor",[-92,y.fluid,0],[-68,y.flow,0],2.2,"#dbe6e8",.9);
+  tube("fittings",[-44,y.cassette+1,0],[-92,y.fluid,0],2.0,"#ff5a52",.72);
+  tube("fittings",[44,y.cassette+1,0],[112,y.fluid,0],2.0,"#ff5a52",.72);
+  tube("standard",[-38,y.standard,-44],[-28,y.pump,30],1.5,"#ffbd68",.75);
+  tube("waste",[20,y.cassette+1,-12],[42,y.waste,-44],1.8,"#bfeaf4",.55);
+  tube("pump",[-68,y.pump,28],[-44,y.cassette+1,0],1.6,"#30d5c8",.65);
+  tube("valve-bank",[-28,y.pump,30],[-14,y.standard,-44],1.4,"#ffbd68",.65);
+  if(activeView==="validation"){
+    box("standard",[32,12,22],[-98,8,-52],"#ffbd68",.45);
+    box("waste",[44,24,28],[92,-4,-50],"#dcecf2",.22);
+  }
+  setVisibilityForView();
+}
+function setView(id){activeView=id; build(); const v=views[id]; camera.position.set(...v.camera); controls.target.set(...v.target); controls.update(); renderUI();}
+function selectPart(id){activePart=id; renderUI();}
+function renderUI(){
+  document.getElementById("views").innerHTML=Object.entries(views).map(([id,v])=>`<button class="button ${id===activeView?"active":""}" data-view="${id}">${v.label}</button>`).join("");
+  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+  document.getElementById("partList").innerHTML=parts.map(p=>`<button class="part-button ${p.id===activePart?"active":""}" data-part="${p.id}">${p.name}<span>${p.exact}</span></button>`).join("");
+  document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>selectPart(b.dataset.part));
+  const p=partById.get(activePart)||parts[0];
+  document.getElementById("inspector").innerHTML=`<div class="type">${p.type}</div><div class="title">${p.name}</div><p><b>Exact part / family:</b> ${p.exact}</p><p><b>Modeled dimensions:</b> ${p.dims}</p><p><b>Function:</b> ${p.detail}</p><p><b>Validation risk:</b> ${p.risk}</p><p><b>Source:</b> ${p.source}</p><a class="source-link" href="${p.href}" target="_blank" rel="noopener">Open source / order page</a>`;
+  for(const [id,objs] of objectById){objs.forEach(obj=>{if(obj.material){obj.material.emissive=new THREE.Color(id===activePart?0x254b60:0x000000);obj.material.emissiveIntensity = id === activePart ? 0.55 : 0;}})}
+}
+const raycaster=new THREE.Raycaster(); const mouse=new THREE.Vector2();
+canvas.addEventListener("click",e=>{mouse.x=e.clientX/innerWidth*2-1; mouse.y=-(e.clientY/innerHeight)*2+1; raycaster.setFromCamera(mouse,camera); const hit=raycaster.intersectObjects(root.children,true).find(h=>h.object.userData.partId); if(hit) selectPart(hit.object.userData.partId);});
+addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight);});
+function animate(){requestAnimationFrame(animate); controls.update(); renderer.render(scene,camera);}
+setView("assembled"); animate();
+</script>
 </body>
 </html>
