@@ -27,6 +27,7 @@ const DEV_REWRITES = {
   '/urine-aki/app/': '/urine-aki/app/index.html',
   '/prototype': '/prototype.html',
   '/prototype/': '/prototype/index.html',
+  '/web-terms': '/web-terms.html',
   '/bid/alaska-dotpf': '/bid/alaska-dotpf.html',
   '/bid/3d/viewer': '/bid/3d/viewer.html',
 }
@@ -58,6 +59,7 @@ export default {
         main: resolve(__dirname, 'index.html'),
         privacy: resolve(__dirname, 'privacy.html'),
         terms: resolve(__dirname, 'terms.html'),
+        webTerms: resolve(__dirname, 'web-terms.html'),
         support: resolve(__dirname, 'support.html'),
         app: resolve(__dirname, 'app.html'),
       },

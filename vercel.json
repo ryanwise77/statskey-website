@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/web-terms", "destination": "/web-terms.html" },
     { "source": "/support", "destination": "/support.html" },
     { "source": "/cbm", "destination": "/cbm.html" },
     { "source": "/cbm/", "destination": "/cbm/index.html" },
