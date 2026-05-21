@@ -91,9 +91,6 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
   })
   const [bowelDurationMinutes, setBowelDurationMinutes] = useState(Math.floor(initialDuration / 60))
   const [bowelDurationSeconds, setBowelDurationSeconds] = useState(initialDuration % 60)
-  const [showInDashboardTimeline, setShowInDashboardTimeline] = useState(
-    initialEntry?.showInDashboardTimeline ?? false
-  )
 
   async function save() {
     if (!user) return
@@ -138,7 +135,6 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
         type: kind,
         data,
         notes: notes.trim() || undefined,
-        showInDashboardTimeline: kind === 'bowelMovement' ? showInDashboardTimeline : undefined,
         date,
         createdAt: initialEntry?.createdAt ?? new Date(),
       }
@@ -340,21 +336,6 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
               </button>
             </div>
           </div>
-
-          <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3 text-[13px] text-text-secondary">
-            <input
-              type="checkbox"
-              className="mt-1"
-              checked={showInDashboardTimeline}
-              onChange={(e) => setShowInDashboardTimeline(e.target.checked)}
-            />
-            <span>
-              <span className="block font-medium text-text-primary">Show on today's timeline</span>
-              <span className="block mt-1">
-                Off by default for privacy. Gut checks stay available in history and detail views.
-              </span>
-            </span>
-          </label>
         </div>
       )}
 

@@ -199,7 +199,6 @@ export interface WellnessEntry {
   data: WellnessData
   mealId?: string
   notes?: string
-  showInDashboardTimeline?: boolean
   date: Date
   createdAt: Date
 }

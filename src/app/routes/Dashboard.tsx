@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useAuth } from '../lib/auth'
 import { useTodayMeals } from '../lib/data/useTodayMeals'
 import { useTodayWater } from '../lib/data/useTodayWater'
@@ -18,7 +18,6 @@ import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
 import { WorkoutCard } from '../components/WorkoutCard'
 import { EmptyState } from '../components/EmptyState'
 import { ActivityCard } from '../components/ActivityCard'
-import type { WellnessEntry } from '../lib/types'
 
 export function Dashboard() {
   const { user, profile } = useAuth()
@@ -32,6 +31,7 @@ export function Dashboard() {
   const glucoseState = useLatestGlucose(uid)
   const todayDate = useMemo(() => new Date(), [])
   const healthState = useHealthDailyForDay(uid, todayDate)
+  const [showSensitiveTimelineDetails, setShowSensitiveTimelineDetails] = useState(false)
 
   const totals = useMemo(() => dailyTotals(mealsState.meals), [mealsState.meals])
 
@@ -41,11 +41,7 @@ export function Dashboard() {
       | { kind: 'wellness'; date: Date; id: string; entry: typeof wellnessState.entries[number] }
     const items: Item[] = []
     for (const m of mealsState.meals) items.push({ kind: 'meal', date: m.date, id: m.id, meal: m })
-    for (const w of wellnessState.entries) {
-      if (showsInDashboardTimeline(w)) {
-        items.push({ kind: 'wellness', date: w.date, id: w.id, entry: w })
-      }
-    }
+    for (const w of wellnessState.entries) items.push({ kind: 'wellness', date: w.date, id: w.id, entry: w })
     items.sort((a, b) => b.date.getTime() - a.date.getTime())
     return items
   }, [mealsState.meals, wellnessState.entries])
@@ -91,9 +87,18 @@ export function Dashboard() {
       </div>
 
       <section className="panel">
-        <div className="flex items-baseline justify-between mb-2">
+        <div className="flex items-baseline justify-between gap-3 mb-2">
           <h2 className="card-title">Today's timeline</h2>
-          <Link to="/history" className="link text-[12px]">View history →</Link>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="link text-[12px]"
+              onClick={() => setShowSensitiveTimelineDetails((show) => !show)}
+            >
+              {showSensitiveTimelineDetails ? 'Hide private details' : 'Show private details'}
+            </button>
+            <Link to="/history" className="link text-[12px]">View history →</Link>
+          </div>
         </div>
         {mealsState.loading || wellnessState.loading ? (
           <p className="text-text-muted text-[13px]">Loading…</p>
@@ -108,7 +113,11 @@ export function Dashboard() {
               item.kind === 'meal' ? (
                 <MealTimelineRow key={`m-${item.id}`} meal={item.meal} />
               ) : (
-                <WellnessTimelineRow key={`w-${item.id}`} entry={item.entry} />
+                <WellnessTimelineRow
+                  key={`w-${item.id}`}
+                  entry={item.entry}
+                  concealSensitive={!showSensitiveTimelineDetails}
+                />
               )
             )}
           </div>
@@ -137,11 +146,4 @@ export function Dashboard() {
       </section>
     </div>
   )
-}
-
-function showsInDashboardTimeline(entry: WellnessEntry): boolean {
-  if (entry.data.kind === 'bowelMovement') {
-    return entry.showInDashboardTimeline === true
-  }
-  return true
 }

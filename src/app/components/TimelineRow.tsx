@@ -39,9 +39,16 @@ export function MealTimelineRow({ meal }: MealRowProps) {
 
 interface WellnessRowProps {
   entry: WellnessEntry
+  concealSensitive?: boolean
 }
 
-function wellnessTitle(entry: WellnessEntry): string {
+function isSensitiveWellnessEntry(entry: WellnessEntry): boolean {
+  return entry.data.kind === 'bowelMovement'
+}
+
+function wellnessTitle(entry: WellnessEntry, concealSensitive = false): string {
+  if (concealSensitive && isSensitiveWellnessEntry(entry)) return 'Wellness entry'
+
   switch (entry.data.kind) {
     case 'symptom':
       return entry.data.entry.symptom || 'Symptom'
@@ -60,7 +67,11 @@ function wellnessTitle(entry: WellnessEntry): string {
   }
 }
 
-function wellnessSubtitle(entry: WellnessEntry): string | undefined {
+function wellnessSubtitle(entry: WellnessEntry, concealSensitive = false): string | undefined {
+  if (concealSensitive && isSensitiveWellnessEntry(entry)) {
+    return 'Details hidden'
+  }
+
   switch (entry.data.kind) {
     case 'symptom': {
       const parts: string[] = []
@@ -89,18 +100,18 @@ function wellnessSubtitle(entry: WellnessEntry): string | undefined {
   }
 }
 
-export function WellnessTimelineRow({ entry }: WellnessRowProps) {
-  const sub = wellnessSubtitle(entry)
+export function WellnessTimelineRow({ entry, concealSensitive = false }: WellnessRowProps) {
+  const sub = wellnessSubtitle(entry, concealSensitive)
   return (
-    <div className="timeline-row">
+    <Link to={`/wellness/${entry.id}`} className="timeline-row hover:bg-white/[0.02] transition-colors px-3 -mx-3 rounded-md">
       <div className="timeline-time">{formatTime(entry.date)}</div>
       <div className="timeline-content">
         <div className="timeline-title">
           <span className="timeline-badge">Wellness</span>
-          {wellnessTitle(entry)}
+          {wellnessTitle(entry, concealSensitive)}
         </div>
         {sub && <div className="timeline-subtitle">{sub}</div>}
       </div>
-    </div>
+    </Link>
   )
 }

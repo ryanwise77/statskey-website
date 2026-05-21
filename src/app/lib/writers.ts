@@ -193,7 +193,6 @@ export async function saveWellness(uid: string, entry: WellnessEntry): Promise<v
     createdAt: entry.createdAt,
     mealId: entry.mealId ?? null,
     notes: entry.notes ?? null,
-    showInDashboardTimeline: entry.showInDashboardTimeline ?? false,
   }
 
   await setDoc(doc(db, 'users', uid, 'wellness', entry.id), payload, { merge: true })
