@@ -130,13 +130,45 @@ export async function setWaterOz(uid: string, flOz: number, day: Date = new Date
 function encodeWellnessData(data: WellnessData): Record<string, unknown> {
   switch (data.kind) {
     case 'symptom':
-      return { type: 'symptom', symptom: data.entry }
+      return {
+        type: 'symptom',
+        symptom: {
+          symptom: data.entry.symptom,
+          severity: data.entry.severity,
+          duration: data.entry.duration ?? null,
+          bodyArea: data.entry.bodyArea ?? null,
+          triggers: data.entry.triggers,
+        },
+      }
     case 'mood':
-      return { type: 'mood', mood: data.entry }
+      return {
+        type: 'mood',
+        mood: {
+          rating: data.entry.rating,
+          tags: data.entry.tags,
+          notes: data.entry.notes ?? null,
+        },
+      }
     case 'energy':
-      return { type: 'energy', energy: data.entry }
+      return {
+        type: 'energy',
+        energy: {
+          level: data.entry.level,
+          crashTime: data.entry.crashTime ?? null,
+          notes: data.entry.notes ?? null,
+        },
+      }
     case 'bowelMovement':
-      return { type: 'bowelMovement', bowelMovement: data.entry }
+      return {
+        type: 'bowelMovement',
+        bowelMovement: {
+          bristolType: data.entry.bristolType,
+          color: data.entry.color ?? null,
+          urgency: data.entry.urgency ?? null,
+          durationInSeconds: data.entry.durationInSeconds ?? null,
+          notes: data.entry.notes ?? null,
+        },
+      }
     case 'sleep':
       return { type: 'sleep', sleepHours: data.hours, sleepQuality: data.quality }
     case 'hydration':
@@ -159,9 +191,10 @@ export async function saveWellness(uid: string, entry: WellnessEntry): Promise<v
     data: encodeWellnessData(entry.data),
     date: entry.date,
     createdAt: entry.createdAt,
+    mealId: entry.mealId ?? null,
+    notes: entry.notes ?? null,
+    showInDashboardTimeline: entry.showInDashboardTimeline ?? false,
   }
-  if (entry.mealId) payload.mealId = entry.mealId
-  if (entry.notes) payload.notes = entry.notes
 
   await setDoc(doc(db, 'users', uid, 'wellness', entry.id), payload, { merge: true })
 }

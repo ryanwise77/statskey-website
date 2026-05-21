@@ -18,6 +18,7 @@ import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
 import { WorkoutCard } from '../components/WorkoutCard'
 import { EmptyState } from '../components/EmptyState'
 import { ActivityCard } from '../components/ActivityCard'
+import type { WellnessEntry } from '../lib/types'
 
 export function Dashboard() {
   const { user, profile } = useAuth()
@@ -40,7 +41,11 @@ export function Dashboard() {
       | { kind: 'wellness'; date: Date; id: string; entry: typeof wellnessState.entries[number] }
     const items: Item[] = []
     for (const m of mealsState.meals) items.push({ kind: 'meal', date: m.date, id: m.id, meal: m })
-    for (const w of wellnessState.entries) items.push({ kind: 'wellness', date: w.date, id: w.id, entry: w })
+    for (const w of wellnessState.entries) {
+      if (showsInDashboardTimeline(w)) {
+        items.push({ kind: 'wellness', date: w.date, id: w.id, entry: w })
+      }
+    }
     items.sort((a, b) => b.date.getTime() - a.date.getTime())
     return items
   }, [mealsState.meals, wellnessState.entries])
@@ -132,4 +137,11 @@ export function Dashboard() {
       </section>
     </div>
   )
+}
+
+function showsInDashboardTimeline(entry: WellnessEntry): boolean {
+  if (entry.data.kind === 'bowelMovement') {
+    return entry.showInDashboardTimeline === true
+  }
+  return true
 }
