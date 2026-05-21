@@ -48,27 +48,52 @@ const BRISTOL_LABELS: Record<number, string> = {
   7: 'Type 7 — Liquid',
 }
 
-export function WellnessLogForm({ onSaved }: { onSaved: () => void }) {
+const DURATION_QUICK_MINUTES = [1, 2, 5, 10, 15, 20]
+
+interface WellnessLogFormProps {
+  onSaved: (entry: WellnessEntry) => void
+  initialEntry?: WellnessEntry
+  onCancel?: () => void
+}
+
+export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLogFormProps) {
   const { user } = useAuth()
-  const [kind, setKind] = useState<Kind>('mood')
-  const [date, setDate] = useState(new Date())
-  const [notes, setNotes] = useState('')
+  const isEditing = initialEntry != null
+  const initialKind = initialEntry ? kindFromEntry(initialEntry) : 'mood'
+  const initialBowel = initialEntry?.data.kind === 'bowelMovement' ? initialEntry.data.entry : undefined
+  const initialDuration = initialBowel?.durationInSeconds ?? 0
+  const [kind, setKind] = useState<Kind>(initialKind)
+  const [date, setDate] = useState(initialEntry?.date ?? new Date())
+  const [notes, setNotes] = useState(initialEntry?.notes ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [mood, setMood] = useState<MoodEntry>({ rating: 3, tags: [], notes: undefined })
-  const [energy, setEnergy] = useState<EnergyEntry>({ level: 3, notes: undefined })
+  const [mood, setMood] = useState<MoodEntry>(
+    initialEntry?.data.kind === 'mood' ? initialEntry.data.entry : { rating: 3, tags: [], notes: undefined }
+  )
+  const [energy, setEnergy] = useState<EnergyEntry>(
+    initialEntry?.data.kind === 'energy' ? initialEntry.data.entry : { level: 3, notes: undefined }
+  )
   const [symptom, setSymptom] = useState<SymptomEntry>({
-    symptom: '',
-    severity: 3,
-    triggers: [],
+    symptom: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.symptom : '',
+    severity: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.severity : 3,
+    duration: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.duration : undefined,
+    bodyArea: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.bodyArea : undefined,
+    triggers: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.triggers : [],
   })
-  // Match the iOS "don't default color/urgency" behavior from BowelLogView.
+  // Match the iOS "don't default optional gut-check fields" behavior from BowelLogView.
   const [bowel, setBowel] = useState<BowelMovementEntry>({
-    bristolType: 4,
-    color: undefined,
-    urgency: undefined,
+    bristolType: initialBowel?.bristolType ?? 4,
+    color: initialBowel?.color,
+    urgency: initialBowel?.urgency,
+    durationInSeconds: initialBowel?.durationInSeconds,
+    notes: initialBowel?.notes,
   })
+  const [bowelDurationMinutes, setBowelDurationMinutes] = useState(Math.floor(initialDuration / 60))
+  const [bowelDurationSeconds, setBowelDurationSeconds] = useState(initialDuration % 60)
+  const [showInDashboardTimeline, setShowInDashboardTimeline] = useState(
+    initialEntry?.showInDashboardTimeline ?? false
+  )
 
   async function save() {
     if (!user) return
@@ -92,21 +117,33 @@ export function WellnessLogForm({ onSaved }: { onSaved: () => void }) {
           data = { kind: 'symptom', entry: { ...symptom, symptom: symptom.symptom.trim() } }
           break
         case 'bowelMovement':
-          data = { kind: 'bowelMovement', entry: bowel }
+          {
+            const durationInSeconds = bowelDurationMinutes * 60 + bowelDurationSeconds
+            const trimmedNotes = notes.trim()
+            data = {
+              kind: 'bowelMovement',
+              entry: {
+                ...bowel,
+                durationInSeconds: durationInSeconds > 0 ? durationInSeconds : undefined,
+                notes: trimmedNotes || undefined,
+              },
+            }
+          }
           break
       }
 
       const entry: WellnessEntry = {
-        id: newId(),
+        id: initialEntry?.id ?? newId(),
         userId: user.uid,
         type: kind,
         data,
         notes: notes.trim() || undefined,
+        showInDashboardTimeline: kind === 'bowelMovement' ? showInDashboardTimeline : undefined,
         date,
-        createdAt: new Date(),
+        createdAt: initialEntry?.createdAt ?? new Date(),
       }
       await saveWellness(user.uid, entry)
-      onSaved()
+      onSaved(entry)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
@@ -120,11 +157,22 @@ export function WellnessLogForm({ onSaved }: { onSaved: () => void }) {
         <span className="card-title block mb-2">Type</span>
         <div className="tab-strip">
           {KINDS.map((k) => (
-            <button key={k} className={kind === k ? 'active' : ''} onClick={() => setKind(k)}>
+            <button
+              key={k}
+              className={kind === k ? 'active' : ''}
+              onClick={() => setKind(k)}
+              disabled={isEditing}
+              title={isEditing ? 'Create a new entry to change type.' : undefined}
+            >
               {k === 'bowelMovement' ? 'Gut check' : k[0].toUpperCase() + k.slice(1)}
             </button>
           ))}
         </div>
+        {isEditing && (
+          <p className="text-text-muted text-[12px] mt-2">
+            Entry type is fixed when editing, matching the iOS journal flow.
+          </p>
+        )}
       </div>
 
       {kind === 'mood' && (
@@ -231,6 +279,82 @@ export function WellnessLogForm({ onSaved }: { onSaved: () => void }) {
               ))}
             </div>
           </div>
+
+          <div>
+            <span className="text-text-muted text-[11px] uppercase tracking-wider block mb-1.5">
+              Duration {bowelDurationMinutes || bowelDurationSeconds ? '' : '(not recorded)'}
+            </span>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Minutes">
+                <input
+                  className="input"
+                  type="number"
+                  min={0}
+                  max={59}
+                  inputMode="numeric"
+                  value={bowelDurationMinutes}
+                  onChange={(e) => setBowelDurationMinutes(clampDurationPart(e.target.value, 59))}
+                />
+              </Field>
+              <Field label="Seconds">
+                <input
+                  className="input"
+                  type="number"
+                  min={0}
+                  max={59}
+                  inputMode="numeric"
+                  value={bowelDurationSeconds}
+                  onChange={(e) => setBowelDurationSeconds(clampDurationPart(e.target.value, 59))}
+                />
+              </Field>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {DURATION_QUICK_MINUTES.map((minutes) => (
+                <button
+                  key={minutes}
+                  type="button"
+                  className={
+                    'btn ' +
+                    (bowelDurationMinutes === minutes && bowelDurationSeconds === 0
+                      ? 'btn-primary'
+                      : 'btn-secondary') +
+                    ' text-[12px]'
+                  }
+                  onClick={() => {
+                    setBowelDurationMinutes(minutes)
+                    setBowelDurationSeconds(0)
+                  }}
+                >
+                  {minutes}m
+                </button>
+              ))}
+              <button
+                type="button"
+                className="btn btn-secondary text-[12px]"
+                onClick={() => {
+                  setBowelDurationMinutes(0)
+                  setBowelDurationSeconds(0)
+                }}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3 text-[13px] text-text-secondary">
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={showInDashboardTimeline}
+              onChange={(e) => setShowInDashboardTimeline(e.target.checked)}
+            />
+            <span>
+              <span className="block font-medium text-text-primary">Show on today's timeline</span>
+              <span className="block mt-1">
+                Off by default for privacy. Gut checks stay available in history and detail views.
+              </span>
+            </span>
+          </label>
         </div>
       )}
 
@@ -256,8 +380,13 @@ export function WellnessLogForm({ onSaved }: { onSaved: () => void }) {
       {error && <div className="error-banner">{error}</div>}
 
       <div className="flex justify-end gap-2">
+        {onCancel && (
+          <button className="btn btn-ghost" type="button" onClick={onCancel} disabled={saving}>
+            Cancel
+          </button>
+        )}
         <button className="btn btn-primary" onClick={save} disabled={saving}>
-          {saving ? 'Saving…' : 'Save entry'}
+          {saving ? 'Saving...' : isEditing ? 'Save changes' : 'Save entry'}
         </button>
       </div>
     </div>
@@ -306,6 +435,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
+function clampDurationPart(value: string, max: number): number {
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed)) return 0
+  return Math.min(max, Math.max(0, Math.floor(parsed)))
+}
+
 function toDatetimeLocal(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
@@ -313,4 +448,16 @@ function toDatetimeLocal(d: Date): string {
 
 function fromDatetimeLocal(s: string): Date {
   return new Date(s)
+}
+
+function kindFromEntry(entry: WellnessEntry): Kind {
+  switch (entry.data.kind) {
+    case 'mood':
+    case 'energy':
+    case 'symptom':
+    case 'bowelMovement':
+      return entry.data.kind
+    default:
+      return entry.type
+  }
 }

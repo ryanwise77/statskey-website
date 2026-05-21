@@ -257,6 +257,7 @@ export function decodeWellness(raw: Raw, id: string): WellnessEntry | undefined 
     data,
     mealId: str(raw.mealId),
     notes: str(raw.notes),
+    showInDashboardTimeline: bool(raw.showInDashboardTimeline),
     date: toDateOrNow(raw.date),
     createdAt: toDateOrNow(raw.createdAt),
   }

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { Meal, WellnessEntry } from '../lib/types'
 import { mealDisplayName, mealTotal } from '../lib/aggregates'
 import { NUTRIENT_KEYS } from '../lib/types'
+import { formatDuration } from '../lib/format'
 
 function formatTime(d: Date): string {
   return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
@@ -72,6 +73,9 @@ function wellnessSubtitle(entry: WellnessEntry): string | undefined {
       const parts: string[] = []
       if (e.color) parts.push(e.color)
       if (e.urgency != null) parts.push(`urgency ${e.urgency}`)
+      if (e.durationInSeconds != null && e.durationInSeconds > 0) {
+        parts.push(formatDuration(e.durationInSeconds))
+      }
       return parts.join(' · ') || entry.notes
     }
     case 'mood':
