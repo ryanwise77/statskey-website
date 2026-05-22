@@ -1,0 +1,15 @@
+---
+description: Protect user work and remote branches from agent overwrites
+alwaysApply: true
+---
+
+# Protect User Work
+
+- Do not commit, push, amend, rebase, reset, checkout, force sync, or otherwise change Git history unless the user explicitly asks for that exact action.
+- Do not overwrite, revert, delete, or reformat unrelated files. Treat every uncommitted change and every untracked file as user-owned unless you created it in the current task.
+- Before editing, identify the smallest files needed for the request and keep changes scoped there.
+- If a fix requires touching deployed backend, GitHub configuration, or CI/CD, explain the change and get explicit approval before making it.
+- When repairing a regression, preserve existing features and data contracts unless the user explicitly asks to replace them.
+- Before any website deploy or route/build config change, run `git status --short` and include relevant untracked files in the deployment plan instead of assuming only tracked files matter.
+- Preserve standalone presentation/static pages and their route mappings, especially `nike-statskey-presentation.html`, `public/nike-run-club/**`, `public/hospital-ckm/**`, `public/prototype/**`, and `vercel.json` rewrites.
+- If a live page is down, fix the route/deploy inclusion directly. Do not solve it by reverting recent website edits or removing newer pages.

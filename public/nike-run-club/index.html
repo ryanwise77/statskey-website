@@ -1,0 +1,2569 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StatsKey x Nike | The Body, Made Legible</title>
+  <meta name="description" content="StatsKey x Nike Run Club presentation: health context, running, nutrition, and the future of body intelligence." />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090f;
+      --panel: #101520;
+      --panel-2: #151d2b;
+      --ink: #f6f7fb;
+      --muted: #a8b1c5;
+      --quiet: #68748e;
+      --line: rgba(255,255,255,.12);
+      --line-strong: rgba(255,255,255,.24);
+      --blue: #78a6ff;
+      --cyan: #40d9c8;
+      --violet: #b493ff;
+      --green: #9ee493;
+      --amber: #ffd166;
+      --red: #ff7a7a;
+      --max: 1180px;
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 18% 14%, rgba(120,166,255,.16), transparent 34%),
+        radial-gradient(circle at 86% 74%, rgba(64,217,200,.11), transparent 35%),
+        linear-gradient(135deg, #06080d 0%, #0a0f18 52%, #07090f 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    .deck {
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      min-height: 100vh;
+      padding: 54px clamp(28px, 5vw, 76px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide.active { display: flex; }
+
+    .frame {
+      width: min(var(--max), 100%);
+      min-height: min(760px, calc(100vh - 128px));
+      display: grid;
+      gap: 34px;
+      align-content: center;
+    }
+
+    .frame.split {
+      grid-template-columns: minmax(0, 1.02fr) minmax(390px, .98fr);
+      align-items: center;
+    }
+
+    .frame.market {
+      grid-template-columns: minmax(360px, .78fr) minmax(560px, 1.22fr);
+      align-items: center;
+    }
+
+    .frame.market h2 {
+      font-size: clamp(34px, 4vw, 58px);
+      max-width: 620px;
+    }
+
+    .frame.market .lede {
+      font-size: clamp(18px, 1.7vw, 23px);
+      max-width: 620px;
+    }
+
+    .frame.market .claim {
+      font-size: 15px;
+      grid-template-columns: 32px 1fr;
+      gap: 11px;
+    }
+
+    .frame.market .num {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+    }
+
+    .frame.center { text-align: center; justify-items: center; }
+    .frame.opening {
+      grid-template-columns: minmax(0, .72fr) minmax(560px, 1.28fr);
+      align-items: center;
+      gap: 56px;
+    }
+    .frame.opening h1 {
+      font-size: clamp(36px, 4.2vw, 58px);
+    }
+    .frame.opening .lede {
+      font-size: clamp(16px, 1.5vw, 20px);
+    }
+
+    .kicker {
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1, h2 {
+      font-family: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: -.045em;
+      line-height: .96;
+    }
+
+    h1 {
+      font-size: clamp(48px, 6.2vw, 84px);
+      max-width: 980px;
+      line-height: 1.01;
+    }
+
+    h2 {
+      font-size: clamp(38px, 4.8vw, 70px);
+      max-width: 930px;
+      line-height: 1.02;
+    }
+
+    h3 {
+      font-size: 18px;
+      letter-spacing: -.01em;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: clamp(22px, 2.3vw, 32px);
+      line-height: 1.22;
+      max-width: 900px;
+      margin-top: 24px;
+    }
+
+    .body {
+      color: var(--muted);
+      font-size: 21px;
+      line-height: 1.44;
+      max-width: 760px;
+    }
+
+    .fine {
+      color: var(--quiet);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .brand-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 15px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .problem-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .problem-card {
+      display: grid;
+      gap: 9px;
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+    }
+
+    .problem-card h3 {
+      color: var(--ink);
+      font-size: 16px;
+    }
+
+    .problem-card p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.38;
+    }
+
+    .data-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    .data-point {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 15px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .data-point strong {
+      display: block;
+      color: var(--cyan);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 7px;
+    }
+
+    .data-point span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.28;
+    }
+
+    /* ── Hero body-hub SVG container ──────────────────────────── */
+    .body-hub {
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 820px;
+      margin-left: auto;
+    }
+
+    .body-hub svg { width: 100%; height: 100%; display: block; }
+
+    /* ── Revenue bar chart (market slide) ─────────────────────── */
+    .rev-chart {
+      display: grid;
+      gap: 18px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .rev-chart h3 {
+      color: var(--ink);
+      font-size: 14px;
+      letter-spacing: .02em;
+      margin-bottom: 4px;
+    }
+
+    .rev-chart .rev-source {
+      color: var(--quiet);
+      font-size: 11px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .rev-bar {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr) 110px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .rev-bar .label {
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .rev-bar .label small {
+      display: block;
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .rev-bar .track {
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .rev-bar .fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+    }
+
+    .rev-bar .fill.warn { background: linear-gradient(90deg, var(--violet), var(--amber)); }
+    .rev-bar .fill.flat { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+
+    .rev-bar .value {
+      color: var(--cyan);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 18px;
+      letter-spacing: -.03em;
+      text-align: right;
+    }
+
+    .rev-bar.statskey .value { color: var(--green); }
+
+    /* ── Cost pyramid (arbitrage slide) ───────────────────────── */
+    .cost-pyramid {
+      display: grid;
+      gap: 10px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .cost-tier {
+      display: grid;
+      grid-template-columns: 122px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      margin: 0 auto;
+    }
+
+    .cost-tier.t1 { width: 60%; border-color: rgba(120,166,255,.32); }
+    .cost-tier.t2 { width: 80%; border-color: rgba(180,147,255,.26); }
+    .cost-tier.t3 { width: 100%; border-color: rgba(64,217,200,.32); }
+
+    .cost-tier strong {
+      font-size: 13px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .cost-tier.t1 strong { color: var(--blue); }
+    .cost-tier.t2 strong { color: var(--violet); }
+    .cost-tier.t3 strong { color: var(--cyan); }
+
+    .cost-tier span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.36;
+    }
+
+    .price-proof {
+      display: grid;
+      gap: 12px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .price-proof-row {
+      display: grid;
+      grid-template-columns: 122px 164px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .price-proof-row:last-child { border-bottom: 0; }
+
+    .price-proof-row strong {
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.18;
+    }
+
+    .price-proof-row b {
+      color: var(--cyan);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 16px;
+      letter-spacing: -.03em;
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+    }
+
+    .price-proof-row span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.32;
+    }
+
+    .price-proof-row.statskey {
+      margin-top: 4px;
+      padding: 16px;
+      border: 1px solid rgba(64,217,200,.28);
+      border-radius: 18px;
+      background: rgba(64,217,200,.07);
+    }
+
+    .delta-pill {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      border: 1px solid rgba(64,217,200,.28);
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: var(--cyan);
+      background: rgba(64,217,200,.07);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .screenshot-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+
+    .app-shot {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,.04);
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .app-shot img {
+      width: 100%;
+      aspect-ratio: 9 / 19.5;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 16px;
+      display: block;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(0,0,0,.25);
+    }
+
+    .app-shot strong {
+      display: block;
+      color: var(--ink);
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.12;
+    }
+
+    .app-shot span {
+      display: block;
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .comparison-band {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .comparison-band .band-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px 18px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .comparison-band .band-card.accent {
+      border-color: rgba(64,217,200,.32);
+      background: rgba(64,217,200,.07);
+    }
+
+    .comparison-band strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      margin-bottom: 7px;
+    }
+
+    .comparison-band span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .statskey-proof {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .phone-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .phone-shot {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 24px;
+      padding: 8px;
+      background: rgba(255,255,255,.045);
+      min-width: 0;
+    }
+
+    .phone-shot img {
+      width: 100%;
+      aspect-ratio: 9 / 19.5;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 18px;
+      display: block;
+      background: rgba(255,255,255,.9);
+    }
+
+    .phone-shot strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    .report-card {
+      border: 1px solid rgba(64,217,200,.28);
+      border-radius: 28px;
+      background: rgba(64,217,200,.06);
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .report-stat {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(0,0,0,.18);
+    }
+
+    .report-stat strong {
+      display: block;
+      color: var(--cyan);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 25px;
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 7px;
+    }
+
+    .report-stat span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .app-showcase {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(310px, .72fr) minmax(0, 1.28fr);
+      gap: 20px;
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 38px;
+      padding: 18px;
+      background:
+        radial-gradient(circle at 24% 0%, rgba(120,166,255,.24), transparent 34%),
+        radial-gradient(circle at 82% 86%, rgba(64,217,200,.2), transparent 30%),
+        linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
+      box-shadow: 0 34px 90px rgba(0,0,0,.32);
+    }
+
+    .app-showcase::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 37px;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.2), transparent 42%, rgba(64,217,200,.14));
+      opacity: .5;
+    }
+
+    .product-showcase {
+      gap: 18px;
+    }
+
+    .product-showcase h2 {
+      max-width: 1080px;
+      font-size: clamp(34px, 3.8vw, 56px);
+    }
+
+    .product-showcase .lede {
+      max-width: 980px;
+      margin-top: 16px;
+      font-size: clamp(17px, 1.45vw, 21px);
+    }
+
+    .showcase-copy,
+    .device-stage {
+      position: relative;
+      z-index: 1;
+    }
+
+    .showcase-copy {
+      display: grid;
+      gap: 14px;
+      align-content: stretch;
+      min-width: 0;
+    }
+
+    .showcase-pill {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(64,217,200,.3);
+      border-radius: 999px;
+      padding: 8px 11px;
+      color: var(--cyan);
+      background: rgba(64,217,200,.08);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .lifestyle-card {
+      position: relative;
+      min-height: 238px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 30px;
+      background: rgba(0,0,0,.25);
+    }
+
+    .lifestyle-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      filter: saturate(1.08) contrast(1.05);
+    }
+
+    .lifestyle-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(7,9,15,.05), rgba(7,9,15,.78)),
+        radial-gradient(circle at 82% 12%, rgba(255,209,102,.18), transparent 32%);
+    }
+
+    .lifestyle-caption {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 18px;
+      z-index: 1;
+      display: grid;
+      gap: 6px;
+    }
+
+    .lifestyle-caption strong {
+      color: var(--ink);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 22px;
+      letter-spacing: -.04em;
+    }
+
+    .lifestyle-caption span {
+      color: rgba(246,247,251,.72);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .showcase-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .showcase-metric {
+      min-width: 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 14px;
+      background: rgba(0,0,0,.2);
+    }
+
+    .showcase-metric strong {
+      display: block;
+      color: var(--cyan);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 7px;
+    }
+
+    .showcase-metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .device-stage {
+      display: grid;
+      grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr);
+      gap: 14px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .hero-phone {
+      justify-self: center;
+      width: min(100%, 224px);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 42px;
+      padding: 10px;
+      background: linear-gradient(145deg, rgba(246,247,251,.95), rgba(185,198,214,.86));
+      box-shadow: 0 30px 70px rgba(0,0,0,.42), 0 0 0 8px rgba(255,255,255,.035);
+      transform: rotate(-1.25deg);
+    }
+
+    .hero-phone img {
+      width: 100%;
+      aspect-ratio: 9 / 19.5;
+      display: block;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 32px;
+      background: #eef1f7;
+    }
+
+    .screen-stack {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+
+    .screen-card {
+      min-width: 0;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 24px;
+      padding: 8px;
+      background: rgba(7,9,15,.48);
+      box-shadow: 0 18px 48px rgba(0,0,0,.22);
+    }
+
+    .screen-card:nth-child(2),
+    .screen-card:nth-child(4) {
+      transform: translateY(18px);
+    }
+
+    .screen-card img {
+      width: 100%;
+      aspect-ratio: 9 / 19.5;
+      display: block;
+      object-fit: cover;
+      object-position: top center;
+      border-radius: 18px;
+      background: #eef1f7;
+    }
+
+    .screen-card strong {
+      display: block;
+      margin: 9px 4px 3px;
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.15;
+    }
+
+    .screen-card span {
+      display: block;
+      margin: 0 4px 3px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.25;
+    }
+
+    .feature-matrix {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 30px;
+      overflow: hidden;
+      background: rgba(255,255,255,.045);
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1.16fr repeat(4, .54fr) 1.55fr;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      min-height: 66px;
+      align-items: stretch;
+    }
+
+    .feature-row:last-child { border-bottom: 0; }
+
+    .feature-row.header {
+      min-height: 50px;
+      background: rgba(255,255,255,.07);
+    }
+
+    .feature-cell {
+      padding: 14px 13px;
+      border-right: 1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.28;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .feature-cell:last-child { border-right: 0; }
+    .feature-row.header .feature-cell {
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .feature-name {
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .feature-status {
+      justify-content: center;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .feature-status.yes { color: var(--green); }
+    .feature-status.partial { color: var(--amber); }
+    .feature-status.no { color: var(--quiet); }
+    .feature-status.sk {
+      color: var(--cyan);
+      background: linear-gradient(90deg, rgba(64,217,200,.16), rgba(64,217,200,.07));
+      border-left: 1px solid rgba(64,217,200,.24);
+    }
+
+    .feature-note {
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.32;
+      font-weight: 650;
+    }
+
+    .feature-row.header .feature-status.sk {
+      color: var(--cyan);
+      font-size: 13px;
+      letter-spacing: .08em;
+    }
+
+    .feature-row .feature-cell:nth-child(6) {
+      background: rgba(64,217,200,.045);
+      border-left: 1px solid rgba(64,217,200,.22);
+    }
+
+    .prototype-wall {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .prototype-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 360px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(64,217,200,.13), transparent 38%),
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+      padding: 22px;
+      display: grid;
+      align-content: space-between;
+    }
+
+    .prototype-visual {
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+    }
+
+    .prototype-caption {
+      padding: 12px 13px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      background: rgba(5,8,14,.86);
+      backdrop-filter: blur(12px);
+    }
+
+    .prototype-caption strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.1;
+    }
+
+    .prototype-caption span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.28;
+    }
+
+    .proto-svg {
+      width: 100%;
+      max-width: 270px;
+      height: auto;
+      display: block;
+    }
+
+    .glucose-card {
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid rgba(64,217,200,.28);
+      border-radius: 20px;
+      background: rgba(64,217,200,.06);
+    }
+
+    .glucose-card h4 {
+      margin: 0 0 12px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .glucose-band {
+      position: relative;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .glucose-band .range {
+      position: absolute;
+      left: 22%;
+      width: 52%;
+      top: 0;
+      bottom: 0;
+      background: rgba(64,217,200,.32);
+    }
+
+    .glucose-band .peak {
+      position: absolute;
+      left: 92%;
+      top: 4px;
+      bottom: 4px;
+      width: 3px;
+      border-radius: 99px;
+      background: var(--amber);
+    }
+
+    .glucose-band .marker {
+      position: absolute;
+      left: 64%;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      margin-top: -7px;
+      border-radius: 999px;
+      background: var(--cyan);
+      border: 2px solid rgba(0,0,0,.35);
+    }
+
+    .glucose-scale {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 8px;
+      color: var(--quiet);
+      font-size: 11px;
+    }
+
+    .glucose-scale span:nth-child(2),
+    .glucose-scale span:nth-child(3) {
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .progress-story {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 26px;
+      align-items: center;
+    }
+
+    .progress-visual {
+      display: grid;
+      gap: 14px;
+    }
+
+    .mileage-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 28px;
+      padding: 20px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .mileage-card h3,
+    .glucose-proof h3 {
+      margin: 0 0 12px;
+      color: var(--ink);
+      font-size: 16px;
+    }
+
+    .mileage-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .progress-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .progress-kpi {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .progress-kpi strong {
+      display: block;
+      color: var(--cyan);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 25px;
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 7px;
+    }
+
+    .progress-kpi span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.28;
+    }
+
+    .glucose-proof {
+      border: 1px solid rgba(64,217,200,.28);
+      border-radius: 28px;
+      padding: 20px;
+      background: rgba(64,217,200,.06);
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .glucose-ring {
+      width: 142px;
+      height: 142px;
+      display: block;
+    }
+
+    .glucose-proof .big {
+      display: block;
+      color: var(--cyan);
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 44px;
+      line-height: .9;
+      letter-spacing: -.05em;
+    }
+
+    .glucose-proof .sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-top: 8px;
+      display: block;
+    }
+
+
+    /* ── Partnership Venn (Nike + StatsKey) ───────────────────── */
+    .venn {
+      width: 100%;
+      aspect-ratio: 1.1;
+      max-width: 460px;
+      margin-left: auto;
+    }
+
+    .venn svg { width: 100%; height: 100%; display: block; }
+
+    /* ── Stat ring (health urgency) ───────────────────────────── */
+    .ring-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .ring-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,.04);
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .ring-card svg { width: 76px; height: 76px; }
+    .ring-card .ring-stat {
+      font-family: "Space Grotesk", Inter, sans-serif;
+      font-size: 21px;
+      color: var(--cyan);
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+    .ring-card .ring-body {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.32;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      position: relative;
+    }
+
+    .mark::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(8,10,18,.8);
+      border-radius: 50%;
+      inset: 8px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      width: 100%;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      width: 100%;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .card.dark {
+      background: rgba(8,12,20,.58);
+    }
+
+    .stat {
+      display: grid;
+      gap: 9px;
+      min-height: 148px;
+      align-content: start;
+    }
+
+    .stat strong {
+      color: var(--ink);
+      font-size: clamp(30px, 4vw, 54px);
+      letter-spacing: -.055em;
+      line-height: .94;
+      font-family: "Space Grotesk", Inter, sans-serif;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .claim-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 28px;
+      max-width: 760px;
+    }
+
+    .claim {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 14px;
+      align-items: start;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.35;
+    }
+
+    .claim b {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .num {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background: rgba(64,217,200,.12);
+      border: 1px solid rgba(64,217,200,.28);
+      color: var(--cyan);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .source {
+      color: var(--quiet);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 14px;
+    }
+
+    .nav {
+      position: fixed;
+      left: 28px;
+      right: 28px;
+      bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      color: var(--quiet);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      z-index: 50;
+    }
+
+    .nav .controls {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: var(--line-strong); }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 3px;
+      width: 100%;
+      background: rgba(255,255,255,.08);
+      z-index: 60;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      transition: width .24s ease;
+    }
+
+    .quote {
+      border-left: 4px solid var(--cyan);
+      padding-left: 24px;
+      color: var(--ink);
+      font-size: clamp(26px, 3.1vw, 42px);
+      line-height: 1.1;
+      letter-spacing: -.03em;
+      max-width: 880px;
+      font-family: "Space Grotesk", Inter, sans-serif;
+    }
+
+    .quote small {
+      display: block;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 16px;
+      font-family: Inter, sans-serif;
+      letter-spacing: 0;
+    }
+
+    .bubble-map {
+      width: 100%;
+      aspect-ratio: 1.1;
+      border-radius: 34px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at center, rgba(120,166,255,.16), transparent 56%),
+        rgba(255,255,255,.035);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.17);
+      background: rgba(16,21,32,.88);
+      color: var(--ink);
+      padding: 18px;
+      line-height: 1.1;
+      font-weight: 850;
+      letter-spacing: -.03em;
+    }
+
+    .bubble em {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 650;
+      letter-spacing: 0;
+      margin-top: 7px;
+    }
+
+    .market-visual .bubble {
+      font-size: 18px;
+    }
+
+    .market-visual .bubble em {
+      font-size: 13px;
+      line-height: 1.18;
+    }
+
+    .market-visual .bubble.big {
+      font-size: 22px;
+    }
+
+    .bubble.big { width: 240px; height: 240px; left: 32%; top: 28%; color: var(--cyan); }
+    .bubble.b1 { width: 190px; height: 190px; left: 7%; top: 8%; }
+    .bubble.b2 { width: 184px; height: 184px; right: 7%; top: 10%; }
+    .bubble.b3 { width: 168px; height: 168px; left: 9%; bottom: 10%; }
+    .bubble.b4 { width: 158px; height: 158px; right: 10%; bottom: 12%; }
+    .bubble.b5 { width: 124px; height: 124px; left: 42%; top: 5%; color: var(--violet); }
+    .bubble.b6 { width: 132px; height: 132px; left: 42%; bottom: 5%; color: var(--amber); }
+
+    .data-orbit {
+      width: 100%;
+      aspect-ratio: 1.08;
+      border-radius: 34px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.035);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50%;
+    }
+
+    .orbit-ring.r1 { width: 72%; height: 72%; }
+    .orbit-ring.r2 { width: 46%; height: 46%; border-color: rgba(64,217,200,.23); }
+
+    .orbit-core {
+      width: 170px;
+      height: 170px;
+      border-radius: 44px;
+      background: linear-gradient(135deg, rgba(64,217,200,.2), rgba(120,166,255,.2));
+      border: 1px solid rgba(255,255,255,.23);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      z-index: 2;
+      padding: 18px;
+      font-weight: 900;
+      letter-spacing: -.03em;
+      font-size: 22px;
+    }
+
+    .node {
+      position: absolute;
+      min-width: 116px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(16,21,32,.92);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .node small {
+      display: block;
+      color: var(--quiet);
+      margin-top: 3px;
+      font-weight: 650;
+      font-size: 11px;
+    }
+
+    .n1 { top: 9%; left: 38%; }
+    .n2 { top: 25%; right: 7%; }
+    .n3 { bottom: 22%; right: 8%; }
+    .n4 { bottom: 9%; left: 38%; }
+    .n5 { bottom: 22%; left: 7%; }
+    .n6 { top: 25%; left: 7%; }
+
+    .matrix {
+      display: grid;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .market-board {
+      display: grid;
+      gap: 12px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      padding: 22px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .market-row {
+      display: grid;
+      grid-template-columns: 122px 142px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .market-row:last-child { border-bottom: 0; }
+
+    .market-row strong {
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.15;
+    }
+
+    .market-row b {
+      color: var(--cyan);
+      font-size: 14px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .market-row span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.28;
+      min-width: 0;
+    }
+
+    .market-row.statskey {
+      padding: 16px;
+      margin-top: 4px;
+      border: 1px solid rgba(64,217,200,.24);
+      border-radius: 20px;
+      background: rgba(64,217,200,.07);
+    }
+
+    .matrix-row {
+      display: grid;
+      grid-template-columns: 154px 1fr 90px;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .bar-track {
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 11px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .tag.good { color: var(--green); border-color: rgba(158,228,147,.32); }
+    .tag.warn { color: var(--amber); border-color: rgba(255,209,102,.32); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      width: 100%;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 20px 16px;
+      background: rgba(255,255,255,.045);
+      min-height: 162px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      position: relative;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid rgba(255,255,255,.25);
+      border-right: 2px solid rgba(255,255,255,.25);
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .flow-step strong {
+      font-size: 16px;
+      color: var(--ink);
+    }
+
+    .flow-step span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.36;
+    }
+
+    .axis {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      padding: 30px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .axis-line {
+      position: relative;
+      height: 10px;
+      background: linear-gradient(90deg, rgba(120,166,255,.35), rgba(64,217,200,.7));
+      border-radius: 999px;
+      margin: 58px 10px 46px;
+    }
+
+    .milestone {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 4px solid var(--cyan);
+    }
+
+    .milestone label {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 28px;
+      min-width: 170px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 850;
+      text-align: center;
+    }
+
+    .milestone small {
+      display: block;
+      color: var(--quiet);
+      font-weight: 650;
+      margin-top: 3px;
+    }
+
+    .m1 { left: 8%; }
+    .m2 { left: 31%; }
+    .m3 { left: 56%; }
+    .m4 { left: 79%; }
+    .m5 { left: 96%; }
+
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      width: 100%;
+      align-items: start;
+    }
+
+    .evidence-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .evidence-item {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 15px;
+      align-items: start;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .evidence-item strong {
+      color: var(--cyan);
+      font-size: 22px;
+      letter-spacing: -.04em;
+      font-family: "Space Grotesk", Inter, sans-serif;
+    }
+
+    .evidence-item span {
+      color: var(--muted);
+      line-height: 1.32;
+      font-size: 14px;
+    }
+
+    .product-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .stack-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 18px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 15px 17px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .stack-row b {
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .stack-row span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.32;
+    }
+
+    .source-list {
+      columns: 2;
+      column-gap: 28px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.38;
+      max-width: 1060px;
+      text-align: left;
+    }
+
+    .source-list li {
+      break-inside: avoid;
+      margin: 0 0 10px;
+    }
+
+    .speaker {
+      display: none;
+      margin-top: 22px;
+      padding: 15px 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      color: var(--quiet);
+      font-size: 13px;
+      line-height: 1.35;
+      max-width: 830px;
+      background: rgba(255,255,255,.03);
+    }
+
+    body.show-notes .speaker { display: block; }
+
+    .highlight { color: var(--cyan); }
+    .blue { color: var(--blue); }
+    .amber { color: var(--amber); }
+    .green { color: var(--green); }
+
+    @media (max-width: 980px) {
+      body { overflow: auto; }
+      .deck { height: auto; }
+      .slide {
+        min-height: auto;
+        padding: 48px 22px 96px;
+      }
+      .slide:not(.active) { display: none; }
+      .frame, .frame.split, .frame.opening, .frame.market {
+        min-height: auto;
+        grid-template-columns: 1fr;
+      }
+      .grid-3, .grid-2, .evidence-grid, .flow, .data-strip, .ring-grid, .screenshot-grid, .comparison-band, .prototype-wall, .statskey-proof, .phone-strip, .app-showcase, .device-stage, .screen-stack, .showcase-stats {
+        grid-template-columns: 1fr;
+      }
+      .screen-card:nth-child(2),
+      .screen-card:nth-child(4),
+      .hero-phone {
+        transform: none;
+      }
+      .cost-tier.t1, .cost-tier.t2, .cost-tier.t3 { width: 100%; }
+      .body-hub, .venn { margin: 0 auto; }
+      .rev-bar { grid-template-columns: 90px minmax(0, 1fr) 80px; }
+      .flow-step::after { display: none; }
+      .source-list { columns: 1; }
+      .bubble-map, .data-orbit { min-height: 460px; }
+      .nav { left: 14px; right: 14px; }
+    }
+
+    @media print {
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+
+      body { overflow: visible; background: #07090f; }
+      .slide {
+        display: flex !important;
+        min-height: 100vh;
+        height: 100vh;
+        page-break-after: always;
+        break-after: page;
+      }
+      .nav, .progress { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+  <main class="deck" id="deck">
+    <section class="slide active" data-title="The Problem">
+      <div class="frame opening">
+        <div>
+          <div class="kicker">Problem</div>
+          <h1>Health data is everywhere. Meaningful context is missing.</h1>
+          <p class="lede">A serious runner already generates miles, heart rate, sleep, routes, and recovery signals every week. Almost nobody is building the harder dataset: comprehensive nutrition, GI patterns, glucose response, and recovery context tied to those runs. That is the missing layer.</p>
+          <div class="problem-stack" style="margin-top: 22px">
+            <div class="problem-card">
+              <h3>Fragmented records</h3>
+              <p>Wearables and workouts are tracked. Comprehensive nutrition, GI patterns, glucose response, and recovery context are rarely connected to them.</p>
+            </div>
+            <div class="problem-card">
+              <h3>Inflated subscriptions</h3>
+              <p>Consumers pay premium prices for apps with increasingly commoditized software.</p>
+            </div>
+            <div class="problem-card">
+              <h3>Unanswered "why"</h3>
+              <p>Users are left guessing what changed, what mattered, and what to try next.</p>
+            </div>
+          </div>
+        </div>
+        <div class="body-hub" aria-label="Fragmented body signals">
+          <svg viewBox="0 0 460 460" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="bhGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#40d9c8" stop-opacity=".22"/>
+                <stop offset="100%" stop-color="#40d9c8" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="230" cy="230" r="220" fill="url(#bhGlow)"/>
+            <circle cx="230" cy="230" r="170" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="2 6"/>
+            <circle cx="230" cy="230" r="110" fill="none" stroke="rgba(64,217,200,.22)"/>
+            <!-- center silhouette -->
+            <g transform="translate(230 230)">
+              <circle r="62" fill="rgba(16,21,32,.92)" stroke="rgba(64,217,200,.45)" stroke-width="1.5"/>
+              <text y="-6" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="14" font-weight="800" letter-spacing="-0.02em">THE BODY</text>
+              <text y="14" text-anchor="middle" fill="#a8b1c5" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.12em">ONE DATASET</text>
+            </g>
+            <!-- signal nodes -->
+            <g font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f6f7fb">
+              <g transform="translate(230 60)"><circle r="22" fill="rgba(16,21,32,.95)" stroke="rgba(120,166,255,.55)"/><text y="3" text-anchor="middle">Food</text></g>
+              <g transform="translate(390 150)"><circle r="22" fill="rgba(16,21,32,.95)" stroke="rgba(64,217,200,.55)"/><text y="3" text-anchor="middle">HR</text></g>
+              <g transform="translate(390 310)"><circle r="22" fill="rgba(16,21,32,.95)" stroke="rgba(180,147,255,.55)"/><text y="3" text-anchor="middle">CGM</text></g>
+              <g transform="translate(230 400)"><circle r="22" fill="rgba(16,21,32,.95)" stroke="rgba(255,209,102,.55)"/><text y="3" text-anchor="middle">GI</text></g>
+              <g transform="translate(70 310)"><circle r="22" fill="rgba(16,21,32,.95)" stroke="rgba(120,166,255,.55)"/><text y="3" text-anchor="middle">Runs</text></g>
+              <g transform="translate(70 150)"><circle r="22" fill="rgba(16,21,32,.95)" stroke="rgba(158,228,147,.55)"/><text y="3" text-anchor="middle">Sleep</text></g>
+            </g>
+            <!-- connecting strokes from center -->
+            <g stroke="rgba(64,217,200,.35)" stroke-width="1.2" fill="none">
+              <path d="M230 168 L230 88"/>
+              <path d="M280 200 L368 158"/>
+              <path d="M280 260 L368 302"/>
+              <path d="M230 292 L230 378"/>
+              <path d="M180 260 L92 302"/>
+              <path d="M180 200 L92 158"/>
+            </g>
+          </svg>
+        </div>
+        <div class="speaker">Open plainly: the problem is not that people lack data; it is that the data is fragmented, overpriced, and disconnected from decisions.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Health Urgency">
+      <div class="frame">
+        <div>
+          <div class="kicker">Why this matters now</div>
+          <h2>The signals that matter most are the ones people ignore.</h2>
+          <p class="lede">Diet, metabolic disease, and digestive health drive a staggering share of preventable U.S. mortality and quality of life — and most people are not tracking any of it.</p>
+        </div>
+        <div class="ring-grid">
+          <div class="ring-card">
+            <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/><circle cx="40" cy="40" r="33" fill="none" stroke="#40d9c8" stroke-width="8" stroke-dasharray="207" stroke-dashoffset="114" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="17" font-weight="700">45%</text></svg>
+            <div><span class="ring-stat">Diet-linked deaths</span><span class="ring-body">U.S. cardiometabolic deaths associated with suboptimal diet (JAMA).</span></div>
+          </div>
+          <div class="ring-card">
+            <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/><circle cx="40" cy="40" r="33" fill="none" stroke="#78a6ff" stroke-width="8" stroke-dasharray="207" stroke-dashoffset="124" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="17" font-weight="700">40%</text></svg>
+            <div><span class="ring-stat">Adult obesity</span><span class="ring-body">U.S. adults with obesity, Aug 2021-Aug 2023 (CDC/NCHS).</span></div>
+          </div>
+          <div class="ring-card">
+            <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/><circle cx="40" cy="40" r="33" fill="none" stroke="#ffd166" stroke-width="8" stroke-dasharray="207" stroke-dashoffset="36" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="14" font-weight="700">60-70M</text></svg>
+            <div><span class="ring-stat">Digestive disease</span><span class="ring-body">Americans affected by digestive disease (NIDDK).</span></div>
+          </div>
+          <div class="ring-card">
+            <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/><circle cx="40" cy="40" r="33" fill="none" stroke="#b493ff" stroke-width="8" stroke-dasharray="207" stroke-dashoffset="190" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="17" font-weight="700">~8%</text></svg>
+            <div><span class="ring-stat">Fecal incontinence</span><span class="ring-body">Global adult prevalence in a 2024 meta-analysis. Under-discussed.</span></div>
+          </div>
+          <div class="ring-card">
+            <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/><circle cx="40" cy="40" r="33" fill="none" stroke="#9ee493" stroke-width="8" stroke-dasharray="207" stroke-dashoffset="124" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="17" font-weight="700">40%+</text></svg>
+            <div><span class="ring-stat">Functional GI</span><span class="ring-body">Adults meeting criteria for at least one functional GI disorder (Rome).</span></div>
+          </div>
+          <div class="ring-card">
+            <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/><circle cx="40" cy="40" r="33" fill="none" stroke="#ff7a7a" stroke-width="8" stroke-dasharray="207" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="17" font-weight="700">45</text></svg>
+            <div><span class="ring-stat">Screening age</span><span class="ring-body">Current average-risk colorectal cancer screening start age in the U.S.</span></div>
+          </div>
+        </div>
+        <p class="speaker">Defensible line: "Food is not just fuel. At population scale, diet is one of the largest drivers of preventable cardiometabolic death."</p>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Stigma">
+      <div class="frame split">
+        <div>
+          <div class="kicker">Runner health signal</div>
+          <h2>GI distress is more common than people admit.</h2>
+          <p class="lede">Endurance runners routinely manage cramps, urgency, nausea, bloating, fueling tolerance, and bathroom risk. The same signal generalizes beyond running: digestive health affects tens of millions of Americans, but stigma keeps it out of the data.</p>
+          <div class="claim-list">
+            <div class="claim"><span class="num">01</span><span><b>Performance:</b> GI comfort changes fueling, pacing, confidence, and long-run execution.</span></div>
+            <div class="claim"><span class="num">02</span><span><b>Structure:</b> log Bristol type, urgency, timing, food records, hydration, sleep, and training load.</span></div>
+            <div class="claim"><span class="num">03</span><span><b>Generalize:</b> the same framework helps non-runners connect diet, digestion, energy, and recovery.</span></div>
+          </div>
+        </div>
+        <div class="card dark">
+          <h3>Evidence base</h3>
+          <div class="data-strip" style="grid-template-columns: 1fr; margin-top: 18px">
+            <div class="data-point"><strong>30-90%</strong><span>reported prevalence range for exercise-induced GI symptoms among endurance runners across reviews.</span></div>
+            <div class="data-point"><strong>42%</strong><span>stomach pain/cramps reported in one endurance-runner dietary-restriction study.</span></div>
+            <div class="data-point"><strong>22%</strong><span>urge to defecate reported in the same runner study; side stitch was also 22%.</span></div>
+            <div class="data-point"><strong>60-70M</strong><span>Americans affected by digestive diseases, according to NIDDK.</span></div>
+            <div class="data-point"><strong>7-15%</strong><span>NIDDK range for fecal incontinence among non-institutionalized U.S. adults.</span></div>
+          </div>
+          <div class="speaker">Frame it as performance first, then dignity and health. It is not niche: runners feel it, everyday people hide it, and StatsKey makes it trackable.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Personal Origin">
+      <div class="frame">
+        <div>
+          <div class="kicker">What StatsKey made measurable</div>
+          <h2>Training volume became a system, not a guess.</h2>
+          <p class="lede">MyFitnessPal and Cronometer could record food. They could not connect nutrition, training load, glucose, GI, sleep, recovery, and decisions into one navigable record. StatsKey came from building that system for myself.</p>
+        </div>
+        <div class="progress-story">
+          <div class="progress-visual">
+            <div class="mileage-card">
+              <h3>Mileage progression</h3>
+              <svg class="mileage-svg" viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg" aria-label="Mileage progression chart">
+                <g stroke="rgba(255,255,255,.10)" stroke-width="1">
+                  <line x1="42" y1="270" x2="530" y2="270"/>
+                  <line x1="42" y1="210" x2="530" y2="210"/>
+                  <line x1="42" y1="150" x2="530" y2="150"/>
+                  <line x1="42" y1="90" x2="530" y2="90"/>
+                </g>
+                <g fill="#a8b1c5" font-family="Inter, sans-serif" font-size="11">
+                  <text x="10" y="274">0</text>
+                  <text x="6" y="214">500</text>
+                  <text x="0" y="154">1k</text>
+                  <text x="0" y="94">1.5k</text>
+                </g>
+                <path d="M42 235 L91 205 L140 225 L189 231 L238 168 L287 198 L336 175 L385 124 L434 138 L483 42 L530 82" fill="none" stroke="#40d9c8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                <g fill="#78a6ff">
+                  <circle cx="42" cy="235" r="5"/><circle cx="91" cy="205" r="5"/><circle cx="140" cy="225" r="5"/><circle cx="189" cy="231" r="5"/><circle cx="238" cy="168" r="5"/><circle cx="287" cy="198" r="5"/><circle cx="336" cy="175" r="5"/><circle cx="385" cy="124" r="5"/><circle cx="434" cy="138" r="5"/><circle cx="483" cy="42" r="6"/><circle cx="530" cy="82" r="6"/>
+                </g>
+                <g fill="#a8b1c5" font-family="Inter, sans-serif" font-size="11" text-anchor="middle">
+                  <text x="42" y="300">2016</text><text x="140" y="300">2018</text><text x="238" y="300">2020</text><text x="336" y="300">2022</text><text x="434" y="300">2024</text><text x="530" y="300">2026 YTD</text>
+                </g>
+                <g fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="18" font-weight="800">
+                  <text x="455" y="34">1,488 mi</text>
+                  <text x="486" y="74">1,121 YTD</text>
+                </g>
+              </svg>
+            </div>
+            <div class="progress-kpis">
+              <div class="progress-kpi"><strong>2,445.7</strong><span>miles trailing 365 days</span></div>
+              <div class="progress-kpi"><strong>78.6</strong><span>mi/week trailing 90 days</span></div>
+              <div class="progress-kpi"><strong>2,282</strong><span>meals logged in 8 months</span></div>
+            </div>
+          </div>
+          <div class="progress-visual">
+            <div class="glucose-proof">
+              <svg class="glucose-ring" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" aria-label="Glucose time in range ring">
+                <circle cx="80" cy="80" r="62" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="16"/>
+                <circle cx="80" cy="80" r="62" fill="none" stroke="#40d9c8" stroke-width="16" stroke-linecap="round" stroke-dasharray="389" stroke-dashoffset="42" transform="rotate(-90 80 80)"/>
+                <text x="80" y="74" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="33" font-weight="800">89.1%</text>
+                <text x="80" y="99" text-anchor="middle" fill="#a8b1c5" font-family="Inter, sans-serif" font-size="11">70-140 mg/dL</text>
+              </svg>
+              <div>
+                <h3>Blood sugar stayed mostly in range</h3>
+                <span class="big">210</span>
+                <span class="sub">meal responses tracked; glucose became context for meals, training, and lows. Max peak: 265 mg/dL.</span>
+              </div>
+            </div>
+            <div class="data-strip" style="grid-template-columns: 1fr">
+              <div class="data-point"><strong>190</strong><span>bowel entries in latest 30-day audit; GI became measurable instead of anecdotal.</span></div>
+              <div class="data-point"><strong>610</strong><span>AI coach turns from Sep 2025-Mar 2026; decisions became searchable memory.</span></div>
+              <div class="data-point"><strong>1 system</strong><span>nutrition, running, glucose, GI, recovery, and AI all joined into one progress dataset.</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="source">Source: StatsKey Personal Progress Dataset canvas and parsed Apple Health / training exports.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-title="StatsKey Proof">
+      <div class="frame">
+        <div>
+          <div class="kicker">What StatsKey already produces</div>
+          <h2>App screens for daily use. Exports for deeper analysis.</h2>
+          <p class="lede">The product is not just a tracker. It creates daily interfaces for action and comprehensive exports for analysis, review, and querying with external AI.</p>
+        </div>
+        <div class="statskey-proof">
+          <div class="phone-strip">
+            <div class="phone-shot">
+              <img src="/statskey-app/activity-may11.png" alt="StatsKey Activity screen">
+              <strong>Activity + energy balance</strong>
+            </div>
+            <div class="phone-shot">
+              <img src="/statskey-app/nutrition-insights.png" alt="StatsKey Nutrition Insights screen">
+              <strong>Nutrition + glucose insights</strong>
+            </div>
+            <div class="phone-shot">
+              <img src="/statskey-app/friends-routes.png" alt="StatsKey routes and social running screen">
+              <strong>Routes + run history</strong>
+            </div>
+          </div>
+          <div class="report-card">
+            <h3>31-day export report</h3>
+            <p class="source" style="margin-top: 0">StatsKey Report · Apr 14-May 14, 2026 · generated May 14</p>
+            <div class="report-grid">
+              <div class="report-stat"><strong>405</strong><span>meals logged</span></div>
+              <div class="report-stat"><strong>112,753</strong><span>total calories</span></div>
+              <div class="report-stat"><strong>94%</strong><span>glucose time in range</span></div>
+              <div class="report-stat"><strong>8,393</strong><span>glucose readings</span></div>
+              <div class="report-stat"><strong>34</strong><span>workouts</span></div>
+              <div class="report-stat"><strong>254.6 mi</strong><span>total distance</span></div>
+            </div>
+            <div class="delta-pill">Export means the user can query their dataset with their own AI, too.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Nutrition Depth Proof">
+      <div class="frame">
+        <div>
+          <div class="kicker">Comprehensive nutrition, not just calories</div>
+          <h2>StatsKey turns food into structured records.</h2>
+          <p class="lede">The nutrition layer is intentionally deeper than a calorie counter: ingredient-level edits, serving-size refinement, macros, fiber, minerals, and nutrition facts views all become part of the indexed body record.</p>
+        </div>
+        <div class="statskey-proof">
+          <div class="phone-strip">
+            <div class="phone-shot">
+              <img src="/statskey-app/record-food-list.png" alt="StatsKey daily food record screen">
+              <strong>Daily food record</strong>
+            </div>
+            <div class="phone-shot">
+              <img src="/statskey-app/edit-meal-ingredients.png" alt="StatsKey edit meal ingredients screen">
+              <strong>Ingredient refinement</strong>
+            </div>
+            <div class="phone-shot">
+              <img src="/statskey-app/nutrition-facts-minerals.png" alt="StatsKey nutrition facts minerals screen">
+              <strong>Nutrition facts + minerals</strong>
+            </div>
+          </div>
+          <div class="report-card">
+            <h3>What this replaces</h3>
+            <div class="report-grid">
+              <div class="report-stat"><strong>Serving</strong><span>gram-level portion edits and refinement</span></div>
+              <div class="report-stat"><strong>Macros</strong><span>calories, protein, carbs, fat, fiber</span></div>
+              <div class="report-stat"><strong>Minerals</strong><span>potassium, sodium, calcium, iron, magnesium</span></div>
+              <div class="report-stat"><strong>Context</strong><span>food records join workouts, glucose, GI, and recovery</span></div>
+            </div>
+            <div class="delta-pill">This is the raw material for useful AI: structured food records, not just logged calories.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Market Money">
+      <div class="frame market">
+        <div>
+          <div class="kicker">The market bubble</div>
+          <h2>Billions of dollars chase software that is increasingly easy to clone.</h2>
+          <p class="lede">The category proves people pay for body tracking. What it does not justify is the price. The visible software is now standard: auth, GPS records, food records, charts, AI wrappers. The real cost is payroll, brand, and acquisition.</p>
+          <div class="claim-list">
+            <div class="claim"><span class="num">A</span><span><b>Demand is proven.</b> Consumers pay monthly for fitness, nutrition, wearables, and AI calorie apps.</span></div>
+            <div class="claim"><span class="num">B</span><span><b>Utility is fragmented.</b> Each app owns one slice. None own the body record.</span></div>
+            <div class="claim"><span class="num">C</span><span><b>StatsKey's opening.</b> Free tracking, paid AI depth where compute is actually expensive.</span></div>
+          </div>
+        </div>
+        <div class="rev-chart" aria-label="Reported revenue and valuation across the fitness app category">
+          <div>
+            <div class="rev-source">Reported revenue / scale</div>
+            <h3>Where the money sits today</h3>
+          </div>
+          <div class="rev-bar">
+            <span class="label">Garmin<small>2024 revenue</small></span>
+            <div class="track"><div class="fill" style="width: 100%"></div></div>
+            <span class="value">$6.30B</span>
+          </div>
+          <div class="rev-bar">
+            <span class="label">Strava<small>2025 ARR · $2.2B val.</small></span>
+            <div class="track"><div class="fill" style="width: 27%"></div></div>
+            <span class="value">~$500M</span>
+          </div>
+          <div class="rev-bar">
+            <span class="label">MyFitnessPal<small>2025 revenue · 220M users</small></span>
+            <div class="track"><div class="fill warn" style="width: 17%"></div></div>
+            <span class="value">~$310M</span>
+          </div>
+          <div class="rev-bar">
+            <span class="label">Cal AI<small>monthly gross profit</small></span>
+            <div class="track"><div class="fill warn" style="width: 4%"></div></div>
+            <span class="value">~$1.4M/mo</span>
+          </div>
+          <div class="rev-bar">
+            <span class="label">Oura · Whoop<small>multi-B valuations</small></span>
+            <div class="track"><div class="fill" style="width: 22%"></div></div>
+            <span class="value">$5.99-$199+</span>
+          </div>
+          <p class="source" style="margin-top: 8px">Sources: official pricing pages; Garmin FY24 results; CNBC; press materials. Revenues and valuations are reported figures and should be treated as directional.</p>
+          <div style="margin-top: 10px; padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(64,217,200,.28); background: rgba(64,217,200,.06); color: var(--ink); font-size: 14px; line-height: 1.4">
+            <b style="color: var(--green)">StatsKey today:</b> pre-revenue. Core tracking is free; paid tiers ($0.99 Pro, $19.99 Pro+) exist to cover real AI compute, not to underwrite payroll.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="App Surface Comparison">
+      <div class="frame">
+        <div>
+          <div class="kicker">Feature-by-feature replacement</div>
+          <h2>StatsKey absorbs the common app surfaces, then adds the missing context layer.</h2>
+          <p class="lede">The incumbents are valuable because each solved one visible job. StatsKey is positioned to replace those jobs at the base layer — running, food records, wearable import, AI insight, exports — and connect them into one body record.</p>
+        </div>
+        <div class="feature-matrix" aria-label="Feature comparison between StatsKey and incumbents">
+          <div class="feature-row header">
+            <div class="feature-cell">Functionality</div>
+            <div class="feature-cell feature-status">Strava</div>
+            <div class="feature-cell feature-status">MyFitnessPal</div>
+            <div class="feature-cell feature-status">Cal AI</div>
+            <div class="feature-cell feature-status">Wearables</div>
+            <div class="feature-cell feature-status sk">StatsKey</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">GPS running / workout records</div>
+            <div class="feature-cell feature-status yes">Strong</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status yes">Strong</div>
+            <div class="feature-cell feature-note">Free running + imported workout context; route, pace, HR, splits, effort.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">Comprehensive food records</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status yes">Strong</div>
+            <div class="feature-cell feature-status partial">Photo-first</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-note">Free nutrition tracking with 40+ nutrient fields and multiple input modes.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">Photo / barcode / label capture</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status yes">Yes</div>
+            <div class="feature-cell feature-status yes">Strong</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-note">AI search, camera/photo, barcode, label scan, library, manual entry.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">Imported wearable context</div>
+            <div class="feature-cell feature-status partial">Activity</div>
+            <div class="feature-cell feature-status partial">Limited</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status yes">Core</div>
+            <div class="feature-cell feature-note">HealthKit import: HR, sleep, glucose, VO2 max, steps, calories, body data.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">GI / bowel / wellness records</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status partial">Journal</div>
+            <div class="feature-cell feature-note">Bristol type, color, urgency, duration, energy, mood, notes, timing.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">AI correlation across body data</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status partial">Nutrition coach</div>
+            <div class="feature-cell feature-status partial">Food AI</div>
+            <div class="feature-cell feature-status partial">Coach/scores</div>
+            <div class="feature-cell feature-note">AI asks what changed across food, runs, GI, glucose, sleep, and recovery.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">Exportable longitudinal body dataset</div>
+            <div class="feature-cell feature-status partial">Activities</div>
+            <div class="feature-cell feature-status partial">Food data</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status partial">Device data</div>
+            <div class="feature-cell feature-note">Comprehensive export supports review, research, clinicians, and future partners.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-cell feature-name">Blood/stool result readiness</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-status no">No</div>
+            <div class="feature-cell feature-note">Builds the behavioral baseline that would make blood/stool results more useful later.</div>
+          </div>
+        </div>
+        <p class="source">This is a feature-surface comparison based on public app positioning and StatsKey's current product model.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Infrastructure Arbitrage">
+      <div class="frame split">
+        <div>
+          <div class="kicker">Price vs utility</div>
+          <h2>The category charges for the wrapper. StatsKey charges for the compute.</h2>
+          <p class="lede">A run tracker, food record, chart, barcode scan, and subscription screen are no longer rare technology. Users are paying premium app prices for partial records. StatsKey keeps tracking free and monetizes the expensive part: AI analysis over a richer dataset.</p>
+          <div class="delta-pill">Core question: what does the user get for each dollar?</div>
+        </div>
+        <div class="price-proof" aria-label="Price versus utility comparison">
+          <div class="price-proof-row">
+            <strong>Strava</strong>
+            <b>$11.99/mo</b>
+            <span>Excellent running/social graph. Does not know food records, GI patterns, glucose response, or recovery context.</span>
+          </div>
+          <div class="price-proof-row">
+            <strong>MyFitnessPal</strong>
+            <b>$19.99+</b>
+            <span>Large food diary. Limited run context, wearable context, GI tracking, and personal correlation analysis.</span>
+          </div>
+          <div class="price-proof-row">
+            <strong>Cal AI</strong>
+            <b>$5.99-$19.99/mo</b>
+            <span>Fast photo calorie entry. Still exposed to portion error, hidden ingredients, and no longitudinal body record.</span>
+          </div>
+          <div class="price-proof-row statskey">
+            <strong>StatsKey</strong>
+            <b>free / $0.99 / $19.99</b>
+            <span>Free running + nutrition tracking. Paid tiers cover AI tokens, premium models, exports, and deeper correlation analysis.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Nike Run Club Fit">
+      <div class="frame split">
+        <div>
+          <div class="kicker">Why Nike Run Club</div>
+          <h2>NRC owns the run. The next step is explaining the runner.</h2>
+          <p class="lede">Nike Run Club already gives runners tracking, guided runs, training plans, challenges, coaching voice, and community. StatsKey adds the missing context around those runs: fueling, recovery, glucose response, GI comfort, and consistency.</p>
+        </div>
+        <div class="card dark">
+          <p class="quote">"To bring inspiration and innovation to every athlete in the world."<small>Nike mission · footnote: "If you have a body, you are an athlete."</small></p>
+          <div class="claim-list">
+            <div class="claim"><span class="num">01</span><span><b>Run context.</b> Why did this long run feel great or awful?</span></div>
+            <div class="claim"><span class="num">02</span><span><b>Coaching layer.</b> Turn fueling, sleep, GI, and recovery into better run guidance.</span></div>
+            <div class="claim"><span class="num">03</span><span><b>Community lift.</b> Make body intelligence feel like part of the run-club experience.</span></div>
+          </div>
+          <div class="data-strip">
+            <div class="data-point"><strong>300</strong><span>approx. NRC audio guided runs in Nike public materials.</span></div>
+            <div class="data-point"><strong>160+</strong><span>countries where NRC is available, according to Nike app feature materials.</span></div>
+            <div class="data-point"><strong>6</strong><span>NRC training plans cited in Nike public materials.</span></div>
+          </div>
+          <p class="source">Sources: Nike mission · NRC public feature materials · Nike Well Collective as supporting wellness context.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Data Flywheel">
+      <div class="frame split">
+        <div>
+          <div class="kicker">StatsKey's wedge</div>
+          <h2>One indexed body database, queryable in plain English.</h2>
+          <p class="lede">StatsKey already captures the surfaces needed for a longitudinal body record: comprehensive food records, imported wearable data, workouts, glucose, GI/wellness, and AI conversation. It indexes that database so AI can retrieve the right history instead of guessing from a generic prompt.</p>
+        </div>
+        <div class="data-orbit" aria-label="StatsKey data orbit">
+          <div class="orbit-ring r1"></div>
+          <div class="orbit-ring r2"></div>
+          <div class="orbit-core">AI<br><span class="fine">indexed body context</span></div>
+          <div class="node n1">Nutrition<small>50+ nutrients</small></div>
+          <div class="node n2">Wearables<small>imported HR, sleep, activity</small></div>
+          <div class="node n3">Glucose<small>response curves</small></div>
+          <div class="node n4">Workouts<small>pace, load, route</small></div>
+          <div class="node n5">GI + wellness<small>Bristol, urgency, energy</small></div>
+          <div class="node n6">Baseline<small>for later testing</small></div>
+        </div>
+        <div class="data-strip" style="grid-column: 1 / -1">
+          <div class="data-point"><strong>Shipped surfaces</strong><span>food records, running, HealthKit import, GI/wellness records, glucose, AI conversation, and exports.</span></div>
+          <div class="data-point"><strong>Comprehensive export</strong><span>users can export their dataset and query it with their own AI, without plugging in an API key or paying for a StatsKey subscription.</span></div>
+          <div class="data-point"><strong>Unprecedented layer</strong><span>not a food diary, run log, or wearable score — an indexed personal body database AI can navigate.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Business Model">
+      <div class="frame split">
+        <div>
+          <div class="kicker">Economics</div>
+          <h2>The Cursor model, applied to the body.</h2>
+          <p class="lede">Cursor is an AI coding tool. Its breakthrough is context: it indexes the codebase of your project, so AI can navigate files, understand relationships, and answer from the actual system instead of guessing. StatsKey applies the same idea to health: index the user's body database so nutrition, runs, wearables, GI, glucose, and recovery history become easier to navigate.</p>
+        </div>
+        <div class="card dark">
+          <div class="product-stack">
+            <div class="stack-row"><b>Free access</b><span>Running and nutrition tracking stay free so the indexed health database can grow.</span></div>
+            <div class="stack-row"><b>StatsKey Pro</b><span>$0.99/mo tier with Gemini 2.5 Flash food analysis and 250K AI tokens per month.</span></div>
+            <div class="stack-row"><b>StatsKey Pro+</b><span>$19.99/mo curated price with 2M AI tokens, premium models, and priority support.</span></div>
+            <div class="stack-row"><b>Later revenue</b><span>Token packs and, if partnerships are established, sample-analysis reports tied to real COGS rather than arbitrary paywalls.</span></div>
+          </div>
+          <div class="data-strip">
+            <div class="data-point"><strong>8x</strong><span>Pro+ token allowance vs standard Pro: 2M vs 250K monthly AI tokens.</span></div>
+            <div class="data-point"><strong>~$10</strong><span>worst-case raw API ceiling for 2M tokens at a $5/M blended cost assumption in code comments.</span></div>
+            <div class="data-point"><strong>50%+</strong><span>gross margin floor at $19.99 if the full Pro+ token allowance is consumed.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="StatsKey Biometrics Prototypes">
+      <div class="frame">
+        <div>
+          <div class="kicker">Where StatsKey is heading</div>
+          <h2>From personal health records to biochemical intelligence.</h2>
+          <p class="lede">The app starts by building the behavioral dataset: nutrition, runs, wearables, glucose, GI, sleep, and recovery. The next horizon is biochemical context. In the future, StatsKey can pair that dataset with lab partners for blood/stool analysis, and longer term with StatsKey-built monitoring hardware. Here is what I am actively building now.</p>
+        </div>
+        <div class="prototype-wall" aria-label="StatsKey Biometrics prototype previews">
+          <div class="prototype-card">
+            <div class="prototype-visual">
+              <svg class="proto-svg" viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg" aria-label="CBM cartridge platform diagram">
+                <defs>
+                  <linearGradient id="cbmA" x1="0" x2="1"><stop stop-color="#40d9c8"/><stop offset="1" stop-color="#78a6ff"/></linearGradient>
+                </defs>
+                <rect x="38" y="34" width="224" height="150" rx="36" fill="rgba(8,12,20,.92)" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
+                <rect x="66" y="74" width="168" height="70" rx="20" fill="rgba(255,255,255,.055)" stroke="rgba(64,217,200,.35)"/>
+                <circle cx="94" cy="109" r="16" fill="none" stroke="url(#cbmA)" stroke-width="5"/>
+                <circle cx="150" cy="109" r="16" fill="none" stroke="#b493ff" stroke-width="5"/>
+                <circle cx="206" cy="109" r="16" fill="none" stroke="#ffd166" stroke-width="5"/>
+                <path d="M78 166h144" stroke="url(#cbmA)" stroke-width="6" stroke-linecap="round"/>
+                <text x="150" y="212" text-anchor="middle" fill="#a8b1c5" font-family="Inter, sans-serif" font-size="12">reader + disposable cartridge</text>
+              </svg>
+            </div>
+            <div class="prototype-caption"><strong>CBM platform</strong><span>Active prototype: reusable reader + disposable cartridges for validated biochemical monitoring.</span></div>
+          </div>
+          <div class="prototype-card">
+            <div class="prototype-visual">
+              <svg class="proto-svg" viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg" aria-label="CKM potassium monitor concept">
+                <defs>
+                  <radialGradient id="ckmGlow" cx="50%" cy="50%" r="55%"><stop stop-color="#40d9c8" stop-opacity=".35"/><stop offset="1" stop-color="#40d9c8" stop-opacity="0"/></radialGradient>
+                </defs>
+                <circle cx="150" cy="110" r="92" fill="url(#ckmGlow)"/>
+                <rect x="74" y="54" width="152" height="112" rx="30" fill="rgba(8,12,20,.92)" stroke="rgba(64,217,200,.38)" stroke-width="2"/>
+                <text x="150" y="93" text-anchor="middle" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="38" font-weight="800">K+</text>
+                <text x="150" y="122" text-anchor="middle" fill="#40d9c8" font-family="Space Grotesk, Inter, sans-serif" font-size="24" font-weight="800">4.2</text>
+                <text x="150" y="142" text-anchor="middle" fill="#a8b1c5" font-family="Inter, sans-serif" font-size="11">potassium trend concept</text>
+                <path d="M80 188c34-28 57 24 90-2s48-18 68 2" fill="none" stroke="#78a6ff" stroke-width="5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="prototype-caption"><strong>CKM prototype</strong><span>Active prototype: continuous potassium monitoring as a first biochemical wedge.</span></div>
+          </div>
+          <div class="prototype-card">
+            <div class="prototype-visual">
+              <svg class="proto-svg" viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg" aria-label="Hardware stack prototype diagram">
+                <defs>
+                  <linearGradient id="hwA" x1="0" x2="1"><stop stop-color="#78a6ff"/><stop offset=".55" stop-color="#40d9c8"/><stop offset="1" stop-color="#b493ff"/></linearGradient>
+                </defs>
+                <g transform="translate(35 38)">
+                  <path d="M32 42h166l28 28-28 28H32L4 70z" fill="rgba(120,166,255,.11)" stroke="rgba(120,166,255,.38)" stroke-width="2"/>
+                  <path d="M32 76h166l28 28-28 28H32L4 104z" fill="rgba(64,217,200,.11)" stroke="rgba(64,217,200,.38)" stroke-width="2"/>
+                  <path d="M32 110h166l28 28-28 28H32L4 138z" fill="rgba(180,147,255,.11)" stroke="rgba(180,147,255,.38)" stroke-width="2"/>
+                  <circle cx="116" cy="104" r="28" fill="rgba(8,12,20,.88)" stroke="url(#hwA)" stroke-width="4"/>
+                  <text x="116" y="109" text-anchor="middle" fill="#f6f7fb" font-family="Inter, sans-serif" font-size="12" font-weight="800">STACK</text>
+                </g>
+                <text x="150" y="216" text-anchor="middle" fill="#a8b1c5" font-family="Inter, sans-serif" font-size="12">puck · cartridge · sensor interface</text>
+              </svg>
+            </div>
+            <div class="prototype-caption"><strong>Hardware viewer</strong><span>Current design work: puck, cartridge stack, electrochemical interface, optics, skin contact.</span></div>
+          </div>
+        </div>
+        <div class="data-strip">
+          <div class="data-point"><strong>Partner labs</strong><span>Future blood/stool analysis should start with qualified partners, not premature in-house claims.</span></div>
+          <div class="data-point"><strong>Owned workflows</strong><span>Longer term: StatsKey-controlled collection and analysis when validation, regulation, and economics are ready.</span></div>
+          <div class="data-point"><strong>Cross-analyte</strong><span>Example: glucose response may mean something different when potassium is already low.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Nike Partnership">
+      <div class="frame split">
+        <div>
+          <div class="kicker">Run Club partnership: why now</div>
+          <h2>NRC can move from "track the run" to "understand the runner."</h2>
+          <p class="lede">Nike already proved an integration model in 2023 by connecting NRC and NTC workouts into Strava's community of 100M+ athletes. StatsKey is a different kind of partner: not another feed for workouts, but the nutrition, recovery, glucose, and GI context that explains <b>why</b> a session went well or poorly.</p>
+          <div class="data-strip" style="margin-top: 22px">
+            <div class="data-point"><strong>2023</strong><span>Nike + Strava: NRC/NTC syncing and Nike challenges on Strava.</span></div>
+            <div class="data-point"><strong>100M+</strong><span>Strava athletes cited in partnership announcement.</span></div>
+            <div class="data-point"><strong>750K+</strong><span>Strava clubs cited as Nike member reach.</span></div>
+          </div>
+        </div>
+        <div class="venn" aria-label="Nike and StatsKey complementary capabilities">
+          <svg viewBox="0 0 460 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="vNike" cx="50%" cy="50%" r="55%">
+                <stop offset="0%" stop-color="#78a6ff" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="#78a6ff" stop-opacity=".05"/>
+              </radialGradient>
+              <radialGradient id="vSK" cx="50%" cy="50%" r="55%">
+                <stop offset="0%" stop-color="#40d9c8" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="#40d9c8" stop-opacity=".05"/>
+              </radialGradient>
+            </defs>
+            <circle cx="160" cy="210" r="155" fill="url(#vNike)" stroke="rgba(120,166,255,.5)"/>
+            <circle cx="300" cy="210" r="155" fill="url(#vSK)" stroke="rgba(64,217,200,.5)"/>
+            <!-- Labels -->
+            <text x="78" y="50" fill="#78a6ff" font-family="Space Grotesk, Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="-0.02em">NIKE</text>
+            <g fill="#f6f7fb" font-family="Inter, sans-serif" font-size="12" font-weight="600">
+              <text x="35" y="170">Run culture</text>
+              <text x="35" y="195">Coaching · NRC</text>
+              <text x="35" y="220">Community</text>
+              <text x="35" y="245">Brand trust</text>
+              <text x="35" y="270">Distribution</text>
+            </g>
+            <text x="360" y="50" fill="#40d9c8" font-family="Space Grotesk, Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="-0.02em">STATSKEY</text>
+            <g fill="#f6f7fb" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">
+              <text x="430" y="170">Food records</text>
+              <text x="430" y="195">Wearable import</text>
+              <text x="430" y="220">GI + glucose</text>
+              <text x="430" y="245">AI layer</text>
+              <text x="430" y="270">Testing context</text>
+            </g>
+            <!-- Overlap label -->
+            <g transform="translate(230 210)" text-anchor="middle">
+              <rect x="-78" y="-46" width="156" height="92" rx="18" fill="rgba(8,12,20,.85)" stroke="rgba(255,255,255,.18)"/>
+              <text y="-22" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="13" font-weight="800" letter-spacing="0.06em">RUNNER WHO</text>
+              <text y="0" fill="#40d9c8" font-family="Space Grotesk, Inter, sans-serif" font-size="20" font-weight="800" letter-spacing="-0.03em">UNDERSTANDS</text>
+              <text y="22" fill="#f6f7fb" font-family="Space Grotesk, Inter, sans-serif" font-size="13" font-weight="800" letter-spacing="0.06em">THEIR BODY</text>
+              <text y="40" fill="#a8b1c5" font-family="Inter, sans-serif" font-size="10">fueling · recovery · GI · consistency</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Partnership Vision">
+      <div class="frame">
+        <div>
+          <div class="kicker">What a Nike x StatsKey partnership could become</div>
+          <h2>A healthier Run Club, not just a faster one.</h2>
+          <p class="lede">NRC already helps runners start, train, and stay motivated. StatsKey could add the health layer around the run: fueling, recovery, GI comfort, sleep, glucose response, and confidence that the body is adapting rather than just enduring.</p>
+        </div>
+        <div class="flow">
+          <div class="flow-step"><span class="tag">1</span><strong>Fuel the run</strong><span>Connect food records to long-run energy, bonking, glucose response, and recovery.</span></div>
+          <div class="flow-step"><span class="tag">2</span><strong>Protect consistency</strong><span>Use sleep, workload, GI comfort, and recovery signals to reduce avoidable bad sessions.</span></div>
+          <div class="flow-step"><span class="tag">3</span><strong>Normalize GI health</strong><span>Make bathroom risk, urgency, and fueling tolerance part of runner preparation without shame.</span></div>
+          <div class="flow-step"><span class="tag">4</span><strong>Keep trust central</strong><span>Runners control imports, exports, consent, and what is shared.</span></div>
+          <div class="flow-step"><span class="tag">5</span><strong>Grow the relationship</strong><span>Nike becomes the brand helping runners understand their bodies, not only their splits.</span></div>
+        </div>
+        <div class="data-strip">
+          <div class="data-point"><strong>Nike</strong><span>a Run Club health layer that deepens trust, habit, coaching relevance, and member retention.</span></div>
+          <div class="data-point"><strong>StatsKey</strong><span>a real runner cohort to improve body-context AI and validate what actually helps.</span></div>
+          <div class="data-point"><strong>Runner</strong><span>better decisions around fueling, recovery, GI comfort, consistency, confidence, and long-term health.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Pilot Metrics">
+      <div class="frame split">
+        <div>
+          <div class="kicker">Consumer benefit</div>
+          <h2>For the runner, health context becomes training context.</h2>
+          <p class="lede">A Nike x StatsKey experience should make the runner feel more understood, not more surveilled. The benefit is practical and health-forward: fewer blind spots around energy, digestion, recovery, and whether training is building the body up or breaking it down.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card stat"><strong>Energy</strong><span>pre-run fueling, post-run recovery, energy dips, bonk frequency, and glucose response where available.</span></div>
+          <div class="card stat"><strong>GI comfort</strong><span>Bristol distribution, urgency events, foods/timing before distress, and confidence before long runs.</span></div>
+          <div class="card stat"><strong>Recovery</strong><span>sleep consistency, perceived effort, soreness, readiness, missed workouts, and workload tolerance.</span></div>
+          <div class="card stat"><strong>Health habit</strong><span>food-record days, GI/wellness entries, export usage, and confidence in training decisions.</span></div>
+        </div>
+        <div class="data-strip" style="grid-column: 1 / -1">
+          <div class="data-point"><strong>Run brand</strong><span>Nike remains the voice of motivation, coaching, community, and aspiration.</span></div>
+          <div class="data-point"><strong>Health layer</strong><span>StatsKey adds the private nutrition, GI, glucose, and recovery context around that run journey.</span></div>
+          <div class="data-point"><strong>Trust first</strong><span>opt-in only; no raw sensitive data sharing without explicit user permission.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Close">
+      <div class="frame center">
+        <div class="kicker">The ask</div>
+        <h1>Every runner deserves to understand the body behind the run.</h1>
+        <p class="lede">StatsKey makes that context private, affordable, and actionable. Nike Run Club can make it part of the culture of running: healthier habits, better training decisions, and less shame around the signals runners already feel.</p>
+        <div class="speaker">Close with the health-forward partnership frame: Nike owns the run; StatsKey explains the body context around it.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Sources">
+      <div class="frame center">
+        <div>
+          <div class="kicker">Selected source appendix</div>
+          <h2>Evidence anchors</h2>
+        </div>
+        <ol class="source-list">
+          <li>Nike mission and "If you have a body, you are an athlete": about.nike.com/en/mission</li>
+          <li>Nike Well Collective: movement, mindfulness, nutrition, rest, connection.</li>
+          <li>Nike Run Club, Nike Training Club, marathon training plan public product pages.</li>
+          <li>Nike and Strava official partnership releases: NRC/NTC workout syncing, Nike clubs, challenges, 100M+ athletes, 750K+ clubs.</li>
+          <li>Nike partner app/device help pages and public reporting on lack of a broad public NRC developer API.</li>
+          <li>Nike Sport Research Lab and Swoosh TC public materials for athlete research/coaching pilot framing.</li>
+          <li>Strava official pricing; MyFitnessPal official premium pricing; Oura official membership pricing.</li>
+          <li>Cal AI growth/economics: CNBC and TechCrunch reporting; accuracy caveats from peer-reviewed AI nutrition estimation research.</li>
+          <li>JAMA/PubMed: U.S. cardiometabolic deaths associated with suboptimal diet.</li>
+          <li>Lancet/GBD: dietary risks associated with 11 million global deaths in 2017.</li>
+          <li>CDC/NCHS: U.S. adult obesity prevalence Aug 2021-Aug 2023.</li>
+          <li>CDC diabetes data: diagnosed/undiagnosed diabetes and prediabetes estimates.</li>
+          <li>NIDDK digestive diseases and fecal incontinence fact pages.</li>
+          <li>American Cancer Society and USPSTF: colorectal cancer trends and screening age.</li>
+          <li>Rome Foundation global GI disorder prevalence study.</li>
+          <li>FTC Health Breach Notification Rule; WHO AI health governance guidance.</li>
+          <li>StatsKey local product docs: in-app AI context, indexed query strategy, Pro/Pro+ subscriptions, nutrition/wellness/analysis tools, export strategy, HealthKit service, sample analysis specs.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav" aria-label="Slide navigation">
+    <div><span id="counter">01 / 20</span> <span id="slideTitle">The Problem</span></div>
+    <div class="controls">
+      <button type="button" id="prev" aria-label="Previous slide">Prev</button>
+      <button type="button" id="notes" aria-label="Toggle presenter notes">Notes</button>
+      <button type="button" id="next" aria-label="Next slide">Next</button>
+    </div>
+  </nav>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progress = document.getElementById('progress');
+    const counter = document.getElementById('counter');
+    const slideTitle = document.getElementById('slideTitle');
+    const prev = document.getElementById('prev');
+    const notes = document.getElementById('notes');
+    const next = document.getElementById('next');
+    let index = Number(new URLSearchParams(location.search).get('slide') || 1) - 1;
+    index = Math.max(0, Math.min(slides.length - 1, index));
+
+    function render() {
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      const n = String(index + 1).padStart(2, '0');
+      const total = String(slides.length).padStart(2, '0');
+      counter.textContent = `${n} / ${total}`;
+      slideTitle.textContent = slides[index].dataset.title || '';
+      progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+      const url = new URL(location.href);
+      url.searchParams.set('slide', String(index + 1));
+      history.replaceState(null, '', url);
+    }
+
+    function go(delta) {
+      index = Math.max(0, Math.min(slides.length - 1, index + delta));
+      render();
+    }
+
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    notes.addEventListener('click', () => document.body.classList.toggle('show-notes'));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') {
+        event.preventDefault();
+        go(1);
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+        event.preventDefault();
+        go(-1);
+      }
+      if (event.key === 'Home') {
+        index = 0;
+        render();
+      }
+      if (event.key === 'End') {
+        index = slides.length - 1;
+        render();
+      }
+      if (event.key.toLowerCase() === 'n') {
+        document.body.classList.toggle('show-notes');
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/web-terms", "destination": "/web-terms.html" },
     { "source": "/support", "destination": "/support.html" },
     { "source": "/cbm", "destination": "/cbm.html" },
     { "source": "/cbm/", "destination": "/cbm/index.html" },
@@ -29,6 +30,10 @@
     { "source": "/prototype", "destination": "/prototype.html" },
     { "source": "/prototype/", "destination": "/prototype/index.html" },
     { "source": "/prototype.html", "destination": "/prototype.html" },
+    { "source": "/nike-statskey-presentation", "destination": "/nike-statskey-presentation.html" },
+    { "source": "/nike-statskey-presentation.html", "destination": "/nike-statskey-presentation.html" },
+    { "source": "/nike-run-club", "destination": "/nike-run-club/index.html" },
+    { "source": "/nike-run-club/", "destination": "/nike-run-club/index.html" },
     { "source": "/bid/alaska-dotpf", "destination": "/bid/alaska-dotpf.html" },
     { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
     { "source": "/app", "destination": "/app.html" },
