@@ -15,6 +15,8 @@
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Barlow,ui-sans-serif,system-ui,sans-serif}
 body{background:radial-gradient(circle at 18% 12%,rgba(44,158,255,.16),transparent 30%),radial-gradient(circle at 88% 18%,rgba(112,240,203,.10),transparent 28%),linear-gradient(145deg,#03060b 0%,#07101a 48%,#04070d 100%)}
 #canvas{display:block;width:100vw;height:100vh;touch-action:none}
+.fallback-render{position:fixed;inset:0;z-index:1;display:grid;place-items:center;padding:28px;background:radial-gradient(circle at 50% 38%,rgba(112,240,203,.12),transparent 26rem),linear-gradient(145deg,#03060b 0%,#07101a 48%,#04070d 100%)}
+.fallback-render.hidden{display:none}.fallback-card{width:min(920px,calc(100vw - 48px));border:1px solid var(--line);border-radius:24px;background:rgba(7,12,19,.88);padding:20px}.fallback-card svg{width:100%;height:auto;display:block}.fallback-card p{margin:12px 0 0;color:var(--soft);font-size:13px;line-height:1.55}.fallback-card b{color:var(--ink)}
 .panel{position:fixed;z-index:3;background:linear-gradient(180deg,rgba(13,22,34,.92),rgba(7,12,19,.84));border:1px solid var(--line);backdrop-filter:blur(14px)}
 .brand{left:18px;top:18px;width:min(318px,calc(100vw - 36px));padding:12px 14px;border-radius:18px}
 .back{display:inline-flex;gap:7px;margin-bottom:10px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;text-decoration:none}
@@ -23,10 +25,44 @@ body{background:radial-gradient(circle at 18% 12%,rgba(44,158,255,.16),transpare
 .toolbar{right:18px;top:18px;width:min(300px,calc(100vw - 36px));padding:14px;border-radius:18px}.panel-title{margin:0 0 10px;color:var(--aqua);font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700}.views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.button{appearance:none;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.055);color:var(--ink);padding:9px 10px;font:700 11px Rajdhani,sans-serif;cursor:pointer}.button.active{background:rgba(112,240,203,.14);border-color:rgba(112,240,203,.55);color:#f8fffd}
 .parts-panel{left:18px;bottom:18px;width:min(390px,calc(100vw - 36px));max-height:34vh;overflow:auto;padding:14px;border-radius:18px}.part-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.part-button{appearance:none;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.045);color:var(--soft);padding:8px 9px;text-align:left;font:700 11px Rajdhani,sans-serif;letter-spacing:.06em;cursor:pointer}.part-button.active{border-color:rgba(112,240,203,.65);background:rgba(112,240,203,.12);color:#f8fffd}.part-button span{display:block;margin-top:2px;color:var(--muted);font:600 10px Barlow,sans-serif;letter-spacing:0;text-transform:none}
 .inspector{right:18px;bottom:18px;width:min(455px,calc(100vw - 36px));max-height:48vh;overflow:auto;padding:16px;border-radius:18px}.type{color:var(--amber);font-size:10px;font-weight:700}.title{margin-top:4px;font-family:Rajdhani,sans-serif;font-size:27px;font-weight:700;line-height:1}.inspector p{margin:8px 0 0;color:var(--soft);font-size:12px;line-height:1.5}.inspector b{color:var(--ink)}.source-link{display:inline-flex;margin-top:12px;color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700}.hint{position:fixed;left:18px;bottom:calc(34vh + 38px);z-index:2;color:var(--muted);font-size:11px;background:rgba(10,14,20,.72);border:1px solid var(--line);border-radius:999px;padding:9px 12px}
+.legend{position:fixed;left:50%;bottom:18px;z-index:2;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:min(620px,calc(100vw - 36px));padding:9px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(10,14,20,.72);backdrop-filter:blur(12px);color:var(--muted);font-size:11px}.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.legend i{width:9px;height:9px;border-radius:999px;display:inline-block}.legend .sample i{background:#8fd3ff}.legend .cal i{background:#ffbd68}.legend .qc i{background:#70f0cb}.legend .waste i{background:#dcecf2}
 @media(max-width:760px){.toolbar{top:auto;bottom:18px;left:18px;right:auto}.inspector,.parts-panel{display:none}.hint{display:none}.brand{max-height:44vh;overflow:auto}}
 </style>
 </head>
 <body>
+<div class="fallback-render" id="fallbackRender" aria-label="Static Hospital CKM first article render">
+  <div class="fallback-card">
+    <svg viewBox="0 0 760 460" role="img" aria-label="Hospital CKM first article static assembly blueprint">
+      <rect x="40" y="44" width="680" height="360" rx="30" fill="#071217" stroke="#243041"/>
+      <rect x="110" y="96" width="540" height="146" rx="22" fill="#121c24" stroke="#35556b"/>
+      <text x="130" y="126" fill="#8fd3ff" font-family="Rajdhani, sans-serif" font-size="18" font-weight="700">REUSABLE READER · 170 x 112 x 42 mm</text>
+      <rect x="154" y="156" width="190" height="62" rx="9" fill="#0b3a42" stroke="#70f0cb"/>
+      <text x="188" y="193" fill="#eef6ff" font-family="Rajdhani, sans-serif" font-size="30" font-weight="700">K+ trend</text>
+      <rect x="390" y="158" width="54" height="26" rx="5" fill="#132530" stroke="#8fd3ff"/>
+      <rect x="458" y="158" width="38" height="26" rx="5" fill="#26313a" stroke="#70f0cb"/>
+      <rect x="514" y="158" width="72" height="26" rx="5" fill="#18212a" stroke="#ffbd68"/>
+      <text x="394" y="176" fill="#c5d3e1" font-family="Barlow, sans-serif" font-size="11">FLOW</text>
+      <text x="466" y="176" fill="#c5d3e1" font-family="Barlow, sans-serif" font-size="11">mp6</text>
+      <text x="526" y="176" fill="#c5d3e1" font-family="Barlow, sans-serif" font-size="11">ADS124S08</text>
+      <rect x="135" y="282" width="490" height="72" rx="18" fill="#1d3d45" stroke="#70f0cb"/>
+      <text x="154" y="308" fill="#eef6ff" font-family="Rajdhani, sans-serif" font-size="18" font-weight="700">DISPOSABLE FLOW-CELL · 120 x 44 x 14 mm · 3.0 mm channel</text>
+      <path d="M164 324 H594" stroke="#4ea3ff" stroke-width="12" stroke-linecap="round" opacity=".45"/>
+      <path d="M164 324 H594" stroke="#8fd3ff" stroke-width="3" stroke-linecap="round"/>
+      <g font-family="Barlow, sans-serif" font-size="10" text-anchor="middle" font-weight="700">
+        <circle cx="302" cy="324" r="13" fill="#36d399"/><text x="302" y="328" fill="#03110e">K1</text>
+        <circle cx="336" cy="324" r="13" fill="#2fbf78"/><text x="336" y="328" fill="#03110e">K2</text>
+        <circle cx="370" cy="324" r="13" fill="#70f0cb"/><text x="370" y="328" fill="#03110e">K3</text>
+        <circle cx="404" cy="324" r="13" fill="#8fd3ff"/><text x="404" y="328" fill="#03110e">REF</text>
+        <circle cx="438" cy="324" r="13" fill="#8995a1"/><text x="438" y="328" fill="#03110e">BLK</text>
+      </g>
+      <rect x="172" y="366" width="76" height="32" rx="8" fill="#ffbd68" opacity=".72"/>
+      <rect x="500" y="364" width="88" height="34" rx="8" fill="#dcecf2" opacity=".25" stroke="#dcecf2"/>
+      <text x="186" y="386" fill="#050b0e" font-family="Barlow, sans-serif" font-size="12" font-weight="700">KCl standards</text>
+      <text x="523" y="385" fill="#eef6ff" font-family="Barlow, sans-serif" font-size="12" font-weight="700">Waste</text>
+    </svg>
+    <p><b>Static fallback render.</b> If the 3D scene is not visible, this still identifies the first article geometry and assembly stack. The WebGL viewer will replace it when Three.js loads.</p>
+  </div>
+</div>
 <canvas id="canvas"></canvas>
 <section class="panel brand">
   <a class="back" href="/hospital-ckm/">Back to Hospital CKM</a>
@@ -39,6 +75,7 @@ body{background:radial-gradient(circle at 18% 12%,rgba(44,158,255,.16),transpare
 <section class="panel parts-panel"><h2 class="panel-title">Parts</h2><div class="part-list" id="partList"></div></section>
 <section class="panel inspector" id="inspector"></section>
 <div class="hint">Drag to rotate · Scroll to zoom · Click a part</div>
+<div class="legend" aria-label="Render legend"><span class="sample"><i></i>sample path</span><span class="cal"><i></i>KCl calibration</span><span class="qc"><i></i>sensor / QC bay</span><span class="waste"><i></i>waste capture</span></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from "three";
@@ -63,9 +100,10 @@ const parts = [
   {id:"stopcock",name:"Clinical stopcock / manifold",type:"orderable fluidics",exact:"Qosina 3-way stopcock family, e.g. 99762 / 99520-3",dims:"Modeled envelope 38 x 24 x 12 mm; final dimensions per selected SKU",detail:"Bench and simulation manifold for sample/waste/standard routing.",risk:"Clinical use needs selected part drawings, pressure rating, biocompatibility, and sterile packaging.",source:"Qosina stopcocks",href:"https://www.qosina.com/categories/stopcocks-manifolds/stopcocks"},
   {id:"reader-shell",name:"Bedside reader shell",type:"custom reusable",exact:"Custom sealed reader enclosure, prototype SLA/CNC, future molded PC/ABS",dims:"170 x 112 x 42 mm modeled shell with bedrail flange",detail:"Reusable housing for display, electronics, pump/valve control, isolated pressure couplers, and network/power ports.",risk:"Must survive cleaning, drops, cable strain, fluid ingress, and hospital electrical safety review.",source:"Custom fabrication",href:"https://www.protolabs.com/services/3d-printing/"},
   {id:"display",name:"Touch display",type:"orderable display",exact:"Adafruit 2.8 inch TFT LCD touchscreen breakout, product 1770 / ILI9341 family",dims:"Modeled PCB 70 x 50 x 6 mm; 2.8 inch 240 x 320 display",detail:"Prototype bedside status display for trend, QC, comparator age, and confirm-test prompts.",risk:"Production version needs medical UI, cleaning, brightness, and alarm/human-factors validation.",source:"Adafruit product 1770",href:"https://www.adafruit.com/product/1770"},
-  {id:"afe",name:"Electrochemical AFE",type:"orderable electronics",exact:"Analog Devices AD5940 electrochemical / impedance AFE",dims:"LFCSP 7 x 7 mm or WLCSP 3.6 x 4.2 mm; modeled 7 x 7 mm",detail:"Supports impedance, diagnostics, and electrochemical characterization in the reusable reader.",risk:"May not be the primary high-Z potentiometric path without external electrometer buffering.",source:"Analog Devices AD5940",href:"https://www.analog.com/en/products/ad5940.html"},
-  {id:"buffer",name:"Electrometer buffer",type:"orderable electronics",exact:"Texas Instruments LMP7721 3 fA input-bias op amp",dims:"8-pin SOIC 4.9 x 6.0 mm",detail:"High-impedance buffer for K+ ISE/reference nodes before ADC.",risk:"Requires guarded PCB layout, low-leakage assembly, and cleaning process validation.",source:"TI LMP7721",href:"https://www.ti.com/product/LMP7721"},
-  {id:"adc",name:"Precision ADC",type:"orderable electronics",exact:"Texas Instruments ADS1220 24-bit ADC",dims:"VQFN 3.5 x 3.5 x 0.9 mm modeled",detail:"Digitizes buffered potentiometric channels and temperature/reference diagnostics.",risk:"Noise and leakage budget must support clinically useful mV resolution.",source:"TI ADS1220",href:"https://www.ti.com/product/ADS1220"},
+  {id:"afe",name:"Electrometer front end",type:"orderable electronics",exact:"Analog Devices AD5940 kept as optional impedance/health-check AFE, not the primary K+ voltage path",dims:"LFCSP 7 x 7 mm modeled package; optional on proof PCB",detail:"Useful for electrode impedance and membrane-health experiments while the K+ value is read through high-Z buffers into the precision ADC.",risk:"Do not rely on this alone for high-impedance potentiometric K+ measurement; isolate it from the measurement node during OCP reads.",source:"Analog Devices AD5940",href:"https://www.analog.com/en/products/ad5940.html"},
+  {id:"buffer",name:"Electrometer buffer array",type:"orderable electronics",exact:"Texas Instruments LMP7721 3 fA input-bias op amps, one guarded buffer per ISE/reference/QC node",dims:"8-pin SOIC body 4.9 x 3.9 mm each; modeled as four guarded buffer packages",detail:"High-impedance isolation for K1/K2/K3, blank, reference sentinel, and open-circuit potentiometric nodes before ADC multiplexing.",risk:"Requires guarded PCB layout, low-leakage standoffs, clean flux process, driven shields, and leakage testing before trusting drift data.",source:"TI LMP7721",href:"https://www.ti.com/product/LMP7721"},
+  {id:"adc",name:"Multi-channel precision ADC",type:"orderable electronics",exact:"Texas Instruments ADS124S08 24-bit, 12-channel delta-sigma ADC",dims:"VQFN-32 RHB package 5.0 x 5.0 mm; 0.9 mm class height; modeled 5 x 5 mm",detail:"Replaces the smaller ADS1220 role so one precision ADC can digitize K1/K2/K3, blank, reference, temperature, and diagnostics with margin.",risk:"Multiplexing must be validated for settling time, leakage, channel memory, common-mode range, and fail-closed handling of impossible channel agreement.",source:"TI ADS124S08",href:"https://www.ti.com/product/ADS124S08"},
+  {id:"temperature",name:"Temperature sensor",type:"orderable electronics",exact:"Texas Instruments TMP117 high-accuracy digital temperature sensor",dims:"6-pin WSON 2.0 x 2.0 mm package; modeled near cassette thermal bay",detail:"Provides local temperature compensation for Nernst slope, fluid bay drift analysis, and warm-up/thermal-stability gating.",risk:"Sensor must measure the fluid/electrode thermal state, not just board temperature; production needs verified thermal coupling.",source:"TI TMP117",href:"https://www.ti.com/product/TMP117"},
   {id:"mcu",name:"MCU / network module",type:"orderable electronics",exact:"ESP32-S3 module or Nordic nRF52840 gateway module for prototype",dims:"Modeled module 18 x 25 x 3 mm",detail:"Runs state machine, logs data, handles local network export, display, and alarms.",risk:"Hospital production needs cybersecurity, isolation, update policy, and EMR integration.",source:"Espressif ESP32-S3",href:"https://www.espressif.com/en/products/socs/esp32-s3"},
   {id:"psu",name:"Power module",type:"orderable electronics",exact:"Medical-grade external 5 V supply plus internal isolated DC/DC prototype module",dims:"Modeled 28 x 16 x 9 mm internal module",detail:"Powers sensors, valves, display, and analog front end with isolated rails.",risk:"Production system must meet IEC 60601 electrical safety and leakage-current requirements.",source:"CUI / medical power modules",href:"https://www.cui.com/catalog/power/dc-dc-converters"},
   {id:"standard",name:"KCl calibration reservoirs",type:"orderable consumable",exact:"NIST-traceable KCl standards, Thermo Orion 921906 class plus custom cartridge reservoirs",dims:"Two modeled reservoirs, 18 x 10 x 24 mm each; 0.8 mL each",detail:"Onboard low/high K+ checks for one-point/two-point validation and drift recovery.",risk:"Reservoir leaching, evaporation, shelf life, and accidental mixing must be validated.",source:"Thermo Orion potassium standard",href:"https://www.thermofisher.com/order/catalog/product/921906"},
@@ -74,12 +112,12 @@ const parts = [
 ];
 const partById = new Map(parts.map(p=>[p.id,p]));
 const views = {
-  assembled:{label:"Assembled",camera:[126,82,136],target:[0,10,0]},
-  exploded:{label:"Exploded",camera:[150,102,164],target:[0,22,0]},
-  fluidics:{label:"Fluidics",camera:[116,58,118],target:[0,0,-4]},
-  chemistry:{label:"Chemistry",camera:[58,44,62],target:[0,-6,-8]},
-  reader:{label:"Reader",camera:[90,68,96],target:[0,34,0]},
-  validation:{label:"Validation",camera:[138,80,152],target:[2,14,10]}
+  assembled:{label:"Assembled",camera:[270,165,292],target:[0,22,0]},
+  exploded:{label:"Exploded",camera:[315,200,340],target:[0,34,0]},
+  fluidics:{label:"Fluidics",camera:[215,104,238],target:[0,4,-6]},
+  chemistry:{label:"Chemistry",camera:[98,66,112],target:[0,0,-12]},
+  reader:{label:"Reader",camera:[160,112,176],target:[0,42,0]},
+  validation:{label:"Validation",camera:[220,126,244],target:[2,16,4]}
 };
 let activeView="assembled"; let activePart="cassette";
 const objectById = new Map();
@@ -88,21 +126,43 @@ const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0d1117);
 const camera=new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 1000);
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
 const controls=new OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
-scene.add(new THREE.AmbientLight(0xffffff,.62)); const key=new THREE.DirectionalLight(0xffffff,.86); key.position.set(80,110,70); scene.add(key); const fill=new THREE.DirectionalLight(0x8fd3ff,.28); fill.position.set(-80,30,-70); scene.add(fill);
-const root=new THREE.Group(); scene.add(root);
-function mat(hex, opacity=1, metal=.06){return new THREE.MeshStandardMaterial({color:new THREE.Color(hex),roughness:.54,metalness:metal,transparent:opacity<1,opacity,depthWrite:opacity>=.62,side:THREE.DoubleSide});}
+scene.add(new THREE.AmbientLight(0xffffff,.54)); const key=new THREE.DirectionalLight(0xffffff,1.05); key.position.set(80,120,82); scene.add(key); const fill=new THREE.DirectionalLight(0x8fd3ff,.34); fill.position.set(-90,42,-88); scene.add(fill); const rim=new THREE.DirectionalLight(0x70f0cb,.22); rim.position.set(20,58,-120); scene.add(rim);
+const root=new THREE.Group(); root.scale.setScalar(.84); scene.add(root);
+function mat(hex, opacity=1, metal=.06){return new THREE.MeshStandardMaterial({color:new THREE.Color(hex),roughness:.5,metalness:metal,transparent:opacity<1,opacity,depthWrite:opacity>=.62,side:THREE.DoubleSide});}
 function remember(id,obj){obj.userData.partId=id; if(!objectById.has(id)) objectById.set(id,[]); objectById.get(id).push(obj); return obj;}
 function box(id,size,pos,hex,opacity=1,metal=.06){const m=remember(id,new THREE.Mesh(new THREE.BoxGeometry(...size),mat(hex,opacity,metal))); m.position.set(...pos); root.add(m); return m;}
 function cyl(id,r,h,pos,hex,opacity=1,metal=.06,axis="y"){const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,80),mat(hex,opacity,metal))); if(axis==="x")m.rotation.z=Math.PI/2; if(axis==="z")m.rotation.x=Math.PI/2; m.position.set(...pos); root.add(m); return m;}
+function sphere(id,r,pos,hex,opacity=1,metal=.06){const m=remember(id,new THREE.Mesh(new THREE.SphereGeometry(r,32,16),mat(hex,opacity,metal))); m.position.set(...pos); root.add(m); return m;}
 function tube(id,start,end,r,hex,opacity=.9){const mid=new THREE.Vector3((start[0]+end[0])/2,(start[1]+end[1])/2,(start[2]+end[2])/2); const dir=new THREE.Vector3(end[0]-start[0],end[1]-start[1],end[2]-start[2]); const len=dir.length(); const geom=new THREE.CylinderGeometry(r,r,len,48); const mesh=remember(id,new THREE.Mesh(geom,mat(hex,opacity,.04))); mesh.position.copy(mid); mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); root.add(mesh); return mesh;}
-function labelPlate(id,text,pos){const plate=box(id,[16,.8,5],pos,"#142029",.86); return plate;}
+function route(id,points,r,hex,opacity=.9){for(let i=0;i<points.length-1;i++)tube(id,points[i],points[i+1],r,hex,opacity); points.slice(1,-1).forEach(p=>sphere(id,r*1.08,p,hex,opacity));}
+function screw(id,pos){cyl(id,1.5,.8,pos,"#d7dde3",.96,.18); cyl(id,.72,1,pos,"#253241",.96,.08);}
+function standoff(id,x,z,floorY,boardBottomY){const h=boardBottomY-floorY; cyl(id,1.7,h,[x,floorY+h/2,z],"#c7d3db",.94,.14); cyl(id,2.8,1.2,[x,floorY+.6,z],"#2a3641",.95,.08); screw(id,[x,boardBottomY+.9,z]);}
+function pcbTrace(id,points,color="#ffbd68"){route(id,points,.26,color,.82);}
+function labelSprite(id,text,pos,color="#8fd3ff",width=34){
+  const c=document.createElement("canvas"); c.width=512; c.height=128; const ctx=c.getContext("2d");
+  ctx.fillStyle="rgba(5,11,14,.78)"; ctx.strokeStyle=color; ctx.lineWidth=4; ctx.beginPath(); ctx.roundRect(10,18,492,92,22); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#eef6ff"; ctx.font="700 42px Rajdhani, Arial, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(text,256,66);
+  const tex=new THREE.CanvasTexture(c); const spr=remember(id,new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,opacity:.9})));
+  spr.position.set(...pos); spr.scale.set(width,6,1); root.add(spr); return spr;
+}
+function clampSaddle(id,pos){
+  const [x,y,z]=pos;
+  // Rectangular rail with a U-shaped reader saddle and two clamp ears.
+  box(id,[168,18,18],[x,y,z],"#242d34",.92,.08);
+  box(id,[44,10,16],[x-58,y-14,z],"#1c252c",.94,.08);
+  box(id,[8,24,22],[x-82,y-17,z],"#1c252c",.94,.08);
+  box(id,[8,24,22],[x-34,y-17,z],"#1c252c",.94,.08);
+  cyl(id,3.2,58,[x-58,y-18,z],"#d7dde3",.95,.12,"x");
+  cyl(id,2.4,8,[x-88,y-18,z],"#ffbd68",.98,.16,"x");
+  cyl(id,2.4,8,[x-28,y-18,z],"#ffbd68",.98,.16,"x");
+}
 function setVisibilityForView(){
   const include={
     assembled:null,
     exploded:null,
     fluidics:["cassette","main-channel","flow-sensor","pump","valve-bank","pressure-a","pressure-b","fittings","stopcock","standard","waste"],
     chemistry:["cassette","main-channel","sensor-strip","k1","k2","k3","ref-a","ref-b","blank","standard"],
-    reader:["reader-shell","display","afe","buffer","adc","mcu","psu","mount","pump","valve-bank"],
+    reader:["reader-shell","display","afe","buffer","adc","temperature","mcu","psu","mount","pump","valve-bank"],
     validation:["cassette","main-channel","sensor-strip","k1","k2","k3","ref-a","ref-b","blank","flow-sensor","pump","valve-bank","pressure-a","pressure-b","standard","waste"]
   }[activeView];
   if(!include)return;
@@ -111,85 +171,172 @@ function setVisibilityForView(){
 function build(){
   root.clear(); objectById.clear();
   const exploded=activeView==="exploded";
-  const lift = exploded ? 34 : 0;
+  const lift = exploded ? 38 : 0;
   const cassetteY = 0;
   const top = cassetteY + 7;
   const channelY = cassetteY + 1.1;
-  const stripY = top + 0.5 + lift * 0.35;
+  const stripY = top + 1.3 + lift * 0.38;
   const shellY = 36 + lift;
-  const boardY = shellY + 2;
+  const boardY = shellY + 1.5;
   const rearZ = -18;
   const frontZ = 18;
   const railY = 12 + lift * 0.55;
   const portY = cassetteY + 1.1;
+  const boardTopY = boardY - 4.2;
+  const boardBottomY = boardTopY - .8;
+  const chassisFloorY = shellY - 18.5;
+  const flowY = boardTopY + 4.45;
+  const pumpY = boardTopY + 2.1;
+  const valveY = boardTopY + 5.0;
 
-  // Bedrail, shell, and cassette cradle: the reader physically captures the cassette from above.
-  box("mount",[168,18,18],[0,shellY+42,-58],"#242d34",.92,.08);
-  cyl("mount",15,34,[-78,shellY+22,-58],"#1c252c",.9,.08,"z");
-  box("reader-shell",[170,42,112],[0,shellY,0],"#111820",.34,.08);
-  box("reader-shell",[132,8,7],[0,railY,28],"#16232b",.72,.08);
-  box("reader-shell",[132,8,7],[0,railY,-28],"#16232b",.72,.08);
-  box("reader-shell",[8,12,58],[-66,railY,0],"#16232b",.72,.08);
-  box("reader-shell",[8,12,58],[66,railY,0],"#16232b",.72,.08);
+  // Hospital rail, clamp, reader shell, and cassette cradle: this is a bedside module, not a patch.
+  clampSaddle("mount",[0,shellY+42,-66]);
+  box("reader-shell",[170,42,112],[0,shellY,0],"#111820",.24,.08);
+  box("reader-shell",[166,4,108],[0,shellY+22,0],"#1a2530",.42,.08);
+  box("reader-shell",[160,6,7],[0,railY,29],"#16232b",.82,.08);
+  box("reader-shell",[160,6,7],[0,railY,-29],"#16232b",.82,.08);
+  box("reader-shell",[8,12,64],[-70,railY,0],"#16232b",.82,.08);
+  box("reader-shell",[8,12,64],[70,railY,0],"#16232b",.82,.08);
+  box("reader-shell",[124,2.2,42],[0,railY-5,0],"#0b1218",.56,.06);
+  box("reader-shell",[140,2,90],[20,chassisFloorY,0],"#0b1218",.38,.06);
+  box("reader-shell",[136,5,4],[20,chassisFloorY+3,43],"#253241",.72,.08);
+  box("reader-shell",[136,5,4],[20,chassisFloorY+3,-43],"#253241",.72,.08);
+  box("reader-shell",[4,5,84],[-50,chassisFloorY+3,0],"#253241",.72,.08);
+  box("reader-shell",[4,5,84],[90,chassisFloorY+3,0],"#253241",.72,.08);
+  labelSprite("reader-shell","reusable reader",[0,shellY+50,5],"#8fd3ff",38);
 
-  // Disposable cassette is the geometric anchor. It sits between the reader rails.
-  box("cassette",[120,14,44],[0,cassetteY,0],"#bfeaf4",.28,.04);
-  box("main-channel",[88,4,6],[0,channelY,0],"#4ea3ff",.44,.04);
-  tube("main-channel",[-44,channelY,0],[44,channelY,0],3.0,"#4ea3ff",.46);
+  // Disposable cassette is a layered machined part: lower plate, gasket, clear cover, screws, ports, and capture rails.
+  box("cassette",[122,4,46],[0,cassetteY-5,0],"#0a2027",.78,.05);
+  box("cassette",[120,8,44],[0,cassetteY,0],"#bfeaf4",.20,.04);
+  box("cassette",[116,1.2,40],[0,top+1.0,0],"#e8fbff",.30,.04);
+  box("cassette",[108,.9,34],[0,top+1.8,0],"#70f0cb",.10,.02);
+  [[-54,top+2,18],[54,top+2,18],[-54,top+2,-18],[54,top+2,-18],[-8,top+2,18],[28,top+2,-18]].forEach(p=>screw("cassette",p));
+  box("cassette",[130,3,4],[0,cassetteY+7.5,27],"#d7dde3",.45,.08);
+  box("cassette",[130,3,4],[0,cassetteY+7.5,-27],"#d7dde3",.45,.08);
+  labelSprite("cassette","single-use cassette",[0,-18,25],"#70f0cb",42);
 
-  // End-face ports and short rigid connector bosses align with the cassette channel.
-  cyl("fittings",4,12,[-66,portY,0],"#d7dde3",.95,.08,"x");
-  cyl("fittings",4,12,[66,portY,0],"#d7dde3",.95,.08,"x");
-  cyl("fittings",3.2,10,[-28,portY,25],"#d7dde3",.95,.08,"z");
-  cyl("fittings",3.2,10,[28,portY,25],"#d7dde3",.95,.08,"z");
+  // The actual sample lane runs through the cassette. Side bypasses show calibration and flush legs.
+  tube("main-channel",[-46,channelY,0],[46,channelY,0],3.0,"#4ea3ff",.58);
+  tube("main-channel",[-36,channelY,-9],[-12,channelY,-9],1.1,"#4ea3ff",.42);
+  tube("main-channel",[12,channelY,9],[36,channelY,9],1.1,"#4ea3ff",.42);
+  [-28,-14,0,14,28].forEach((x,i)=>sphere("main-channel",1.15,[x,channelY,0],i%2?"#8fd3ff":"#4ea3ff",.9));
+  labelSprite("main-channel","sample flow",[0,12,13],"#8fd3ff",31);
 
-  // Chemistry strip is seated on the top face in the wet bay; membrane disks sit on the strip, not in free space.
-  box("sensor-strip",[33.8,.5,10.2],[-4,stripY,rearZ],"#f0f2f4",.95,.05);
-  cyl("k1",2.0,.45,[-17,stripY+.45,rearZ],"#36d399",1,.08);
-  cyl("k2",2.0,.45,[-9,stripY+.45,rearZ],"#2fbf78",1,.08);
-  cyl("k3",2.0,.45,[-1,stripY+.45,rearZ],"#70f0cb",1,.08);
-  cyl("ref-a",2.0,.45,[8,stripY+.45,rearZ],"#d9eeff",1,.08);
-  cyl("ref-b",2.0,.45,[16,stripY+.45,rearZ],"#8fd3ff",1,.08);
-  cyl("blank",2.0,.45,[24,stripY+.45,rearZ],"#8995a1",1,.08);
-  box("ref-a",[16,2,3.2],[8,stripY+2.2,rearZ-8],"#d9eeff",.75,.04);
-  box("ref-b",[16,2,3.2],[16,stripY+4.4,rearZ-8],"#8fd3ff",.75,.04);
+  // End-face and top-face fluidic connectors. These make the tubing and sample direction legible.
+  cyl("fittings",4.2,12,[-66,portY,0],"#d7dde3",.98,.12,"x");
+  cyl("fittings",4.2,12,[66,portY,0],"#d7dde3",.98,.12,"x");
+  cyl("fittings",3.2,10,[-30,portY,25],"#d7dde3",.98,.12,"z");
+  cyl("fittings",3.2,10,[30,portY,25],"#d7dde3",.98,.12,"z");
+  cyl("fittings",3.0,9,[-48,portY,-25],"#d7dde3",.98,.12,"z");
+  cyl("fittings",3.0,9,[48,portY,-25],"#d7dde3",.98,.12,"z");
+  labelSprite("fittings","1/4-28 ports",[-86,11,7],"#dcecf2",27);
 
-  // Pressure diaphragms are mounted on the cassette top, directly above upstream/downstream channel zones.
-  box("pressure-a",[10.54,3.53,8.1],[-38,top+2.0,frontZ],"#f4f1e8",.95,.06);
-  box("pressure-b",[10.54,3.53,8.1],[38,top+2.0,frontZ],"#f4f1e8",.95,.06);
+  // Chemistry strip is clamped under a transparent wet window; the disks line up with the flowing stream.
+  box("sensor-strip",[38,.55,13],[-2,stripY,rearZ],"#f7f8fb",.98,.05);
+  box("sensor-strip",[42,.7,16],[-2,stripY+1.0,rearZ],"#dbefff",.18,.04);
+  [-20,-12,-4,6,16,25].forEach((x,i)=>box("sensor-strip",[2.4,.4,13],[x,stripY+.35,rearZ],"#2d3742",.72,.06));
+  cyl("k1",2.15,.55,[-20,stripY+1.0,rearZ],"#36d399",1,.08);
+  cyl("k2",2.15,.55,[-12,stripY+1.0,rearZ],"#2fbf78",1,.08);
+  cyl("k3",2.15,.55,[-4,stripY+1.0,rearZ],"#70f0cb",1,.08);
+  cyl("ref-a",2.15,.55,[6,stripY+1.0,rearZ],"#d9eeff",1,.08);
+  cyl("ref-b",2.15,.55,[16,stripY+1.0,rearZ],"#8fd3ff",1,.08);
+  cyl("blank",2.15,.55,[25,stripY+1.0,rearZ],"#8995a1",1,.08);
+  box("ref-a",[18,2.2,3.4],[6,stripY+3.2,rearZ-8],"#d9eeff",.78,.04);
+  box("ref-b",[18,2.2,3.4],[16,stripY+5.8,rearZ-8],"#8fd3ff",.78,.04);
+  tube("sensor-strip",[-24,stripY+1.6,rearZ+7],[29,stripY+1.6,rearZ+7],.45,"#70f0cb",.7);
+  labelSprite("sensor-strip","K1 K2 K3 REF BLK",[-1,20,-24],"#70f0cb",39);
 
-  // Reader internals stay inside the transparent reader shell envelope.
-  box("display",[70,4,50],[-38,shellY+23,0],"#1a2a33",.95,.08);
-  box("display",[58,4.4,36],[-38,shellY+25,0],"#0b3a42",.96,.08);
-  box("reader-shell",[128,1.4,78],[18,boardY-4,0],"#0c6e41",.62,.05);
-  box("flow-sensor",[48,8.9,15.5],[-54,boardY,-24],"#132530",.95,.08);
-  box("pump",[30,3.8,15],[-54,boardY+10,12],"#26313a",.95,.08);
-  box("valve-bank",[30,9,18],[-16,boardY+8,12],"#1b242b",.96,.08);
-  box("afe",[7,2,7],[26,boardY+3,-27],"#18212a",1,.1);
-  box("buffer",[6,2,4.9],[38,boardY+3,-27],"#18212a",1,.1);
-  box("adc",[3.5,1.2,3.5],[48,boardY+3,-27],"#18212a",1,.1);
-  box("mcu",[25,3,18],[32,boardY+3,22],"#234d85",1,.08);
-  box("psu",[28,9,16],[66,boardY+5,20],"#30343a",1,.08);
+  // Pressure, temperature, and bubble diagnostics are physically attached to the cassette around the wet bay.
+  box("pressure-a",[10.54,3.53,8.1],[-41,top+2.4,frontZ],"#f4f1e8",.98,.06);
+  box("pressure-b",[10.54,3.53,8.1],[41,top+2.4,frontZ],"#f4f1e8",.98,.06);
+  box("temperature",[3,1.2,3],[-2,top+2.8,frontZ+9],"#70f0cb",1,.08);
+  box("pressure-a",[9,.8,18],[-41,top+4.7,frontZ],"#ff7a85",.42,.04);
+  box("pressure-b",[9,.8,18],[41,top+4.7,frontZ],"#ff7a85",.42,.04);
+  box("cassette",[16,3.4,8],[0,top+2.7,frontZ+18],"#0b2f3a",.52,.04);
+  sphere("cassette",1.2,[-3,top+5.2,frontZ+18],"#8fd3ff",.82);
+  sphere("cassette",.9,[2,top+5.0,frontZ+18],"#dcecf2",.68);
+  labelSprite("pressure-a","pressure + bubble",[0,20,35],"#ff7a85",39);
 
-  // Calibration reservoirs and waste cartridge attach to the disposable cassette sidewall.
-  box("standard",[18,24,10],[-42,cassetteY-1,-35],"#ffbd68",.58,.04);
-  box("standard",[18,24,10],[-18,cassetteY-1,-35],"#ffbd68",.38,.04);
-  box("waste",[34,28,22],[48,cassetteY-2,-35],"#dcecf2",.25,.04);
-  box("stopcock",[38,12,24],[74,cassetteY+3,24],"#e6eef4",.9,.06);
+  // Reader internals: visible boards, cables, pump, valve bank, flow sensor, analog front end, ADC, MCU, and power.
+  box("display",[74,4,50],[-41,shellY+23,6],"#17232c",.98,.08);
+  box("display",[60,4.4,36],[-41,shellY+25,6],"#0b3a42",.98,.08);
+  box("display",[48,4.8,5],[-41,shellY+27,13],"#70f0cb",.82,.04);
+  box("display",[38,4.8,3],[-41,shellY+27,5],"#ffbd68",.72,.04);
+  box("display",[32,4.8,3],[-41,shellY+27,-2],"#8fd3ff",.72,.04);
+  box("display",[82,3,58],[-41,shellY+21,6],"#0b1218",.62,.08);
+  box("display",[82,5,4],[-41,shellY+24,35],"#d7dde3",.72,.08);
+  box("display",[82,5,4],[-41,shellY+24,-23],"#d7dde3",.72,.08);
+  box("display",[4,5,58],[-83,shellY+24,6],"#d7dde3",.72,.08);
+  box("display",[4,5,58],[1,shellY+24,6],"#d7dde3",.72,.08);
+  [[-74,shellY+27,28],[-8,shellY+27,28],[-74,shellY+27,-16],[-8,shellY+27,-16]].forEach(p=>screw("display",p));
+  box("reader-shell",[132,1.6,82],[20,boardY-5,0],"#0c6e41",.74,.05);
+  [[-36,34],[12,34],[56,34],[-36,-34],[12,-34],[56,-34]].forEach(([x,z])=>standoff("reader-shell",x,z,chassisFloorY+1,boardBottomY));
+  [[-36,boardY-4,34],[12,boardY-4,34],[56,boardY-4,34],[-36,boardY-4,-34],[12,boardY-4,-34],[56,boardY-4,-34]].forEach(p=>screw("reader-shell",p));
+  box("flow-sensor",[48,8.9,15.5],[-53,flowY,-25],"#132530",.98,.08);
+  cyl("flow-sensor",2.8,10,[-78,flowY,-25],"#d7dde3",.96,.08,"x");
+  cyl("flow-sensor",2.8,10,[-28,flowY,-25],"#d7dde3",.96,.08,"x");
+  box("pump",[30,4.2,15],[-54,pumpY,13],"#26313a",.98,.08);
+  cyl("pump",4,4,[-64,pumpY,13],"#111820",.98,.08,"x");
+  cyl("pump",4,4,[-44,pumpY,13],"#111820",.98,.08,"x");
+  box("valve-bank",[38,10,20],[-12,valveY,15],"#1b242b",.98,.08);
+  [-24,-12,0].forEach(x=>cyl("valve-bank",3.2,9,[x,valveY+6,15],"#2a3641",.98,.08));
+  box("afe",[9,2,9],[20,boardTopY+1,-28],"#18212a",1,.1);
+  labelSprite("afe","health AFE",[20,boardY+18,-38],"#ffbd68",24);
+  [[32,-33],[41,-33],[50,-33],[32,-23],[41,-23]].forEach(([x,z])=>box("buffer",[4.9,1.6,3.9],[x,boardTopY+.8,z],"#18212a",1,.1));
+  box("adc",[6,1.4,6],[58,boardTopY+.7,-28],"#18212a",1,.1);
+  box("mcu",[26,3,20],[30,boardTopY+1.5,25],"#234d85",1,.08);
+  box("psu",[30,9,17],[68,boardTopY+4.5,22],"#30343a",1,.08);
+  box("buffer",[34,3.2,5],[42,boardTopY+1.6,-40],"#d7dde3",.92,.08);
+  box("mcu",[28,3.2,5],[30,boardTopY+1.6,39],"#d7dde3",.92,.08);
+  box("psu",[22,3.2,5],[68,boardTopY+1.6,36],"#d7dde3",.92,.08);
+  box("flow-sensor",[12,5,9],[-80,boardTopY+2.5,-42],"#d7dde3",.92,.08);
+  box("pump",[12,5,9],[-70,boardTopY+2.5,31],"#d7dde3",.92,.08);
+  box("valve-bank",[12,5,9],[8,boardTopY+2.5,31],"#d7dde3",.92,.08);
+  labelSprite("buffer","guarded mV inputs",[42,boardY+19,-24],"#70f0cb",36);
+  labelSprite("adc","24-bit ADC",[64,boardY+17,-40],"#ffbd68",24);
+  pcbTrace("buffer",[[20,boardTopY+1.8,-28],[20,boardTopY+1.8,-40],[42,boardTopY+1.8,-40],[42,boardTopY+1.8,-33]],"#70f0cb");
+  pcbTrace("buffer",[[32,boardTopY+1.8,-28],[32,boardTopY+1.8,-40],[58,boardTopY+1.8,-40],[58,boardTopY+1.8,-28]],"#ffbd68");
+  pcbTrace("mcu",[[58,boardTopY+1.8,-28],[72,boardTopY+1.8,-28],[72,boardTopY+1.8,39],[30,boardTopY+1.8,39],[30,boardTopY+1.8,25]],"#8fd3ff");
+  pcbTrace("psu",[[68,boardTopY+5,22],[82,boardTopY+5,22],[82,boardTopY+1.8,36],[68,boardTopY+1.8,36],[50,boardTopY+1.8,39],[30,boardTopY+1.8,39]],"#dcecf2");
+  route("buffer",[[-2,stripY+2.2,rearZ-16],[-2,stripY+6,-34],[42,stripY+6,-34],[42,boardTopY+1.6,-40]],.42,"#70f0cb",.72);
+  route("pressure-a",[[-41,top+5.5,frontZ],[-41,top+10,35],[-70,top+10,35],[-80,boardTopY+2.5,-42]],.34,"#ff7a85",.62);
+  route("pressure-b",[[41,top+5.5,frontZ],[41,top+10,35],[-70,top+10,35],[-80,boardTopY+2.5,-42]],.34,"#ff7a85",.62);
 
-  // Tubing is routed around the assembly perimeter instead of through component bodies.
-  tube("fittings",[-112,portY,0],[-72,portY,0],2.1,"#dbe6e8",.9);
-  tube("fittings",[72,portY,0],[112,portY,0],2.1,"#dbe6e8",.9);
-  tube("flow-sensor",[-72,portY,0],[-54,boardY,-24],1.6,"#dbe6e8",.76);
-  tube("flow-sensor",[-54,boardY,-24],[-66,portY,0],1.6,"#dbe6e8",.76);
-  tube("standard",[-42,cassetteY-1,-35],[-28,portY,25],1.3,"#ffbd68",.72);
-  tube("standard",[-18,cassetteY-1,-35],[-16,boardY+8,12],1.3,"#ffbd68",.58);
-  tube("pump",[-54,boardY+10,12],[-28,portY,25],1.4,"#30d5c8",.68);
-  tube("valve-bank",[-16,boardY+8,12],[28,portY,25],1.4,"#30d5c8",.68);
-  tube("waste",[28,portY,25],[48,cassetteY-2,-35],1.6,"#bfeaf4",.58);
+  // Reservoirs and waste are clipped to the disposable cassette, not floating props.
+  box("standard",[18,28,11],[-44,cassetteY-4,-38],"#ffbd68",.62,.04);
+  box("standard",[18,28,11],[-20,cassetteY-4,-38],"#ffbd68",.42,.04);
+  box("standard",[40,3,14],[-32,cassetteY+10,-38],"#1d2b34",.62,.04);
+  labelSprite("standard","KCl low / high",[-32,-23,-49],"#ffbd68",34);
+  box("waste",[38,34,24],[50,cassetteY-6,-39],"#dcecf2",.22,.04);
+  box("waste",[28,3,18],[50,cassetteY+13,-39],"#dcecf2",.34,.04);
+  labelSprite("waste","closed waste",[54,-25,-51],"#dcecf2",29);
+  box("stopcock",[38,12,24],[76,cassetteY+5,24],"#e6eef4",.94,.06);
+  cyl("stopcock",4,32,[76,cassetteY+13,24],"#c8d7df",.95,.08,"x");
+  labelSprite("stopcock","manual manifold",[84,22,24],"#dcecf2",34);
+
+  // Tubing routes are explicit: patient/circuit sample in, through flow sensor, cassette, then waste.
+  route("fittings",[[-122,portY,0],[-96,portY,0],[-96,portY,-34],[-82,boardTopY+2.5,-42],[-78,flowY,-25]],2.0,"#dbe6e8",.88);
+  route("flow-sensor",[[-28,flowY,-25],[-28,boardTopY+2.5,-42],[-96,boardTopY+2.5,-42],[-96,portY,-34],[-66,portY,0]],1.45,"#dbe6e8",.72);
+  route("fittings",[[66,portY,0],[84,portY,0],[84,portY,-34],[112,portY,-34],[112,portY,0]],1.8,"#dbe6e8",.82);
+  labelSprite("fittings","sample in",[-124,12,-6],"#8fd3ff",26);
+  route("standard",[[-44,cassetteY+9,-38],[-56,cassetteY+9,-38],[-56,portY,-31],[-48,portY,-25]],1.25,"#ffbd68",.78);
+  route("standard",[[-20,cassetteY+9,-38],[-20,cassetteY+15,-52],[76,cassetteY+15,-52],[76,cassetteY+13,24]],1.18,"#ffbd68",.62);
+  route("pump",[[-54,pumpY,13],[-70,boardTopY+2.5,31],[-70,top+12,31],[-30,top+12,31],[-30,portY,25]],1.35,"#30d5c8",.7);
+  route("valve-bank",[[-12,valveY,15],[8,boardTopY+2.5,31],[8,top+12,31],[30,top+12,31],[30,portY,25]],1.35,"#30d5c8",.7);
+  route("waste",[[30,portY,25],[30,cassetteY+15,35],[70,cassetteY+15,35],[70,cassetteY+12,-39],[50,cassetteY+12,-39]],1.55,"#bfeaf4",.62);
+  route("stopcock",[[112,portY,0],[116,portY,18],[90,cassetteY+13,30],[76,cassetteY+13,24]],1.7,"#dbe6e8",.72);
+  route("waste",[[76,cassetteY+13,24],[92,cassetteY+15,24],[92,cassetteY+15,-39],[50,cassetteY+12,-39]],1.5,"#dcecf2",.55);
+  [[-103,portY,0],[-88,portY,0],[94,portY,0],[104,portY,0]].forEach(p=>sphere("fittings",1.35,p,"#8fd3ff",.95));
+  [[-43,cassetteY+4,-33],[-30,cassetteY+3,-30],[40,cassetteY+15,-52],[76,cassetteY+13,24]].forEach(p=>sphere("standard",1.2,p,"#ffbd68",.88));
+  [[36,portY,18],[43,cassetteY+7,-19],[50,cassetteY+10,-34]].forEach(p=>sphere("waste",1.2,p,"#dcecf2",.78));
+
   if(activeView==="validation"){
-    box("standard",[32,12,22],[-104,-18,-44],"#ffbd68",.45);
-    box("waste",[44,24,28],[104,-18,-44],"#dcecf2",.22);
+    box("standard",[32,12,22],[-106,-20,-46],"#ffbd68",.45);
+    labelSprite("standard","step standards",[-106,-8,-46],"#ffbd68",32);
+    box("waste",[44,24,28],[106,-20,-46],"#dcecf2",.22);
+    labelSprite("waste","challenge waste",[106,-4,-46],"#dcecf2",32);
+    tube("main-channel",[-88,-20,-46],[-48,channelY,0],1.4,"#ffbd68",.55);
+    tube("waste",[48,channelY,0],[88,-20,-46],1.4,"#dcecf2",.45);
   }
   setVisibilityForView();
 }
@@ -202,13 +349,14 @@ function renderUI(){
   document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>selectPart(b.dataset.part));
   const p=partById.get(activePart)||parts[0];
   document.getElementById("inspector").innerHTML=`<div class="type">${p.type}</div><div class="title">${p.name}</div><p><b>Exact part / family:</b> ${p.exact}</p><p><b>Modeled dimensions:</b> ${p.dims}</p><p><b>Function:</b> ${p.detail}</p><p><b>Validation risk:</b> ${p.risk}</p><p><b>Source:</b> ${p.source}</p><a class="source-link" href="${p.href}" target="_blank" rel="noopener">Open source / order page</a>`;
-  for(const [id,objs] of objectById){objs.forEach(obj=>{if(obj.material){obj.material.emissive=new THREE.Color(id===activePart?0x254b60:0x000000);obj.material.emissiveIntensity = id === activePart ? 0.55 : 0;}})}
+  for(const [id,objs] of objectById){objs.forEach(obj=>{if(obj.material && "emissive" in obj.material){obj.material.emissive=new THREE.Color(id===activePart?0x254b60:0x000000);obj.material.emissiveIntensity = id === activePart ? 0.55 : 0;}})}
 }
 const raycaster=new THREE.Raycaster(); const mouse=new THREE.Vector2();
 canvas.addEventListener("click",e=>{mouse.x=e.clientX/innerWidth*2-1; mouse.y=-(e.clientY/innerHeight)*2+1; raycaster.setFromCamera(mouse,camera); const hit=raycaster.intersectObjects(root.children,true).find(h=>h.object.userData.partId); if(hit) selectPart(hit.object.userData.partId);});
 addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight);});
 function animate(){requestAnimationFrame(animate); controls.update(); renderer.render(scene,camera);}
 setView("assembled"); animate();
+requestAnimationFrame(()=>document.getElementById("fallbackRender")?.classList.add("hidden"));
 </script>
 </body>
 </html>
