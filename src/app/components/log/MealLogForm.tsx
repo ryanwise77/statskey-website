@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '../../lib/auth'
 import { analyzeNutritionInput, filesToBase64 } from '../../lib/ai/geminiNutrition'
 import { useFoodLibrary } from '../../lib/data/useFoodLibrary'
+import { availableServingUnits, convertServingAmount, nutrientsForServing } from '../../lib/serving'
 import { newId, saveFoodToLibrary, saveMeal } from '../../lib/writers'
 import type { AnalysisMode, FoodItem, FoodSource, ItemCategory, Meal } from '../../lib/types'
 
@@ -48,7 +49,14 @@ const NUTRIENT_FIELDS = [
   { key: 'dietary_fiber', label: 'Fib' },
 ] as const
 
-export function MealLogForm({ onSaved }: { onSaved: () => void }) {
+interface MealLogFormProps {
+  onSaved: (meal: Meal) => void
+  initialDate?: Date
+  initialMeal?: Meal
+  onCancel?: () => void
+}
+
+export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: MealLogFormProps) {
   const { user } = useAuth()
   const {
     items: libraryItems,
@@ -57,11 +65,14 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
     loading: libraryLoading,
     error: libraryError,
   } = useFoodLibrary(user?.uid)
-  const now = new Date()
+  const isEditing = initialMeal != null
+  const now = initialMeal?.date ?? initialDate ?? new Date()
   const [inputMode, setInputMode] = useState<InputMode>('aiSearch')
-  const [mealName, setMealName] = useState('')
+  const [mealName, setMealName] = useState(initialMeal?.name ?? '')
   const [date, setDate] = useState(now)
-  const [items, setItems] = useState<Draft[]>([emptyDraft()])
+  const [items, setItems] = useState<Draft[]>(
+    initialMeal?.items.length ? initialMeal.items.map(itemToDraft) : [emptyDraft()]
+  )
   const [saveTarget, setSaveTarget] = useState<SaveTarget>('record')
   const [query, setQuery] = useState('')
   const [barcode, setBarcode] = useState('')
@@ -81,9 +92,46 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
 
   function updateNutrient(idx: number, key: string, value: number) {
     setItems((prev) =>
-      prev.map((it, i) =>
-        i === idx ? { ...it, nutrients: { ...it.nutrients, [key]: Number(value) || 0 } } : it
-      )
+      prev.map((it, i) => {
+        if (i !== idx) return it
+        const nutrients = { ...it.nutrients, [key]: Number(value) || 0 }
+        return {
+          ...it,
+          nutrients,
+          baseNutrients: nutrients,
+          baseServingSize: Number(it.servingSize) || 1,
+          baseServingUnit: it.servingUnit,
+          gramWeight: currentDraftGramWeight(it),
+        }
+      })
+    )
+  }
+
+  function updateServingSize(idx: number, value: number) {
+    setItems((prev) =>
+      prev.map((it, i) => {
+        if (i !== idx) return it
+        const servingSize = Number.isFinite(value) ? value : 0
+        return {
+          ...it,
+          servingSize,
+          nutrients: nutrientsForServing(it, servingSize, it.servingUnit),
+        }
+      })
+    )
+  }
+
+  function updateServingUnit(idx: number, value: string) {
+    setItems((prev) =>
+      prev.map((it, i) => {
+        if (i !== idx) return it
+        const servingUnit = value.trim() || 'serving'
+        return {
+          ...it,
+          servingUnit,
+          nutrients: nutrientsForServing(it, it.servingSize, servingUnit),
+        }
+      })
     )
   }
 
@@ -110,8 +158,19 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
     setError(null)
     try {
       if (inputMode === 'aiSearch') {
-        if (!query.trim()) throw new Error('Enter a food search first.')
-        appendAnalyzed(await analyzeNutritionInput({ query: query.trim() }, 'aiSearch'))
+        if (!query.trim() && selectedFiles.length === 0) {
+          throw new Error('Enter a food search or attach a photo.')
+        }
+        const images = selectedFiles.length ? await filesToBase64(selectedFiles.slice(0, 5)) : undefined
+        appendAnalyzed(
+          await analyzeNutritionInput(
+            {
+              query: query.trim() || 'Food photo nutrition analysis',
+              images,
+            },
+            'aiSearch'
+          )
+        )
         return
       }
 
@@ -203,29 +262,42 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
         .filter((it) => it.name.trim())
         .map(draftToFoodItem)
 
-      if (saveTarget === 'library' || saveTarget === 'both') {
+      if (!isEditing && (saveTarget === 'library' || saveTarget === 'both')) {
         await Promise.all(mealItems.map((item) => saveFoodToLibrary(user.uid, item)))
       }
 
-      if (saveTarget === 'library') {
-        onSaved()
+      if (!isEditing && saveTarget === 'library') {
+        onSaved(initialMeal ?? {
+          id: newId(),
+          userId: user.uid,
+          name: mealName.trim() || undefined,
+          items: mealItems,
+          date,
+          multiplier: 1,
+          isFavorite: false,
+          analysisMode: inferAnalysisMode(mealItems),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
         return
       }
 
       const meal: Meal = {
-        id: newId(),
+        id: initialMeal?.id ?? newId(),
         userId: user.uid,
         name: mealName.trim() || undefined,
         items: mealItems,
         date,
-        multiplier: 1,
-        isFavorite: false,
-        analysisMode: inferAnalysisMode(mealItems),
-        createdAt: new Date(),
+        multiplier: initialMeal?.multiplier ?? 1,
+        isFavorite: initialMeal?.isFavorite ?? false,
+        analysisMode: initialMeal?.analysisMode ?? inferAnalysisMode(mealItems),
+        createdAt: initialMeal?.createdAt ?? new Date(),
         updatedAt: new Date(),
       }
+      if (initialMeal?.glucoseResponse) meal.glucoseResponse = initialMeal.glucoseResponse
+      if (initialMeal?.photoURLs?.length) meal.photoURLs = initialMeal.photoURLs
       await saveMeal(user.uid, meal)
-      onSaved()
+      onSaved(meal)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
@@ -250,6 +322,7 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
               }
               onClick={() => {
                 setInputMode(option.id)
+                setSelectedFiles([])
                 setError(null)
               }}
             >
@@ -356,15 +429,11 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
                   step="0.1"
                   min={0}
                   value={it.servingSize}
-                  onChange={(e) => update(idx, 'servingSize', Number(e.target.value))}
+                  onChange={(e) => updateServingSize(idx, Number(e.target.value))}
                 />
               </Field>
               <Field label="Serving unit">
-                <input
-                  className="input"
-                  value={it.servingUnit}
-                  onChange={(e) => update(idx, 'servingUnit', e.target.value)}
-                />
+                <ServingUnitInput item={it} onChange={(value) => updateServingUnit(idx, value)} />
               </Field>
             </div>
             <div className="grid grid-cols-5 gap-2">
@@ -396,30 +465,51 @@ export function MealLogForm({ onSaved }: { onSaved: () => void }) {
       </div>
 
       <div>
-        <span className="card-title block mb-2">Save options</span>
-        <div className="tab-strip">
-          {(['record', 'library', 'both'] as SaveTarget[]).map((target) => (
-            <button
-              key={target}
-              type="button"
-              className={saveTarget === target ? 'active' : ''}
-              onClick={() => setSaveTarget(target)}
-            >
-              {target === 'record'
-                ? 'Add to Record'
-                : target === 'library'
-                  ? 'Save to Library'
-                  : 'Record + Library'}
-            </button>
-          ))}
-        </div>
+        {!isEditing && (
+          <>
+            <span className="card-title block mb-2">Save options</span>
+            <div className="tab-strip">
+              {(['record', 'library', 'both'] as SaveTarget[]).map((target) => (
+                <button
+                  key={target}
+                  type="button"
+                  className={saveTarget === target ? 'active' : ''}
+                  onClick={() => setSaveTarget(target)}
+                >
+                  {target === 'record'
+                    ? 'Add to Record'
+                    : target === 'library'
+                      ? 'Save to Library'
+                      : 'Record + Library'}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
+
+      {isEditing && (
+        <div className="rounded-xl border border-accent/20 bg-accent/10 px-3 py-2 text-[12px] text-text-secondary">
+          Changes update this meal in place, even if it belongs to a previous calendar day.
+        </div>
+      )}
 
       {error && <div className="error-banner">{error}</div>}
 
       <div className="flex justify-end gap-2">
+        {onCancel && (
+          <button className="btn btn-ghost" type="button" onClick={onCancel} disabled={saving}>
+            Cancel
+          </button>
+        )}
         <button className="btn btn-primary" onClick={save} disabled={saving}>
-          {saving ? 'Saving...' : saveTarget === 'library' ? 'Save foods' : 'Save meal'}
+          {saving
+            ? 'Saving...'
+            : isEditing
+              ? 'Save changes'
+              : saveTarget === 'library'
+                ? 'Save foods'
+                : 'Save meal'}
         </button>
       </div>
     </div>
@@ -509,21 +599,27 @@ function InputModePanel({
 
   if (mode === 'aiSearch') {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-end">
-        <Field label="Search here">
-          <input
-            className="input"
-            placeholder="e.g. 2 eggs, sourdough toast, coffee with milk"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') onAnalyze()
-            }}
-          />
-        </Field>
-        <button className="btn btn-primary" type="button" disabled={analyzing} onClick={onAnalyze}>
-          {analyzing ? 'Searching...' : 'Search with AI'}
-        </button>
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-end">
+          <Field label="Search here">
+            <input
+              className="input"
+              placeholder="e.g. 2 eggs, sourdough toast, coffee with milk"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') onAnalyze()
+              }}
+            />
+          </Field>
+          <button className="btn btn-primary" type="button" disabled={analyzing} onClick={onAnalyze}>
+            {analyzing ? 'Searching...' : 'Search with AI'}
+          </button>
+        </div>
+        <PhotoInput onFiles={setSelectedFiles} label="Add photos (optional)" />
+        <p className="text-text-muted text-[12px]">
+          Attach up to 5 photos to analyze alongside your description — or leave the text empty to identify the food from the images alone.
+        </p>
       </div>
     )
   }
@@ -804,9 +900,17 @@ function formatNumber(value: number): string {
   return value.toFixed(1).replace(/\.0$/, '')
 }
 
-function PhotoInput({ capture, onFiles }: { capture?: boolean; onFiles: (files: File[]) => void }) {
+function PhotoInput({
+  capture,
+  onFiles,
+  label = 'Images',
+}: {
+  capture?: boolean
+  onFiles: (files: File[]) => void
+  label?: string
+}) {
   return (
-    <Field label="Images">
+    <Field label={label}>
       <input
         className="input"
         type="file"
@@ -852,6 +956,43 @@ function NutrientField({
   )
 }
 
+function ServingUnitInput({ item, onChange }: { item: Draft; onChange: (unit: string) => void }) {
+  const units = availableServingUnits(item)
+  const datalistId = `serving-units-${item.id}`
+
+  if (units.length > 1) {
+    return (
+      <select
+        className="input"
+        value={item.servingUnit}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {units.map((unit) => (
+          <option key={unit} value={unit}>
+            {unit}
+          </option>
+        ))}
+      </select>
+    )
+  }
+
+  return (
+    <>
+      <input
+        className="input"
+        list={datalistId}
+        value={item.servingUnit}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <datalist id={datalistId}>
+        {units.map((unit) => (
+          <option key={unit} value={unit} />
+        ))}
+      </datalist>
+    </>
+  )
+}
+
 function emptyDraft(source: FoodSource = 'manual'): Draft {
   return {
     id: newId(),
@@ -878,6 +1019,7 @@ function isBlank(draft: Draft): boolean {
 }
 
 function itemToDraft(item: FoodItem): Draft {
+  const baseNutrients = item.baseNutrients ?? item.nutrients
   return {
     id: item.id,
     name: item.name,
@@ -890,28 +1032,31 @@ function itemToDraft(item: FoodItem): Draft {
     itemCategory: item.itemCategory,
     notes: item.notes ?? '',
     geminiExplanation: item.geminiExplanation,
-    baseNutrients: item.baseNutrients,
-    baseServingSize: item.baseServingSize,
-    baseServingUnit: item.baseServingUnit,
-    gramWeight: item.gramWeight,
+    baseNutrients,
+    baseServingSize: item.baseServingSize ?? item.servingSize,
+    baseServingUnit: item.baseServingUnit ?? item.servingUnit,
+    gramWeight: item.gramWeight ?? currentItemGramWeight(item),
     gramsPerCup: item.gramsPerCup,
   }
 }
 
 function draftToFoodItem(draft: Draft): FoodItem {
   const now = new Date()
+  const servingSize = Number(draft.servingSize) || 1
+  const servingUnit = draft.servingUnit.trim() || 'serving'
+  const baseNutrients = draft.baseNutrients ?? draft.nutrients
   return {
     id: draft.id || newId(),
     name: draft.name.trim(),
     brand: draft.brand.trim() || undefined,
-    servingSize: Number(draft.servingSize) || 1,
-    servingUnit: draft.servingUnit.trim() || 'serving',
+    servingSize,
+    servingUnit,
     barcode: draft.barcode.trim() || undefined,
     nutrients: draft.nutrients,
-    baseNutrients: draft.baseNutrients,
-    baseServingSize: draft.baseServingSize,
-    baseServingUnit: draft.baseServingUnit,
-    gramWeight: draft.gramWeight,
+    baseNutrients,
+    baseServingSize: draft.baseServingSize ?? servingSize,
+    baseServingUnit: draft.baseServingUnit ?? servingUnit,
+    gramWeight: draft.gramWeight ?? currentDraftGramWeight(draft),
     gramsPerCup: draft.gramsPerCup,
     isFavorite: false,
     useCount: 0,
@@ -931,6 +1076,23 @@ function inferAnalysisMode(items: FoodItem[]): AnalysisMode {
   }
   if (items.some((item) => item.source === 'aiSearch')) return 'text'
   return 'manual'
+}
+
+function currentDraftGramWeight(draft: Draft): number | undefined {
+  return currentItemGramWeight({
+    ...draft,
+    isFavorite: false,
+    useCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  })
+}
+
+function currentItemGramWeight(item: FoodItem): number | undefined {
+  const servingSize = Number(item.servingSize)
+  if (!Number.isFinite(servingSize) || servingSize <= 0) return undefined
+  const converted = convertServingAmount(item, servingSize, item.servingUnit, 'g')
+  return converted
 }
 
 function sourceLabel(source: FoodSource): string {

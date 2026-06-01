@@ -1,0 +1,243 @@
+import { useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { startTokenPackCheckout, type TokenPackId } from '../lib/billing'
+import { useAuth } from '../lib/auth'
+import { formatTokens, useTokenBalance } from '../lib/data/useTokenBalance'
+
+interface TokenPack {
+  id: TokenPackId
+  name: string
+  tokens: string
+  price: string
+  subtitle: string
+  bestFor: string
+  featured?: boolean
+}
+
+const TOKEN_PACKS: TokenPack[] = [
+  {
+    id: '1m',
+    name: 'Starter top-up',
+    tokens: '1M',
+    price: '$6.99',
+    subtitle: 'Small overflow pack for extra Flow questions.',
+    bestFor: 'A few deeper chats',
+  },
+  {
+    id: '5m',
+    name: 'Power month',
+    tokens: '5M',
+    price: '$29.99',
+    subtitle: 'The cleanest option for heavy managed AI use.',
+    bestFor: 'Frequent deep analysis',
+    featured: true,
+  },
+  {
+    id: '25m',
+    name: 'Research pack',
+    tokens: '25M',
+    price: '$149.99',
+    subtitle: 'Large one-time reserve for long context and bulk analysis.',
+    bestFor: 'Power users and reports',
+  },
+  {
+    id: '100m',
+    name: 'Frontier reserve',
+    tokens: '100M',
+    price: '$599.99',
+    subtitle: 'High-volume reserve for users who do not want BYOK.',
+    bestFor: 'Never think about tokens',
+  },
+]
+
+export function Tokens() {
+  return <TokenPackStore testMode={false} />
+}
+
+export function TokensTest() {
+  return <TokenPackStore testMode />
+}
+
+function TokenPackStore({ testMode }: { testMode: boolean }) {
+  const { user } = useAuth()
+  const tokenState = useTokenBalance(user?.uid)
+  const [searchParams] = useSearchParams()
+  const [busyPack, setBusyPack] = useState<TokenPackId | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const checkoutState = searchParams.get('checkout')
+
+  const status = useMemo(() => {
+    if (checkoutState === 'success') {
+      return {
+        tone: 'success',
+        title: 'Checkout complete',
+        copy: testMode
+          ? 'Stripe test mode confirmed the fake-card payment. Tokens are granted only if your UID is in the test allowlist.'
+          : 'Stripe confirmed your payment. Tokens are granted by the webhook and should appear in StatsKey shortly.',
+      }
+    }
+    if (checkoutState === 'cancelled') {
+      return {
+        tone: 'neutral',
+        title: 'Checkout cancelled',
+        copy: 'No charge was made. Pick a pack below when you are ready.',
+      }
+    }
+    return null
+  }, [checkoutState, testMode])
+
+  async function buy(pack: TokenPackId) {
+    setBusyPack(pack)
+    setError(null)
+    try {
+      await startTokenPackCheckout(pack, { testMode })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e))
+      setBusyPack(null)
+    }
+  }
+
+  return (
+    <div className="max-w-[940px] space-y-8">
+      <header className="space-y-3">
+        <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-data">
+          Managed AI tokens
+        </div>
+        {testMode && (
+          <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
+            Stripe test mode
+          </div>
+        )}
+        <div className="space-y-2">
+          <h1 className="font-display text-[34px] font-bold tracking-[-0.035em]">
+            {testMode ? 'Test token checkout before going live.' : 'More Flow tokens, no API key.'}
+          </h1>
+          <p className="max-w-[680px] text-[15px] leading-relaxed text-text-secondary">
+            {testMode
+              ? 'This hidden route uses Stripe test keys and fake cards. It only grants tokens for Firebase UIDs in the server allowlist.'
+              : "Buy web-only Stripe top-ups for StatsKey's managed Claude, ChatGPT, and Grok routes. Tokens are added to the same account you use in the iOS app."}
+          </p>
+        </div>
+      </header>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <div className="panel space-y-1">
+          <span className="card-title">Remaining</span>
+          <div className="font-display text-[30px] font-bold tracking-[-0.04em] text-text-primary">
+            {tokenState.loading ? 'Loading…' : formatTokens(tokenState.tokens?.balance ?? 0)}
+          </div>
+          <p className="text-[12px] text-text-muted">Managed AI token balance</p>
+        </div>
+        <div className="panel space-y-1">
+          <span className="card-title">Lifetime used</span>
+          <div className="font-display text-[30px] font-bold tracking-[-0.04em] text-text-primary">
+            {tokenState.loading ? 'Loading…' : formatTokens(tokenState.tokens?.lifetimeUsed ?? 0)}
+          </div>
+          <p className="text-[12px] text-text-muted">Deducted by app usage</p>
+        </div>
+        <div className="panel space-y-1">
+          <span className="card-title">Billing period</span>
+          <div className="font-display text-[30px] font-bold tracking-[-0.04em] text-text-primary">
+            {tokenState.loading ? 'Loading…' : tokenState.tokens?.currentMonth ?? 'None'}
+          </div>
+          <p className="text-[12px] text-text-muted">
+            {tokenState.tokens?.lastStripeCheckoutSessionId
+              ? 'Latest web pack recorded'
+              : tokenState.tokens?.lastStripeTestCheckoutSessionId
+                ? 'Latest test pack recorded'
+                : 'No web pack yet'}
+          </p>
+        </div>
+      </section>
+
+      {tokenState.error && <div className="error-banner">{tokenState.error}</div>}
+
+      {testMode && (
+        <div className="panel space-y-2">
+          <h2 className="font-display text-[18px] font-semibold text-text-primary">Test card</h2>
+          <p className="text-[13px] text-text-secondary">
+            Use <span className="font-mono text-text-primary">4242 4242 4242 4242</span>,
+            any future expiration date, and any CVC. No real money moves in this mode.
+          </p>
+        </div>
+      )}
+
+      {status && (
+        <div className={status.tone === 'success' ? 'success-banner' : 'panel'}>
+          <h2 className="font-display text-[18px] font-semibold text-text-primary">{status.title}</h2>
+          <p className="mt-1 text-[13px] text-text-secondary">{status.copy}</p>
+        </div>
+      )}
+
+      {error && <div className="error-banner">{error}</div>}
+
+      <section className="grid gap-4 md:grid-cols-2">
+        {TOKEN_PACKS.map((pack) => (
+          <article
+            key={pack.id}
+            className={`token-pack-card ${pack.featured ? 'token-pack-card--featured' : ''}`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em] text-text-primary">
+                    {pack.name}
+                  </h2>
+                  {pack.featured && <span className="token-pack-badge">Best fit</span>}
+                </div>
+                <p className="mt-1 text-[13px] text-text-secondary">{pack.subtitle}</p>
+              </div>
+              <div className="text-right">
+                <div className="font-display text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+                  {pack.tokens}
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.14em] text-text-muted">tokens</div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-end justify-between gap-4">
+              <div>
+                <div className="font-display text-[24px] font-bold tracking-[-0.03em] text-text-primary">
+                  {pack.price}
+                </div>
+                <p className="text-[12px] text-text-muted">{pack.bestFor}</p>
+              </div>
+              <button
+                className={pack.featured ? 'btn btn-primary' : 'btn btn-secondary'}
+                onClick={() => buy(pack.id)}
+                disabled={busyPack !== null}
+              >
+                {busyPack === pack.id ? 'Opening Stripe…' : (testMode ? 'Test checkout' : 'Buy on web')}
+              </button>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-[1.15fr_0.85fr]">
+        <div className="panel space-y-3">
+          <span className="card-title">How this works</span>
+          <p className="text-[14px] leading-relaxed text-text-secondary">
+            Stripe handles the payment page. After payment succeeds, a Firebase webhook grants
+            the token pack to your StatsKey account and the iOS app picks it up from Firebase.
+          </p>
+          <p className="text-[12px] leading-relaxed text-text-muted">
+            Do not open this checkout from inside the iOS app unless StatsKey has the relevant
+            Apple external-purchase entitlement and review approval.
+          </p>
+        </div>
+
+        <div className="panel space-y-3">
+          <span className="card-title">Already subscribed?</span>
+          <p className="text-[14px] leading-relaxed text-text-secondary">
+            Pro+ remains the normal power-user plan with 2M managed tokens every month.
+            Packs are for spikes when you need more without bringing your own provider key.
+          </p>
+          <Link to="/profile" className="link text-[13px] font-medium">
+            View profile and subscription status
+          </Link>
+        </div>
+      </section>
+    </div>
+  )
+}

@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
+import { useGlucoseStatus } from '../lib/data/useGlucoseStatus'
 import { useSubscription } from '../lib/data/useSubscription'
+import { formatTokens, useTokenBalance } from '../lib/data/useTokenBalance'
 import type { ActivityLevel, AppFocus, BiologicalProfile, UserProfile } from '../lib/profile'
 
 const BIO_OPTIONS: { value: BiologicalProfile; label: string }[] = [
@@ -32,6 +35,8 @@ const FOCUS_OPTIONS: { value: AppFocus; label: string }[] = [
 export function Profile() {
   const { user, profile, saveProfile, profileLoaded } = useAuth()
   const subState = useSubscription(user?.uid)
+  const tokenState = useTokenBalance(user?.uid)
+  const glucoseStatus = useGlucoseStatus(user?.uid)
   const [draft, setDraft] = useState<UserProfile | null>(profile)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -182,13 +187,97 @@ export function Profile() {
               </div>
             )}
             <p className="text-text-muted text-[12px] mt-2">
-              Subscriptions are managed through the App Store on iOS. Web-based billing is not currently available.
+              iOS subscriptions are managed through the App Store. Web token packs are available
+              separately for power users who need more managed AI usage without bringing an API key.
+            </p>
+            <Link to="/tokens" className="link text-[13px] font-medium">
+              Buy web token packs
+            </Link>
+          </>
+        )}
+      </div>
+
+      <div className="panel space-y-3">
+        <span className="card-title">AI Tokens</span>
+        {tokenState.loading ? (
+          <p className="text-text-muted text-[13px]">Loading…</p>
+        ) : tokenState.error ? (
+          <div className="error-banner">{tokenState.error}</div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-text-secondary">Remaining</span>
+              <span className="text-text-primary font-medium">
+                {formatTokens(tokenState.tokens?.balance ?? 0)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-text-secondary">Lifetime used</span>
+              <span className="text-text-primary">
+                {formatTokens(tokenState.tokens?.lifetimeUsed ?? 0)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-text-secondary">Current month</span>
+              <span className="text-text-primary">
+                {tokenState.tokens?.currentMonth ?? 'None'}
+              </span>
+            </div>
+            <Link to="/tokens" className="link text-[13px] font-medium">
+              Manage web token packs
+            </Link>
+          </>
+        )}
+      </div>
+
+      <div className="panel space-y-3">
+        <span className="card-title">Glucose data</span>
+        {glucoseStatus.loading ? (
+          <p className="text-text-muted text-[13px]">Loading…</p>
+        ) : glucoseStatus.error ? (
+          <div className="error-banner">{glucoseStatus.error}</div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-text-secondary">Latest source</span>
+              <span className="text-text-primary font-medium">
+                {glucoseStatus.latest?.source ?? 'Not connected'}
+              </span>
+            </div>
+            {glucoseStatus.latest && (
+              <div className="flex items-center justify-between text-[14px]">
+                <span className="text-text-secondary">Latest reading</span>
+                <span className="text-text-primary">
+                  {Math.round(glucoseStatus.latest.value)} mg/dL · {formatRelativeTime(glucoseStatus.latest.timestamp)}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-[14px]">
+              <span className="text-text-secondary">Dexcom API sync</span>
+              <span className="text-text-primary">
+                {glucoseStatus.dexcomCount && glucoseStatus.dexcomCount > 0
+                  ? `${glucoseStatus.dexcomCount.toLocaleString()} readings synced`
+                  : 'Connect once in the iOS app'}
+              </span>
+            </div>
+            <p className="text-text-muted text-[12px] mt-2">
+              Dexcom Share login stays in the iOS app keychain. Once connected there, StatsKey backs the readings up to Firebase so Flow and the website can use the same history.
             </p>
           </>
         )}
       </div>
     </div>
   )
+}
+
+function formatRelativeTime(date: Date): string {
+  const minutes = Math.max(0, Math.round((Date.now() - date.getTime()) / 60000))
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.round(minutes / 60)
+  if (hours < 48) return `${hours}h ago`
+  const days = Math.round(hours / 24)
+  return `${days}d ago`
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

@@ -2,23 +2,33 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 
+const REDIRECT_PATH_KEY = 'statskey.login.redirectPath'
+
 export function Login() {
   const { user, signInWithGoogle, signInWithApple, error, loading } = useAuth()
   const location = useLocation()
   const [busy, setBusy] = useState<null | 'google' | 'apple'>(null)
   const [localError, setLocalError] = useState<string | null>(null)
+  const from = (location.state as { from?: { pathname: string; search?: string; hash?: string } } | null)?.from
 
   useEffect(() => { setLocalError(error) }, [error])
 
   if (user && !loading) {
-    const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/'
-    return <Navigate to={from} replace />
+    const redirectPath =
+      sessionStorage.getItem(REDIRECT_PATH_KEY) ??
+      (from ? `${from.pathname}${from.search ?? ''}${from.hash ?? ''}` : null) ??
+      '/'
+    sessionStorage.removeItem(REDIRECT_PATH_KEY)
+    return <Navigate to={redirectPath} replace />
   }
 
   async function go(which: 'google' | 'apple') {
     setBusy(which)
     setLocalError(null)
     try {
+      if (from) {
+        sessionStorage.setItem(REDIRECT_PATH_KEY, `${from.pathname}${from.search ?? ''}${from.hash ?? ''}`)
+      }
       if (which === 'google') await signInWithGoogle()
       else await signInWithApple()
     } catch {
@@ -60,7 +70,7 @@ export function Login() {
         </div>
 
         <p className="text-text-muted text-[12px] mt-6 text-center leading-relaxed">
-          By continuing you agree to the <a className="link" href="/terms">Terms</a> and <a className="link" href="/privacy">Privacy Policy</a>.
+          By continuing you agree to the <a className="link" href="/web-terms">Web Interface Terms</a>, <a className="link" href="/terms">iOS App Terms</a>, and <a className="link" href="/privacy">Privacy Policy</a>.
         </p>
       </div>
     </div>

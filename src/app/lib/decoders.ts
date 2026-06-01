@@ -18,7 +18,9 @@ import type {
   Meal,
   MoodEntry,
   PaceZoneDistribution,
+  RouteDifficulty,
   RoutePoint,
+  SavedRoute,
   Split,
   StoolColor,
   SymptomEntry,
@@ -289,6 +291,41 @@ export function decodeRoutePoints(v: unknown): RoutePoint[] {
     if (p) out.push(p)
   }
   return out
+}
+
+export function decodeSavedRoute(raw: Raw, idFallback: string): SavedRoute {
+  const difficulty = parseRouteDifficulty(str(raw.difficulty))
+  return {
+    id: str(raw.id) ?? idFallback,
+    name: str(raw.name) ?? 'Untitled route',
+    description: str(raw.description) ?? '',
+    sportType: str(raw.sportType) ?? 'running',
+    createdBy: str(raw.createdBy) ?? '',
+    creatorName: str(raw.creatorName) ?? '',
+    routePoints: decodeRoutePoints(raw.routePoints),
+    distance: num(raw.distance) ?? 0,
+    elevationGain: num(raw.elevationGain) ?? 0,
+    elevationLoss: num(raw.elevationLoss) ?? 0,
+    estimatedDuration: num(raw.estimatedDuration) ?? 0,
+    difficulty,
+    isPublic: bool(raw.isPublic) ?? false,
+    rating: num(raw.rating) ?? 0,
+    ratingCount: num(raw.ratingCount) ?? 0,
+    timesCompleted: num(raw.timesCompleted) ?? 0,
+    createdAt: toDateOrNow(raw.createdAt),
+  }
+}
+
+function parseRouteDifficulty(value: string | undefined): RouteDifficulty {
+  switch (value) {
+    case 'easy':
+    case 'moderate':
+    case 'hard':
+    case 'expert':
+      return value
+    default:
+      return 'moderate'
+  }
 }
 
 function decodeSplit(raw: Raw, idx: number): Split {

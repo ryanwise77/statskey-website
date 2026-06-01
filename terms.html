@@ -27,7 +27,7 @@
     <main class="pt-28 pb-24 px-8">
       <div class="max-w-[720px] mx-auto">
         <h1 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.035em] mb-2">Terms of Service</h1>
-        <p class="text-text-muted text-[13px] mb-12">Effective Date: April 2, 2026</p>
+        <p class="text-text-muted text-[13px] mb-12">Effective Date: May 15, 2026</p>
 
         <div class="space-y-10 text-[15px] text-text-secondary leading-relaxed legal-content">
 
@@ -44,9 +44,9 @@
               <li>Nutritional analysis and tracking across 50+ nutrients</li>
               <li>Exercise, activity, and workout logging</li>
               <li>Weight and body metrics monitoring</li>
-              <li>Continuous glucose monitor (CGM) integration</li>
-              <li>Apple Health integration</li>
-              <li>AI conversational features for health data queries</li>
+              <li>Continuous glucose monitor (CGM) integration and historical glucose record syncing</li>
+              <li>Apple Health integration, including optional import of historical records you authorize</li>
+              <li>AI conversational features for health data queries, including queries that use synced historical glucose records</li>
               <li>Cloud synchronization</li>
             </ul>
             <p class="mt-3">Features may be added, modified, or removed at any time without notice.</p>
@@ -67,13 +67,13 @@
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">4. Medical Disclaimer</h2>
             <p class="p-4 border border-white/[0.08] rounded-lg bg-white/[0.02] text-text-primary">
-              <strong>IMPORTANT — PLEASE READ CAREFULLY.</strong> StatsKey is NOT a medical device, is NOT intended to diagnose, treat, cure, or prevent any disease or medical condition, and is NOT a substitute for professional medical advice, diagnosis, or treatment. All nutritional information, glucose data analysis, biometric correlations, health insights, and AI-generated outputs provided by StatsKey are estimates and approximations only. They may be inaccurate, incomplete, or incorrect. Never disregard professional medical advice or delay seeking treatment because of information provided by StatsKey. Always consult a qualified healthcare professional before making any dietary, fitness, or health decisions. You assume full responsibility for how you use any information provided by the Application. If you experience a medical emergency, call your local emergency services immediately.
+              <strong>IMPORTANT — PLEASE READ CAREFULLY.</strong> StatsKey is NOT a medical device, is NOT intended to diagnose, treat, cure, or prevent any disease or medical condition, and is NOT a substitute for professional medical advice, diagnosis, treatment, glucose monitoring, or diabetes management. All nutritional information, glucose data displays, glucose trend analysis, biometric correlations, health insights, and AI-generated outputs provided by StatsKey are estimates and approximations only. They may be delayed, inaccurate, incomplete, unavailable, or incorrect. Do not use StatsKey, synced glucose records, alerts, summaries, AI outputs, or other Application content to make insulin dosing decisions, medication decisions, hypoglycemia or hyperglycemia treatment decisions, emergency decisions, or any other medical decisions. Use the applicable CGM device, manufacturer-provided application or receiver, product labeling, blood glucose meter checks when appropriate, and advice from your qualified healthcare professional for medical decisions. Never disregard professional medical advice or delay seeking treatment because of information provided by StatsKey. You assume full responsibility for how you use any information provided by the Application. If you experience a medical emergency, call your local emergency services immediately.
             </p>
           </section>
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5. AI-Generated Content Disclaimer</h2>
-            <p>StatsKey uses third-party artificial intelligence services (including but not limited to Google Gemini and Anthropic Claude) to analyze food photographs, estimate nutritional content, and generate conversational responses about your health data. AI-generated content is provided on an "as-is" basis. We make no representations or warranties regarding its accuracy, completeness, reliability, or suitability for any purpose. AI outputs may contain errors, hallucinations, or misleading information. You should independently verify any AI-generated information before relying on it. AI providers and models used may change at any time without notice.</p>
+            <p>StatsKey uses third-party artificial intelligence services (including but not limited to Google Gemini and Anthropic Claude) to analyze food photographs, estimate nutritional content, and generate conversational responses about your health data. If you enable the relevant features, AI conversational responses may use synced historical health records, including glucose records imported from Apple Health, CGM providers, or other sources and backed up to your StatsKey account using Firebase / Google Cloud Platform. AI-generated content is provided on an "as-is" basis. We make no representations or warranties regarding its accuracy, completeness, reliability, or suitability for any purpose. AI outputs may contain errors, hallucinations, or misleading information. You should independently verify any AI-generated information before relying on it, and you must not rely on AI outputs for medical, clinical, insulin dosing, emergency, or treatment decisions. AI providers and models used may change at any time without notice.</p>
           </section>
 
           <section>
@@ -93,6 +93,8 @@
               <li>Upload inappropriate, offensive, or illegal content.</li>
               <li>Exploit our API or attempt to log data in excess of what a human could reasonably record in a single day.</li>
               <li>Circumvent any security measures or access controls.</li>
+              <li>Use the Application, CGM integrations, or any third-party credentials, tokens, sessions, APIs, or data in a way that violates the applicable third-party terms, developer agreements, product labeling, regulatory approvals, or access permissions.</li>
+              <li>Use any CGM integration for automated insulin delivery, active patient monitoring that is intended to drive immediate clinical action, hospital or inpatient monitoring, emergency response, clinical trials, regulated medical-device functionality, or any other use that requires regulatory clearance or provider authorization that StatsKey has not expressly obtained.</li>
               <li>Use the Application to develop a competing product or service.</li>
             </ul>
             <p class="mt-3">Any violation of these restrictions may result in immediate termination of your account and revocation of your subscription without refund.</p>
@@ -136,75 +138,90 @@
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">10. Third-Party Services</h2>
             <p class="mb-3">StatsKey integrates with third-party services including but not limited to:</p>
             <ul class="list-disc pl-5 space-y-1">
-              <li>Apple HealthKit (subject to Apple's terms)</li>
+              <li>Apple HealthKit, including optional health and glucose record import (subject to Apple's terms)</li>
               <li>Apple and Google Sign-In (subject to their respective terms)</li>
               <li>Firebase / Google Cloud Platform (subject to Google's terms)</li>
-              <li>CGM providers (Dexcom, Abbott, Nightscout — subject to their respective terms)</li>
+              <li>CGM providers and services (including Dexcom CGM systems, Dexcom Share, Abbott LibreLinkUp, and Nightscout — subject to their respective terms, privacy policies, product labeling, and availability)</li>
               <li>AI providers (Google, Anthropic — subject to their respective terms)</li>
             </ul>
-            <p class="mt-3">We are not responsible for the availability, accuracy, or practices of any third-party service. Your use of third-party services is at your own risk and subject to those parties' terms.</p>
+            <p class="mt-3">We are not responsible for the availability, accuracy, security, legality, or practices of any third-party service. Your use of third-party services is at your own risk and subject to those parties' terms. You are responsible for maintaining any third-party account, device, sensor, receiver, mobile app, permissions, authorizations, internet connection, and product setup required for those services to work.</p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">11. Disclaimers</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">11. Dexcom and CGM Data Integration</h2>
+            <p class="mb-3">StatsKey may allow you to connect continuous glucose monitor data from third-party services, including Dexcom CGM systems, Dexcom Share, Apple Health, Abbott LibreLinkUp, and Nightscout. These integrations are optional and are enabled only when you provide the required permissions, credentials, URL, or other connection information.</p>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li><strong class="text-text-primary">Authorization.</strong> By connecting a CGM service, you represent that you own the account or have legal authority to connect it, and you authorize StatsKey to retrieve, process, display, store, and sync glucose readings and related metadata on your behalf.</li>
+              <li><strong class="text-text-primary">Dexcom access status.</strong> Dexcom's public developer agreement provides sandbox access only unless Dexcom grants additional production access under a separate agreement. If StatsKey offers a Dexcom API integration, access to real patient Dexcom CGM data is available only to the extent Dexcom has authorized the integration and you complete Dexcom's required account connection, authorization, consent, or sharing flow. We may limit, suspend, or disable Dexcom functionality at any time if required to comply with Dexcom requirements, regulatory obligations, security obligations, or provider instructions.</li>
+              <li><strong class="text-text-primary">Third-party terms.</strong> You must comply with the applicable third-party terms, privacy policies, product labeling, account rules, and sharing settings. We do not control those terms and cannot guarantee that a third-party provider will continue to permit, support, or make available any integration.</li>
+              <li><strong class="text-text-primary">Revocation and disconnection.</strong> You may disconnect a CGM integration in the Application, and some providers may also allow you to revoke authorization in the provider's own account settings. Disconnection or revocation stops future syncing where technically available, but it does not automatically delete glucose records already imported into StatsKey; those records remain subject to our Privacy Policy and your deletion rights.</li>
+              <li><strong class="text-text-primary">Delay and availability.</strong> CGM data in StatsKey may be delayed, incomplete, duplicated, unavailable, simulated, or different from data shown in the manufacturer's own device, receiver, or application. Provider services may be interrupted, rate-limited, changed, suspended, or terminated without notice. Sandbox or simulated CGM data must not be used for clinical validation, training algorithms, production use, or medical decisions.</li>
+              <li><strong class="text-text-primary">No medical or safety-critical use.</strong> StatsKey is a historical tracking, analysis, and wellness application. It is not a real-time glucose monitor, alarm, remote monitoring service, emergency notification system, or diabetes treatment tool. Do not use StatsKey to detect, treat, or respond to hypoglycemia or hyperglycemia, to calculate or administer insulin, to adjust medication, or to make other medical decisions.</li>
+              <li><strong class="text-text-primary">No misuse.</strong> You may not use StatsKey to bypass access controls, scrape or overload third-party services, interfere with service integrity, access CGM data without authorization, monitor another person without legal authority and consent, compare or benchmark CGM products or services, make false or misleading statements about a CGM provider or its products, or use CGM integrations for clinical, commercial, emergency, or regulated medical-device purposes.</li>
+            </ul>
+            <p>StatsKey is not affiliated with, sponsored by, endorsed by, approved by, or validated by Dexcom, Inc., Abbott, or Nightscout. References to third-party names are solely to identify compatibility or data sources and are not used as branding. Dexcom and Dexcom Share are registered or unregistered trademarks of Dexcom, Inc. in the United States and/or other countries. Abbott, FreeStyle Libre, and LibreLinkUp are trademarks of Abbott and its affiliates. Nightscout is an open-source project and is not operated by StatsKey.</p>
+          </section>
+
+          <section>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">12. Disclaimers</h2>
             <p class="p-4 border border-white/[0.08] rounded-lg bg-white/[0.02]">
               THE APPLICATION AND ALL CONTENT, FEATURES, AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. TO THE FULLEST EXTENT PERMITTED BY LAW, WE DISCLAIM ALL WARRANTIES INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND ACCURACY. WE DO NOT WARRANT THAT THE APPLICATION WILL BE UNINTERRUPTED, ERROR-FREE, SECURE, OR FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS. WE DO NOT WARRANT THE ACCURACY OF ANY NUTRITIONAL ESTIMATES, AI-GENERATED CONTENT, HEALTH INSIGHTS, GLUCOSE ANALYSIS, OR BIOMETRIC CORRELATIONS. ALL DATA AND OUTPUTS ARE APPROXIMATIONS AND MAY CONTAIN ERRORS.
             </p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">12. Limitation of Liability</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">13. Limitation of Liability</h2>
             <p class="p-4 border border-white/[0.08] rounded-lg bg-white/[0.02]">
               TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL STATSKEY, ITS OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, OR AFFILIATES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF PROFITS, GOODWILL, DATA, HEALTH OUTCOMES, BODILY INJURY, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF OR INABILITY TO USE THE APPLICATION, REGARDLESS OF THE THEORY OF LIABILITY (CONTRACT, TORT, NEGLIGENCE, STRICT LIABILITY, OR OTHERWISE), EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. OUR TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS ARISING FROM OR RELATED TO THE APPLICATION SHALL NOT EXCEED THE GREATER OF (A) THE AMOUNT YOU PAID US IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED DOLLARS ($100 USD).
             </p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">13. Indemnification</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">14. Indemnification</h2>
             <p>You agree to indemnify, defend, and hold harmless StatsKey, its officers, directors, employees, and agents from and against any and all claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or in any way connected with: (a) your use of the Application; (b) your violation of these Terms; (c) your violation of any rights of a third party; or (d) any claim that your use of the Application caused damage to a third party.</p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">14. Dispute Resolution and Arbitration</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">15. Dispute Resolution and Arbitration</h2>
             <p class="mb-3"><strong class="text-text-primary">Binding Arbitration.</strong> Any dispute, claim, or controversy arising out of or relating to these Terms or the Application shall be resolved by binding arbitration administered by the American Arbitration Association ("AAA") under its Consumer Arbitration Rules, rather than in court, except that either party may seek injunctive or equitable relief in court for intellectual property matters.</p>
             <p class="mb-3"><strong class="text-text-primary">Class Action Waiver.</strong> YOU AND STATSKEY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, CONSOLIDATED, OR REPRESENTATIVE ACTION. The arbitrator may not consolidate more than one person's claims and may not preside over any form of representative or class proceeding.</p>
-            <p><strong class="text-text-primary">Opt-Out.</strong> You may opt out of this arbitration agreement by sending written notice to ryanws@statskeybiometrics.com within 30 days of first accepting these Terms. If you opt out, disputes will be resolved in the courts specified in Section 16.</p>
+            <p><strong class="text-text-primary">Opt-Out.</strong> You may opt out of this arbitration agreement by sending written notice to ryanws@statskeybiometrics.com within 30 days of first accepting these Terms. If you opt out, disputes will be resolved in the courts specified in Section 17.</p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">15. Account Termination</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">16. Account Termination</h2>
             <ul class="list-disc pl-5 space-y-2">
               <li>You may delete your account at any time through the Application.</li>
               <li>We may suspend or terminate your account at any time for violation of these Terms, or for any other reason at our sole discretion, with or without notice.</li>
               <li>We may suspend the service for maintenance, updates, or other operational reasons.</li>
               <li>Upon termination, your right to use the Application ceases immediately.</li>
               <li>Deleted data cannot be recovered. We are not responsible for loss of data resulting from account deletion.</li>
-              <li>Sections 4, 5, 11, 12, 13, 14, and 16 survive termination.</li>
+              <li>Sections 4, 5, 11, 12, 13, 14, 15, and 17 survive termination.</li>
             </ul>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">16. Governing Law and Jurisdiction</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">17. Governing Law and Jurisdiction</h2>
             <p>These Terms shall be governed by and construed in accordance with the laws of the State of Texas, United States, without regard to its conflict of law provisions. Subject to the arbitration provision above, any legal action arising from these Terms shall be brought exclusively in the state or federal courts located in Texas, and you consent to the personal jurisdiction of such courts.</p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">17. Force Majeure</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">18. Force Majeure</h2>
             <p>We shall not be liable for any failure or delay in performance resulting from causes beyond our reasonable control, including but not limited to acts of God, natural disasters, war, terrorism, pandemics, labor disputes, government actions, power failures, internet or telecommunications failures, or third-party service outages.</p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">18. Severability</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">19. Severability</h2>
             <p>If any provision of these Terms is held to be invalid, illegal, or unenforceable, the remaining provisions shall continue in full force and effect. The invalid provision shall be modified to the minimum extent necessary to make it valid and enforceable while preserving its original intent.</p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">19. Entire Agreement</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">20. Entire Agreement</h2>
             <p>These Terms, together with the Privacy Policy, constitute the entire agreement between you and StatsKey regarding your use of the Application and supersede all prior agreements, understandings, and representations.</p>
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">20. Contact</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">21. Contact</h2>
             <p>For questions about these Terms:</p>
             <p class="mt-2"><strong class="text-text-primary">Email:</strong> <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a></p>
           </section>

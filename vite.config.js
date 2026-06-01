@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 // Mirror production Vercel rewrites for extension-less paths during `vite dev`
 // so the embedded bid viewer iframe and clean URLs behave the same locally.
 const DEV_REWRITES = {
+  '/web-terms': '/web-terms.html',
   '/cbm': '/cbm.html',
   '/cbm/': '/cbm/index.html',
   '/ckm': '/ckm.html',
@@ -17,6 +18,8 @@ const DEV_REWRITES = {
   '/cpm/viewer/': '/ckm/viewer/index.html',
   '/hospital-ckm': '/hospital-ckm.html',
   '/hospital-ckm/': '/hospital-ckm/index.html',
+  '/hospital-ckm/procurement': '/hospital-ckm/procurement/index.html',
+  '/hospital-ckm/procurement/': '/hospital-ckm/procurement/index.html',
   '/hospital-ckm/viewer': '/hospital-ckm/viewer/index.html',
   '/hospital-ckm/viewer/': '/hospital-ckm/viewer/index.html',
   '/urine-aki': '/urine-aki.html',
@@ -27,6 +30,10 @@ const DEV_REWRITES = {
   '/urine-aki/app/': '/urine-aki/app/index.html',
   '/prototype': '/prototype.html',
   '/prototype/': '/prototype/index.html',
+  '/nike-statskey-presentation': '/nike-run-club/index.html',
+  '/nike-statskey-presentation.html': '/nike-run-club/index.html',
+  '/nike-run-club': '/nike-run-club/index.html',
+  '/nike-run-club/': '/nike-run-club/index.html',
   '/bid/alaska-dotpf': '/bid/alaska-dotpf.html',
   '/bid/3d/viewer': '/bid/3d/viewer.html',
 }
@@ -58,7 +65,9 @@ export default {
         main: resolve(__dirname, 'index.html'),
         privacy: resolve(__dirname, 'privacy.html'),
         terms: resolve(__dirname, 'terms.html'),
+        webTerms: resolve(__dirname, 'web-terms.html'),
         support: resolve(__dirname, 'support.html'),
+        nikeRunClub: resolve(__dirname, 'nike-statskey-presentation.html'),
         app: resolve(__dirname, 'app.html'),
       },
     },

@@ -261,6 +261,30 @@ export interface RoutePoint {
   heartRate?: number // bpm at this point
 }
 
+export type RouteDifficulty = 'easy' | 'moderate' | 'hard' | 'expert'
+
+/** User-planned or imported route. Matches SavedRoute in
+ *  biometrics/StatsKey/Models/Route.swift. */
+export interface SavedRoute {
+  id: string
+  name: string
+  description: string
+  sportType: string
+  createdBy: string
+  creatorName: string
+  routePoints: RoutePoint[]
+  distance: number // miles
+  elevationGain: number // feet
+  elevationLoss: number // feet
+  estimatedDuration: number // seconds
+  difficulty: RouteDifficulty
+  isPublic: boolean
+  rating: number
+  ratingCount: number
+  timesCompleted: number
+  createdAt: Date
+}
+
 /** Per-mile split. Matches Split. */
 export interface Split {
   id: string

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { MealLogForm } from '../components/log/MealLogForm'
 import { SubstanceLogForm } from '../components/log/SubstanceLogForm'
 import { SupplementLogForm } from '../components/log/SupplementLogForm'
@@ -20,10 +20,12 @@ const TABS: Array<{ id: Tab; label: string }> = [
 
 export function Record() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [tab, setTab] = useState<Tab>('meal')
+  const initialMealDate = dateFromSearch(location.search)
 
   function handleSaved() {
-    navigate('/', { replace: true })
+    navigate(location.state?.returnTo ?? '/', { replace: true })
   }
 
   return (
@@ -44,7 +46,7 @@ export function Record() {
       </div>
 
       <div className="panel">
-        {tab === 'meal' && <MealLogForm onSaved={handleSaved} />}
+        {tab === 'meal' && <MealLogForm initialDate={initialMealDate} onSaved={handleSaved} />}
         {tab === 'water' && <WaterLogForm onSaved={handleSaved} />}
         {tab === 'wellness' && <WellnessLogForm onSaved={handleSaved} />}
         {tab === 'workout' && <WorkoutLogForm onSaved={handleSaved} />}
@@ -53,4 +55,12 @@ export function Record() {
       </div>
     </div>
   )
+}
+
+function dateFromSearch(search: string): Date | undefined {
+  const value = new URLSearchParams(search).get('date')
+  if (!value) return undefined
+
+  const parsed = new Date(`${value}T12:00`)
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed
 }

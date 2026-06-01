@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
 import { getAuth, type Auth } from 'firebase/auth'
-import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getFirestore, initializeFirestore, type Firestore } from 'firebase/firestore'
 import { getFunctions, type Functions } from 'firebase/functions'
 
 // The Firebase web API key is not a secret. Access is enforced by Firestore
@@ -24,5 +24,13 @@ export const firebaseApp: FirebaseApp =
   getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)
 
 export const auth: Auth = getAuth(firebaseApp)
-export const db: Firestore = getFirestore(firebaseApp)
+export const db: Firestore = getConfiguredFirestore(firebaseApp)
 export const functions: Functions = getFunctions(firebaseApp)
+
+function getConfiguredFirestore(app: FirebaseApp): Firestore {
+  try {
+    return initializeFirestore(app, { ignoreUndefinedProperties: true })
+  } catch {
+    return getFirestore(app)
+  }
+}

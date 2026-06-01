@@ -1,13 +1,20 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
 import { useAuth } from '../lib/auth'
 import { useMealDetail } from '../lib/data/useMealDetail'
+import { MealLogForm } from '../components/log/MealLogForm'
 import { mealDisplayName, mealTotal } from '../lib/aggregates'
+import { deleteMeal } from '../lib/writers'
 import { NUTRIENT_KEYS, type FoodItem } from '../lib/types'
 
 export function MealDetail() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const { meal, loading, notFound, error } = useMealDetail(user?.uid, id)
+  const [isEditing, setIsEditing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   if (loading) return <p className="text-text-secondary text-sm">Loading…</p>
   if (error) return <div className="error-banner">{error}</div>
@@ -33,17 +40,77 @@ export function MealDetail() {
   const fat = Math.round(mealTotal(meal, NUTRIENT_KEYS.fat))
   const fiber = Math.round(mealTotal(meal, NUTRIENT_KEYS.fiber))
 
+  async function handleDelete() {
+    if (!user || deleting) return
+    if (!window.confirm('Delete this meal? This cannot be undone.')) return
+
+    setDeleting(true)
+    setActionError(null)
+    try {
+      await deleteMeal(user.uid, meal.id)
+      navigate('/history', { replace: true })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e))
+      setDeleting(false)
+    }
+  }
+
+  if (isEditing) {
+    return (
+      <div className="space-y-6 max-w-[760px]">
+        <header>
+          <button
+            className="text-text-muted hover:text-text-primary text-[12px]"
+            type="button"
+            onClick={() => setIsEditing(false)}
+          >
+            ← Back to meal
+          </button>
+          <h1 className="font-display text-[26px] font-bold tracking-[-0.02em] mt-1">
+            Edit Meal
+          </h1>
+          <p className="text-text-secondary text-[13px] mt-1">
+            Updating {meal.date.toLocaleDateString([], { month: 'long', day: 'numeric' })}
+          </p>
+        </header>
+        <div className="panel">
+          <MealLogForm
+            initialMeal={meal}
+            onSaved={() => setIsEditing(false)}
+            onCancel={() => setIsEditing(false)}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6 max-w-[720px]">
       <header>
-        <Link to="/" className="text-text-muted hover:text-text-primary text-[12px]">← Dashboard</Link>
-        <h1 className="font-display text-[26px] font-bold tracking-[-0.02em] mt-1">{mealDisplayName(meal)}</h1>
+        <Link to="/history" className="text-text-muted hover:text-text-primary text-[12px]">← History</Link>
+        <div className="flex items-start justify-between gap-3 mt-1">
+          <h1 className="font-display text-[26px] font-bold tracking-[-0.02em]">{mealDisplayName(meal)}</h1>
+          <div className="flex gap-2">
+            <button className="btn btn-secondary text-[12px] !py-1.5 !px-3" onClick={() => setIsEditing(true)}>
+              Edit
+            </button>
+            <button
+              className="btn btn-ghost text-[12px] !py-1.5 !px-3 text-red-300"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
+        </div>
         <p className="text-text-secondary text-[13px] mt-1">
           {time}
           {meal.multiplier !== 1 && ` · ×${meal.multiplier}`}
           {meal.analysisMode && ` · ${meal.analysisMode}`}
         </p>
       </header>
+
+      {actionError && <div className="error-banner">{actionError}</div>}
 
       <div className="panel grid grid-cols-5 gap-3 text-center">
         <Stat label="Cal" value={cal} />

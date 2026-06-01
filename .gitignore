@@ -23,3 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Local CAD / 3D design sources — not referenced by the website; kept out of git to avoid repo bloat
+public/guitar/brand manufactured models/
+*.stp
+*.step
+*.STP
+*.STEP

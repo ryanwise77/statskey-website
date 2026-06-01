@@ -47,6 +47,7 @@ body {
     linear-gradient(180deg, #05060a 0%, #030407 48%, #000 100%);
   color: var(--ink);
   font-family: var(--font-sans);
+  font-size: 17px;
   overflow-x: hidden;
   line-height: 1.5;
 }
@@ -110,7 +111,7 @@ a { color: inherit; text-decoration: none; }
   gap: 9px;
   color: rgba(245, 245, 247, 0.92);
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -131,7 +132,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   gap: 24px;
   color: rgba(182, 186, 197, 0.82);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .site-nav__links a,
@@ -156,7 +157,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: var(--ink);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
@@ -260,7 +261,7 @@ a { color: inherit; text-decoration: none; }
   max-width: 620px;
   margin-top: 28px;
   color: var(--ink-2);
-  font-size: clamp(1.05rem, 1.9vw, 1.28rem);
+  font-size: clamp(1.16rem, 2vw, 1.42rem);
   line-height: 1.62;
 }
 
@@ -329,12 +330,12 @@ a { color: inherit; text-decoration: none; }
 
 .button {
   display: inline-flex;
-  min-height: 46px;
+  min-height: 48px;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  padding: 0 20px;
-  font-size: 14px;
+  padding: 0 22px;
+  font-size: 15px;
   font-weight: 650;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
@@ -360,7 +361,7 @@ a { color: inherit; text-decoration: none; }
 .hero-note {
   margin-top: 15px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .hero-orb {
@@ -433,7 +434,7 @@ a { color: inherit; text-decoration: none; }
 .panel-label {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -455,7 +456,7 @@ a { color: inherit; text-decoration: none; }
   padding: 6px 10px;
   color: var(--cyan);
   background: rgba(48, 213, 200, 0.08);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -523,7 +524,7 @@ a { color: inherit; text-decoration: none; }
 .signal-card em {
   display: block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
 }
 
@@ -545,7 +546,7 @@ a { color: inherit; text-decoration: none; }
   padding: 14px;
   color: var(--ink-2);
   background: rgba(48, 213, 200, 0.055);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -568,7 +569,7 @@ a { color: inherit; text-decoration: none; }
   margin-inline: auto;
   text-align: center;
   font-family: var(--font-display);
-  font-size: clamp(1.65rem, 4vw, 3.55rem);
+  font-size: clamp(1.9rem, 4.3vw, 4.05rem);
   font-weight: 600;
   letter-spacing: -0.048em;
   line-height: 1.08;
@@ -596,7 +597,7 @@ a { color: inherit; text-decoration: none; }
 .flow-copy h2,
 .cta-card h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.15rem, 5.2vw, 4.75rem);
+  font-size: clamp(2.55rem, 5.8vw, 5.4rem);
   font-weight: 700;
   letter-spacing: -0.058em;
   line-height: 0.96;
@@ -608,7 +609,7 @@ a { color: inherit; text-decoration: none; }
   max-width: 620px;
   margin-top: 18px;
   color: var(--ink-2);
-  font-size: clamp(0.98rem, 1.6vw, 1.12rem);
+  font-size: clamp(1.08rem, 1.8vw, 1.28rem);
   line-height: 1.65;
 }
 
@@ -646,7 +647,7 @@ a { color: inherit; text-decoration: none; }
 .feature-icon {
   color: var(--cyan);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.14em;
 }
 
@@ -654,7 +655,7 @@ a { color: inherit; text-decoration: none; }
 .lab-card h3 {
   margin-top: 38px;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.6vw, 2.05rem);
+  font-size: clamp(1.55rem, 2.8vw, 2.35rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.04;
@@ -664,7 +665,7 @@ a { color: inherit; text-decoration: none; }
 .lab-card p {
   margin-top: 13px;
   color: var(--ink-2);
-  font-size: 14px;
+  font-size: 15.5px;
   line-height: 1.62;
 }
 
@@ -681,7 +682,7 @@ a { color: inherit; text-decoration: none; }
 .exercise-note__label {
   color: var(--cyan);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -689,7 +690,7 @@ a { color: inherit; text-decoration: none; }
 .exercise-note p {
   margin-top: 10px;
   color: var(--ink-2);
-  font-size: 14px;
+  font-size: 15.5px;
   line-height: 1.72;
 }
 
@@ -721,21 +722,21 @@ a { color: inherit; text-decoration: none; }
 .timeline-row > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   padding-top: 3px;
 }
 
 .timeline-row strong {
   display: block;
   color: var(--ink);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 650;
 }
 
 .timeline-row p {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 .timeline-row--active {
@@ -763,7 +764,7 @@ a { color: inherit; text-decoration: none; }
   max-width: 86%;
   border-radius: 22px;
   padding: 15px 17px;
-  font-size: 14px;
+  font-size: 15.5px;
   line-height: 1.62;
 }
 
@@ -801,7 +802,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--muted);
   background: rgba(0, 0, 0, 0.22);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -839,7 +840,7 @@ a { color: inherit; text-decoration: none; }
 .lab-card span {
   color: var(--cyan);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -883,7 +884,7 @@ a { color: inherit; text-decoration: none; }
   justify-content: space-between;
   gap: 18px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .site-footer__inner div {
@@ -909,6 +910,7 @@ a { color: inherit; text-decoration: none; }
 .reveal-stagger-3 { transition-delay: 0.18s; }
 .reveal-stagger-4 { transition-delay: 0.24s; }
 .reveal-stagger-5 { transition-delay: 0.30s; }
+.reveal-stagger-6 { transition-delay: 0.36s; }
 .d1 { transition-delay: 0.1s; }
 .d2 { transition-delay: 0.2s; }
 .d3 { transition-delay: 0.3s; }

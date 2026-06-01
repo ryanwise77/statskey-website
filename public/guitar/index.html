@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A for-fun custom hybrid guitar concept: instruments engineered to cover acoustic, single-coil, and humbucker voices, with true-scale 3D engineering viewers for nine build directions.">
+<link rel="canonical" href="https://statskeybiometrics.com/guitar/">
+<title>Custom Hybrid Guitar — For Fun</title>
+<link rel="icon" href="/favicon.svg">
+<style>
+:root{
+  --bg:#0d1117; --bg-soft:#0a0e14; --surface:#111826; --surface-2:#131b27; --surface-3:#172031;
+  --border:#243041; --border-soft:#1b2534; --ink:#e6edf3; --ink-2:#c9d1d9; --muted:#7d8590; --muted-2:#96a3b3;
+  --blue:#8fd3ff; --amber:#f0c674; --mint:#7ee3c0; --rose:#ff8aa1;
+  --shadow:0 10px 40px rgba(0,0,0,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;background:var(--surface);border:1px solid var(--border-soft);border-radius:4px;padding:1px 5px;color:var(--ink-2);font-size:.9em}
+.bar{position:sticky;top:0;z-index:50;background:rgba(10,14,20,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.bar__row{display:flex;align-items:center;justify-content:space-between;padding:10px 22px;gap:14px;flex-wrap:wrap;max-width:1180px;margin:0 auto}
+.bar__brand{display:flex;align-items:center;gap:12px;font-size:14px}
+.bar__chip{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);border:1px solid var(--border);padding:3px 8px;border-radius:999px;background:var(--surface)}
+.bar__title{color:var(--ink);font-weight:700}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink-2);padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-2);border-color:#2d3a4b;color:var(--ink);text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 22px 96px}
+.hero{padding:18px 0 8px}
+.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
+.hero h1{font-size:32px;letter-spacing:-.02em;margin-bottom:12px;line-height:1.15}
+.hero p{color:var(--muted-2);max-width:760px;font-size:15px;margin-bottom:10px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;min-width:120px}
+.stat b{display:block;color:var(--ink);font-size:16px}
+.stat span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.section-title{margin:34px 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.note{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;color:var(--ink-2);font-size:14px;margin-top:14px}
+.note b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:16px}
+.card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+.card:hover{border-color:#2d3a4b;transform:translateY(-2px);text-decoration:none}
+.card--rec{border-color:var(--mint)}
+.card--warm{border-color:var(--amber)}
+.card__top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.card__cost{font-size:12px;color:var(--mint);border:1px solid var(--border);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.card h3{font-size:17px;color:var(--ink);letter-spacing:-.01em}
+.card .char{color:var(--amber);font-size:12px;font-weight:600;margin-bottom:8px}
+.card p{color:var(--ink-2);font-size:13.5px;margin-bottom:10px}
+.tone{list-style:none;margin:0 0 12px;padding:0}
+.tone li{color:var(--muted-2);font-size:12.5px;padding-left:14px;position:relative;margin:3px 0}
+.tone li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--blue)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tag{font-size:10.5px;letter-spacing:.04em;color:var(--muted-2);border:1px solid var(--border-soft);border-radius:6px;padding:2px 7px}
+.card__cta{margin-top:auto;display:inline-flex;align-items:center;gap:7px;color:var(--blue);font-size:13px;font-weight:600}
+.badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;border-radius:6px;padding:2px 7px}
+.badge--rec{color:#07121d;background:var(--mint)}
+.badge--warm{color:#1d1503;background:var(--amber)}
+.foot{margin-top:40px;border-top:1px solid var(--border-soft);padding-top:18px;color:var(--muted);font-size:12px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar__row">
+    <div class="bar__brand">
+      <span class="bar__chip">For Fun</span>
+      <span class="bar__title">Custom Hybrid Guitar</span>
+    </div>
+    <span style="display:flex;gap:8px">
+      <a class="btn" href="/guitar/parts/">Component catalog</a>
+      <a class="btn" href="/#hardware">&larr; Back to StatsKey</a>
+    </span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Engineering Concept</div>
+    <h1>One guitar, engineered to cover the whole map.</h1>
+    <p>
+      This is a personal design study: a single hybrid instrument that aims to deliver believable
+      acoustic textures, expressive single-coil voices, and thick humbucker rhythm and leads, on one
+      neck, built to survive stage use. Every option below is a true-scale, component-level 3D model
+      generated from the same millimeter specification, not a sketch.
+    </p>
+    <p>
+      Tone is described directly in sonic terms. Pick the direction that matches the sound in your head.
+    </p>
+    <div class="stats">
+      <div class="stat"><b>8</b><span>Build directions</span></div>
+      <div class="stat"><b>25.5"</b><span>Default scale</span></div>
+      <div class="stat"><b>Hybrid</b><span>Magnetic + piezo + body sensor</span></div>
+      <div class="stat"><b>$4.5k&ndash;$10k</b><span>Cost spread</span></div>
+    </div>
+  </section>
+
+  <div class="note">
+    <b>How to read each viewer:</b> drag to rotate, scroll to zoom, and use the on-screen toggles for
+    <b>Exploded</b>, <b>Transparent body</b>, <b>Internals</b>, and <b>Datums</b>, plus a finish-style
+    selector and camera presets (Hero / Top / Side / Bridge / Electronics). The viewers load a 3D engine
+    from a CDN, so they need an internet connection.
+  </div>
+
+  <div class="note" style="border-left:3px solid var(--mint)">
+    <b>Want every part?</b> The <a href="/guitar/parts/">full component catalog</a> lists every
+    component with precise specs, what it does, why it was chosen, and several links to order each one.
+  </div>
+
+  <div class="note" style="border-left:3px solid var(--blue)">
+    <b>TX-A22 is live:</b> the acoustic-first hybrid now uses the Taylor reference body, an electric neck,
+    an imported Strat STEP headstock/tuner set, and the custom hand-picked electronics package.
+  </div>
+
+  <div class="section-title">The nine directions</div>
+  <div class="grid">
+
+    <a class="card card--rec" href="/guitar/options/02-deeper-chambered-hardtail.html">
+      <div class="card__top"><h3>Deeper Chambered Hardtail</h3><span class="card__cost">$6k&ndash;$8.5k</span></div>
+      <div class="char">Woody, open, balanced. <span class="badge badge--rec">Recommended</span></div>
+      <p>The best all-rounder: real body response under the hand with electric stability intact.</p>
+      <ul class="tone">
+        <li>Airy acoustic-leaning cleans with real bloom</li>
+        <li>Woody, vocal midrange when chords ring</li>
+        <li>Singing, sustained leads that decay naturally</li>
+      </ul>
+      <div class="tags"><span class="tag">songwriting</span><span class="tag">crossover</span><span class="tag">slide</span><span class="tag">mid-gain</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card card--rec" href="/guitar/options/08-triax-unified-hybrid.html">
+      <div class="card__top"><h3>Triax Unified Hybrid</h3><span class="card__cost">$7k&ndash;$10k</span></div>
+      <div class="char">Unified, flexible, premium. <span class="badge badge--rec">One-guitar synthesis</span></div>
+      <p>The most complete version: center-block chambered mahogany, bridge humbucker, middle single, compact neck rail, piezo hardtail, and dual outputs.</p>
+      <ul class="tone">
+        <li>Bright electric snap without losing humbucker weight</li>
+        <li>Warm rhythm and lead voices from the mahogany/maple platform</li>
+        <li>Separate acoustic and magnetic paths for serious stage or studio routing</li>
+      </ul>
+      <div class="tags"><span class="tag">one guitar</span><span class="tag">center block</span><span class="tag">neck rail</span><span class="tag">stage</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card card--rec" href="/guitar/options/09-tx-a22-acoustic-first.html">
+      <div class="card__top"><h3>TX-A22 Acoustic-First</h3><span class="card__cost">$7.5k&ndash;$11k</span></div>
+      <div class="char">Taylor body, electric neck, Strat head. <span class="badge badge--rec">Acoustic-first</span></div>
+      <p>A Taylor-style acoustic body paired with an electric neck, imported Strat STEP headstock, soundhole magnetic voice, undersaddle pickup, internal sensing, blend controls, and stereo output.</p>
+      <ul class="tone">
+        <li>Real acoustic body presence from the Taylor reference chassis</li>
+        <li>Electric neck/head ergonomics for familiar stage playability</li>
+        <li>Hand-picked acoustic/electric electronics for blendable hybrid voices</li>
+      </ul>
+      <div class="tags"><span class="tag">Taylor body</span><span class="tag">Strat head</span><span class="tag">soundhole pickup</span><span class="tag">stereo</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card card--warm" href="/guitar/options/07-mahogany-humbucker-voiced.html">
+      <div class="card__top"><h3>Mahogany Humbucker-Voiced</h3><span class="card__cost">$6k&ndash;$9k</span></div>
+      <div class="char">Thick, warm, sustaining. <span class="badge badge--warm">Rhythm + warm leads</span></div>
+      <p>Thick carved-cap mahogany-style body with twin humbuckers for warm rhythm and singing leads.</p>
+      <ul class="tone">
+        <li>Thick, full rhythm chords with weight behind them</li>
+        <li>Round, vocal neck-pickup leads that sustain</li>
+        <li>Smooth high gain that stays musical, never brittle</li>
+      </ul>
+      <div class="tags"><span class="tag">driving rhythm</span><span class="tag">classic rock</span><span class="tag">warm leads</span><span class="tag">coil-split</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card" href="/guitar/options/01-electric-first-hardtail.html">
+      <div class="card__top"><h3>Electric-First Hardtail</h3><span class="card__cost">$4.5k&ndash;$7k</span></div>
+      <div class="char">Bright, tight, immediate.</div>
+      <p>A fast, modern electric that can fake an acoustic when it has to.</p>
+      <ul class="tone">
+        <li>Glassy, spanky clean chords with quick attack</li>
+        <li>Punchy mid-gain crunch that stays articulate</li>
+        <li>Focused high-gain leads with controlled low end</li>
+      </ul>
+      <div class="tags"><span class="tag">modern rock</span><span class="tag">indie</span><span class="tag">recording</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card" href="/guitar/options/03-piezo-trem-hybrid.html">
+      <div class="card__top"><h3>Strat-Feel Piezo Trem</h3><span class="card__cost">$5.5k&ndash;$8.5k</span></div>
+      <div class="char">Glassy, vocal, springy.</div>
+      <p>Expressive single-coil language with piezo acoustic on tap. Vibrato is the point.</p>
+      <ul class="tone">
+        <li>Bell-like bridge sparkle and chime</li>
+        <li>Hollow, scooped in-between positions</li>
+        <li>Vocal bends and shimmering vibrato swells</li>
+      </ul>
+      <div class="tags"><span class="tag">blues</span><span class="tag">funk</span><span class="tag">classic rock</span><span class="tag">expressive leads</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card" href="/guitar/options/04-acoustic-first-crossover.html">
+      <div class="card__top"><h3>Acoustic-First Crossover</h3><span class="card__cost">$6.5k&ndash;$10k</span></div>
+      <div class="char">Open, natural, percussive.</div>
+      <p>A real-feeling acoustic that can plug in and rock lightly. Songwriter-led.</p>
+      <ul class="tone">
+        <li>Full, open strum with genuine body thump</li>
+        <li>Fingerstyle bloom and string-to-string clarity</li>
+        <li>Fast, crisp flatpicked runs</li>
+      </ul>
+      <div class="tags"><span class="tag">singer-songwriter</span><span class="tag">fingerstyle</span><span class="tag">flatpicking</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card" href="/guitar/options/05-dual-output-studio-hybrid.html">
+      <div class="card__top"><h3>Dual-Output Studio Hybrid</h3><span class="card__cost">$4.5k&ndash;$7.5k</span></div>
+      <div class="char">Clean, separated, wide.</div>
+      <p>Cheapest path to genuinely pro sound if you run external rigs.</p>
+      <ul class="tone">
+        <li>Pristine, low-noise DI cleans</li>
+        <li>Layered acoustic and electric stacked together</li>
+        <li>Wide stereo spread across two chains</li>
+      </ul>
+      <div class="tags"><span class="tag">recording</span><span class="tag">looping</span><span class="tag">in-ear rigs</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+    <a class="card" href="/guitar/options/06-heavy-rhythm-hybrid.html">
+      <div class="card__top"><h3>Heavy Rhythm Hybrid</h3><span class="card__cost">$5.5k&ndash;$8.5k</span></div>
+      <div class="char">Tight, saturated, aggressive.</div>
+      <p>Tight low end and aggression first. Acoustic is a useful side channel.</p>
+      <ul class="tone">
+        <li>Tight, chugging palm-muted low strings</li>
+        <li>Saturated rhythm that keeps note definition</li>
+        <li>Aggressive pinch harmonics that scream</li>
+      </ul>
+      <div class="tags"><span class="tag">drop tunings</span><span class="tag">progressive</span><span class="tag">down-tuned</span></div>
+      <span class="card__cta">Open 3D viewer &rarr;</span>
+    </a>
+
+  </div>
+
+  <div class="section-title">Design intent</div>
+  <div class="note">
+    The electric-wide direction is <b>TX-1</b>: center-block chambered mahogany/maple body, bridge humbucker,
+    middle single, compact neck rail, hardtail piezo, and stereo routing. The acoustic-first direction is
+    <b>TX-A22</b>: Taylor reference body geometry, electric neck ergonomics, Strat STEP headstock, and custom
+    acoustic/electric electronics.
+  </div>
+
+  <div class="foot">
+    <span>StatsKey &copy; 2026 &middot; For-fun engineering concept</span>
+    <span><a href="/#hardware">Hardware</a> &middot; <a href="/">Home</a></span>
+  </div>
+</main>
+</body>
+</html>

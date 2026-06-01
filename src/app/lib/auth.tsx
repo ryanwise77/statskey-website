@@ -9,6 +9,7 @@ import {
 import {
   GoogleAuthProvider,
   OAuthProvider,
+  getRedirectResult,
   onAuthStateChanged,
   signInWithPopup,
   signOut as fbSignOut,
@@ -41,11 +42,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    let cancelled = false
+    let authStateSettled = false
+    let redirectSettled = false
+
+    function finishInitialLoad() {
+      if (!cancelled && authStateSettled && redirectSettled) {
+        setLoading(false)
+      }
+    }
+
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (!result?.user) return
+        setUser(result.user)
+        await ensureProfile(result.user)
+      })
+      .catch((e) => {
+        if (!cancelled) setError(toMessage(e))
+      })
+      .finally(() => {
+        redirectSettled = true
+        finishInitialLoad()
+      })
+
     const unsub = onAuthStateChanged(auth, (next) => {
+      if (cancelled) return
       setUser(next)
-      setLoading(false)
+      authStateSettled = true
+      finishInitialLoad()
     })
-    return () => unsub()
+    return () => {
+      cancelled = true
+      unsub()
+    }
   }, [])
 
   useEffect(() => {

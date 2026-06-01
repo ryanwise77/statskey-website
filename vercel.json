@@ -19,6 +19,8 @@
     { "source": "/cpm.html", "destination": "/cpm.html" },
     { "source": "/hospital-ckm", "destination": "/hospital-ckm.html" },
     { "source": "/hospital-ckm/", "destination": "/hospital-ckm/index.html" },
+    { "source": "/hospital-ckm/procurement", "destination": "/hospital-ckm/procurement/index.html" },
+    { "source": "/hospital-ckm/procurement/", "destination": "/hospital-ckm/procurement/index.html" },
     { "source": "/hospital-ckm/viewer", "destination": "/hospital-ckm/viewer/index.html" },
     { "source": "/hospital-ckm/viewer/", "destination": "/hospital-ckm/viewer/index.html" },
     { "source": "/urine-aki", "destination": "/urine-aki.html" },
@@ -36,6 +38,7 @@
     { "source": "/nike-run-club/", "destination": "/nike-run-club/index.html" },
     { "source": "/bid/alaska-dotpf", "destination": "/bid/alaska-dotpf.html" },
     { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
+    { "source": "/__/auth/:path*", "destination": "https://statskey.firebaseapp.com/__/auth/:path*" },
     { "source": "/app", "destination": "/app.html" },
     { "source": "/app/:path*", "destination": "/app.html" }
   ]

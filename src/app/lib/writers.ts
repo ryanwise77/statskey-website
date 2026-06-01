@@ -13,6 +13,8 @@ import { localDateString, startOfDay } from './firestore'
 import type {
   FoodItem,
   Meal,
+  RoutePoint,
+  SavedRoute,
   SubstanceEntry,
   WellnessData,
   WellnessEntry,
@@ -67,7 +69,8 @@ export async function saveMeal(uid: string, meal: Meal): Promise<void> {
     createdAt: meal.createdAt,
     updatedAt: new Date(),
   }
-  if (meal.name) payload.name = meal.name
+  // Keep this explicit so editing an existing meal can clear its prior name.
+  payload.name = meal.name ?? null
   if (meal.glucoseResponse) payload.glucoseResponse = meal.glucoseResponse
   if (meal.photoURLs && meal.photoURLs.length) payload.photoURLs = meal.photoURLs
   if (meal.analysisMode) payload.analysisMode = meal.analysisMode
@@ -272,6 +275,49 @@ export async function saveWorkout(uid: string, workout: WorkoutSession): Promise
 
 export async function deleteWorkout(uid: string, workoutId: string): Promise<void> {
   await deleteDoc(doc(db, 'users', uid, 'workoutSessions', workoutId))
+}
+
+// MARK: - Route writes
+
+function encodeRoutePoint(point: RoutePoint): Record<string, unknown> {
+  const out: Record<string, unknown> = {
+    latitude: point.latitude,
+    longitude: point.longitude,
+    altitude: point.altitude,
+    timestamp: point.timestamp,
+    speed: point.speed,
+  }
+  if (point.heartRate != null) out.heartRate = point.heartRate
+  return out
+}
+
+export async function saveRoute(uid: string, route: SavedRoute): Promise<void> {
+  const payload: Record<string, unknown> = {
+    id: route.id,
+    name: route.name,
+    description: route.description,
+    sportType: route.sportType,
+    createdBy: uid,
+    creatorName: route.creatorName,
+    routePoints: route.routePoints.map(encodeRoutePoint),
+    distance: route.distance,
+    elevationGain: route.elevationGain,
+    elevationLoss: route.elevationLoss,
+    estimatedDuration: route.estimatedDuration,
+    difficulty: route.difficulty,
+    isPublic: route.isPublic,
+    rating: route.rating,
+    ratingCount: route.ratingCount,
+    timesCompleted: route.timesCompleted,
+    createdAt: route.createdAt,
+  }
+
+  await setDoc(doc(db, 'users', uid, 'routes', route.id), payload, { merge: true })
+  if (route.isPublic) {
+    await setDoc(doc(db, 'publicRoutes', route.id), payload, { merge: true })
+  } else {
+    await deleteDoc(doc(db, 'publicRoutes', route.id)).catch(() => {})
+  }
 }
 
 // MARK: - Friendships

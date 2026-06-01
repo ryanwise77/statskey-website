@@ -1,0 +1,41 @@
+{
+  "strava": {
+    "trackName": "Strava: Run, Bike, Walk",
+    "count": 10,
+    "files": [
+      "app-screenshots/strava-1.jpg",
+      "app-screenshots/strava-2.jpg"
+    ]
+  },
+  "myfitnesspal": {
+    "trackName": "MyFitnessPal: Calorie Counter",
+    "count": 0,
+    "files": []
+  },
+  "cal-ai": {
+    "trackName": "Cal AI - Calorie Tracker",
+    "count": 4,
+    "files": [
+      "app-screenshots/cal-ai-1.png",
+      "app-screenshots/cal-ai-2.png"
+    ]
+  },
+  "oura": {
+    "trackName": "Oura",
+    "count": 0,
+    "files": []
+  },
+  "whoop": {
+    "trackName": "WHOOP",
+    "count": 0,
+    "files": []
+  },
+  "garmin": {
+    "trackName": "Garmin Connect\u2122",
+    "count": 8,
+    "files": [
+      "app-screenshots/garmin-1.png",
+      "app-screenshots/garmin-2.png"
+    ]
+  }
+}

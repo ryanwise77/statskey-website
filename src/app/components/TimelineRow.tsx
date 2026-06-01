@@ -92,7 +92,7 @@ function wellnessSubtitle(entry: WellnessEntry): string | undefined {
 export function WellnessTimelineRow({ entry }: WellnessRowProps) {
   const sub = wellnessSubtitle(entry)
   return (
-    <div className="timeline-row">
+    <Link to={`/wellness/${entry.id}`} className="timeline-row hover:bg-white/[0.02] transition-colors px-3 -mx-3 rounded-md">
       <div className="timeline-time">{formatTime(entry.date)}</div>
       <div className="timeline-content">
         <div className="timeline-title">
@@ -101,6 +101,6 @@ export function WellnessTimelineRow({ entry }: WellnessRowProps) {
         </div>
         {sub && <div className="timeline-subtitle">{sub}</div>}
       </div>
-    </div>
+    </Link>
   )
 }

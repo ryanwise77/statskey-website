@@ -1,11 +1,12 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import {
   useMealsHistory,
   useWellnessHistory,
   useWorkoutsHistory,
 } from '../lib/data/useHistory'
-import { addDays } from '../lib/firestore'
+import { addDays, localDateString } from '../lib/firestore'
 import { dailyTotals } from '../lib/aggregates'
 import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
 import { WorkoutCard } from '../components/WorkoutCard'
@@ -14,12 +15,17 @@ import type { Meal, WellnessEntry } from '../lib/types'
 
 type Tab = 'meals' | 'workouts' | 'wellness'
 type Range = 7 | 30 | 90
+type MealBrowseMode = 'range' | 'day'
 
 export function History() {
   const { user } = useAuth()
+  const location = useLocation()
+  const mealDateParam = new URLSearchParams(location.search).get('mealDate')
   const uid = user?.uid
   const [tab, setTab] = useState<Tab>('meals')
   const [range, setRange] = useState<Range>(7)
+  const [selectedMealDay, setSelectedMealDay] = useState(mealDateParam ?? localDateString(new Date()))
+  const [mealBrowseMode, setMealBrowseMode] = useState<MealBrowseMode>(mealDateParam ? 'day' : 'range')
 
   const { start, end } = useMemo(() => {
     const e = new Date()
@@ -49,24 +55,93 @@ export function History() {
           ))}
         </div>
 
-        <div className="tab-strip">
-          {([7, 30, 90] as Range[]).map((r) => (
+        {tab === 'meals' ? (
+          <div className="tab-strip">
             <button
-              key={r}
-              className={range === r ? 'active' : ''}
-              onClick={() => setRange(r)}
+              className={mealBrowseMode === 'range' ? 'active' : ''}
+              onClick={() => setMealBrowseMode('range')}
             >
-              {r}d
+              Recent
             </button>
-          ))}
-        </div>
+            <button
+              className={mealBrowseMode === 'day' ? 'active' : ''}
+              onClick={() => setMealBrowseMode('day')}
+            >
+              Day
+            </button>
+          </div>
+        ) : (
+          <div className="tab-strip">
+            {([7, 30, 90] as Range[]).map((r) => (
+              <button
+                key={r}
+                className={range === r ? 'active' : ''}
+                onClick={() => setRange(r)}
+              >
+                {r}d
+              </button>
+            ))}
+          </div>
+        )}
+
+        {tab === 'meals' && mealBrowseMode === 'range' && (
+          <div className="tab-strip">
+            {([7, 30, 90] as Range[]).map((r) => (
+              <button
+                key={r}
+                className={range === r ? 'active' : ''}
+                onClick={() => setRange(r)}
+              >
+                {r}d
+              </button>
+            ))}
+          </div>
+        )}
+
+        {tab === 'meals' && (
+          <div className="flex flex-wrap items-end gap-2 ml-auto">
+            <label className="block">
+              <span className="text-text-muted text-[11px] uppercase tracking-wider block mb-1">Meal day</span>
+              <input
+                className="input !py-2"
+                type="date"
+                max={localDateString(new Date())}
+                value={selectedMealDay}
+                onChange={(e) => {
+                  setSelectedMealDay(e.target.value)
+                  setMealBrowseMode('day')
+                }}
+              />
+            </label>
+            <Link
+              className="btn btn-primary"
+              to={`/record?date=${selectedMealDay}`}
+              state={{ returnTo: `/history?mealDate=${selectedMealDay}` }}
+            >
+              + Add Meal
+            </Link>
+          </div>
+        )}
       </div>
 
-      {tab === 'meals' && <PanelWrap><MealsHistory uid={uid} start={start} end={end} /></PanelWrap>}
+      {tab === 'meals' && (
+        <PanelWrap>
+          <MealsHistory
+            uid={uid}
+            start={mealBrowseMode === 'day' ? dateFromLocalDateString(selectedMealDay) : start}
+            end={mealBrowseMode === 'day' ? dateFromLocalDateString(selectedMealDay) : end}
+          />
+        </PanelWrap>
+      )}
       {tab === 'workouts' && <WorkoutsHistory uid={uid} start={start} end={end} />}
       {tab === 'wellness' && <PanelWrap><WellnessHistory uid={uid} start={start} end={end} /></PanelWrap>}
     </div>
   )
+}
+
+function dateFromLocalDateString(value: string): Date {
+  const parsed = new Date(`${value}T12:00`)
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed
 }
 
 function PanelWrap({ children }: { children: ReactNode }) {
