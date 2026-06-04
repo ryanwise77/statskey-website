@@ -36,6 +36,8 @@ const DEV_REWRITES = {
   '/nike-run-club/': '/nike-run-club/index.html',
   '/bid/alaska-dotpf': '/bid/alaska-dotpf.html',
   '/bid/3d/viewer': '/bid/3d/viewer.html',
+  '/energy': '/energy.html',
+  '/energy/': '/energy.html',
 }
 
 function devRewritePlugin() {

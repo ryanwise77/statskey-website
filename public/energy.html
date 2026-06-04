@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey Energy — AI underwriting for the subsurface</title>
+    <meta
+      name="description"
+      content="StatsKey Energy turns the public record of wells, logs, and production into calibrated, forward-tested predictions of which energy assets will actually produce."
+    />
+    <meta name="theme-color" content="#080b14" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="StatsKey Energy — AI underwriting for the subsurface" />
+    <meta
+      property="og:description"
+      content="Calibrated, forward-tested predictions of which energy assets will actually produce, built from the public subsurface record."
+    />
+    <meta property="og:url" content="https://statskeybiometrics.com/energy" />
+    <!-- Intentionally unlisted: not linked from the main site. Remove the line below to allow search indexing when ready to go public. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #080b14;
+        --bg-soft: #0c1120;
+        --panel: rgba(255, 255, 255, 0.035);
+        --panel-2: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.09);
+        --border-soft: rgba(255, 255, 255, 0.06);
+        --text: #eaeef8;
+        --muted: #99a4bd;
+        --faint: #6c768f;
+        --teal: #30d5c8;
+        --blue: #6e8eff;
+        --violet: #9b7cff;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        line-height: 1.62;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        overflow-x: hidden;
+        position: relative;
+      }
+      /* faint ambient backdrop */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(620px circle at 78% -6%, rgba(48, 213, 200, 0.10), transparent 60%),
+          radial-gradient(720px circle at 8% 18%, rgba(110, 142, 255, 0.08), transparent 60%);
+        z-index: 0;
+        pointer-events: none;
+      }
+      h1, h2, h3, .brand, .eyebrow, .section__label, .btn, .pill, .stat__v {
+        font-family: "Space Grotesk", "Inter", sans-serif;
+      }
+      .shell { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+      a { color: inherit; }
+      a:focus-visible, .btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 6px; }
+
+      /* ---- header ---- */
+      header { border-bottom: 1px solid var(--border-soft); }
+      .header__inner { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; gap: 16px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+      .brand svg { display: block; flex: none; }
+      .brand__tag { color: var(--faint); font-weight: 500; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; font-family: "Inter", sans-serif; }
+      @media (max-width: 620px) { .brand__tag { display: none; } }
+
+      /* ---- hero ---- */
+      .hero { padding: 92px 0 76px; }
+      .hero__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal);
+        margin-bottom: 22px; font-weight: 500;
+      }
+      .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--teal); opacity: 0.6; }
+      h1 { font-size: clamp(36px, 5.4vw, 58px); line-height: 1.05; letter-spacing: -0.028em; font-weight: 600; }
+      .lede { margin-top: 22px; font-size: clamp(16.5px, 1.9vw, 19px); color: var(--muted); max-width: 540px; }
+      .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
+      .pill {
+        font-size: 12.5px; letter-spacing: 0.02em; color: var(--text);
+        border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; background: var(--panel);
+      }
+      .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font-weight: 600; font-size: 14.5px;
+        padding: 13px 22px; border-radius: 999px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      }
+      .btn--primary { color: #06121f; background: linear-gradient(135deg, var(--teal), var(--blue)); }
+      .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -12px rgba(48, 213, 200, 0.6); }
+      .btn--ghost { color: var(--text); border: 1px solid var(--border); }
+      .btn--ghost:hover { border-color: var(--teal); background: var(--panel); }
+
+      /* ---- hero visual ---- */
+      .visual {
+        position: relative; border: 1px solid var(--border); border-radius: 20px; padding: 22px;
+        background: linear-gradient(180deg, var(--panel-2), var(--panel)); overflow: hidden;
+      }
+      .visual__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+      .visual__title { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); font-family: "Space Grotesk", sans-serif; }
+      .live { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--muted); letter-spacing: 0.04em; }
+      .live span { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 0 rgba(48,213,200,0.5); animation: pulse 2.4s infinite; }
+      @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(48,213,200,0.5);} 70% { box-shadow: 0 0 0 8px rgba(48,213,200,0);} 100% { box-shadow: 0 0 0 0 rgba(48,213,200,0);} }
+      .visual svg { display: block; width: 100%; height: auto; }
+      .visual__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+      .stat { border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px 13px; background: rgba(255,255,255,0.02); }
+      .stat__k { font-size: 11px; letter-spacing: 0.04em; color: var(--faint); }
+      .stat__v { font-size: 18px; font-weight: 600; margin-top: 4px; letter-spacing: -0.01em; }
+
+      /* ---- sections ---- */
+      .section { padding: 60px 0; }
+      .section__label { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint); margin-bottom: 30px; }
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .card {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px;
+        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      }
+      .card:hover { border-color: rgba(110, 142, 255, 0.45); transform: translateY(-3px); background: var(--panel-2); }
+      .card__n { font-family: "Space Grotesk", sans-serif; font-size: 12.5px; color: var(--teal); letter-spacing: 0.12em; }
+      .card h3 { font-size: 19px; margin: 16px 0 10px; font-weight: 600; letter-spacing: -0.01em; }
+      .card p { color: var(--muted); font-size: 14.5px; }
+
+      .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
+      .vision__inner { max-width: 760px; }
+      .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
+      .vision p { margin-top: 18px; color: var(--muted); font-size: 16.5px; }
+      .vision .accent { color: var(--text); font-weight: 500; }
+
+      .contact { padding: 70px 0 30px; }
+      .contact h2 { font-size: clamp(23px, 3.4vw, 31px); letter-spacing: -0.022em; font-weight: 600; }
+      .contact p { color: var(--muted); margin-top: 13px; font-size: 16px; }
+      .contact .btn { margin-top: 24px; }
+
+      footer { border-top: 1px solid var(--border-soft); padding: 30px 0 44px; }
+      .footer__inner { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; color: var(--faint); font-size: 13px; }
+      .footer__inner .dotsep { opacity: 0.4; }
+
+      @media (max-width: 860px) {
+        .hero__grid { grid-template-columns: 1fr; gap: 40px; }
+        .visual { order: 2; }
+      }
+      @media (max-width: 720px) {
+        .cards { grid-template-columns: 1fr; }
+        .hero { padding: 62px 0 52px; }
+        .section { padding: 48px 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="shell header__inner">
+        <div class="brand">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <rect x="0.5" y="0.5" width="25" height="25" rx="7" stroke="url(#g)" stroke-opacity="0.5" />
+            <path d="M5 16.5 L10 13 L15 15 L21 9.5" stroke="url(#g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5 11 L10 8.5 L15 10.5 L21 6" stroke="#6e8eff" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <defs>
+              <linearGradient id="g" x1="3" y1="6" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#30d5c8" /><stop offset="1" stop-color="#6e8eff" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>StatsKey&nbsp;Energy</span>
+        </div>
+        <span class="brand__tag">Subsurface intelligence</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="shell hero__grid">
+          <div class="hero__copy">
+            <span class="eyebrow">Subsurface intelligence</span>
+            <h1>AI underwriting for the subsurface.</h1>
+            <p class="lede">
+              StatsKey Energy turns the public record of wells, well logs, and production into
+              calibrated, forward-tested predictions of which energy assets will actually produce —
+              so capital backs the right rock.
+            </p>
+            <div class="pill-row">
+              <span class="pill">Calibrated</span>
+              <span class="pill">Forward-tested</span>
+              <span class="pill">Multi-basin</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn--primary" href="mailto:energy@statskeybiometrics.com">Get in touch</a>
+              <a class="btn btn--ghost" href="#approach">How it works</a>
+            </div>
+          </div>
+
+          <div class="visual" aria-label="Illustrative subsurface model view">
+            <div class="visual__head">
+              <span class="visual__title">Subsurface model</span>
+              <span class="live"><span></span> reading the record</span>
+            </div>
+            <svg viewBox="0 0 380 180" role="img" aria-label="Stylized rock layers with well-log curves">
+              <defs>
+                <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#6e8eff" stop-opacity="0.16" />
+                  <stop offset="1" stop-color="#6e8eff" stop-opacity="0.04" />
+                </linearGradient>
+                <linearGradient id="pay" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#30d5c8" stop-opacity="0.34" />
+                  <stop offset="1" stop-color="#30d5c8" stop-opacity="0.10" />
+                </linearGradient>
+              </defs>
+              <!-- strata -->
+              <path d="M0 26 Q95 16 190 24 T380 22 V44 Q285 36 190 44 T0 46 Z" fill="url(#band)" />
+              <path d="M0 54 Q95 46 190 52 T380 50 V78 Q285 70 190 78 T0 80 Z" fill="url(#pay)" />
+              <path d="M0 88 Q95 80 190 86 T380 84 V108 Q285 100 190 108 T0 110 Z" fill="url(#band)" />
+              <path d="M0 118 Q95 110 190 116 T380 114 V150 Q285 142 190 150 T0 152 Z" fill="url(#band)" />
+              <!-- log curve A (gamma) -->
+              <path d="M58 8 C70 40, 44 58, 64 84 C80 104, 52 128, 70 168" fill="none" stroke="#30d5c8" stroke-width="2.2" stroke-linecap="round" />
+              <!-- log curve B (resistivity) -->
+              <path d="M300 8 C288 44, 318 64, 300 92 C286 116, 314 134, 300 168" fill="none" stroke="#6e8eff" stroke-width="2" stroke-opacity="0.8" stroke-linecap="round" />
+              <!-- pay pick -->
+              <circle cx="190" cy="65" r="4.5" fill="#30d5c8" />
+              <circle cx="190" cy="65" r="9" fill="none" stroke="#30d5c8" stroke-opacity="0.4" />
+            </svg>
+            <div class="visual__row">
+              <div class="stat"><div class="stat__k">Pre-drill signal</div><div class="stat__v">Logs</div></div>
+              <div class="stat"><div class="stat__k">Outcome</div><div class="stat__v">Production</div></div>
+              <div class="stat"><div class="stat__k">Output</div><div class="stat__v">P(produce)</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="approach">
+        <div class="shell">
+          <div class="section__label">What we do</div>
+          <div class="cards">
+            <article class="card">
+              <div class="card__n">01</div>
+              <h3>Read the record</h3>
+              <p>Modern computer vision turns decades of scanned well logs and fragmented public data into structured, machine-readable signal.</p>
+            </article>
+            <article class="card">
+              <div class="card__n">02</div>
+              <h3>Learn from outcomes</h3>
+              <p>Models trained across basins on what was known before a well and what it actually produced — calibrated, with honest uncertainty.</p>
+            </article>
+            <article class="card">
+              <div class="card__n">03</div>
+              <h3>Underwrite with discipline</h3>
+              <p>Every prediction is validated on geography and time the model never saw, so a number is trustworthy enough to back with capital.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section vision">
+        <div class="shell vision__inner">
+          <div class="section__label">Where we're headed</div>
+          <h2>A foundation model of the subsurface.</h2>
+          <p>
+            We're building toward a <span class="accent">multimodal model</span> that reads well logs,
+            geology, completions, production — and ultimately seismic — in a single representation, and
+            gets sharper with every new well and every recorded outcome.
+          </p>
+          <p>
+            The goal is a durable underwriting edge for overlooked energy assets: the discipline of a
+            rigorous, forward-tested model applied with modern compute at a scale few can match.
+          </p>
+        </div>
+      </section>
+
+      <section class="contact">
+        <div class="shell">
+          <div class="section__label">Contact</div>
+          <h2>Early-stage, and building.</h2>
+          <p>For partnership, data, or diligence inquiries.</p>
+          <a class="btn btn--primary" href="mailto:energy@statskeybiometrics.com">energy@statskeybiometrics.com</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer__inner">
+        <span>StatsKey Energy &copy; 2026</span>
+        <span>A StatsKey company <span class="dotsep">·</span> statskeybiometrics.com/energy</span>
+      </div>
+    </footer>
+  </body>
+</html>
