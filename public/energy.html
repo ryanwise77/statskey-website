@@ -6,7 +6,7 @@
     <title>StatsKey Energy — AI underwriting for the subsurface</title>
     <meta
       name="description"
-      content="StatsKey Energy turns the public record of wells, logs, and production into calibrated, forward-tested predictions of which energy assets will actually produce."
+      content="StatsKey Energy trains 3D seismic at scale on the public subsurface record — calibrated, forward-tested predictions of where and how to drill in basins the model has never seen."
     />
     <meta name="theme-color" content="#080b14" />
     <meta property="og:type" content="website" />
@@ -122,8 +122,10 @@
 
       /* ---- sections ---- */
       .section { padding: 60px 0; }
-      .section__label { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint); margin-bottom: 30px; }
-      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .section__label { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint); margin-bottom: 14px; }
+      .section__title { font-size: clamp(24px, 3.6vw, 33px); line-height: 1.12; letter-spacing: -0.022em; font-weight: 600; max-width: 720px; }
+      .section__intro { color: var(--muted); font-size: 16px; max-width: 600px; margin-top: 14px; }
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
       .card {
         background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px;
         transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
@@ -132,6 +134,45 @@
       .card__n { font-family: "Space Grotesk", sans-serif; font-size: 12.5px; color: var(--teal); letter-spacing: 0.12em; }
       .card h3 { font-size: 19px; margin: 16px 0 10px; font-weight: 600; letter-spacing: -0.01em; }
       .card p { color: var(--muted); font-size: 14.5px; }
+
+      /* ---- metric cards (big numbers) ---- */
+      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+      .metric {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 26px 24px;
+        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      }
+      .metric:hover { border-color: rgba(48, 213, 200, 0.42); transform: translateY(-3px); background: var(--panel-2); }
+      .metric__v {
+        font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 4.4vw, 41px); font-weight: 700;
+        line-height: 1; letter-spacing: -0.02em; width: fit-content;
+        background: var(--metric-grad, linear-gradient(135deg, var(--teal), var(--blue)));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .metric h3 { font-size: 15.5px; margin: 15px 0 7px; font-weight: 600; letter-spacing: -0.01em; }
+      .metric p { color: var(--muted); font-size: 13.8px; }
+      .metrics--teal { --metric-grad: linear-gradient(135deg, #30d5c8, #57e1d4); }
+      .metrics--blue { --metric-grad: linear-gradient(135deg, #6e8eff, #9b7cff); }
+
+      /* ---- principle list ---- */
+      .principles { display: grid; gap: 14px; margin-top: 30px; max-width: 880px; }
+      .principle {
+        display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start;
+        padding: 20px 22px; border: 1px solid var(--border-soft); border-radius: 14px; background: var(--panel);
+        transition: border-color 0.25s ease, background 0.25s ease;
+      }
+      .principle:hover { border-color: rgba(110, 142, 255, 0.35); background: var(--panel-2); }
+      .principle__dot { width: 9px; height: 9px; margin-top: 9px; border-radius: 50%; background: linear-gradient(135deg, var(--teal), var(--blue)); box-shadow: 0 0 0 4px rgba(48, 213, 200, 0.08); }
+      .principle p { color: var(--muted); font-size: 15px; }
+      .principle strong { color: var(--text); font-weight: 600; font-family: "Space Grotesk", sans-serif; letter-spacing: -0.01em; }
+
+      /* ---- banner / pull quote ---- */
+      .banner {
+        margin-top: 28px; border: 1px solid var(--border-soft); border-left: 3px solid var(--teal);
+        border-radius: 0 14px 14px 0; background: linear-gradient(90deg, rgba(48, 213, 200, 0.08), rgba(48, 213, 200, 0));
+        padding: 17px 24px; color: var(--text); font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(15px, 1.85vw, 17px); font-weight: 500; letter-spacing: -0.01em;
+      }
+      .banner--blue { border-left-color: var(--blue); background: linear-gradient(90deg, rgba(110, 142, 255, 0.08), rgba(110, 142, 255, 0)); }
 
       .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
       .vision__inner { max-width: 760px; }
@@ -153,7 +194,7 @@
         .visual { order: 2; }
       }
       @media (max-width: 720px) {
-        .cards { grid-template-columns: 1fr; }
+        .cards, .metrics { grid-template-columns: 1fr; }
         .hero { padding: 62px 0 52px; }
         .section { padding: 48px 0; }
       }
@@ -189,14 +230,14 @@
             <span class="eyebrow">Subsurface intelligence</span>
             <h1>AI underwriting for the subsurface.</h1>
             <p class="lede">
-              StatsKey Energy turns the public record of wells, well logs, and production into
-              calibrated, forward-tested predictions of which energy assets will actually produce —
-              so capital backs the right rock.
+              StatsKey Energy trains 3D seismic at scale on a massive, representative slice of the
+              public subsurface record — learning to call where to drill and how to drill in basins
+              the model has never seen.
             </p>
             <div class="pill-row">
-              <span class="pill">Calibrated</span>
-              <span class="pill">Forward-tested</span>
-              <span class="pill">Multi-basin</span>
+              <span class="pill">3D seismic at scale</span>
+              <span class="pill">Calibrated &amp; forward-tested</span>
+              <span class="pill">Generalizes to unseen basins</span>
             </div>
             <div class="actions">
               <a class="btn btn--primary" href="mailto:isabel@statskeybiometrics.com">Get in touch</a>
@@ -207,7 +248,7 @@
           <div class="visual" aria-label="Illustrative subsurface model view">
             <div class="visual__head">
               <span class="visual__title">Subsurface model</span>
-              <span class="live"><span></span> reading the record</span>
+              <span class="live"><span></span> training at scale</span>
             </div>
             <svg viewBox="0 0 380 180" role="img" aria-label="Stylized rock layers with well-log curves">
               <defs>
@@ -234,9 +275,56 @@
               <circle cx="190" cy="65" r="9" fill="none" stroke="#30d5c8" stroke-opacity="0.4" />
             </svg>
             <div class="visual__row">
-              <div class="stat"><div class="stat__k">Pre-drill signal</div><div class="stat__v">Logs</div></div>
-              <div class="stat"><div class="stat__k">Outcome</div><div class="stat__v">Production</div></div>
-              <div class="stat"><div class="stat__k">Output</div><div class="stat__v">P(produce)</div></div>
+              <div class="stat"><div class="stat__k">Input</div><div class="stat__v">3D seismic</div></div>
+              <div class="stat"><div class="stat__k">Corpus</div><div class="stat__v">Multi-basin</div></div>
+              <div class="stat"><div class="stat__k">Output</div><div class="stat__v">Drill calls</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="principle">
+        <div class="shell">
+          <div class="section__label">The principle</div>
+          <h2 class="section__title">Generalization beats interpretation.</h2>
+          <div class="principles">
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>Superior data, not cleverer features.</strong> A model trained on a representative sample of the earth's subsurface learns structure that transfers — the same way large models generalize in every other domain.</p>
+            </div>
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>One field teaches one field; a thousand surveys teach the rock.</strong> The scale and breadth of representative data is the moat — not any single clever model.</p>
+            </div>
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>Compute is the enabler, not the edge.</strong> Modern accelerators are simply what finally make training on a corpus this large possible.</p>
+            </div>
+          </div>
+          <div class="banner banner--blue">Majors aim this at their own acreage. No one aims it at the whole public record.</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="shell">
+          <div class="section__label">The fuel is free</div>
+          <h2 class="section__title">Petabytes of public 3D seismic, already downloadable.</h2>
+          <p class="section__intro">The seismic library that once required a supermajor is now a public download — and it grows every month.</p>
+          <div class="metrics metrics--teal">
+            <div class="metric">
+              <div class="metric__v">5 TB</div>
+              <h3>NAMSS Gulf of Mexico</h3>
+              <p>200 public-domain 3D surveys with direct SEG-Y links; 1,100+ across the EEZ.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">230 TB</div>
+              <h3>UK NDR</h3>
+              <p>Seismic, logs, pressure, and core — free up to 3 TB every month.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">482</div>
+              <h3>NLOG 3D surveys</h3>
+              <p>Plus 24,174 2D lines across the Dutch shelf.</p>
             </div>
           </div>
         </div>
@@ -244,17 +332,18 @@
 
       <section class="section" id="approach">
         <div class="shell">
-          <div class="section__label">What we do</div>
+          <div class="section__label">How it works</div>
+          <h2 class="section__title">From raw record to a number you can back.</h2>
           <div class="cards">
             <article class="card">
               <div class="card__n">01</div>
               <h3>Read the record</h3>
-              <p>Modern computer vision turns decades of scanned well logs and fragmented public data into structured, machine-readable signal.</p>
+              <p>Modern models turn decades of public 3D seismic, scanned well logs, and fragmented data into structured, machine-readable signal.</p>
             </article>
             <article class="card">
               <div class="card__n">02</div>
               <h3>Learn from outcomes</h3>
-              <p>Models trained across basins on what was known before a well and what it actually produced — calibrated, with honest uncertainty.</p>
+              <p>Trained across basins on what was known before a well and what it actually produced — calibrated, with honest uncertainty.</p>
             </article>
             <article class="card">
               <div class="card__n">03</div>
@@ -265,14 +354,39 @@
         </div>
       </section>
 
+      <section class="section">
+        <div class="shell">
+          <div class="section__label">The asymmetric bet</div>
+          <h2 class="section__title">A near-zero test against an industry-scale prize.</h2>
+          <div class="metrics metrics--blue">
+            <div class="metric">
+              <div class="metric__v">$500B+</div>
+              <h3>Spent upstream each year</h3>
+              <p>Allocating even ~1% better is about $5B a year of value.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">$7&ndash;200M</div>
+              <h3>Per drilling decision</h3>
+              <p>One avoided dry hole or bad acquisition pays for the whole program many times over.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">&asymp; $0</div>
+              <h3>To test the thesis</h3>
+              <p>A few thousand GPU-hours on public data, covered by startup credits.</p>
+            </div>
+          </div>
+          <div class="banner">Capped downside, uncapped upside. That is the entire case.</div>
+        </div>
+      </section>
+
       <section class="section vision">
         <div class="shell vision__inner">
           <div class="section__label">Where we're headed</div>
           <h2>A foundation model of the subsurface.</h2>
           <p>
-            We're building toward a <span class="accent">multimodal model</span> that reads well logs,
-            geology, completions, production — and ultimately seismic — in a single representation, and
-            gets sharper with every new well and every recorded outcome.
+            We're building toward a <span class="accent">multimodal model</span> that reads 3D seismic,
+            well logs, geology, completions, and production in a single representation — and gets sharper
+            with every new survey and every recorded outcome.
           </p>
           <p>
             The goal is a durable underwriting edge for overlooked energy assets: the discipline of a
