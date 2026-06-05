@@ -6,7 +6,7 @@
     <title>StatsKey Energy — AI underwriting for the subsurface</title>
     <meta
       name="description"
-      content="StatsKey Energy trains 3D seismic at scale on the public subsurface record — calibrated, forward-tested predictions of where and how to drill in basins the model has never seen."
+      content="StatsKey Energy trains a seismic-driven, multimodal model on the public subsurface record at scale — calibrated, forward-tested predictions of where and how to drill in basins the model has never seen."
     />
     <meta name="theme-color" content="#080b14" />
     <meta property="og:type" content="website" />
@@ -174,6 +174,33 @@
       }
       .banner--blue { border-left-color: var(--blue); background: linear-gradient(90deg, rgba(110, 142, 255, 0.08), rgba(110, 142, 255, 0)); }
 
+      /* ---- industry-gap cards ---- */
+      .gapcards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 30px; }
+      .gapcard {
+        border: 1px solid var(--border-soft); border-radius: 14px; padding: 20px 22px; background: var(--panel);
+        transition: border-color 0.25s ease, background 0.25s ease;
+      }
+      .gapcard:hover { border-color: rgba(110, 142, 255, 0.32); background: var(--panel-2); }
+      .gapcard h4 { font-family: "Space Grotesk", sans-serif; font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .gapcard__row { margin-top: 12px; }
+      .gapcard__k { display: block; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 3px; }
+      .gapcard__v { color: var(--muted); font-size: 13.8px; }
+      .gapcard__v--open { color: var(--text); }
+      .gapcard--open {
+        background: linear-gradient(150deg, rgba(48, 213, 200, 0.10), rgba(110, 142, 255, 0.06));
+        border-color: rgba(48, 213, 200, 0.32);
+      }
+      .gapcard--open h4 { color: var(--teal); }
+
+      /* ---- scale stat band ---- */
+      .statband { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
+      .statband__s { border: 1px solid var(--border-soft); border-radius: 14px; padding: 18px 18px; background: rgba(255, 255, 255, 0.02); }
+      .statband__v { font-family: "Space Grotesk", sans-serif; font-size: clamp(22px, 2.8vw, 29px); font-weight: 700; letter-spacing: -0.02em; line-height: 1; color: var(--text); }
+      .statband__k { margin-top: 9px; font-size: 12.7px; color: var(--muted); line-height: 1.5; }
+      .src { color: var(--faint); white-space: nowrap; }
+      .scale__note { margin-top: 22px; max-width: 780px; color: var(--muted); font-size: 15.5px; }
+      .scale__note strong { color: var(--text); font-weight: 600; }
+
       .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
       .vision__inner { max-width: 760px; }
       .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
@@ -194,7 +221,8 @@
         .visual { order: 2; }
       }
       @media (max-width: 720px) {
-        .cards, .metrics { grid-template-columns: 1fr; }
+        .cards, .metrics, .gapcards { grid-template-columns: 1fr; }
+        .statband { grid-template-columns: repeat(2, 1fr); }
         .hero { padding: 62px 0 52px; }
         .section { padding: 48px 0; }
       }
@@ -230,9 +258,9 @@
             <span class="eyebrow">Subsurface intelligence</span>
             <h1>AI underwriting for the subsurface.</h1>
             <p class="lede">
-              StatsKey Energy trains 3D seismic at scale on a massive, representative slice of the
-              public subsurface record — learning to call where to drill and how to drill in basins
-              the model has never seen.
+              StatsKey Energy trains on the public subsurface record at scale — 3D seismic the
+              leading driver, fused with well logs, geology, and production — to call where to drill
+              and how to drill in basins the model has never seen.
             </p>
             <div class="pill-row">
               <span class="pill">3D seismic at scale</span>
@@ -275,7 +303,7 @@
               <circle cx="190" cy="65" r="9" fill="none" stroke="#30d5c8" stroke-opacity="0.4" />
             </svg>
             <div class="visual__row">
-              <div class="stat"><div class="stat__k">Input</div><div class="stat__v">3D seismic</div></div>
+              <div class="stat"><div class="stat__k">Lead driver</div><div class="stat__v">3D seismic</div></div>
               <div class="stat"><div class="stat__k">Corpus</div><div class="stat__v">Multi-basin</div></div>
               <div class="stat"><div class="stat__k">Output</div><div class="stat__v">Drill calls</div></div>
             </div>
@@ -302,6 +330,45 @@
             </div>
           </div>
           <div class="banner banner--blue">Majors aim this at their own acreage. No one aims it at the whole public record.</div>
+        </div>
+      </section>
+
+      <section class="section" id="gap">
+        <div class="shell">
+          <div class="section__label">The industry gap</div>
+          <h2 class="section__title">Everyone touches the data. No one underwrites the whole record.</h2>
+          <p class="section__intro">Upstream is one of the most data-rich industries on earth, yet the layer between raw subsurface data and the capital decision is still unclaimed. Each camp builds for its own incentive — and leaves the independent underwriting layer open.</p>
+          <div class="gapcards">
+            <div class="gapcard">
+              <h4>Majors</h4>
+              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Proprietary AI and supercomputing to interpret their own seismic and accelerate exploration.</span></div>
+              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">The proof stays private — locked to their acreage, data, and balance sheet. It never becomes an independent product.</span></div>
+            </div>
+            <div class="gapcard">
+              <h4>Service companies</h4>
+              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Selling tools for interpretation, field optimization, and existing-well workflows.</span></div>
+              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">They sell software and services — not the capital allocator deciding which outside asset is mispriced.</span></div>
+            </div>
+            <div class="gapcard">
+              <h4>Data vendors</h4>
+              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Monetizing seismic libraries, production databases, and deal-screening products.</span></div>
+              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">Closest to it — but still data and analytics supply, not forward-tested, rock-to-production underwriting.</span></div>
+            </div>
+            <div class="gapcard">
+              <h4>AI-native explorers</h4>
+              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Applying AI to new-energy plays — geothermal, hydrogen, and minerals.</span></div>
+              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">They prove the AI-explorer playbook; the oilfield-specific opportunity stays fragmented and underbuilt.</span></div>
+            </div>
+            <div class="gapcard">
+              <h4>Academia &amp; foundation models</h4>
+              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Training large seismic models that generalize across basins for faults, salt, and facies.</span></div>
+              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">They stop at the rock label. The money is in connecting that signal to barrels and dollars.</span></div>
+            </div>
+            <div class="gapcard gapcard--open">
+              <h4>The open lane</h4>
+              <div class="gapcard__row"><span class="gapcard__k">StatsKey Energy</span><span class="gapcard__v gapcard__v--open">An independent, data-native underwriting layer between raw subsurface data and the buy/drill decision — forward-tested, calibrated, and accountable to outcomes, not locked to any one operator's acreage.</span></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -354,28 +421,56 @@
         </div>
       </section>
 
+      <section class="section" id="scale">
+        <div class="shell">
+          <div class="section__label">The scale</div>
+          <h2 class="section__title">A multi-million-dollar decision, tens of thousands of times a year.</h2>
+          <p class="section__intro">This is not a niche. It is one of the largest, most capital-intensive decision surfaces on earth — and almost none of it is underwritten by a model that was forced to predict before it knew the answer.</p>
+          <div class="statband">
+            <div class="statband__s">
+              <div class="statband__v">~$570B</div>
+              <div class="statband__k">Invested in upstream oil &amp; gas in 2025 — the capital surface every prediction is measured against. <span class="src">(IEA)</span></div>
+            </div>
+            <div class="statband__s">
+              <div class="statband__v">~70,000</div>
+              <div class="statband__k">New wells drilled worldwide each year; roughly 2 million since 2000 — each a multi-million-dollar bet. <span class="src">(Rystad)</span></div>
+            </div>
+            <div class="statband__s">
+              <div class="statband__v">~90%</div>
+              <div class="statband__k">Of that spend just offsets decline at existing fields — so where the next dollar goes matters more, not less. <span class="src">(IEA)</span></div>
+            </div>
+            <div class="statband__s">
+              <div class="statband__v">Petabytes</div>
+              <div class="statband__k">Of public seismic, logs, and production — fragmented across USGS, BOEM, UK NDR, NLOG, and state regulators.</div>
+            </div>
+          </div>
+          <p class="scale__note">The data is public and petabyte-scale. The compute to learn from all of it — <strong>H100</strong>, <strong>H200</strong>, and whatever comes next — now exists and compounds every year. What is missing is the model that reads the entire record at once: majors point this at their own acreage, academia stops at the rock label, and no one has connected the whole public subsurface to barrels and dollars. That is the opening.</p>
+        </div>
+      </section>
+
       <section class="section">
         <div class="shell">
-          <div class="section__label">The asymmetric bet</div>
-          <h2 class="section__title">A near-zero test against an industry-scale prize.</h2>
+          <div class="section__label">The prize</div>
+          <h2 class="section__title">Seismic drives the read. The rock decides the barrels.</h2>
+          <p class="section__intro">Seismic is the strongest signal — fused with well logs, geology, completions, and production into one model of the rock. The rock decides the barrels, and the barrels decide where hundreds of billions in capital go every year. Price that chain at scale and you underwrite the industry, not one operator's acreage.</p>
           <div class="metrics metrics--blue">
             <div class="metric">
-              <div class="metric__v">$500B+</div>
-              <h3>Spent upstream each year</h3>
-              <p>Allocating even ~1% better is about $5B a year of value.</p>
+              <div class="metric__v">$15&ndash;25B+</div>
+              <h3>Value pool, every year</h3>
+              <p>What a 3&ndash;5% better allocation across upstream capital is worth — before a single new barrel is found.</p>
             </div>
             <div class="metric">
               <div class="metric__v">$7&ndash;200M</div>
-              <h3>Per drilling decision</h3>
-              <p>One avoided dry hole or bad acquisition pays for the whole program many times over.</p>
+              <h3>Per well, shale to deepwater</h3>
+              <p>Every drilling decision is a multi-million-dollar bet on what the rock will produce.</p>
             </div>
             <div class="metric">
-              <div class="metric__v">&asymp; $0</div>
-              <h3>To test the thesis</h3>
-              <p>A few thousand GPU-hours on public data, covered by startup credits.</p>
+              <div class="metric__v">Trillions</div>
+              <h3>In reserves to underwrite</h3>
+              <p>Every lease, unit, and acquisition is a subsurface position waiting to be priced.</p>
             </div>
           </div>
-          <div class="banner">Capped downside, uncapped upside. That is the entire case.</div>
+          <div class="banner">Price the rock, and you price the industry.</div>
         </div>
       </section>
 
