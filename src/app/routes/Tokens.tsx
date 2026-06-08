@@ -1,8 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { signInWithCustomToken } from 'firebase/auth'
 import { startTokenPackCheckout, type TokenPackId } from '../lib/billing'
+import { auth } from '../lib/firebase'
 import { useAuth } from '../lib/auth'
 import { formatTokens, useTokenBalance } from '../lib/data/useTokenBalance'
+
+// Deep link back into the iOS app after a web purchase.
+const APP_RETURN_URL = 'statskey://tokens/success'
 
 interface TokenPack {
   id: TokenPackId
@@ -20,7 +25,7 @@ const TOKEN_PACKS: TokenPack[] = [
     name: 'Starter top-up',
     tokens: '1M',
     price: '$6.99',
-    subtitle: 'Small overflow pack for extra Flow questions.',
+    subtitle: 'Small overflow pack for extra Intelligence questions.',
     bestFor: 'A few deeper chats',
   },
   {
@@ -61,10 +66,36 @@ export function TokensTest() {
 function TokenPackStore({ testMode }: { testMode: boolean }) {
   const { user } = useAuth()
   const tokenState = useTokenBalance(user?.uid)
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [busyPack, setBusyPack] = useState<TokenPackId | null>(null)
   const [error, setError] = useState<string | null>(null)
   const checkoutState = searchParams.get('checkout')
+  const returnToApp = searchParams.get('return') === 'app'
+
+  // Auth handoff: the iOS app opens this page with a one-time Firebase custom
+  // token so the user is signed into the same account automatically — no second
+  // login. Consume it once, then strip it from the URL so it can't be reused.
+  useEffect(() => {
+    const token = searchParams.get('signInToken')
+    if (!token) return
+    void signInWithCustomToken(auth, token)
+      .catch(() => {})
+      .finally(() => {
+        const next = new URLSearchParams(searchParams)
+        next.delete('signInToken')
+        setSearchParams(next, { replace: true })
+      })
+  }, [searchParams, setSearchParams])
+
+  // After a successful web purchase from the app, bounce back into the app so
+  // the user isn't stranded in the browser.
+  useEffect(() => {
+    if (checkoutState !== 'success' || !returnToApp) return
+    const timer = setTimeout(() => {
+      window.location.href = APP_RETURN_URL
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [checkoutState, returnToApp])
 
   const status = useMemo(() => {
     if (checkoutState === 'success') {
@@ -90,7 +121,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
     setBusyPack(pack)
     setError(null)
     try {
-      await startTokenPackCheckout(pack, { testMode })
+      await startTokenPackCheckout(pack, { testMode, returnToApp })
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
       setBusyPack(null)
@@ -110,7 +141,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
         )}
         <div className="space-y-2">
           <h1 className="font-display text-[34px] font-bold tracking-[-0.035em]">
-            {testMode ? 'Test token checkout before going live.' : 'More Flow tokens, no API key.'}
+            {testMode ? 'Test token checkout before going live.' : 'More Intelligence tokens, no API key.'}
           </h1>
           <p className="max-w-[680px] text-[15px] leading-relaxed text-text-secondary">
             {testMode
@@ -166,6 +197,11 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
         <div className={status.tone === 'success' ? 'success-banner' : 'panel'}>
           <h2 className="font-display text-[18px] font-semibold text-text-primary">{status.title}</h2>
           <p className="mt-1 text-[13px] text-text-secondary">{status.copy}</p>
+          {checkoutState === 'success' && returnToApp && (
+            <a href={APP_RETURN_URL} className="btn btn-primary mt-3 inline-flex">
+              Return to StatsKey
+            </a>
+          )}
         </div>
       )}
 

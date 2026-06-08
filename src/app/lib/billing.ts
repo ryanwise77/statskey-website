@@ -26,15 +26,18 @@ const createTokenPackCheckoutTest = httpsCallable<TokenPackCheckoutRequest, Chec
 
 export async function startTokenPackCheckout(
   pack: TokenPackId,
-  options: { testMode?: boolean } = {}
+  options: { testMode?: boolean; returnToApp?: boolean } = {}
 ): Promise<void> {
   const origin = window.location.origin
   const path = options.testMode ? '/app/tokens-test' : '/app/tokens'
   const callable = options.testMode ? createTokenPackCheckoutTest : createTokenPackCheckout
+  // Carry the "return=app" flag through Stripe so the post-checkout page can
+  // deep-link the user back into the iOS app instead of stranding them on web.
+  const returnSuffix = options.returnToApp ? '&return=app' : ''
   const { data } = await callable({
     pack,
-    successUrl: `${origin}${path}?checkout=success`,
-    cancelUrl: `${origin}${path}?checkout=cancelled`,
+    successUrl: `${origin}${path}?checkout=success${returnSuffix}`,
+    cancelUrl: `${origin}${path}?checkout=cancelled${returnSuffix}`,
   })
 
   if (!data.url) {

@@ -261,7 +261,7 @@ export function Profile() {
               </span>
             </div>
             <p className="text-text-muted text-[12px] mt-2">
-              Dexcom Share login stays in the iOS app keychain. Once connected there, StatsKey backs the readings up to Firebase so Flow and the website can use the same history.
+              Dexcom Share login stays in the iOS app keychain. Once connected there, StatsKey backs the readings up to Firebase so Intelligence and the website can use the same history.
             </p>
           </>
         )}

@@ -37,7 +37,7 @@ export function buildSystemPrompt(inputs: ContextInputs): string {
   sections.push(
     [
       '--- IDENTITY ---',
-      'You are StatsKey Flow — an AI assistant that helps the user understand their nutrition, training, and biometric data.',
+      'You are StatsKey Intelligence — an AI assistant that helps the user understand their nutrition, training, and biometric data.',
       'Be concise, specific, and honest. Prefer short answers unless the user asks for depth.',
     ].join('\n')
   )

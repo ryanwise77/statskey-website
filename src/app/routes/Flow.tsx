@@ -164,7 +164,7 @@ export function Flow() {
     <div className="space-y-4 h-[calc(100vh-8rem)] flex flex-col">
       <header className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-[24px] font-bold tracking-[-0.02em]">Flow</h1>
+          <h1 className="font-display text-[24px] font-bold tracking-[-0.02em]">Intelligence</h1>
           <p className="text-text-secondary text-[13px] mt-0.5">
             {title ? title : 'Ask about your nutrition, training, or wellness data.'}
           </p>
@@ -207,7 +207,7 @@ export function Flow() {
         <textarea
           className="input flex-1 resize-none"
           rows={2}
-          placeholder="Ask Flow about your data…"
+          placeholder="Ask Intelligence about your data…"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={onKey}

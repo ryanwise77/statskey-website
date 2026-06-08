@@ -28,7 +28,7 @@ export function FlowHistory() {
         <div>
           <h1 className="font-display text-[28px] font-bold tracking-[-0.02em]">Chat history</h1>
           <p className="text-text-secondary text-[14px] mt-1">
-            Resume past conversations with Flow.
+            Resume past conversations with Intelligence.
           </p>
         </div>
         <Link to="/flow" className="btn btn-primary">New chat</Link>
@@ -40,7 +40,7 @@ export function FlowHistory() {
         ) : error ? (
           <div className="error-banner">{error}</div>
         ) : sessions.length === 0 ? (
-          <EmptyState title="No conversations yet" subtitle="Start a chat in Flow." />
+          <EmptyState title="No conversations yet" subtitle="Start a chat in Intelligence." />
         ) : (
           <div className="divide-y divide-white/[0.04]">
             {sessions.map((s) => (
