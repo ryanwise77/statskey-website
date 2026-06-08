@@ -38,6 +38,8 @@ const DEV_REWRITES = {
   '/bid/3d/viewer': '/bid/3d/viewer.html',
   '/energy': '/energy.html',
   '/energy/': '/energy.html',
+  '/hardware': '/index.html',
+  '/hardware/': '/index.html',
 }
 
 function devRewritePlugin() {

@@ -47,3 +47,24 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     }
   })
 })
+
+// "/hardware" is a real, shareable URL that maps to the homepage hardware
+// section. When the section is present we scroll to it smoothly and reflect the
+// path without a full reload; a direct visit (served via rewrite) lands on the
+// section. Links fall back to a normal navigation when the section is absent.
+const hardwareSection = document.getElementById('hardware')
+if (hardwareSection) {
+  document.querySelectorAll('a[href="/hardware"]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      hardwareSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      history.pushState(null, '', '/hardware')
+    })
+  })
+
+  if (/^\/hardware\/?$/.test(window.location.pathname)) {
+    const jumpToHardware = () => hardwareSection.scrollIntoView({ block: 'start' })
+    jumpToHardware()
+    window.addEventListener('load', jumpToHardware)
+  }
+}
