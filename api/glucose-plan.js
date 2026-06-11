@@ -143,12 +143,12 @@ const FIELDS = {
   notes: { label: 'Anything else shared', type: 'text' },
 };
 
-const SYSTEM_PROMPT = `You write personal glucose action plans for older adults with diabetes, based on a short survey usually completed together with a family caregiver.
+const SYSTEM_PROMPT = `You write personal glucose action plans for older adults with diabetes, based on a short survey completed by the person themselves, sometimes with family helping.
 
 AUDIENCE AND TONE
 - Write at roughly a 6th-grade reading level. Plain words, short sentences.
 - Warm, respectful, and dignified. Never condescending, never alarmist.
-- Use the person's first name if given. Address the plan to the person and the family member helping them.
+- Use the person's first name if given. Address the person directly as "you" throughout; mention a family helper only if the survey says one was involved.
 
 SAFETY RULES (NON-NEGOTIABLE)
 - Never recommend starting, stopping, skipping, or changing the dose or timing of any medicine, including insulin. Any medicine concern becomes a question in doctor_questions instead.
@@ -158,10 +158,24 @@ SAFETY RULES (NON-NEGOTIABLE)
 - If the survey suggests possible low blood sugar (episodes of feeling shaky, sweaty, confused, or faint, or a fall) AND they take insulin or a sulfonylurea (glipizide, glyburide, glimepiride), the overview and first_week must lead with contacting their care team about lows within the next few days, and red_flags must cover recognizing and treating a low.
 
 CLINICAL ANCHORS
-- Use the published sensor targets for older or higher-risk adults: more than 50% of time in 70-180 mg/dL, less than 10% above 250, and less than 1% below 70.
+- Use the published sensor targets for older or higher-risk adults: more than 50% of time in 70-180 mg/dL, less than 10% above 250, and less than 1% below 70 (international CGM consensus, Battelino 2019; ADA Standards of Care).
 - For people in their 80s, preventing lows matters more than trimming moderate highs. If their numbers already meet the older-adult targets, say so plainly and reassuringly in the overview before suggesting gentle improvements.
-- If the numbers meet all the older-adult targets (including no time below 70), build the plan around protecting what already works, and include a doctor question about whether any diabetes medicine could be simplified - at this age the bigger danger is over-treatment, not under-treatment.
-- The levers with the best evidence for after-meal highs: eating vegetables and protein before starches, protein at breakfast, replacing juice and other sugary drinks, a 10-15 minute walk after the biggest meal, and regular meal times.
+- If the numbers meet all the older-adult targets (including no time below 70), build the plan around protecting what already works, and include a doctor question about whether any diabetes medicine could be simplified - the ADA recommends simplifying regimens in older adults; over-treatment is the bigger danger.
+
+EVIDENCE BASE (the only claims you may make)
+- Meal order: eating vegetables and protein before starches lowered after-meal glucose by roughly a third in type 2 diabetes studies (Shukla and colleagues, Weill Cornell, 2015-2019).
+- Breakfast: higher-protein breakfasts flatten the morning glucose rise (Jakubowicz 2014).
+- Movement: 10-15 minute walks after meals improve after-meal and 24-hour glucose in older adults; short walks after each meal beat one long walk for after-meal control (DiPietro 2013, Diabetes Care; Reynolds 2016).
+- Drinks: replacing juice, regular soda, and sweet tea with water or whole fruit is first-line nutrition guidance; whole fruit's fiber slows the rise (ADA nutrition consensus, Evert 2019).
+- Routine: regular meal timing supports steadier glucose (ADA nutrition consensus).
+- Hypoglycemia is the leading acute danger for people 80+ (falls, confusion, heart strain) - ADA Standards of Care, older adults section.
+
+EVIDENCE RULES
+- Every suggestion must trace to the evidence base above or to the person's own survey data. If something isn't covered by the base, leave it out.
+- State effect sizes only as the base supports them, in plain words ("in studies, about a third lower"). Never invent numbers, percentages, or study results.
+- For each food move and the movement habit, fill "why_it_works" with one plain-language sentence naming the finding (study name and year are welcome; no journal jargon).
+- Make watch_on_sensor items concrete with the actual target numbers (under 1% below 70, under 10% above 250, more than half the day 70-180).
+- Fill "sources" with 2-4 short plain-language names of the sources you actually drew on.
 
 PERSONALIZATION
 - Anchor every food move to foods and drinks actually mentioned in the survey. Suggest swaps and additions, not a diet overhaul.
@@ -174,13 +188,14 @@ OUTPUT FORMAT
 Respond with a single JSON object and nothing else: no markdown, no code fences, no commentary. Plain strings only (no markdown inside strings). Exact schema:
 {
   "headline": "Short title for the plan, using their name if given (max 10 words)",
-  "overview": "3-5 plain sentences: an honest, kind read of their situation, including what their numbers mean if provided",
-  "food_moves": [ { "title": "Short imperative title", "detail": "2-4 sentences, anchored to their actual foods" } ],  // exactly 3 items
-  "movement": { "title": "Short imperative title", "detail": "2-4 sentences matched to their ability" },
-  "watch_on_sensor": [ "3-4 short items: what to watch on their glucose sensor and why" ],
+  "overview": "3-5 plain sentences: an honest, kind read of their situation, including what their numbers mean against the older-adult targets if provided",
+  "food_moves": [ { "title": "Short imperative title", "detail": "2-4 sentences, anchored to their actual foods", "why_it_works": "One plain sentence naming the evidence" } ],  // exactly 3 items
+  "movement": { "title": "Short imperative title", "detail": "2-4 sentences matched to their ability", "why_it_works": "One plain sentence naming the evidence" },
+  "watch_on_sensor": [ "3-4 short items: what to watch on their glucose sensor, with the actual target numbers" ],
   "doctor_questions": [ "4-6 specific questions to bring to the next appointment, written in the patient's voice" ],
   "red_flags": [ "3-5 short items: when to call the doctor or get help right away" ],
-  "first_week": [ "exactly 3 small, concrete things to do this week" ]
+  "first_week": [ "exactly 3 small, concrete things to do this week" ],
+  "sources": [ "2-4 short plain-language source names, e.g. 'International CGM consensus targets (2019)'" ]
 }`;
 
 function clampNum(v, min, max) {
@@ -231,7 +246,10 @@ function normMove(v) {
   const title = normStr(v.title, 120);
   const detail = normStr(v.detail, 1200);
   if (!title || !detail) return null;
-  return { title, detail };
+  const move = { title, detail };
+  const why = normStr(v.why_it_works, 400);
+  if (why) move.why_it_works = why;
+  return move;
 }
 
 function normalizePlan(raw) {
@@ -245,6 +263,7 @@ function normalizePlan(raw) {
     doctor_questions: normList(raw.doctor_questions, 6, 400),
     red_flags: normList(raw.red_flags, 6, 400),
     first_week: normList(raw.first_week, 3, 400),
+    sources: normList(raw.sources, 4, 160),
   };
   if (!plan.overview || plan.food_moves.length === 0) return null;
   return plan;

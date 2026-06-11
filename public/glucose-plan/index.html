@@ -168,6 +168,21 @@
         color: var(--muted); font-size: 0.9rem; pointer-events: none;
       }
 
+      /* Numbers readout */
+      .readout { margin-top: 0.9rem; border-top: 1px solid var(--line); padding-top: 0.8rem; display: grid; gap: 0.45rem; }
+      .readout-row { display: flex; gap: 0.55rem; align-items: flex-start; font-size: 0.95rem; }
+      .readout-dot { flex: none; width: 0.8rem; height: 0.8rem; border-radius: 50%; margin-top: 0.32rem; }
+      .readout-dot.ok { background: var(--teal); }
+      .readout-dot.warn { background: #d99a26; }
+      .readout-note { font-size: 0.78rem; color: var(--muted); }
+
+      /* Evidence styling */
+      .why {
+        font-size: 0.88rem; color: #0b5a53; background: var(--teal-soft);
+        border-radius: 8px; padding: 0.45rem 0.65rem; margin-top: 0.5rem;
+      }
+      .sources { font-size: 0.85rem; color: var(--muted); margin-top: 1.1rem; line-height: 1.6; }
+
       /* Libre file import */
       .dropzone {
         border: 2px dashed var(--line); border-radius: 14px; background: #fff;
@@ -267,6 +282,7 @@
         .wrap { max-width: none; padding: 0; }
         .card, .banner { border: 1.5px solid #999; box-shadow: none; break-inside: avoid; }
         .plan-overview, .banner, .red-card { background: #fff; color: #000; }
+        .why { background: #fff; color: #000; border: 1px solid #999; }
         .section-title, .brand { color: #000; }
         .move-num { background: #000; }
         .move-card p { color: #000; }
@@ -279,13 +295,13 @@
     <div class="wrap">
       <header class="site">
         <div class="brand">StatsKey <span>· Glucose Action Plan</span></div>
-        <div class="tagline">Made to be filled out together</div>
+        <div class="tagline">Take it at your own pace</div>
       </header>
       <main id="app"></main>
       <footer class="site no-print">
-        This tool shares general wellness ideas to talk through with a doctor. It is not medical
-        advice, it never suggests medicine changes, and it is not for emergencies. Answers stay on
-        this device and are used only to create the plan.
+        This tool shares general wellness ideas to talk through with your doctor. It is not medical
+        advice, it never suggests medicine changes, and it is not for emergencies. Your answers stay
+        on this device and are used only to create your plan.
       </footer>
     </div>
 
@@ -296,17 +312,17 @@
 
       const STEPS = [
         {
-          title: "About them",
+          title: "About you",
           intro: "A few basics. Skip anything you're not sure about.",
           questions: [
-            { key: "helper", type: "choice", label: "Who is filling this out?", options: [
-              ["together", "We're doing it together"],
-              ["family_alone", "A family member, on their behalf"],
-              ["self", "I'm filling it out for myself"],
+            { key: "helper", type: "choice", label: "Who is answering?", options: [
+              ["self", "I'm answering for myself"],
+              ["together", "Family is helping me right now"],
+              ["family_alone", "I'm a family member, answering for them"],
             ]},
-            { key: "first_name", type: "text", label: "Their first name", optional: true,
-              hint: "Used only to address the plan.", placeholder: "For example: Vera" },
-            { key: "age_band", type: "choice", label: "Their age", options: [
+            { key: "first_name", type: "text", label: "Your first name", optional: true,
+              hint: "So the plan can speak to you by name.", placeholder: "For example: Vera" },
+            { key: "age_band", type: "choice", label: "Your age", options: [
               ["under65", "Under 65"], ["65to74", "65 to 74"], ["75to84", "75 to 84"], ["85plus", "85 or older"],
             ]},
             { key: "diabetes_type", type: "choice", label: "Type of diabetes", options: [
@@ -315,17 +331,17 @@
           ],
         },
         {
-          title: "Their glucose sensor",
-          intro: "If they wear a sensor, its app has a 90-day report with these numbers. Leave blank anything you can't find.",
+          title: "Your glucose sensor",
+          intro: "If you wear a sensor, its app has a 90-day report with these numbers. Leave blank anything you can't find.",
           questions: [
-            { key: "sensor", type: "choice", label: "Do they wear a glucose sensor?", options: [
+            { key: "sensor", type: "choice", label: "Do you wear a glucose sensor?", options: [
               ["libre", "Yes — FreeStyle Libre"],
               ["dexcom", "Yes — Dexcom"],
               ["other", "Yes — another sensor"],
               ["none", "No — fingerstick checks only"],
             ]},
-            { key: "_libre_upload", type: "libre", label: "Fill her numbers in automatically", optional: true,
-              hint: "Sign in with her Libre account, or add the data file from LibreView.com. Either way the numbers below fill themselves in \u2014 including when her highs usually happen. Nothing is saved." },
+            { key: "_libre_upload", type: "libre", label: "Fill your numbers in automatically", optional: true,
+              hint: "Sign in with your Libre account, or add the data file from LibreView.com. Either way the numbers below fill themselves in \u2014 including when your highs usually happen. Nothing is saved." },
             { key: "_sensor_numbers", type: "numbers", label: "Numbers from the sensor app", optional: true,
               hint: "Filled in for you if you connect above \u2014 or copy them from the app\u2019s 90-day \u201cTime in Ranges\u201d page.",
               fields: [
@@ -334,7 +350,7 @@
                 ["pct_below_70", "Time below 70", "%"],
                 ["avg_glucose", "Average glucose", "mg/dL"],
               ]},
-            { key: "high_times", type: "multi", label: "When do the highs usually happen?", optional: true,
+            { key: "high_times", type: "multi", label: "When do your highs usually happen?", optional: true,
               hint: "Choose all that apply.",
               options: [
                 ["after_breakfast", "After breakfast"],
@@ -347,9 +363,9 @@
         },
         {
           title: "Medicines",
-          intro: "This matters most for safety, so the plan knows what questions to send to the doctor.",
+          intro: "This matters most for safety, so the plan knows what questions to send to your doctor.",
           questions: [
-            { key: "meds", type: "multi", label: "Which diabetes medicines do they take?",
+            { key: "meds", type: "multi", label: "Which diabetes medicines do you take?",
               hint: "Choose all that apply. The bottle labels can help.",
               options: [
                 ["insulin", "Insulin (any kind)"],
@@ -357,7 +373,7 @@
                 ["metformin", "Metformin"],
                 ["glp1", "Ozempic, Trulicity, or Mounjaro type injectable"],
                 ["sglt2", "Jardiance or Farxiga type pill"],
-                ["pills_unsure", "Takes pills, but not sure which"],
+                ["pills_unsure", "I take pills, but I'm not sure which"],
                 ["none", "No diabetes medicines"],
               ]},
             { key: "meds_other", type: "text", label: "Any other medicines worth mentioning?", optional: true,
@@ -372,10 +388,10 @@
         },
         {
           title: "Food and drinks",
-          intro: "The plan works with what they already eat — small swaps, not a new diet.",
+          intro: "The plan works with what you already eat — small swaps, not a new diet.",
           questions: [
-            { key: "who_cooks", type: "choice", label: "Who cooks most of their meals?", options: [
-              ["self", "They cook for themself"],
+            { key: "who_cooks", type: "choice", label: "Who cooks most of your meals?", options: [
+              ["self", "I cook for myself"],
               ["family", "Family cooks"],
               ["mix", "A mix of both"],
               ["prepared", "Mostly prepared, delivered, or restaurant meals"],
@@ -387,12 +403,12 @@
             { key: "sugary_drinks", type: "choice", label: "Juice, regular soda, or sweet tea?", options: [
               ["often", "Often — most days"], ["sometimes", "Sometimes"], ["rarely", "Rarely or never"],
             ]},
-            { key: "sweets", type: "text", label: "Snacks or sweets they enjoy?", optional: true,
+            { key: "sweets", type: "text", label: "Snacks or sweets you enjoy?", optional: true,
               placeholder: "For example: cookies with afternoon coffee" },
             { key: "chewing_issues", type: "choice", label: "Any trouble chewing, denture pain, or a small appetite?", options: [
               ["yes", "Yes"], ["no", "No"],
             ]},
-            { key: "regular_meals", type: "choice", label: "Are meals at about the same times each day?", options: [
+            { key: "regular_meals", type: "choice", label: "Are your meals at about the same times each day?", options: [
               ["yes", "Yes, fairly regular"], ["no", "No, it varies a lot"],
             ]},
           ],
@@ -401,28 +417,28 @@
           title: "Moving and home life",
           intro: "Almost done. This keeps the plan realistic.",
           questions: [
-            { key: "walk", type: "choice", label: "How is their walking?", options: [
-              ["easily", "Can walk 10 minutes or more easily"],
-              ["with_support", "Walks with a cane or walker"],
-              ["limited", "Walking is difficult"],
+            { key: "walk", type: "choice", label: "How is your walking?", options: [
+              ["easily", "I can walk 10 minutes or more easily"],
+              ["with_support", "I walk with a cane or walker"],
+              ["limited", "Walking is difficult for me"],
             ]},
-            { key: "lives", type: "choice", label: "Living situation", options: [
-              ["alone", "Lives alone"], ["with_others", "Lives with family or others"],
+            { key: "lives", type: "choice", label: "Your living situation", options: [
+              ["alone", "I live alone"], ["with_others", "I live with family or others"],
             ]},
-            { key: "sleep_regular", type: "choice", label: "Is their sleep schedule fairly regular?", options: [
+            { key: "sleep_regular", type: "choice", label: "Is your sleep schedule fairly regular?", options: [
               ["yes", "Yes"], ["no", "No"],
             ]},
           ],
         },
         {
-          title: "Their care team",
-          intro: "The plan ends with questions to bring to the next appointment.",
+          title: "Your care team",
+          intro: "The plan ends with questions to bring to your next appointment.",
           questions: [
             { key: "appt_soon", type: "choice", label: "Is there a doctor visit in the next two months?", options: [
               ["yes", "Yes"], ["no", "No"], ["unsure", "Not sure"],
             ]},
-            { key: "med_manager", type: "choice", label: "Who keeps track of the medicines?", options: [
-              ["self", "They do"], ["family", "Family helps"], ["pharmacy", "Pharmacy packs or a pill organizer"],
+            { key: "med_manager", type: "choice", label: "Who keeps track of your medicines?", options: [
+              ["self", "I do"], ["family", "Family helps"], ["pharmacy", "Pharmacy packs or a pill organizer"],
             ]},
             { key: "notes", type: "textarea", label: "Anything else the plan should know?", optional: true,
               placeholder: "Worries, habits, what's been hard\u2026" },
@@ -566,7 +582,7 @@
         for (const k of Object.keys(MEAL_WINDOWS)) {
           windows[k] = winCount[k] ? Math.round((winHigh[k] / winCount[k]) * 1000) / 10 : 0;
         }
-        // Flag windows clearly worse than her overall picture.
+        // Flag windows clearly worse than the overall picture.
         let flagged = Object.keys(windows).filter(
           (k) => windows[k] >= 8 && (windows[k] >= pctAbove180 + 5 || windows[k] >= pctAbove180 * 1.3)
         );
@@ -621,26 +637,26 @@
       // LIBRE_PARSE_END
 
       const LOADING_LINES = [
-        "Reading the answers\u2026",
-        "Comparing the numbers with targets for older adults\u2026",
-        "Looking at meals and daily routine\u2026",
-        "Writing the plan\u2026",
+        "Reading your answers\u2026",
+        "Comparing your numbers with targets for older adults\u2026",
+        "Looking at your meals and daily routine\u2026",
+        "Writing your plan\u2026",
         "Almost there\u2026",
       ];
 
       const DEMO_PLAN = {
         headline: "A steady-sugar plan for Vera",
-        overview: "Vera's sensor shows highs about a third of the day, but only 4% of the time above 250 and almost no lows. For someone in her 80s, that already meets the published safety targets, so this is about gentle fine-tuning, not alarm. Most of her high time likely comes right after meals, and a few small changes to breakfast and drinks can soften those rises. Because she takes glipizide and has had shaky spells, the most important step this week is a call to her doctor about lows.",
+        overview: "Vera, your sensor shows highs about a third of the day, but only 4% of the time above 250 and almost no lows. For someone in your 80s, that already meets the published safety targets, so this is about gentle fine-tuning, not alarm. Most of your high time likely comes right after meals, and a few small changes to breakfast and drinks can soften those rises. Because you take glipizide and have had shaky spells, the most important step this week is a call to your doctor about lows.",
         food_moves: [
-          { title: "Give breakfast a protein partner", detail: "Toast with jam and juice is almost all quick-acting carbohydrate, which explains morning rises. Keep the toast, and add an egg, yogurt, or cottage cheese first. Protein first slows the rise and keeps her full longer." },
-          { title: "Swap the morning juice", detail: "A glass of juice acts like sugar water for her sensor. Try water with a splash of juice, or a small orange instead — the fiber in whole fruit slows things down. Keep juice handy only for treating a low." },
-          { title: "Vegetables and meat before the potatoes", detail: "At dinner, start with the vegetable and the meat, and save the potatoes or bread for last. Same plate, different order — it can meaningfully shrink the after-dinner rise." },
+          { title: "Give breakfast a protein partner", detail: "Toast with jam and juice is almost all quick-acting carbohydrate, which explains your morning rises. Keep the toast, and add an egg, yogurt, or cottage cheese first. Protein first slows the rise and keeps you full longer.", why_it_works: "In studies, higher-protein breakfasts clearly flattened the morning glucose rise (Jakubowicz 2014)." },
+          { title: "Swap the morning juice", detail: "A glass of juice acts like sugar water for your sensor. Try water with a splash of juice, or a small orange instead — the fiber in whole fruit slows things down. Keep juice handy only for treating a low.", why_it_works: "Replacing sugary drinks with water or whole fruit is first-line ADA nutrition guidance — fruit's fiber slows the sugar's arrival (Evert 2019)." },
+          { title: "Vegetables and meat before the potatoes", detail: "At dinner, start with the vegetable and the meat, and save the potatoes or bread for last. Same plate, different order — it can meaningfully shrink the after-dinner rise.", why_it_works: "In Weill Cornell studies, eating carbohydrate last cut the after-meal rise by about a third (Shukla 2015)." },
         ],
-        movement: { title: "A 10-minute stroll after the biggest meal", detail: "A gentle walk within an hour after dinner helps her muscles soak up sugar from the meal. With her cane is fine — around the block or up and down the hallway both count. If the weather is bad, a few minutes of standing kitchen tidying works too." },
+        movement: { title: "A 10-minute stroll after the biggest meal", detail: "A gentle walk within an hour after dinner helps your muscles soak up sugar from the meal. With your cane is fine — around the block or up and down the hallway both count. If the weather is bad, a few minutes of standing kitchen tidying works too.", why_it_works: "In a trial with adults in their 70s and 80s, short walks after meals improved 24-hour glucose — and beat one long daily walk for after-meal control (DiPietro 2013)." },
         watch_on_sensor: [
-          "Time below 70 should stay under 1% — if it creeps up, tell her doctor promptly.",
+          "Time below 70 should stay under 1% — if it creeps up, tell your doctor promptly.",
           "Watch the after-breakfast curve for two weeks to see if the new breakfast flattens it.",
-          "Time above 250 staying under 10% means she is within the safety target for her age.",
+          "Time above 250 staying under 10% means you are within the safety target for your age.",
         ],
         doctor_questions: [
           "I take glipizide and have had shaky spells — could it be causing low blood sugar?",
@@ -660,17 +676,39 @@
           "Add a protein to breakfast every morning.",
           "Take the after-dinner stroll on at least four days.",
         ],
+        sources: [
+          "International CGM consensus targets (Battelino 2019)",
+          "ADA Standards of Care \u2014 older adults",
+          "Weill Cornell meal-order studies (Shukla 2015)",
+          "Post-meal walking trial in older adults (DiPietro 2013)",
+        ],
       };
 
       /* ---------- State ---------- */
 
-      const SS_KEY = "glucose-plan-answers-v1";
+      const LS_KEY = "glucose-plan-v1";
+      const LEGACY_SS_KEY = "glucose-plan-answers-v1";
+
+      function loadSaved() {
+        try {
+          const raw = localStorage.getItem(LS_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (e) { /* private mode etc. */ }
+        try {
+          const legacy = sessionStorage.getItem(LEGACY_SS_KEY);
+          if (legacy) return { answers: JSON.parse(legacy) };
+        } catch (e) { /* ignore */ }
+        return {};
+      }
+      const SAVED = loadSaved();
+
       const state = {
-        screen: "intro", // intro | step | loading | plan | error
+        // Reopening the page after a finished plan brings the plan right back.
+        screen: SAVED.plan || SAVED.planText ? "plan" : "intro", // intro | step | loading | plan | error
         stepIndex: 0,
-        answers: loadAnswers(),
-        plan: null,
-        planText: null,
+        answers: SAVED.answers || {},
+        plan: SAVED.plan || null,
+        planText: SAVED.planText || null,
         errorKind: null,
         loadingTimer: null,
         libreError: null,
@@ -680,15 +718,18 @@
       };
       const DEMO = new URLSearchParams(location.search).has("demo");
 
-      function loadAnswers() {
-        try {
-          const raw = sessionStorage.getItem(SS_KEY);
-          if (raw) return JSON.parse(raw);
-        } catch (e) { /* private mode etc. */ }
-        return {};
-      }
       function saveAnswers() {
-        try { sessionStorage.setItem(SS_KEY, JSON.stringify(state.answers)); } catch (e) { /* ignore */ }
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify({
+            answers: state.answers,
+            plan: state.plan,
+            planText: state.planText,
+          }));
+        } catch (e) { /* ignore */ }
+      }
+      function clearSaved() {
+        try { localStorage.removeItem(LS_KEY); } catch (e) { /* ignore */ }
+        try { sessionStorage.removeItem(LEGACY_SS_KEY); } catch (e) { /* ignore */ }
       }
 
       /* ---------- Rendering helpers ---------- */
@@ -720,13 +761,13 @@
 
       function renderIntro() {
         const points = [
-          "Answer a handful of questions about medicines, meals, and daily life. About five minutes, and it works best done together with family.",
-          "The answers are written into a simple plan: three food moves, one movement habit, what to watch on the sensor, and questions for the doctor.",
-          "Print it, stick it on the fridge, and bring it to the next appointment.",
+          "Answer a handful of questions about your medicines, meals, and daily life. About five minutes, and family is welcome to help.",
+          "Your answers become a simple plan: three food moves, one movement habit, what to watch on your sensor, and questions for your doctor.",
+          "Print it, stick it on the fridge, and bring it to your next appointment.",
         ];
         const card = el("div", { class: "card" }, [
-          el("h1", { text: "A simple glucose plan, made together" }),
-          el("p", { class: "sub", text: "For older adults with diabetes and the family who help them." }),
+          el("h1", { text: "Your glucose action plan" }),
+          el("p", { class: "sub", text: "A few questions about your days, then a simple plan to talk over with your doctor." }),
           el("ul", { class: "intro-points" }, points.map((p, i) =>
             el("li", null, [el("span", { class: "dot", text: String(i + 1) }), el("span", { text: p })])
           )),
@@ -734,7 +775,7 @@
             el("button", { class: "btn btn-primary", text: "Start", onclick: () => { state.screen = "step"; state.stepIndex = 0; render(); } }),
             hasAnyAnswer() ? el("button", { class: "btn btn-quiet", text: "Continue where we left off", onclick: () => { state.screen = "step"; state.stepIndex = lastTouchedStep(); render(); } }) : null,
           ]),
-          el("p", { class: "smallprint", style: "margin-top:1.3rem", text: "This tool offers general wellness ideas to discuss with a doctor — it is not medical advice and never suggests medicine changes. Skip any question; nothing is required." }),
+          el("p", { class: "smallprint", style: "margin-top:1.3rem", text: "This tool offers general wellness ideas to discuss with your doctor — it is not medical advice and never suggests medicine changes. Skip any question; nothing is required." }),
         ]);
         setScreen([card], "h1");
       }
@@ -822,8 +863,8 @@
       }
 
       const LIBRE_ERRORS = {
-        bad_credentials: "That email or password didn't work. It's the same sign-in she uses in the Libre app.",
-        terms_needed: "Abbott is asking her account to accept updated terms. Open her Libre app or LibreView.com once, accept, then try again.",
+        bad_credentials: "That email or password didn't work. It's the same sign-in you use in the Libre app.",
+        terms_needed: "Abbott is asking your account to accept updated terms. Open your Libre app or LibreView.com once, accept, then try again.",
         rate_limited: "Abbott asked us to slow down \u2014 wait a minute and try again.",
         no_data: "Signed in fine, but no sensor history came back on that account.",
         generic: "Couldn't fetch from Abbott just now. The file option below works too.",
@@ -833,17 +874,20 @@
         const email = state.libreEmail.trim();
         const password = state.librePass;
         if (!email || !password) {
-          state.libreError = "Enter her Libre account email and password first.";
+          state.libreError = "Enter your Libre account email and password first.";
           render();
           return;
         }
         state.libreBusy = true;
         state.libreError = null;
         render();
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 45000);
         fetch("/api/libre-history", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ email, password }),
+          signal: controller.signal,
         }).then(async (res) => {
           const data = await res.json().catch(() => ({}));
           state.libreBusy = false;
@@ -855,9 +899,11 @@
             state.libreError = LIBRE_ERRORS[data.error] || LIBRE_ERRORS.generic;
             render();
           }
-        }).catch(() => {
+        }).catch((e) => {
           state.libreBusy = false;
-          state.libreError = LIBRE_ERRORS.generic;
+          state.libreError = e && e.name === "AbortError"
+            ? "It took too long to reach Abbott. Try again in a moment."
+            : LIBRE_ERRORS.generic;
           render();
         });
       }
@@ -866,7 +912,7 @@
         const fs = el("fieldset", null, [el("legend", null, labelWithOptional(q))]);
         if (q.hint) fs.appendChild(el("p", { class: "q-hint", text: q.hint }));
 
-        // Path 1: sign in with her Libre account (proxied to Abbott, never stored).
+        // Path 1: sign in with the Libre account (proxied to Abbott, never stored).
         const emailInput = el("input", {
           type: "email", placeholder: "Libre account email", autocomplete: "off",
           oninput: (e) => { state.libreEmail = e.target.value; },
@@ -879,17 +925,17 @@
         passInput.value = state.librePass;
         const fetchBtn = el("button", {
           class: "btn btn-primary", type: "button",
-          text: state.libreBusy ? "Fetching\u2026" : "Fetch her numbers",
+          text: state.libreBusy ? "Fetching\u2026" : "Fetch my numbers",
           onclick: fetchFromLibre,
         });
         if (state.libreBusy) fetchBtn.disabled = true;
         fs.appendChild(el("div", { class: "dropzone solid" }, [
-          el("span", { class: "dz-title", text: "Sign in with her Libre account" }),
-          el("span", { class: "dz-note", text: "The same email and password as her Libre app." }),
+          el("span", { class: "dz-title", text: "Sign in with your Libre account" }),
+          el("span", { class: "dz-note", text: "The same email and password as your Libre app." }),
           emailInput,
           passInput,
           fetchBtn,
-          el("span", { class: "dz-note", text: "The sign-in goes through this site straight to Abbott to fetch her report. It isn't saved anywhere." }),
+          el("span", { class: "dz-note", text: "The sign-in goes through this site straight to Abbott to fetch your report. It isn't saved anywhere." }),
         ]));
 
         fs.appendChild(el("div", { class: "dz-or", text: "\u2014 or \u2014" }));
@@ -929,7 +975,7 @@
 
         const meta = state.answers._libre_import;
         if (meta) {
-          const lead = meta.source === "account" ? "Fetched from her Libre account: " : "Filled in from her file: ";
+          const lead = meta.source === "account" ? "Fetched from your Libre account: " : "Filled in from your file: ";
           fs.appendChild(el("div", { class: "filechip" }, [
             el("span", { class: "ok-mark", text: "\u2713" }),
             el("span", { text: lead + meta.from + " to " + meta.to + " \u00b7 " + meta.days + " days \u00b7 " + meta.readings.toLocaleString() + " readings. Adjust anything below that looks off." }),
@@ -1020,10 +1066,50 @@
         return wrap;
       }
 
+      // Deterministic readout against the published 65+ targets (Battelino 2019 consensus).
+      function numbersReadout() {
+        const a180 = state.answers.pct_above_180;
+        const a250 = state.answers.pct_above_250;
+        const b70 = state.answers.pct_below_70;
+        const rows = [];
+        if (Number.isFinite(b70)) {
+          rows.push(b70 < 1
+            ? { ok: true, text: "Time below 70: " + b70 + "% \u2014 meets the most important safety target for older adults (under 1%)." }
+            : { ok: false, text: "Time below 70: " + b70 + "% \u2014 above the under-1% safety target. This is the number to bring up with your doctor soon." });
+        }
+        if (Number.isFinite(a250)) {
+          rows.push(a250 < 10
+            ? { ok: true, text: "Time above 250: " + a250 + "% \u2014 within the older-adult target (under 10%)." }
+            : { ok: false, text: "Time above 250: " + a250 + "% \u2014 above the under-10% target. Your doctor can help soften the highest peaks." });
+        }
+        if (Number.isFinite(a180) && Number.isFinite(b70)) {
+          const tir = Math.round((100 - a180 - b70) * 10) / 10;
+          rows.push(tir > 50
+            ? { ok: true, text: "Roughly " + tir + "% of the day in 70-180 \u2014 more than the half-the-day target for adults 65 and older." }
+            : { ok: false, text: "Roughly " + tir + "% of the day in 70-180 \u2014 a bit under the half-the-day target. Small meal and walking changes can close this." });
+        }
+        return rows;
+      }
+
+      function buildReadout(container) {
+        container.replaceChildren();
+        const rows = numbersReadout();
+        if (!rows.length) return;
+        container.appendChild(el("p", { class: "section-title", text: "What your numbers mean" }));
+        for (const r of rows) {
+          container.appendChild(el("div", { class: "readout-row" }, [
+            el("span", { class: "readout-dot " + (r.ok ? "ok" : "warn"), "aria-hidden": "true" }),
+            el("span", { text: r.text }),
+          ]));
+        }
+        container.appendChild(el("p", { class: "readout-note", text: "Targets for adults 65 and older, from the international sensor consensus (2019). Your doctor may set targets just for you." }));
+      }
+
       function renderNumbers(q) {
         const fs = el("fieldset", null, [el("legend", null, labelWithOptional(q))]);
         if (q.hint) fs.appendChild(el("p", { class: "q-hint", text: q.hint }));
         const grid = el("div", { class: "numgrid" });
+        const readout = el("div", { class: "readout", "aria-live": "polite" });
         for (const [key, label, unit] of q.fields) {
           const id = "f_" + key;
           const input = el("input", {
@@ -1033,6 +1119,7 @@
               if (v === "") delete state.answers[key];
               else state.answers[key] = parseFloat(v);
               saveAnswers();
+              buildReadout(readout);
             },
           });
           if (state.answers[key] !== undefined) input.value = state.answers[key];
@@ -1042,6 +1129,8 @@
           ]));
         }
         fs.appendChild(grid);
+        buildReadout(readout);
+        fs.appendChild(readout);
         return fs;
       }
 
@@ -1064,6 +1153,14 @@
       }
 
       async function submit() {
+        const answered = Object.keys(LABELS).filter(
+          (k) => state.answers[k] !== undefined && state.answers[k] !== ""
+        ).length;
+        if (answered < 5 && !confirm(
+          "Only " + answered + (answered === 1 ? " question is" : " questions are") +
+          " answered so far. The plan gets better with more \u2014 create it anyway?"
+        )) return;
+
         state.screen = "loading";
         renderLoading();
 
@@ -1071,16 +1168,20 @@
           setTimeout(() => {
             clearInterval(state.loadingTimer);
             state.plan = DEMO_PLAN; state.planText = null; state.screen = "plan";
+            saveAnswers();
             render();
           }, 2500);
           return;
         }
 
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 90000);
         try {
           const res = await fetch("/api/glucose-plan", {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ answers: state.answers }),
+            signal: controller.signal,
           });
           const data = await res.json().catch(() => ({}));
           clearInterval(state.loadingTimer);
@@ -1088,14 +1189,17 @@
             state.plan = data.plan || null;
             state.planText = data.planText || null;
             state.screen = "plan";
+            saveAnswers();
           } else {
             state.errorKind = data.error || "unknown";
             state.screen = "error";
           }
         } catch (e) {
           clearInterval(state.loadingTimer);
-          state.errorKind = "network";
+          state.errorKind = e && e.name === "AbortError" ? "timeout" : "network";
           state.screen = "error";
+        } finally {
+          clearTimeout(timeout);
         }
         render();
       }
@@ -1105,12 +1209,13 @@
           not_configured: "The connection to the plan-writing AI isn't set up on this site yet.",
           empty_survey: "No answers were filled in yet — go back and answer at least a few questions.",
           network: "The plan couldn't be created — the connection didn't go through.",
+          timeout: "It took too long to write the plan this time. Trying again usually works.",
           unknown: "The plan couldn't be created just now.",
         };
         const msg = messages[state.errorKind] || messages.unknown;
         const card = el("div", { class: "card error-card", "aria-live": "polite" }, [
           el("h2", { text: "That didn't work" }),
-          el("p", { class: "sub", style: "color:inherit", text: msg + " The answers are safe on this page." }),
+          el("p", { class: "sub", style: "color:inherit", text: msg + " Your answers are safe on this page." }),
           el("div", { class: "btn-row" }, [
             el("button", { class: "btn btn-primary", text: "Try again", onclick: submit }),
             el("button", { class: "btn btn-secondary", text: "Copy answers for an AI assistant", onclick: copyPrompt }),
@@ -1140,9 +1245,9 @@
 
       function copyPrompt() {
         const prompt = [
-          "Please write a gentle, plain-language glucose action plan for an older adult with diabetes, based on the survey answers below.",
+          "Please write a gentle, plain-language glucose action plan for an older adult with diabetes, based on the survey answers below. Address the person directly as \u201cyou\u201d throughout.",
           "",
-          "Rules: never suggest starting, stopping, or changing any medicine or dose — turn medicine concerns into questions for their doctor. Never suggest food diaries, meal tracking, or extra fingerstick routines — assume no ongoing tracking beyond the sensor they already wear. Preventing low blood sugar matters more than trimming moderate highs at this age (sensor targets for older adults: over 50% of time in 70-180, under 10% above 250, under 1% below 70). If the numbers already meet those targets, lead with reassurance and ask the doctor about simplifying medicines rather than adding more. Write at a 6th-grade reading level, warm and respectful.",
+          "Rules: never suggest starting, stopping, or changing any medicine or dose — turn medicine concerns into questions for their doctor. Never suggest food diaries, meal tracking, or extra fingerstick routines — assume no ongoing tracking beyond the sensor they already wear. Preventing low blood sugar matters more than trimming moderate highs at this age (sensor targets for older adults: over 50% of time in 70-180, under 10% above 250, under 1% below 70). If the numbers already meet those targets, lead with reassurance and ask the doctor about simplifying medicines rather than adding more. Base every suggestion on established evidence — meal-order studies (Shukla 2015), protein breakfasts (Jakubowicz 2014), post-meal walking trials in older adults (DiPietro 2013), ADA nutrition guidance on sugary drinks (Evert 2019) — and add a short plain-language \u201cwhy it works\u201d to each suggestion. Never invent numbers or study results. Write at a 6th-grade reading level, warm and respectful.",
           "",
           "Structure: a short honest overview; three food moves anchored to their actual meals; one movement habit matched to their ability; what to watch on their glucose sensor; 4-6 questions to bring to the doctor; when to call for help; and three small things to do this week.",
           "",
@@ -1180,25 +1285,30 @@
         const name = (state.answers.first_name || "").trim();
         const dateStr = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
 
-        nodes.push(el("h1", { text: p && p.headline ? p.headline : name ? "A plan for " + name : "The glucose action plan" }));
-        nodes.push(el("p", { class: "sub", text: "Created " + dateStr + " · Bring it to the next doctor visit." }));
+        nodes.push(el("h1", { text: p && p.headline ? p.headline : name ? "A plan for " + name : "Your glucose action plan" }));
+        nodes.push(el("p", { class: "sub", text: "Created " + dateStr + " · Bring it to your next doctor visit." }));
 
         if (needsLowSafetyBanner()) {
           const banner = el("div", { class: "banner" });
-          banner.appendChild(el("strong", { text: "Please mention this to the doctor soon: " }));
+          banner.appendChild(el("strong", { text: "Please mention this to your doctor soon: " }));
           banner.appendChild(document.createTextNode(
-            "the answers describe possible low blood sugar spells alongside insulin or glipizide-type medicine. At this age, lows matter more than highs — a quick call this week is worth it."
+            "your answers mention possible low blood sugar spells alongside insulin or glipizide-type medicine. For someone your age, lows matter more than highs — a quick call this week is worth it."
           ));
           nodes.push(banner);
         }
 
         if (p) {
           if (p.overview) nodes.push(section("The honest overview", [el("p", { text: p.overview })], "plan-overview"));
+          const moveBody = (m) => el("div", null, [
+            el("h3", { text: m.title }),
+            el("p", { text: m.detail }),
+            m.why_it_works ? el("p", { class: "why", text: "Why it works: " + m.why_it_works }) : null,
+          ]);
           if (p.food_moves && p.food_moves.length) {
             nodes.push(section("Three food moves", p.food_moves.map((m, i) =>
               el("div", { class: "move-card" }, [
                 el("div", { class: "move-num", text: String(i + 1) }),
-                el("div", null, [el("h3", { text: m.title }), el("p", { text: m.detail })]),
+                moveBody(m),
               ])
             )));
           }
@@ -1206,7 +1316,7 @@
             nodes.push(section("One movement habit", [
               el("div", { class: "move-card" }, [
                 el("div", { class: "move-num", text: "+" }),
-                el("div", null, [el("h3", { text: p.movement.title }), el("p", { text: p.movement.detail })]),
+                moveBody(p.movement),
               ]),
             ]));
           }
@@ -1218,20 +1328,23 @@
             nodes.push(section("Call for help if\u2026", [plainList(p.red_flags)], "red-card"));
           if (p.first_week && p.first_week.length)
             nodes.push(section("Three things this week", [plainList(p.first_week)]));
+          if (p.sources && p.sources.length)
+            nodes.push(el("p", { class: "sources", text: "Where this comes from: " + p.sources.join(" \u00b7 ") }));
         } else if (state.planText) {
           nodes.push(section("The plan", [el("p", { class: "plan-raw", text: state.planText })]));
         }
 
-        nodes.push(el("p", { class: "plan-meta", text: "Written with AI assistance from the survey answers. It offers general wellness ideas, not medical advice — please review it with the care team before changing anything." }));
+        nodes.push(el("p", { class: "plan-meta", text: "Written with AI assistance from your answers. It offers general wellness ideas, not medical advice — please review it with your care team before changing anything." }));
 
         nodes.push(el("div", { class: "btn-row no-print" }, [
           el("button", { class: "btn btn-primary", text: "Print the plan", onclick: () => window.print() }),
-          el("button", { class: "btn btn-secondary", text: "Edit the answers", onclick: () => { state.screen = "step"; state.stepIndex = 0; render(); } }),
+          el("button", { class: "btn btn-secondary", text: "Edit my answers", onclick: () => { state.screen = "step"; state.stepIndex = 0; render(); } }),
           el("button", {
             class: "btn btn-quiet", text: "Start over",
             onclick: () => {
               if (confirm("Clear all the answers and start fresh?")) {
-                state.answers = {}; saveAnswers(); state.plan = null; state.planText = null;
+                state.answers = {}; state.plan = null; state.planText = null;
+                clearSaved();
                 state.screen = "intro"; render();
               }
             },
