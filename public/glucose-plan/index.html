@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Glucose Action Plan — StatsKey</title>
+    <meta
+      name="description"
+      content="Answer a few questions about daily life with diabetes and get a simple, printable plan to discuss with your doctor."
+    />
+    <meta name="theme-color" content="#faf6ef" />
+    <!-- Intentionally unlisted: not linked from the main site. Remove the line below to allow search indexing when ready to go public. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #faf6ef;
+        --card: #ffffff;
+        --ink: #20231f;
+        --muted: #5b6258;
+        --line: #e3ddd0;
+        --teal: #0e6f66;
+        --teal-soft: #e3f0ee;
+        --amber-bg: #fdf3e0;
+        --amber-line: #e8c98c;
+        --amber-ink: #7a5410;
+        --red-bg: #fbeeec;
+        --red-line: #e7b6ae;
+        --red-ink: #8c2f1f;
+        --radius: 16px;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { font-size: 20px; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 1.4rem 1.1rem 4rem; }
+      header.site {
+        display: flex; align-items: baseline; justify-content: space-between;
+        padding: 0.4rem 0 1.1rem;
+      }
+      .brand { font-weight: 700; font-size: 0.95rem; letter-spacing: 0.02em; color: var(--teal); }
+      .brand span { color: var(--muted); font-weight: 500; }
+      .tagline { font-size: 0.75rem; color: var(--muted); }
+
+      h1 { font-size: 1.85rem; line-height: 1.2; letter-spacing: -0.01em; }
+      h2 { font-size: 1.4rem; line-height: 1.25; letter-spacing: -0.01em; }
+      h2:focus { outline: none; }
+      .sub { color: var(--muted); margin-top: 0.6rem; font-size: 1rem; }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 1.5rem 1.4rem;
+        box-shadow: 0 1px 2px rgba(40, 35, 20, 0.04);
+      }
+      .stack > * + * { margin-top: 1rem; }
+
+      /* Intro */
+      .intro-points { list-style: none; margin-top: 1.2rem; }
+      .intro-points li {
+        display: flex; gap: 0.7rem; align-items: flex-start;
+        padding: 0.55rem 0; font-size: 1.02rem;
+      }
+      .intro-points .dot {
+        flex: none; width: 1.55rem; height: 1.55rem; border-radius: 50%;
+        background: var(--teal-soft); color: var(--teal);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 0.85rem; margin-top: 0.1rem;
+      }
+      .smallprint { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        font: inherit; font-weight: 600; font-size: 1.05rem;
+        min-height: 3.1rem; padding: 0.7rem 1.5rem;
+        border-radius: 999px; border: 2px solid transparent;
+        cursor: pointer; transition: background 0.15s, border-color 0.15s;
+      }
+      .btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+      .btn-primary { background: var(--teal); color: #fff; }
+      .btn-primary:hover { background: #0b5a53; }
+      .btn-secondary { background: transparent; color: var(--teal); border-color: var(--teal); }
+      .btn-secondary:hover { background: var(--teal-soft); }
+      .btn-quiet { background: transparent; color: var(--muted); border-color: var(--line); }
+      .btn-quiet:hover { border-color: var(--muted); color: var(--ink); }
+      .btn-row { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.6rem; }
+      .btn-row .spacer { flex: 1; }
+
+      /* Progress */
+      .progress { display: flex; align-items: center; gap: 0.45rem; margin: 0.2rem 0 1.1rem; }
+      .progress .seg {
+        height: 0.45rem; flex: 1; border-radius: 999px;
+        background: var(--line); transition: background 0.2s;
+      }
+      .progress .seg.done { background: var(--teal); }
+      .step-count { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.3rem; }
+
+      /* Questions */
+      fieldset { border: 0; margin-top: 1.5rem; }
+      fieldset:first-of-type { margin-top: 1.2rem; }
+      legend, .q-label {
+        font-weight: 600; font-size: 1.12rem; line-height: 1.35;
+        margin-bottom: 0.25rem; display: block;
+      }
+      .q-hint { font-size: 0.88rem; color: var(--muted); margin-bottom: 0.6rem; }
+      .optional { font-weight: 500; color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+      .choices { display: grid; gap: 0.55rem; margin-top: 0.55rem; }
+      .choice {
+        display: flex; align-items: center; gap: 0.8rem;
+        background: var(--card); border: 2px solid var(--line); border-radius: 14px;
+        padding: 0.78rem 0.95rem; cursor: pointer; font-size: 1.02rem; line-height: 1.4;
+        transition: border-color 0.12s, background 0.12s;
+      }
+      .choice:hover { border-color: #b9c5b9; }
+      .choice input { position: absolute; opacity: 0; pointer-events: none; }
+      .choice .mark {
+        flex: none; width: 1.45rem; height: 1.45rem; border-radius: 50%;
+        border: 2px solid #b9b3a4; background: #fff; position: relative;
+      }
+      .choice.multi .mark { border-radius: 7px; }
+      .choice.selected { border-color: var(--teal); background: var(--teal-soft); }
+      .choice.selected .mark { border-color: var(--teal); background: var(--teal); }
+      .choice.selected .mark::after {
+        content: ""; position: absolute; inset: 0;
+        background: center / 70% no-repeat
+          url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>');
+      }
+      .choice:focus-within { outline: 3px solid var(--teal); outline-offset: 2px; }
+
+      input[type="text"], input[type="email"], input[type="password"], textarea {
+        width: 100%; font: inherit; font-size: 1.05rem; color: var(--ink);
+        background: #fff; border: 2px solid var(--line); border-radius: 12px;
+        padding: 0.72rem 0.9rem; margin-top: 0.45rem;
+      }
+      input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus,
+      textarea:focus, .numfield input:focus {
+        outline: none; border-color: var(--teal);
+      }
+      textarea { min-height: 5.2rem; resize: vertical; }
+
+      .numgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.6rem; }
+      @media (max-width: 560px) { .numgrid { grid-template-columns: 1fr; } }
+      .numfield label { font-size: 0.92rem; font-weight: 600; display: block; }
+      .numfield .unitwrap { position: relative; }
+      .numfield input {
+        width: 100%; font: inherit; font-size: 1.15rem; color: var(--ink);
+        background: #fff; border: 2px solid var(--line); border-radius: 12px;
+        padding: 0.6rem 3rem 0.6rem 0.9rem; margin-top: 0.35rem;
+      }
+      .numfield .unit {
+        position: absolute; right: 0.9rem; top: 50%; transform: translateY(calc(-50% + 0.17rem));
+        color: var(--muted); font-size: 0.9rem; pointer-events: none;
+      }
+
+      /* Libre file import */
+      .dropzone {
+        border: 2px dashed var(--line); border-radius: 14px; background: #fff;
+        padding: 1rem 1.1rem; margin-top: 0.6rem;
+        display: flex; flex-direction: column; gap: 0.6rem; align-items: flex-start;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      .dropzone.drag { border-color: var(--teal); background: var(--teal-soft); }
+      .dropzone.solid { border-style: solid; }
+      .dropzone .dz-title { font-weight: 600; font-size: 0.98rem; }
+      .dropzone input { margin-top: 0; width: 100%; }
+      .dz-note { font-size: 0.85rem; color: var(--muted); }
+      .dz-or { text-align: center; color: var(--muted); font-size: 0.85rem; margin: 0.55rem 0; width: 100%; }
+      .filechip {
+        display: flex; gap: 0.55rem; align-items: flex-start;
+        background: var(--teal-soft); border: 1.5px solid #bcd8d3; border-radius: 12px;
+        padding: 0.7rem 0.9rem; font-size: 0.92rem; margin-top: 0.6rem;
+      }
+      .filechip .ok-mark { color: var(--teal); font-weight: 700; }
+      .file-error {
+        color: var(--amber-ink); background: var(--amber-bg);
+        border: 1.5px solid var(--amber-line); border-radius: 12px;
+        padding: 0.6rem 0.9rem; font-size: 0.92rem; margin-top: 0.6rem;
+      }
+
+      /* Loading */
+      .loading { text-align: center; padding: 3.2rem 1rem; }
+      .spinner {
+        width: 3rem; height: 3rem; margin: 0 auto 1.4rem;
+        border-radius: 50%; border: 5px solid var(--teal-soft); border-top-color: var(--teal);
+        animation: spin 0.9s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .loading .status { font-weight: 600; font-size: 1.1rem; min-height: 1.6em; }
+      .loading .note { color: var(--muted); font-size: 0.92rem; margin-top: 0.5rem; }
+
+      /* Error */
+      .error-card { border-color: var(--amber-line); background: var(--amber-bg); }
+      .error-card h2 { color: var(--amber-ink); }
+
+      /* Plan */
+      .plan-section { margin-top: 1.3rem; }
+      .plan-overview { background: var(--teal-soft); border-color: #bcd8d3; }
+      .plan-overview p { font-size: 1.06rem; }
+      .section-title {
+        font-size: 0.82rem; font-weight: 700; letter-spacing: 0.09em;
+        text-transform: uppercase; color: var(--teal); margin-bottom: 0.55rem;
+      }
+      .banner {
+        border: 2px solid var(--amber-line); background: var(--amber-bg); color: var(--amber-ink);
+        border-radius: var(--radius); padding: 1.05rem 1.2rem; font-size: 1rem; font-weight: 500;
+        margin-top: 1.3rem;
+      }
+      .banner strong { font-weight: 700; }
+      .move-card { display: flex; gap: 0.95rem; align-items: flex-start; }
+      .move-card + .move-card { margin-top: 0.8rem; }
+      .move-num {
+        flex: none; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+        background: var(--teal); color: #fff; font-weight: 700; font-size: 1.05rem;
+        display: flex; align-items: center; justify-content: center; margin-top: 0.15rem;
+      }
+      .move-card h3 { font-size: 1.08rem; margin-bottom: 0.25rem; }
+      .move-card p { font-size: 0.98rem; color: #3a4036; }
+      ul.plain { list-style: none; }
+      ul.plain li {
+        position: relative; padding: 0.45rem 0 0.45rem 1.75rem; font-size: 1rem;
+      }
+      ul.plain li + li { border-top: 1px solid var(--line); }
+      ul.plain li::before {
+        content: ""; position: absolute; left: 0; top: 0.72rem;
+        width: 1.05rem; height: 1.05rem; border-radius: 5px; border: 2px solid var(--teal);
+      }
+      .red-card { border-color: var(--red-line); background: var(--red-bg); }
+      .red-card .section-title { color: var(--red-ink); }
+      .red-card ul.plain li { border-top-color: var(--red-line); }
+      .red-card ul.plain li::before { border-color: var(--red-ink); border-radius: 50%; }
+      .plan-meta { margin-top: 1.4rem; font-size: 0.82rem; color: var(--muted); }
+      .plan-raw { white-space: pre-wrap; font-size: 0.98rem; }
+
+      footer.site {
+        margin-top: 3.2rem; padding-top: 1.2rem; border-top: 1px solid var(--line);
+        font-size: 0.8rem; color: var(--muted); line-height: 1.6;
+      }
+
+      @media (max-width: 560px) {
+        html { font-size: 18px; }
+        .card { padding: 1.2rem 1.05rem; }
+        .btn { width: 100%; }
+        .btn-row .spacer { display: none; }
+      }
+
+      /* Print: plan only, black on white, large type */
+      @media print {
+        html { font-size: 13.5pt; }
+        body { background: #fff; color: #000; }
+        .no-print, header.site .tagline { display: none !important; }
+        .wrap { max-width: none; padding: 0; }
+        .card, .banner { border: 1.5px solid #999; box-shadow: none; break-inside: avoid; }
+        .plan-overview, .banner, .red-card { background: #fff; color: #000; }
+        .section-title, .brand { color: #000; }
+        .move-num { background: #000; }
+        .move-card p { color: #000; }
+        ul.plain li::before { border-color: #000; }
+        a { color: #000; text-decoration: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <div class="brand">StatsKey <span>· Glucose Action Plan</span></div>
+        <div class="tagline">Made to be filled out together</div>
+      </header>
+      <main id="app"></main>
+      <footer class="site no-print">
+        This tool shares general wellness ideas to talk through with a doctor. It is not medical
+        advice, it never suggests medicine changes, and it is not for emergencies. Answers stay on
+        this device and are used only to create the plan.
+      </footer>
+    </div>
+
+    <script>
+      "use strict";
+
+      /* ---------- Survey definition (keys mirror the API whitelist) ---------- */
+
+      const STEPS = [
+        {
+          title: "About them",
+          intro: "A few basics. Skip anything you're not sure about.",
+          questions: [
+            { key: "helper", type: "choice", label: "Who is filling this out?", options: [
+              ["together", "We're doing it together"],
+              ["family_alone", "A family member, on their behalf"],
+              ["self", "I'm filling it out for myself"],
+            ]},
+            { key: "first_name", type: "text", label: "Their first name", optional: true,
+              hint: "Used only to address the plan.", placeholder: "For example: Vera" },
+            { key: "age_band", type: "choice", label: "Their age", options: [
+              ["under65", "Under 65"], ["65to74", "65 to 74"], ["75to84", "75 to 84"], ["85plus", "85 or older"],
+            ]},
+            { key: "diabetes_type", type: "choice", label: "Type of diabetes", options: [
+              ["t2", "Type 2"], ["t1", "Type 1"], ["unsure", "Not sure"],
+            ]},
+          ],
+        },
+        {
+          title: "Their glucose sensor",
+          intro: "If they wear a sensor, its app has a 90-day report with these numbers. Leave blank anything you can't find.",
+          questions: [
+            { key: "sensor", type: "choice", label: "Do they wear a glucose sensor?", options: [
+              ["libre", "Yes — FreeStyle Libre"],
+              ["dexcom", "Yes — Dexcom"],
+              ["other", "Yes — another sensor"],
+              ["none", "No — fingerstick checks only"],
+            ]},
+            { key: "_libre_upload", type: "libre", label: "Fill her numbers in automatically", optional: true,
+              hint: "Sign in with her Libre account, or add the data file from LibreView.com. Either way the numbers below fill themselves in \u2014 including when her highs usually happen. Nothing is saved." },
+            { key: "_sensor_numbers", type: "numbers", label: "Numbers from the sensor app", optional: true,
+              hint: "Filled in for you if you connect above \u2014 or copy them from the app\u2019s 90-day \u201cTime in Ranges\u201d page.",
+              fields: [
+                ["pct_above_180", "Time above 180", "%"],
+                ["pct_above_250", "Time above 250", "%"],
+                ["pct_below_70", "Time below 70", "%"],
+                ["avg_glucose", "Average glucose", "mg/dL"],
+              ]},
+            { key: "high_times", type: "multi", label: "When do the highs usually happen?", optional: true,
+              hint: "Choose all that apply.",
+              options: [
+                ["after_breakfast", "After breakfast"],
+                ["after_lunch", "After lunch"],
+                ["after_dinner", "After dinner"],
+                ["overnight", "Overnight or first thing in the morning"],
+                ["unsure", "Not sure — no clear pattern"],
+              ]},
+          ],
+        },
+        {
+          title: "Medicines",
+          intro: "This matters most for safety, so the plan knows what questions to send to the doctor.",
+          questions: [
+            { key: "meds", type: "multi", label: "Which diabetes medicines do they take?",
+              hint: "Choose all that apply. The bottle labels can help.",
+              options: [
+                ["insulin", "Insulin (any kind)"],
+                ["sulfonylurea", "Glipizide, glyburide, or glimepiride"],
+                ["metformin", "Metformin"],
+                ["glp1", "Ozempic, Trulicity, or Mounjaro type injectable"],
+                ["sglt2", "Jardiance or Farxiga type pill"],
+                ["pills_unsure", "Takes pills, but not sure which"],
+                ["none", "No diabetes medicines"],
+              ]},
+            { key: "meds_other", type: "text", label: "Any other medicines worth mentioning?", optional: true,
+              placeholder: "For example: prednisone, a water pill\u2026" },
+            { key: "low_episodes", type: "choice", label: "Any spells of feeling shaky, sweaty, confused, or faint?", options: [
+              ["yes", "Yes"], ["no", "No"], ["unsure", "Not sure"],
+            ]},
+            { key: "falls", type: "choice", label: "Any falls in the past year?", options: [
+              ["yes", "Yes"], ["no", "No"],
+            ]},
+          ],
+        },
+        {
+          title: "Food and drinks",
+          intro: "The plan works with what they already eat — small swaps, not a new diet.",
+          questions: [
+            { key: "who_cooks", type: "choice", label: "Who cooks most of their meals?", options: [
+              ["self", "They cook for themself"],
+              ["family", "Family cooks"],
+              ["mix", "A mix of both"],
+              ["prepared", "Mostly prepared, delivered, or restaurant meals"],
+            ]},
+            { key: "breakfast", type: "text", label: "What does a usual breakfast look like?", optional: true,
+              placeholder: "For example: toast with jam, coffee, orange juice" },
+            { key: "other_meals", type: "text", label: "And lunch or dinner?", optional: true,
+              placeholder: "For example: sandwich at lunch; meat, potatoes, vegetable at dinner" },
+            { key: "sugary_drinks", type: "choice", label: "Juice, regular soda, or sweet tea?", options: [
+              ["often", "Often — most days"], ["sometimes", "Sometimes"], ["rarely", "Rarely or never"],
+            ]},
+            { key: "sweets", type: "text", label: "Snacks or sweets they enjoy?", optional: true,
+              placeholder: "For example: cookies with afternoon coffee" },
+            { key: "chewing_issues", type: "choice", label: "Any trouble chewing, denture pain, or a small appetite?", options: [
+              ["yes", "Yes"], ["no", "No"],
+            ]},
+            { key: "regular_meals", type: "choice", label: "Are meals at about the same times each day?", options: [
+              ["yes", "Yes, fairly regular"], ["no", "No, it varies a lot"],
+            ]},
+          ],
+        },
+        {
+          title: "Moving and home life",
+          intro: "Almost done. This keeps the plan realistic.",
+          questions: [
+            { key: "walk", type: "choice", label: "How is their walking?", options: [
+              ["easily", "Can walk 10 minutes or more easily"],
+              ["with_support", "Walks with a cane or walker"],
+              ["limited", "Walking is difficult"],
+            ]},
+            { key: "lives", type: "choice", label: "Living situation", options: [
+              ["alone", "Lives alone"], ["with_others", "Lives with family or others"],
+            ]},
+            { key: "sleep_regular", type: "choice", label: "Is their sleep schedule fairly regular?", options: [
+              ["yes", "Yes"], ["no", "No"],
+            ]},
+          ],
+        },
+        {
+          title: "Their care team",
+          intro: "The plan ends with questions to bring to the next appointment.",
+          questions: [
+            { key: "appt_soon", type: "choice", label: "Is there a doctor visit in the next two months?", options: [
+              ["yes", "Yes"], ["no", "No"], ["unsure", "Not sure"],
+            ]},
+            { key: "med_manager", type: "choice", label: "Who keeps track of the medicines?", options: [
+              ["self", "They do"], ["family", "Family helps"], ["pharmacy", "Pharmacy packs or a pill organizer"],
+            ]},
+            { key: "notes", type: "textarea", label: "Anything else the plan should know?", optional: true,
+              placeholder: "Worries, habits, what's been hard\u2026" },
+          ],
+        },
+      ];
+
+      const LABELS = (() => {
+        const map = {};
+        for (const step of STEPS) {
+          for (const q of step.questions) {
+            if (q.type === "libre") continue;
+            if (q.type === "numbers") {
+              for (const [k, label, unit] of q.fields) map[k] = { label: label + " (" + unit + ")", type: "number" };
+            } else {
+              map[q.key] = { label: q.label, type: q.type, options: q.options ? Object.fromEntries(q.options) : null };
+            }
+          }
+        }
+        return map;
+      })();
+
+      /* ---------- LibreView export parsing (runs entirely on-device) ---------- */
+      // LIBRE_PARSE_BEGIN
+
+      const MEAL_WINDOWS = {
+        after_breakfast: [6, 11],
+        after_lunch: [11, 16],
+        after_dinner: [16, 22],
+        overnight: [22, 6], // wraps midnight
+      };
+
+      function csvSplitLine(line, delim) {
+        const fields = [];
+        let cur = "", inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+            else inQ = !inQ;
+          } else if (ch === delim && !inQ) {
+            fields.push(cur); cur = "";
+          } else cur += ch;
+        }
+        fields.push(cur);
+        return fields;
+      }
+
+      function parseLibreCsv(text) {
+        const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
+        // Locate the column-header row (the metadata rows above it vary by locale).
+        let headIdx = -1, head = null, delim = ",";
+        for (let i = 0; i < Math.min(lines.length, 20); i++) {
+          if (!/device timestamp/i.test(lines[i])) continue;
+          delim = (lines[i].split(";").length > lines[i].split(",").length) ? ";" : ",";
+          head = csvSplitLine(lines[i], delim);
+          headIdx = i;
+          break;
+        }
+        if (headIdx === -1) return { ok: false, error: "not_libre" };
+
+        const idxTs = head.findIndex((c) => /device timestamp/i.test(c));
+        const idxType = head.findIndex((c) => /record type/i.test(c));
+        const idxHist = head.findIndex((c) => /historic glucose/i.test(c));
+        const idxScan = head.findIndex((c) => /scan glucose/i.test(c));
+        if (idxTs === -1 || (idxHist === -1 && idxScan === -1)) return { ok: false, error: "not_libre" };
+        const mmol =
+          (idxHist !== -1 && /mmol/i.test(head[idxHist])) ||
+          (idxScan !== -1 && /mmol/i.test(head[idxScan]));
+
+        // First pass: collect rows, gathering evidence for MM-DD vs DD-MM.
+        const TS_DMY = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})[ T](\d{1,2}):(\d{2})(?::\d{2})?\s*([AP]M)?$/i;
+        const TS_ISO = /^(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2}):(\d{2})/;
+        const hist = [], scan = [];
+        let sawFirstGt12 = false, sawSecondGt12 = false;
+        for (let i = headIdx + 1; i < lines.length; i++) {
+          if (!lines[i]) continue;
+          const f = csvSplitLine(lines[i], delim);
+          if (f.length <= Math.max(idxTs, idxHist, idxScan)) continue;
+          const type = idxType !== -1 ? String(f[idxType]).trim() : "0";
+          let vStr;
+          if (type === "0") vStr = idxHist !== -1 ? f[idxHist] : "";
+          else if (type === "1") vStr = idxScan !== -1 ? f[idxScan] : "";
+          else continue;
+          const v = parseFloat(String(vStr).replace(",", "."));
+          if (!Number.isFinite(v) || v <= 0) continue;
+          const ts = String(f[idxTs]).trim();
+          let row = null;
+          let m = TS_ISO.exec(ts);
+          if (m) {
+            row = { y: +m[1], mo: +m[2], d: +m[3], h: +m[4], min: +m[5], ampm: null, iso: true, v };
+          } else if ((m = TS_DMY.exec(ts))) {
+            row = { a: +m[1], b: +m[2], y: +m[3], h: +m[4], min: +m[5], ampm: m[6] ? m[6].toUpperCase() : null, iso: false, v };
+            if (row.a > 12) sawFirstGt12 = true;
+            if (row.b > 12) sawSecondGt12 = true;
+          }
+          if (!row) continue;
+          (type === "0" ? hist : scan).push(row);
+        }
+
+        const primary = hist.length >= scan.length ? hist : scan;
+        if (primary.length < 24) return { ok: false, error: "too_few" };
+
+        // Day-first only when the data proves it; US month-first is the default.
+        const dayFirst = sawFirstGt12 && !sawSecondGt12;
+        const toMg = (v) => (mmol ? v * 18.016 : v);
+        const readings = primary.map((r) => {
+          let h = r.h;
+          if (r.ampm === "PM" && h < 12) h += 12;
+          if (r.ampm === "AM" && h === 12) h = 0;
+          const mo = r.iso ? r.mo : dayFirst ? r.b : r.a;
+          const d = r.iso ? r.d : dayFirst ? r.a : r.b;
+          return { t: new Date(r.y, mo - 1, d, h, r.min).getTime(), h, v: toMg(r.v) };
+        }).filter((r) => Number.isFinite(r.t));
+
+        // Keep the last 90 days relative to the newest reading in the file.
+        const tMax = Math.max(...readings.map((r) => r.t));
+        const cutoff = tMax - 90 * 86400000;
+        const recent = readings.filter((r) => r.t >= cutoff);
+        if (recent.length < 24) return { ok: false, error: "too_few" };
+
+        const n = recent.length;
+        let sum = 0, above180 = 0, above250 = 0, below70 = 0;
+        const winCount = {}, winHigh = {};
+        for (const k of Object.keys(MEAL_WINDOWS)) { winCount[k] = 0; winHigh[k] = 0; }
+        const days = new Set();
+        for (const r of recent) {
+          sum += r.v;
+          if (r.v > 180) above180++;
+          if (r.v > 250) above250++;
+          if (r.v < 70) below70++;
+          days.add(Math.floor((r.t + 6 * 3600000) / 86400000));
+          for (const [k, [start, end]] of Object.entries(MEAL_WINDOWS)) {
+            const inWin = start < end ? r.h >= start && r.h < end : r.h >= start || r.h < end;
+            if (inWin) { winCount[k]++; if (r.v > 180) winHigh[k]++; }
+          }
+        }
+        const pct = (c) => Math.round((c / n) * 1000) / 10;
+        const pctAbove180 = pct(above180);
+        const windows = {};
+        for (const k of Object.keys(MEAL_WINDOWS)) {
+          windows[k] = winCount[k] ? Math.round((winHigh[k] / winCount[k]) * 1000) / 10 : 0;
+        }
+        // Flag windows clearly worse than her overall picture.
+        let flagged = Object.keys(windows).filter(
+          (k) => windows[k] >= 8 && (windows[k] >= pctAbove180 + 5 || windows[k] >= pctAbove180 * 1.3)
+        );
+        if (flagged.length === 0 && pctAbove180 >= 5) {
+          const top = Object.keys(windows).sort((a, b) => windows[b] - windows[a])[0];
+          if (windows[top] >= 5) flagged = [top];
+        }
+
+        const fmtDate = (t) => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+        return {
+          ok: true,
+          readings: n,
+          days: days.size,
+          from: fmtDate(Math.min(...recent.map((r) => r.t))),
+          to: fmtDate(tMax),
+          unit: mmol ? "mmol/L" : "mg/dL",
+          pctAbove180,
+          pctAbove250: pct(above250),
+          pctBelow70: pct(below70),
+          avg: Math.round(sum / n),
+          windows,
+          flagged,
+        };
+      }
+
+      function buildSampleCsv() {
+        // Deterministic 14-day sample in LibreView's US export format,
+        // with breakfast and dinner rises and no lows.
+        let seed = 42;
+        const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+        const lines = [
+          "Glucose Data,Generated by sample,,",
+          "Device,Serial Number,Device Timestamp,Record Type,Historic Glucose mg/dL,Scan Glucose mg/dL",
+        ];
+        const end = new Date(); end.setHours(12, 0, 0, 0);
+        for (let k = 14 * 96; k >= 1; k--) {
+          const t = new Date(end.getTime() - k * 15 * 60000);
+          const h = t.getHours() + t.getMinutes() / 60;
+          let v = 132 + 18 * Math.sin((h / 24) * Math.PI * 2) + (rand() - 0.5) * 24;
+          if (h >= 8 && h < 10.5) v += 75 + rand() * 45;
+          if (h >= 18 && h < 20.5) v += 45 + rand() * 35;
+          v = Math.max(82, Math.round(v));
+          const hh = t.getHours() % 12 === 0 ? 12 : t.getHours() % 12;
+          const ampm = t.getHours() < 12 ? "AM" : "PM";
+          const mm = String(t.getMinutes()).padStart(2, "0");
+          const ds = String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0") + "-" + t.getFullYear();
+          lines.push("FreeStyle Libre 3,SAMPLE123," + ds + " " + hh + ":" + mm + " " + ampm + ",0," + v + ",");
+        }
+        return lines.join("\n");
+      }
+
+      // LIBRE_PARSE_END
+
+      const LOADING_LINES = [
+        "Reading the answers\u2026",
+        "Comparing the numbers with targets for older adults\u2026",
+        "Looking at meals and daily routine\u2026",
+        "Writing the plan\u2026",
+        "Almost there\u2026",
+      ];
+
+      const DEMO_PLAN = {
+        headline: "A steady-sugar plan for Vera",
+        overview: "Vera's sensor shows highs about a third of the day, but only 4% of the time above 250 and almost no lows. For someone in her 80s, that already meets the published safety targets, so this is about gentle fine-tuning, not alarm. Most of her high time likely comes right after meals, and a few small changes to breakfast and drinks can soften those rises. Because she takes glipizide and has had shaky spells, the most important step this week is a call to her doctor about lows.",
+        food_moves: [
+          { title: "Give breakfast a protein partner", detail: "Toast with jam and juice is almost all quick-acting carbohydrate, which explains morning rises. Keep the toast, and add an egg, yogurt, or cottage cheese first. Protein first slows the rise and keeps her full longer." },
+          { title: "Swap the morning juice", detail: "A glass of juice acts like sugar water for her sensor. Try water with a splash of juice, or a small orange instead — the fiber in whole fruit slows things down. Keep juice handy only for treating a low." },
+          { title: "Vegetables and meat before the potatoes", detail: "At dinner, start with the vegetable and the meat, and save the potatoes or bread for last. Same plate, different order — it can meaningfully shrink the after-dinner rise." },
+        ],
+        movement: { title: "A 10-minute stroll after the biggest meal", detail: "A gentle walk within an hour after dinner helps her muscles soak up sugar from the meal. With her cane is fine — around the block or up and down the hallway both count. If the weather is bad, a few minutes of standing kitchen tidying works too." },
+        watch_on_sensor: [
+          "Time below 70 should stay under 1% — if it creeps up, tell her doctor promptly.",
+          "Watch the after-breakfast curve for two weeks to see if the new breakfast flattens it.",
+          "Time above 250 staying under 10% means she is within the safety target for her age.",
+        ],
+        doctor_questions: [
+          "I take glipizide and have had shaky spells — could it be causing low blood sugar?",
+          "What glucose range do you want me in at my age?",
+          "Should any of my medicines change timing now that I wear a sensor?",
+          "How often should we review my sensor report together?",
+          "Is there anything in my other medicines that raises my sugar?",
+        ],
+        red_flags: [
+          "Feeling shaky, sweaty, or confused — treat it as a low: 4 glucose tablets or half a glass of juice, then recheck in 15 minutes.",
+          "A sensor reading below 55, or below 70 that won't come up after treating.",
+          "Vomiting or unable to keep food down for more than a day.",
+          "New confusion, a fall, or fainting — call for help right away.",
+        ],
+        first_week: [
+          "Call the doctor's office about the shaky spells and the glipizide.",
+          "Add a protein to breakfast every morning.",
+          "Take the after-dinner stroll on at least four days.",
+        ],
+      };
+
+      /* ---------- State ---------- */
+
+      const SS_KEY = "glucose-plan-answers-v1";
+      const state = {
+        screen: "intro", // intro | step | loading | plan | error
+        stepIndex: 0,
+        answers: loadAnswers(),
+        plan: null,
+        planText: null,
+        errorKind: null,
+        loadingTimer: null,
+        libreError: null,
+        libreBusy: false,
+        libreEmail: "", // transient only; credentials are never persisted
+        librePass: "",
+      };
+      const DEMO = new URLSearchParams(location.search).has("demo");
+
+      function loadAnswers() {
+        try {
+          const raw = sessionStorage.getItem(SS_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (e) { /* private mode etc. */ }
+        return {};
+      }
+      function saveAnswers() {
+        try { sessionStorage.setItem(SS_KEY, JSON.stringify(state.answers)); } catch (e) { /* ignore */ }
+      }
+
+      /* ---------- Rendering helpers ---------- */
+
+      const app = document.getElementById("app");
+      function el(tag, attrs, children) {
+        const node = document.createElement(tag);
+        if (attrs) {
+          for (const [k, v] of Object.entries(attrs)) {
+            if (k === "class") node.className = v;
+            else if (k === "text") node.textContent = v;
+            else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+            else node.setAttribute(k, v);
+          }
+        }
+        for (const child of children || []) if (child) node.appendChild(child);
+        return node;
+      }
+      function setScreen(nodes, focusSelector) {
+        app.replaceChildren(...nodes);
+        window.scrollTo(0, 0);
+        if (focusSelector) {
+          const target = app.querySelector(focusSelector);
+          if (target) { target.setAttribute("tabindex", "-1"); target.focus({ preventScroll: true }); }
+        }
+      }
+
+      /* ---------- Screens ---------- */
+
+      function renderIntro() {
+        const points = [
+          "Answer a handful of questions about medicines, meals, and daily life. About five minutes, and it works best done together with family.",
+          "The answers are written into a simple plan: three food moves, one movement habit, what to watch on the sensor, and questions for the doctor.",
+          "Print it, stick it on the fridge, and bring it to the next appointment.",
+        ];
+        const card = el("div", { class: "card" }, [
+          el("h1", { text: "A simple glucose plan, made together" }),
+          el("p", { class: "sub", text: "For older adults with diabetes and the family who help them." }),
+          el("ul", { class: "intro-points" }, points.map((p, i) =>
+            el("li", null, [el("span", { class: "dot", text: String(i + 1) }), el("span", { text: p })])
+          )),
+          el("div", { class: "btn-row" }, [
+            el("button", { class: "btn btn-primary", text: "Start", onclick: () => { state.screen = "step"; state.stepIndex = 0; render(); } }),
+            hasAnyAnswer() ? el("button", { class: "btn btn-quiet", text: "Continue where we left off", onclick: () => { state.screen = "step"; state.stepIndex = lastTouchedStep(); render(); } }) : null,
+          ]),
+          el("p", { class: "smallprint", style: "margin-top:1.3rem", text: "This tool offers general wellness ideas to discuss with a doctor — it is not medical advice and never suggests medicine changes. Skip any question; nothing is required." }),
+        ]);
+        setScreen([card], "h1");
+      }
+
+      function hasAnyAnswer() { return Object.keys(state.answers).length > 0; }
+      function lastTouchedStep() {
+        for (let i = STEPS.length - 1; i >= 0; i--) {
+          for (const q of STEPS[i].questions) {
+            const keys = q.type === "numbers" ? q.fields.map((f) => f[0]) : [q.key];
+            if (keys.some((k) => state.answers[k] !== undefined && state.answers[k] !== "")) return i;
+          }
+        }
+        return 0;
+      }
+
+      function renderStep() {
+        const step = STEPS[state.stepIndex];
+        const progress = el("div", null, [
+          el("p", { class: "step-count", text: "Step " + (state.stepIndex + 1) + " of " + STEPS.length }),
+          el("div", { class: "progress", "aria-hidden": "true" },
+            STEPS.map((s, i) => el("div", { class: "seg" + (i <= state.stepIndex ? " done" : "") }))),
+        ]);
+
+        const qNodes = step.questions.map(renderQuestion);
+        const isLast = state.stepIndex === STEPS.length - 1;
+
+        const nav = el("div", { class: "btn-row no-print" }, [
+          el("button", {
+            class: "btn btn-quiet", text: "Back",
+            onclick: () => {
+              if (state.stepIndex === 0) { state.screen = "intro"; } else { state.stepIndex--; }
+              render();
+            },
+          }),
+          el("div", { class: "spacer" }),
+          el("button", {
+            class: "btn btn-primary", text: isLast ? "Create the plan" : "Next",
+            onclick: () => {
+              if (isLast) { submit(); } else { state.stepIndex++; render(); }
+            },
+          }),
+        ]);
+
+        const card = el("div", { class: "card" }, [
+          el("h2", { text: step.title }),
+          el("p", { class: "sub", text: step.intro }),
+          ...qNodes,
+          nav,
+        ]);
+        setScreen([progress, card], "h2");
+      }
+
+      function renderQuestion(q) {
+        if (q.type === "choice" || q.type === "multi") return renderChoices(q);
+        if (q.type === "numbers") return renderNumbers(q);
+        if (q.type === "libre") return renderLibre(q);
+        return renderTextInput(q);
+      }
+
+      /* ---------- Libre file import UI ---------- */
+
+      function applyLibreSummary(s, source) {
+        state.libreError = null;
+        if (Number.isFinite(s.pctAbove180)) state.answers.pct_above_180 = s.pctAbove180;
+        if (Number.isFinite(s.pctAbove250)) state.answers.pct_above_250 = s.pctAbove250;
+        if (Number.isFinite(s.pctBelow70)) state.answers.pct_below_70 = s.pctBelow70;
+        if (Number.isFinite(s.avg)) state.answers.avg_glucose = s.avg;
+        if (Array.isArray(s.flagged) && s.flagged.length) state.answers.high_times = s.flagged;
+        state.answers._libre_import = { from: s.from, to: s.to, days: s.days, readings: s.readings, source };
+        saveAnswers();
+        render();
+      }
+
+      function applyLibreText(text) {
+        state.libreError = null;
+        const r = parseLibreCsv(text);
+        if (!r.ok) {
+          state.libreError = r.error === "too_few"
+            ? "That file didn't have enough readings to work with."
+            : "That didn't look like a LibreView \u201cDownload glucose data\u201d file.";
+          render();
+          return;
+        }
+        applyLibreSummary(r, "file");
+      }
+
+      const LIBRE_ERRORS = {
+        bad_credentials: "That email or password didn't work. It's the same sign-in she uses in the Libre app.",
+        terms_needed: "Abbott is asking her account to accept updated terms. Open her Libre app or LibreView.com once, accept, then try again.",
+        rate_limited: "Abbott asked us to slow down \u2014 wait a minute and try again.",
+        no_data: "Signed in fine, but no sensor history came back on that account.",
+        generic: "Couldn't fetch from Abbott just now. The file option below works too.",
+      };
+
+      function fetchFromLibre() {
+        const email = state.libreEmail.trim();
+        const password = state.librePass;
+        if (!email || !password) {
+          state.libreError = "Enter her Libre account email and password first.";
+          render();
+          return;
+        }
+        state.libreBusy = true;
+        state.libreError = null;
+        render();
+        fetch("/api/libre-history", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }).then(async (res) => {
+          const data = await res.json().catch(() => ({}));
+          state.libreBusy = false;
+          if (res.ok && data.summary) {
+            state.libreEmail = "";
+            state.librePass = "";
+            applyLibreSummary(data.summary, "account");
+          } else {
+            state.libreError = LIBRE_ERRORS[data.error] || LIBRE_ERRORS.generic;
+            render();
+          }
+        }).catch(() => {
+          state.libreBusy = false;
+          state.libreError = LIBRE_ERRORS.generic;
+          render();
+        });
+      }
+
+      function renderLibre(q) {
+        const fs = el("fieldset", null, [el("legend", null, labelWithOptional(q))]);
+        if (q.hint) fs.appendChild(el("p", { class: "q-hint", text: q.hint }));
+
+        // Path 1: sign in with her Libre account (proxied to Abbott, never stored).
+        const emailInput = el("input", {
+          type: "email", placeholder: "Libre account email", autocomplete: "off",
+          oninput: (e) => { state.libreEmail = e.target.value; },
+        });
+        emailInput.value = state.libreEmail;
+        const passInput = el("input", {
+          type: "password", placeholder: "Libre account password", autocomplete: "off",
+          oninput: (e) => { state.librePass = e.target.value; },
+        });
+        passInput.value = state.librePass;
+        const fetchBtn = el("button", {
+          class: "btn btn-primary", type: "button",
+          text: state.libreBusy ? "Fetching\u2026" : "Fetch her numbers",
+          onclick: fetchFromLibre,
+        });
+        if (state.libreBusy) fetchBtn.disabled = true;
+        fs.appendChild(el("div", { class: "dropzone solid" }, [
+          el("span", { class: "dz-title", text: "Sign in with her Libre account" }),
+          el("span", { class: "dz-note", text: "The same email and password as her Libre app." }),
+          emailInput,
+          passInput,
+          fetchBtn,
+          el("span", { class: "dz-note", text: "The sign-in goes through this site straight to Abbott to fetch her report. It isn't saved anywhere." }),
+        ]));
+
+        fs.appendChild(el("div", { class: "dz-or", text: "\u2014 or \u2014" }));
+
+        // Path 2: the LibreView data file, parsed on-device.
+        const fileInput = el("input", {
+          type: "file", accept: ".csv,text/csv,text/plain", style: "display:none",
+          onchange: (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) file.text().then(applyLibreText, () => { state.libreError = "The file couldn't be read."; render(); });
+          },
+        });
+
+        const zone = el("div", { class: "dropzone" }, [
+          el("span", { class: "dz-title", text: "Add the LibreView data file" }),
+          el("span", { class: "dz-note", text: "From a computer: LibreView.com \u2192 \u201cDownload glucose data.\u201d The file is read on this device only." }),
+          el("button", {
+            class: "btn btn-secondary", type: "button", text: "Choose the file",
+            onclick: () => fileInput.click(),
+          }),
+          el("span", { class: "dz-note", text: "\u2026or drag the file onto this box." }),
+          DEMO ? el("button", {
+            class: "btn btn-quiet", type: "button", text: "Try a sample file",
+            onclick: () => applyLibreText(buildSampleCsv()),
+          }) : null,
+          fileInput,
+        ]);
+        zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("drag"); });
+        zone.addEventListener("dragleave", () => zone.classList.remove("drag"));
+        zone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          zone.classList.remove("drag");
+          const file = e.dataTransfer.files && e.dataTransfer.files[0];
+          if (file) file.text().then(applyLibreText, () => { state.libreError = "The file couldn't be read."; render(); });
+        });
+        fs.appendChild(zone);
+
+        const meta = state.answers._libre_import;
+        if (meta) {
+          const lead = meta.source === "account" ? "Fetched from her Libre account: " : "Filled in from her file: ";
+          fs.appendChild(el("div", { class: "filechip" }, [
+            el("span", { class: "ok-mark", text: "\u2713" }),
+            el("span", { text: lead + meta.from + " to " + meta.to + " \u00b7 " + meta.days + " days \u00b7 " + meta.readings.toLocaleString() + " readings. Adjust anything below that looks off." }),
+          ]));
+        }
+        if (state.libreError) {
+          fs.appendChild(el("div", { class: "file-error", role: "alert", text: state.libreError + " You can also type the numbers below by hand." }));
+        }
+        return fs;
+      }
+
+      function labelWithOptional(q) {
+        const parts = [document.createTextNode(q.label)];
+        if (q.optional) {
+          parts.push(document.createTextNode(" "));
+          parts.push(el("span", { class: "optional", text: "(optional)" }));
+        }
+        return parts;
+      }
+
+      function renderChoices(q) {
+        const multi = q.type === "multi";
+        const fs = el("fieldset", null, [el("legend", null, labelWithOptional(q))]);
+        if (q.hint) fs.appendChild(el("p", { class: "q-hint", text: q.hint }));
+        const list = el("div", { class: "choices" });
+
+        const isSelected = (value) => multi
+          ? Array.isArray(state.answers[q.key]) && state.answers[q.key].includes(value)
+          : state.answers[q.key] === value;
+
+        const refresh = () => {
+          list.querySelectorAll(".choice").forEach((node) => {
+            const input = node.querySelector("input");
+            node.classList.toggle("selected", isSelected(input.value));
+            input.checked = isSelected(input.value);
+          });
+        };
+
+        for (const [value, label] of q.options) {
+          const input = el("input", {
+            type: multi ? "checkbox" : "radio",
+            name: q.key, value,
+            onchange: () => {
+              if (multi) {
+                let cur = Array.isArray(state.answers[q.key]) ? [...state.answers[q.key]] : [];
+                if (cur.includes(value)) cur = cur.filter((v) => v !== value);
+                else {
+                  // "none"-style options are mutually exclusive with the rest.
+                  const exclusive = value === "none" || value === "unsure";
+                  cur = exclusive ? [value] : [...cur.filter((v) => v !== "none" && v !== "unsure"), value];
+                }
+                if (cur.length) state.answers[q.key] = cur; else delete state.answers[q.key];
+              } else {
+                if (state.answers[q.key] === value) delete state.answers[q.key];
+                else state.answers[q.key] = value;
+              }
+              saveAnswers();
+              refresh();
+            },
+          });
+          if (isSelected(value)) input.checked = true;
+          const item = el("label", { class: "choice" + (multi ? " multi" : "") + (isSelected(value) ? " selected" : "") }, [
+            input, el("span", { class: "mark", "aria-hidden": "true" }), el("span", { text: label }),
+          ]);
+          list.appendChild(item);
+        }
+        fs.appendChild(list);
+        return fs;
+      }
+
+      function renderTextInput(q) {
+        const wrap = el("fieldset", null, []);
+        const id = "f_" + q.key;
+        const label = el("label", { class: "q-label", for: id }, labelWithOptional(q));
+        wrap.appendChild(label);
+        if (q.hint) wrap.appendChild(el("p", { class: "q-hint", text: q.hint }));
+        const input = el(q.type === "textarea" ? "textarea" : "input", {
+          id, placeholder: q.placeholder || "",
+          oninput: (e) => {
+            const v = e.target.value;
+            if (v.trim()) state.answers[q.key] = v.slice(0, 600); else delete state.answers[q.key];
+            saveAnswers();
+          },
+        });
+        if (q.type !== "textarea") input.type = "text";
+        input.value = state.answers[q.key] || "";
+        wrap.appendChild(input);
+        return wrap;
+      }
+
+      function renderNumbers(q) {
+        const fs = el("fieldset", null, [el("legend", null, labelWithOptional(q))]);
+        if (q.hint) fs.appendChild(el("p", { class: "q-hint", text: q.hint }));
+        const grid = el("div", { class: "numgrid" });
+        for (const [key, label, unit] of q.fields) {
+          const id = "f_" + key;
+          const input = el("input", {
+            id, type: "number", inputmode: "decimal", min: "0", step: "any",
+            oninput: (e) => {
+              const v = e.target.value;
+              if (v === "") delete state.answers[key];
+              else state.answers[key] = parseFloat(v);
+              saveAnswers();
+            },
+          });
+          if (state.answers[key] !== undefined) input.value = state.answers[key];
+          grid.appendChild(el("div", { class: "numfield" }, [
+            el("label", { for: id, text: label }),
+            el("div", { class: "unitwrap" }, [input, el("span", { class: "unit", text: unit })]),
+          ]));
+        }
+        fs.appendChild(grid);
+        return fs;
+      }
+
+      /* ---------- Submit / loading / error ---------- */
+
+      function renderLoading() {
+        const status = el("p", { class: "status", role: "status", text: LOADING_LINES[0] });
+        let i = 0;
+        clearInterval(state.loadingTimer);
+        state.loadingTimer = setInterval(() => {
+          i = Math.min(i + 1, LOADING_LINES.length - 1);
+          status.textContent = LOADING_LINES[i];
+        }, 7000);
+        const card = el("div", { class: "card loading" }, [
+          el("div", { class: "spinner", "aria-hidden": "true" }),
+          status,
+          el("p", { class: "note", text: "Writing a plan usually takes about half a minute. Please keep this page open." }),
+        ]);
+        setScreen([card]);
+      }
+
+      async function submit() {
+        state.screen = "loading";
+        renderLoading();
+
+        if (DEMO) {
+          setTimeout(() => {
+            clearInterval(state.loadingTimer);
+            state.plan = DEMO_PLAN; state.planText = null; state.screen = "plan";
+            render();
+          }, 2500);
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/glucose-plan", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ answers: state.answers }),
+          });
+          const data = await res.json().catch(() => ({}));
+          clearInterval(state.loadingTimer);
+          if (res.ok && (data.plan || data.planText)) {
+            state.plan = data.plan || null;
+            state.planText = data.planText || null;
+            state.screen = "plan";
+          } else {
+            state.errorKind = data.error || "unknown";
+            state.screen = "error";
+          }
+        } catch (e) {
+          clearInterval(state.loadingTimer);
+          state.errorKind = "network";
+          state.screen = "error";
+        }
+        render();
+      }
+
+      function renderError() {
+        const messages = {
+          not_configured: "The connection to the plan-writing AI isn't set up on this site yet.",
+          empty_survey: "No answers were filled in yet — go back and answer at least a few questions.",
+          network: "The plan couldn't be created — the connection didn't go through.",
+          unknown: "The plan couldn't be created just now.",
+        };
+        const msg = messages[state.errorKind] || messages.unknown;
+        const card = el("div", { class: "card error-card", "aria-live": "polite" }, [
+          el("h2", { text: "That didn't work" }),
+          el("p", { class: "sub", style: "color:inherit", text: msg + " The answers are safe on this page." }),
+          el("div", { class: "btn-row" }, [
+            el("button", { class: "btn btn-primary", text: "Try again", onclick: submit }),
+            el("button", { class: "btn btn-secondary", text: "Copy answers for an AI assistant", onclick: copyPrompt }),
+            el("button", { class: "btn btn-quiet", text: "Back to the questions", onclick: () => { state.screen = "step"; render(); } }),
+          ]),
+          el("p", { class: "smallprint", style: "margin-top:1.1rem", text: "\u201cCopy answers\u201d puts the answers plus instructions on the clipboard, ready to paste into Claude or another AI assistant." }),
+        ]);
+        setScreen([card], "h2");
+      }
+
+      function answersAsLines() {
+        const lines = [];
+        for (const [key, spec] of Object.entries(LABELS)) {
+          const v = state.answers[key];
+          if (v === undefined || v === "" || v === null) continue;
+          if (spec.type === "multi" && Array.isArray(v)) {
+            const labels = v.map((x) => spec.options[x]).filter(Boolean);
+            if (labels.length) lines.push(spec.label + ": " + labels.join("; "));
+          } else if (spec.type === "choice") {
+            if (spec.options[v]) lines.push(spec.label + ": " + spec.options[v]);
+          } else {
+            lines.push(spec.label + ": " + String(v).slice(0, 600));
+          }
+        }
+        return lines;
+      }
+
+      function copyPrompt() {
+        const prompt = [
+          "Please write a gentle, plain-language glucose action plan for an older adult with diabetes, based on the survey answers below.",
+          "",
+          "Rules: never suggest starting, stopping, or changing any medicine or dose — turn medicine concerns into questions for their doctor. Never suggest food diaries, meal tracking, or extra fingerstick routines — assume no ongoing tracking beyond the sensor they already wear. Preventing low blood sugar matters more than trimming moderate highs at this age (sensor targets for older adults: over 50% of time in 70-180, under 10% above 250, under 1% below 70). If the numbers already meet those targets, lead with reassurance and ask the doctor about simplifying medicines rather than adding more. Write at a 6th-grade reading level, warm and respectful.",
+          "",
+          "Structure: a short honest overview; three food moves anchored to their actual meals; one movement habit matched to their ability; what to watch on their glucose sensor; 4-6 questions to bring to the doctor; when to call for help; and three small things to do this week.",
+          "",
+          "Survey answers:",
+          ...answersAsLines(),
+        ].join("\n");
+        navigator.clipboard.writeText(prompt).then(
+          () => alert("Copied. Paste it into Claude or another AI assistant."),
+          () => window.prompt("Copy the text below:", prompt)
+        );
+      }
+
+      /* ---------- Plan ---------- */
+
+      function needsLowSafetyBanner() {
+        const meds = state.answers.meds || [];
+        const riskyMeds = meds.includes("insulin") || meds.includes("sulfonylurea");
+        const lowSignals = state.answers.low_episodes === "yes" || state.answers.falls === "yes";
+        return riskyMeds && lowSignals;
+      }
+
+      function section(title, inner, extraClass) {
+        return el("div", { class: "card plan-section " + (extraClass || "") }, [
+          el("p", { class: "section-title", text: title }),
+          ...inner,
+        ]);
+      }
+      function plainList(items) {
+        return el("ul", { class: "plain" }, items.map((t) => el("li", { text: t })));
+      }
+
+      function renderPlan() {
+        const nodes = [];
+        const p = state.plan;
+        const name = (state.answers.first_name || "").trim();
+        const dateStr = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+
+        nodes.push(el("h1", { text: p && p.headline ? p.headline : name ? "A plan for " + name : "The glucose action plan" }));
+        nodes.push(el("p", { class: "sub", text: "Created " + dateStr + " · Bring it to the next doctor visit." }));
+
+        if (needsLowSafetyBanner()) {
+          const banner = el("div", { class: "banner" });
+          banner.appendChild(el("strong", { text: "Please mention this to the doctor soon: " }));
+          banner.appendChild(document.createTextNode(
+            "the answers describe possible low blood sugar spells alongside insulin or glipizide-type medicine. At this age, lows matter more than highs — a quick call this week is worth it."
+          ));
+          nodes.push(banner);
+        }
+
+        if (p) {
+          if (p.overview) nodes.push(section("The honest overview", [el("p", { text: p.overview })], "plan-overview"));
+          if (p.food_moves && p.food_moves.length) {
+            nodes.push(section("Three food moves", p.food_moves.map((m, i) =>
+              el("div", { class: "move-card" }, [
+                el("div", { class: "move-num", text: String(i + 1) }),
+                el("div", null, [el("h3", { text: m.title }), el("p", { text: m.detail })]),
+              ])
+            )));
+          }
+          if (p.movement) {
+            nodes.push(section("One movement habit", [
+              el("div", { class: "move-card" }, [
+                el("div", { class: "move-num", text: "+" }),
+                el("div", null, [el("h3", { text: p.movement.title }), el("p", { text: p.movement.detail })]),
+              ]),
+            ]));
+          }
+          if (p.watch_on_sensor && p.watch_on_sensor.length)
+            nodes.push(section("What to watch on the sensor", [plainList(p.watch_on_sensor)]));
+          if (p.doctor_questions && p.doctor_questions.length)
+            nodes.push(section("Questions for the next doctor visit", [plainList(p.doctor_questions)]));
+          if (p.red_flags && p.red_flags.length)
+            nodes.push(section("Call for help if\u2026", [plainList(p.red_flags)], "red-card"));
+          if (p.first_week && p.first_week.length)
+            nodes.push(section("Three things this week", [plainList(p.first_week)]));
+        } else if (state.planText) {
+          nodes.push(section("The plan", [el("p", { class: "plan-raw", text: state.planText })]));
+        }
+
+        nodes.push(el("p", { class: "plan-meta", text: "Written with AI assistance from the survey answers. It offers general wellness ideas, not medical advice — please review it with the care team before changing anything." }));
+
+        nodes.push(el("div", { class: "btn-row no-print" }, [
+          el("button", { class: "btn btn-primary", text: "Print the plan", onclick: () => window.print() }),
+          el("button", { class: "btn btn-secondary", text: "Edit the answers", onclick: () => { state.screen = "step"; state.stepIndex = 0; render(); } }),
+          el("button", {
+            class: "btn btn-quiet", text: "Start over",
+            onclick: () => {
+              if (confirm("Clear all the answers and start fresh?")) {
+                state.answers = {}; saveAnswers(); state.plan = null; state.planText = null;
+                state.screen = "intro"; render();
+              }
+            },
+          }),
+        ]));
+
+        setScreen(nodes, "h1");
+      }
+
+      /* ---------- Router ---------- */
+
+      function render() {
+        if (state.screen === "intro") renderIntro();
+        else if (state.screen === "step") renderStep();
+        else if (state.screen === "loading") renderLoading();
+        else if (state.screen === "plan") renderPlan();
+        else renderError();
+      }
+      render();
+    </script>
+  </body>
+</html>
