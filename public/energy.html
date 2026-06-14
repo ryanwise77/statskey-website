@@ -402,19 +402,19 @@
           <p class="section__intro">The public record won't stay this open forever, and on its own it was never going to be enough to win. But there's already enough free 3D seismic, well logs, and production to train a first real model and pressure-test the approach — which is exactly what we're drafting now.</p>
           <div class="metrics metrics--teal">
             <div class="metric">
-              <div class="metric__v">5 TB</div>
-              <h3>NAMSS Gulf of Mexico</h3>
-              <p>200 public-domain 3D surveys with direct SEG-Y links; 1,100+ across the EEZ.</p>
+              <div class="metric__v">Petabytes</div>
+              <h3>Open, and already vast</h3>
+              <p>Decades of 3D seismic, well logs, and production sit in public archives worldwide — petabyte-scale in aggregate, and growing every year.</p>
             </div>
             <div class="metric">
-              <div class="metric__v">230 TB</div>
-              <h3>UK NDR</h3>
-              <p>Seismic, logs, pressure, and core — free up to 3 TB every month.</p>
+              <div class="metric__v">Open</div>
+              <h3>Access was never the barrier</h3>
+              <p>Most of the record is public-domain or free to qualified users. What's scarce isn't the data — it's a model that reads all of it at once.</p>
             </div>
             <div class="metric">
-              <div class="metric__v">482</div>
-              <h3>NLOG 3D surveys</h3>
-              <p>Plus 24,174 2D lines across the Dutch shelf.</p>
+              <div class="metric__v">Multimodal</div>
+              <h3>Rock to barrels, in one record</h3>
+              <p>Not just seismic: logs, completions, pressure, and production histories — the full stack needed to tie the rock to what it produced.</p>
             </div>
           </div>
           <div class="banner">Open data is the on-ramp, not the moat. The edge compounds in the proprietary corpus the model builds from every new survey, well, and recorded outcome.</div>
@@ -522,7 +522,7 @@
             </div>
             <div class="statband__s">
               <div class="statband__v">Petabytes</div>
-              <div class="statband__k">Of public seismic, logs, and production — fragmented across USGS, BOEM, UK NDR, NLOG, and state regulators.</div>
+              <div class="statband__k">Of public seismic, logs, and production — scattered across national archives and regulators worldwide, in formats no one has fused at scale.</div>
             </div>
           </div>
           <p class="scale__note">The data is public, fragmented, and already deep enough to train on. The compute to learn from it — <strong>H100</strong>, <strong>H200</strong>, and whatever comes next — now exists and compounds every year. What's missing is the model that reads the record at once: majors point this at their own acreage, academia stops at the rock label, and no one has connected the public subsurface to where the oil is and how to drill it. That is the opening.</p>
@@ -558,49 +558,49 @@
       <section class="section" id="economics">
         <div class="shell">
           <div class="section__label">The economics</div>
-          <h2 class="section__title">What a globally generalizable model actually costs.</h2>
-          <p class="section__intro">Global generalization doesn't begin until the model trains across a representative, petabyte-scale slice of the record — anything smaller is a regional prototype. The data already sits at that scale: Norway's Diskos alone holds <strong>22 PB</strong> and Brazil's BDEP <strong>11.6 PB</strong> of public petroleum data. The gating cost was never licensing the rock — it's the compute and storage to learn from petabytes of it.</p>
+          <h2 class="section__title">Start small. The gains begin at the threshold.</h2>
+          <p class="section__intro">You don't need the whole earth on day one. The same model starts on a single region and scales outward — compute, storage, and curation all rising with the corpus. What matters isn't any one line item; it's the threshold. Below it, the model only learns local quirks. Past it, the same architecture starts resolving the larger, cross-basin patterns that actually transfer — and that is where the real gains appear.</p>
           <div class="metrics metrics--blue">
             <div class="metric">
-              <div class="metric__v">$1&ndash;5M</div>
-              <h3>Compute &middot; train and re-train</h3>
-              <p>One TGS-class run — a 1.8B-parameter model over 444,000 km² — is now ~15,000 GPU-hours, about 5 days on 128 H200s (≈$45k). A global model is larger and spans 50&ndash;250&times; the data, trained and ablated many times: a program in the hundreds of thousands to low-millions of GPU-hours.</p>
+              <div class="metric__v">Compute</div>
+              <h3>Cheap per run, real as a program</h3>
+              <p>A single training run of a billion-parameter seismic model is only days on a modest GPU cluster — tens of thousands of dollars. The cost grows not from one run but from training, ablating, and retraining as the model and the corpus scale toward the whole earth.</p>
             </div>
             <div class="metric">
-              <div class="metric__v">$70&ndash;280k</div>
-              <h3>Storage &middot; per petabyte, per year</h3>
-              <p>Keeping a petabyte online runs ~$7/TB&middot;mo on Wasabi or Backblaze up to ~$23/TB&middot;mo on S3 — and you hold it several times over: raw SEG-Y, analysis-ready cubes, and model checkpoints, co-located with the GPUs.</p>
+              <div class="metric__v">Storage</div>
+              <h3>Scales with the record itself</h3>
+              <p>Every region added is more to keep online — and held several times over, as raw data, analysis-ready cubes, and model checkpoints beside the GPUs. It becomes the dominant recurring cost as the corpus nears the threshold.</p>
             </div>
             <div class="metric">
-              <div class="metric__v">~$90k</div>
-              <h3>Data movement &middot; per petabyte</h3>
-              <p>The record is mostly free to license — but moving and converting it isn't. Egress runs up to ~$90k per petabyte off hyperscaler-hosted archives, before converting SEG-Y into analysis-ready cubes and tying seismic to wells and production outcomes.</p>
+              <div class="metric__v">Curation</div>
+              <h3>The work is wiring, not licensing</h3>
+              <p>The record is largely free to obtain. The real cost is converting raw files into analysis-ready form and tying every survey to the wells and production outcomes that make it something the model can be graded against.</p>
             </div>
           </div>
           <div class="ladder">
             <div class="rung">
-              <div class="rung__spend">$50&ndash;250k</div>
+              <div class="rung__spend">Start small</div>
               <div class="rung__body">
-                <div class="rung__buys">Tens of TB and a 1&ndash;2B-parameter model — today's seismic-FM scale, a handful of training runs.</div>
-                <div class="rung__use">Generalizes rock labels where data is dense. Not yet a call on where the oil is.</div>
+                <div class="rung__buys">One region — a few surveys fused with local wells and production. Modest compute, modest storage.</div>
+                <div class="rung__use">The model learns local structure. Useful, but it hasn't seen enough earth to generalize.</div>
               </div>
             </div>
             <div class="rung">
-              <div class="rung__spend">$0.5&ndash;2M<span class="rung__per">/yr</span></div>
+              <div class="rung__spend">Scale up</div>
               <div class="rung__body">
-                <div class="rung__buys">Hundreds of TB across several public archives, fused with logs, completions, and production.</div>
-                <div class="rung__use">The first production-calibrated ranking — credible basin by basin, not yet worldwide.</div>
+                <div class="rung__buys">More basins of contrasting geology, trained together as one growing corpus.</div>
+                <div class="rung__use">Patterns begin to rhyme across basins — the first sign the rock, not the location, is being learned.</div>
               </div>
             </div>
             <div class="rung rung--peak">
-              <div class="rung__spend">$5M+<span class="rung__per">/yr</span></div>
+              <div class="rung__spend">The threshold</div>
               <div class="rung__body">
-                <div class="rung__buys">Multiple petabytes from the global record; a multi-billion-parameter multimodal model, retrained continuously as outcomes arrive.</div>
-                <div class="rung__use">Reads basins it has never seen — the threshold where global generalization even becomes possible.</div>
+                <div class="rung__buys">Enough of the earth, at petabyte scale, seen at once — a multi-billion-parameter model retrained as outcomes arrive.</div>
+                <div class="rung__use">The larger patterns resolve and hold in basins it never trained on. This is where generalization — and the actual gains — begin.</div>
               </div>
             </div>
           </div>
-          <p class="scale__note">The single training run was never the barrier — at roughly $45k it's the cheapest part. The real cost of a globally generalizable model is holding petabytes online and iterating for years until it can predict a basin it never trained on. <strong>That's the bill that matters — and it's still small against the $7&ndash;200M each well it would re-rank.</strong></p>
+          <p class="scale__note">The threshold is the whole game. Below it, more data buys diminishing, local returns. Cross it, and the same model starts predicting rock it has never seen — and on a surface where each well is a <strong>$7&ndash;200M</strong> bet, even a small edge past that line is the entire return.</p>
         </div>
       </section>
 
