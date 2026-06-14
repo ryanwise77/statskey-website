@@ -510,6 +510,31 @@
         </div>
       </section>
 
+      <section class="section" id="drilling-lift">
+        <div class="shell">
+          <div class="section__label">How drilling improves</div>
+          <h2 class="section__title">The odds improve when the next well is ranked against every analog the model has seen.</h2>
+          <p class="section__intro">Today, drilling decisions usually combine seismic interpretation, nearby wells, type curves, geosteering models, completion assumptions, and expert judgment. That works, but it is still mostly local: what did nearby rock do, what does the interpreter see, and how much uncertainty can the team tolerate? The model adds a statistical layer underneath that workflow — a probability-ranked view of which rock is more likely to produce economic barrels and how drilling choices should change.</p>
+          <div class="metrics metrics--blue">
+            <div class="metric">
+              <div class="metric__v">~25&ndash;40%</div>
+              <h3>Exploration odds today</h3>
+              <p>Commercial exploration success often lives in this range, and frontier plays can be lower. The opportunity is to move capital toward the better-ranked end of that risk curve.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">60&ndash;80%</div>
+              <h3>Development is safer, not solved</h3>
+              <p>Known-field wells are more likely to find hydrocarbons. The harder question is economic quality: which location, interval, and completion earns the best return.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">Lift</div>
+              <h3>How accuracy gets measured</h3>
+              <p>Compare model-ranked wells against offset wells, play averages, and type curves — then measure hit rate, payout, avoided weak wells, and whether the lift holds in new areas.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="scale">
         <div class="shell">
           <div class="section__label">The scale</div>
@@ -546,7 +571,7 @@
             <div class="metric">
               <div class="metric__v">$15&ndash;25B+</div>
               <h3>Value pool, every year</h3>
-              <p>What a 3&ndash;5% better allocation across upstream capital is worth — before a single new barrel is found.</p>
+              <p>What a 3&ndash;5% better allocation across upstream capital is worth.</p>
             </div>
             <div class="metric">
               <div class="metric__v">$7&ndash;200M</div>
@@ -567,45 +592,45 @@
         <div class="shell">
           <div class="section__label">The economics</div>
           <h2 class="section__title">What each step actually costs — from first signal to global scale.</h2>
-          <p class="section__intro">Building this is a staged climb — and with today's GPU prices, the first steps are genuinely cheap. The early model does not have to be one-basin only: it can start as a small multi-basin sample, then prove whether its rankings help a driller choose better wells or an investor price risk better. The threshold where larger patterns become durable still sits at petabyte scale.</p>
+          <p class="section__intro">Building this is a staged climb — and with today's GPU prices, the first steps are genuinely cheap. The early model can start as a small multi-basin sample, then answer the central question: how much more accurately can it rank where economic barrels are likely to be, and how drilling choices should change?</p>
           <div class="ladder">
             <div class="rung">
               <div class="rung__spend">$2&ndash;10k</div>
               <div class="rung__body">
                 <div class="rung__buys"><strong>1 &middot; Prove the signal.</strong> ~0.5&ndash;5 TB across a small set of contrasting basins &middot; a 100&ndash;300M-parameter model &middot; a few hundred GPU-hours on spot.</div>
-                <div class="rung__use">Tests whether seismic-plus-well context improves rankings over simple offset-well baselines — buildable by one person.</div>
+                <div class="rung__use">Current readout: does seismic-plus-well context improve the ranking of held-out wells against simple baselines?</div>
               </div>
             </div>
             <div class="rung">
               <div class="rung__spend">$25&ndash;100k</div>
               <div class="rung__body">
                 <div class="rung__buys"><strong>2 &middot; Decision-grade pilot.</strong> ~10&ndash;50 TB across several basins or plays &middot; a ~1B-parameter model &middot; a few thousand GPU-hours.</div>
-                <div class="rung__use">Ranks wells, acreage, AFEs, or acquisition targets with uncertainty — useful if it changes even one drilling or investment decision.</div>
+                <div class="rung__use">Useful accuracy means better top-of-list choices: stronger drilling candidates, weaker prospects passed, and downside cases visible earlier.</div>
               </div>
             </div>
             <div class="rung">
               <div class="rung__spend">$250k&ndash;1M<span class="rung__per">/yr</span></div>
               <div class="rung__body">
                 <div class="rung__buys"><strong>3 &middot; Cross several basins.</strong> ~0.1&ndash;0.5 PB over 5&ndash;15 basins &middot; a 1&ndash;3B-parameter multimodal model &middot; tens of thousands of GPU-hours a year.</div>
-                <div class="rung__use">Measures lift against real outcomes: fewer low-probability wells funded, better downside cases, and better capital ranking basin by basin.</div>
+                <div class="rung__use">Measures lift against real outcomes: better economic-well hit rate, fewer low-return wells, and better capital ranking.</div>
               </div>
             </div>
             <div class="rung">
               <div class="rung__spend">$1&ndash;5M<span class="rung__per">/yr</span></div>
               <div class="rung__body">
                 <div class="rung__buys"><strong>4 &middot; A petabyte corpus.</strong> ~1 PB kept online several times over &middot; a 3&ndash;7B-parameter model retrained continuously &middot; hundreds of thousands of GPU-hours a year.</div>
-                <div class="rung__use">Generalizes to under-drilled acreage inside covered regions — the threshold.</div>
+                <div class="rung__use">Improvement target: the same ranking lift holds on under-drilled acreage, not just around dense offset-well control.</div>
               </div>
             </div>
             <div class="rung rung--peak">
               <div class="rung__spend">$5&ndash;20M<span class="rung__per">/yr</span></div>
               <div class="rung__body">
                 <div class="rung__buys"><strong>5 &middot; The global model.</strong> Several-to-tens of PB spanning the world's record &middot; a 7&ndash;70B-parameter multimodal model &middot; low-millions of GPU-hours a year.</div>
-                <div class="rung__use">Predicts where economic oil is and how to drill it — worldwide, in basins it never saw. The revolutionary edge.</div>
+                <div class="rung__use">The revolutionary edge: calibrated predictions of where economic oil is and how to drill it, holding up in basins the model never saw.</div>
               </div>
             </div>
           </div>
-          <p class="scale__note">The near-term ROI is not magic discovery. It is better decision support: rank drilling candidates, AFEs, acreage, recompletions, and acquisitions before money is committed. If the model improves the odds on even one <strong>$7&ndash;200M</strong> well or asset decision, the early research pays for itself.</p>
+          <p class="scale__note">The near-term ROI is not magic discovery. It is making the next drilling or investment decision more accurate: better odds of economic barrels, fewer low-return wells, and clearer downside before money is committed. If that improves even one <strong>$7&ndash;200M</strong> well or asset decision, the early research pays for itself.</p>
         </div>
       </section>
 
