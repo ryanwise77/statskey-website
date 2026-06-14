@@ -165,6 +165,22 @@
       .principle p { color: var(--muted); font-size: 15px; }
       .principle strong { color: var(--text); font-weight: 600; font-family: "Space Grotesk", sans-serif; letter-spacing: -0.01em; }
 
+      /* ---- technical method table ---- */
+      .method-table {
+        margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+        background: var(--panel);
+      }
+      .method-row { display: grid; grid-template-columns: 0.85fr 1.15fr 1fr; border-top: 1px solid var(--border-soft); }
+      .method-row:first-child { border-top: 0; }
+      .method-row--head { background: rgba(255, 255, 255, 0.03); }
+      .method-cell { padding: 18px 20px; border-left: 1px solid var(--border-soft); color: var(--muted); font-size: 14px; line-height: 1.55; }
+      .method-cell:first-child { border-left: 0; }
+      .method-cell--head {
+        font-family: "Space Grotesk", sans-serif; color: var(--faint); font-size: 11px;
+        text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+      }
+      .method-cell strong { display: block; color: var(--text); font-family: "Space Grotesk", sans-serif; font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
+
       /* ---- banner / pull quote ---- */
       .banner {
         margin-top: 28px; border: 1px solid var(--border-soft); border-left: 3px solid var(--teal);
@@ -244,6 +260,10 @@
       @media (max-width: 720px) {
         .cards, .metrics, .gapcards { grid-template-columns: 1fr; }
         .statband { grid-template-columns: repeat(2, 1fr); }
+        .method-row, .method-row--head { grid-template-columns: 1fr; }
+        .method-row--head { display: none; }
+        .method-cell { border-left: 0; border-top: 1px solid var(--border-soft); padding: 15px 18px; }
+        .method-cell:first-child { border-top: 0; }
         .rung { grid-template-columns: 1fr; gap: 8px; }
         .rung:hover { transform: none; }
         .hero { padding: 62px 0 52px; }
@@ -293,7 +313,7 @@
             </div>
             <div class="actions">
               <a class="btn btn--primary" href="mailto:isabel@statskeybiometrics.com">Get in touch</a>
-              <a class="btn btn--ghost" href="#approach">How it works</a>
+              <a class="btn btn--ghost" href="#approach">The method</a>
             </div>
           </div>
 
@@ -450,56 +470,43 @@
 
       <section class="section" id="approach">
         <div class="shell">
-          <div class="section__label">How it works</div>
-          <h2 class="section__title">From raw record to a number you can back.</h2>
-          <div class="cards">
-            <article class="card">
-              <div class="card__n">01</div>
-              <h3>Read the record</h3>
-              <p>Modern models turn decades of public 3D seismic, scanned well logs, and fragmented data into structured, machine-readable signal.</p>
-            </article>
-            <article class="card">
-              <div class="card__n">02</div>
-              <h3>Learn from outcomes</h3>
-              <p>Trained across basins on what was known before a well and what it actually produced — calibrated, with honest uncertainty.</p>
-            </article>
-            <article class="card">
-              <div class="card__n">03</div>
-              <h3>Underwrite with discipline</h3>
-              <p>Every prediction is validated on geography and time the model never saw, so a number is trustworthy enough to back with capital.</p>
-            </article>
-          </div>
-        </div>
-      </section>
+          <div class="section__label">How the model improves</div>
+          <h2 class="section__title">A disciplined analog engine, tested against outcomes.</h2>
+          <p class="section__intro">For a petroleum engineer, the model is best understood as an analog engine with memory, calibration, and uncertainty. A human compares a prospect to nearby wells, maps, logs, seismic character, completion history, and production analogs. The model does the same across thousands to millions of examples, then tests whether those similarities would have predicted the outcome before it happened.</p>
 
-      <section class="section" id="method">
-        <div class="shell">
-          <div class="section__label">The method</div>
-          <h2 class="section__title">A disciplined analog engine — with memory and calibration.</h2>
-          <p class="section__intro">A geologist compares a prospect to nearby wells, logs, seismic character, and production analogs. The model does the same across millions of examples — then tests whether those similarities would actually have predicted the outcome before it happened.</p>
-          <div class="principles">
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>Separate features from labels.</strong> Use only what was knowable before the bit — seismic, maps, offset logs, basin context — to predict what came after: IP, cumulative production, dry hole, payout. The model only gets credit for what it could have known at decision time.</p>
+          <div class="method-table" aria-label="Machine learning principles for subsurface underwriting">
+            <div class="method-row method-row--head">
+              <div class="method-cell method-cell--head">Principle</div>
+              <div class="method-cell method-cell--head">Plain-English meaning</div>
+              <div class="method-cell method-cell--head">Why it generalizes</div>
             </div>
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>Learn rock patterns, not just locations.</strong> Proximity is only the baseline. The edge is seismic texture, impedance-style attributes, log-derived rock properties, structure, facies, and completion context — because rock physics transfers across counties and leases where coordinates don't.</p>
+            <div class="method-row">
+              <div class="method-cell"><strong>Separate features from labels</strong></div>
+              <div class="method-cell">Use pre-drill evidence — seismic, maps, offset logs, and basin context — to predict later outcomes such as initial production, cumulative production, dry hole risk, and payout.</div>
+              <div class="method-cell">Prevents leakage. The model only gets credit for what would have been knowable at decision time.</div>
             </div>
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>Normalize by geology.</strong> Don't compare a Kansas IP to a Gulf Coast cumulative. Ask how good a well is for its own basin, play, and vintage — so the model learns relative quality across depositional systems and technology eras.</p>
+            <div class="method-row">
+              <div class="method-cell"><strong>Learn rock patterns, not just locations</strong></div>
+              <div class="method-cell">Proximity is only the baseline. The edge comes from seismic texture, impedance-style attributes, log-derived rock properties, structure, facies, pressure and fluid proxies, and completion context.</div>
+              <div class="method-cell">Rock physics transfers better than coordinates. Channels, carbonate buildups, fault shadows, and poor-quality reservoirs have patterns beyond one county or lease.</div>
             </div>
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>Hold out space and time.</strong> Train on older wells and other areas, then predict newer wells and whole regions the model never saw — the same conditions a real capital decision has to survive.</p>
+            <div class="method-row">
+              <div class="method-cell"><strong>Normalize by geology</strong></div>
+              <div class="method-cell">Do not compare a Kansas IP directly to a Gulf Coast cumulative barrel label. Compare how good each well is for its basin, play, and vintage.</div>
+              <div class="method-cell">Lets the model learn relative quality across different depositional systems, pressure regimes, and technology eras.</div>
             </div>
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>Update with outcomes.</strong> Every new well, recompletion, failure, and production history is another calibration point. The corpus compounds — the model learns which signals were real and which were noise.</p>
+            <div class="method-row">
+              <div class="method-cell"><strong>Hold out space and time</strong></div>
+              <div class="method-cell">Train on older wells or other areas, then predict newer wells or whole regions the model never saw.</div>
+              <div class="method-cell">Forces the model to survive the same conditions as a real capital decision.</div>
+            </div>
+            <div class="method-row">
+              <div class="method-cell"><strong>Update with outcomes</strong></div>
+              <div class="method-cell">Every new well, recompletion, failure, and production history becomes another calibration point.</div>
+              <div class="method-cell">The corpus compounds. Each decision teaches which signals were real and which were noise.</div>
             </div>
           </div>
-          <div class="banner banner--blue">The goal isn't perfect prediction. It's better ranking and better calibration — fewer low-probability wells funded, more high-probability intervals pursued, and more honest downside cases.</div>
+          <p class="scale__note">The practical goal is not perfect prediction. It is better ranking and better calibration: fewer low-probability wells funded, more high-probability intervals pursued, and more honest downside cases.</p>
         </div>
       </section>
 
