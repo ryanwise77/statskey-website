@@ -312,7 +312,7 @@
               <span class="pill">Generalizes to unseen basins</span>
             </div>
             <div class="actions">
-              <a class="btn btn--primary" href="mailto:isabel@statskeybiometrics.com">Get in touch</a>
+              <a class="btn btn--primary" href="mailto:ryanws@statskeybiometrics.com">Get in touch</a>
               <a class="btn btn--ghost" href="#approach">The method</a>
             </div>
           </div>
@@ -419,26 +419,26 @@
       <section class="section">
         <div class="shell">
           <div class="section__label">The starting fuel</div>
-          <h2 class="section__title">Enough open data to draft the first model — today.</h2>
-          <p class="section__intro">The public record won't stay this open forever, and on its own it was never going to be enough to win. But there's already enough free 3D seismic, well logs, and production to train a first real model and pressure-test the approach — which is exactly what we're drafting now.</p>
+          <h2 class="section__title">Enough accessible data to build an edge — today.</h2>
+          <p class="section__intro">The record is not perfectly open or complete. It is fragmented, uneven, and often hard to use. But there is already enough accessible 3D seismic, well logs, geology, and production history to train a first real model, test the approach, and start building a proprietary advantage from the outcomes it learns.</p>
           <div class="metrics metrics--teal">
             <div class="metric">
               <div class="metric__v">Petabytes</div>
-              <h3>Open, and already vast</h3>
-              <p>Decades of 3D seismic, well logs, and production sit in public archives worldwide — petabyte-scale in aggregate, and growing every year.</p>
+              <h3>Accessible, but fragmented</h3>
+              <p>Decades of 3D seismic, well logs, and production exist across public, semi-public, and commercial channels — large enough to start, but not pre-packaged.</p>
             </div>
             <div class="metric">
-              <div class="metric__v">Open</div>
-              <h3>Access was never the barrier</h3>
-              <p>Most of the record is public-domain or free to qualified users. What's scarce isn't the data — it's a model that reads all of it at once.</p>
+              <div class="metric__v">Messy</div>
+              <h3>The advantage is in the stitching</h3>
+              <p>The work is turning raw files, scanned logs, maps, well records, and production histories into one training record the model can actually learn from.</p>
             </div>
             <div class="metric">
-              <div class="metric__v">Multimodal</div>
-              <h3>Rock to barrels, in one record</h3>
-              <p>Not just seismic: logs, completions, pressure, and production histories — the full stack needed to tie the rock to what it produced.</p>
+              <div class="metric__v">Acquire</div>
+              <h3>Buy more data only when it earns it</h3>
+              <p>Well and production data can be added cheaply; seismic is the expensive piece. Start with accessible data, then license missing surveys or cleaned packages only where they improve the edge.</p>
             </div>
           </div>
-          <div class="banner">Open data is the on-ramp, not the moat. The edge compounds in the proprietary corpus the model builds from every new survey, well, and recorded outcome.</div>
+          <div class="banner">The accessible record is the starting point, not the moat. If more data is necessary, acquire it in stages: cheap well/log additions first, targeted existing seismic next, and broad commercial 3D only after the model proves the signal is worth scaling.</div>
         </div>
       </section>
 
@@ -471,42 +471,42 @@
       <section class="section" id="approach">
         <div class="shell">
           <div class="section__label">How the model improves</div>
-          <h2 class="section__title">A disciplined analog engine, tested against outcomes.</h2>
-          <p class="section__intro">For a petroleum engineer, the model is best understood as an analog engine with memory, calibration, and uncertainty. A human compares a prospect to nearby wells, maps, logs, seismic character, completion history, and production analogs. The model does the same across thousands to millions of examples, then tests whether those similarities would have predicted the outcome before it happened.</p>
+          <h2 class="section__title">Teach it what was known before drilling. Grade it on what happened after.</h2>
+          <p class="section__intro">The model learns the way an experienced geologist reasons, but at much larger scale. For each well, it looks at the evidence available before the decision — seismic shape, nearby wells, maps, logs, geology, and completion plan — then compares its prediction with what the well actually produced. Repeating that before-and-after test across enough rock is how it learns which signals travel and which were local noise.</p>
 
           <div class="method-table" aria-label="Machine learning principles for subsurface underwriting">
             <div class="method-row method-row--head">
-              <div class="method-cell method-cell--head">Principle</div>
-              <div class="method-cell method-cell--head">Plain-English meaning</div>
-              <div class="method-cell method-cell--head">Why it generalizes</div>
+              <div class="method-cell method-cell--head">Step</div>
+              <div class="method-cell method-cell--head">What it means</div>
+              <div class="method-cell method-cell--head">Why it matters</div>
             </div>
             <div class="method-row">
-              <div class="method-cell"><strong>Separate features from labels</strong></div>
-              <div class="method-cell">Use pre-drill evidence — seismic, maps, offset logs, and basin context — to predict later outcomes such as initial production, cumulative production, dry hole risk, and payout.</div>
-              <div class="method-cell">Prevents leakage. The model only gets credit for what would have been knowable at decision time.</div>
+              <div class="method-cell"><strong>Keep the test honest</strong></div>
+              <div class="method-cell">Only show the model what would have been known before the well was drilled: seismic, maps, nearby logs, and basin context.</div>
+              <div class="method-cell">Then grade it against what happened later: production, dry-hole risk, payout, and decline. It cannot cheat by seeing the answer first.</div>
             </div>
             <div class="method-row">
-              <div class="method-cell"><strong>Learn rock patterns, not just locations</strong></div>
-              <div class="method-cell">Proximity is only the baseline. The edge comes from seismic texture, impedance-style attributes, log-derived rock properties, structure, facies, pressure and fluid proxies, and completion context.</div>
-              <div class="method-cell">Rock physics transfers better than coordinates. Channels, carbonate buildups, fault shadows, and poor-quality reservoirs have patterns beyond one county or lease.</div>
+              <div class="method-cell"><strong>Learn the rock, not the address</strong></div>
+              <div class="method-cell">Nearby wells are a starting point, not the edge. The model looks for repeated shapes and textures in the seismic, plus log-derived rock quality, structure, pressure clues, and completion context.</div>
+              <div class="method-cell">A channel, carbonate buildup, fault shadow, or poor reservoir can show up in more than one county. Those patterns matter more than coordinates.</div>
             </div>
             <div class="method-row">
-              <div class="method-cell"><strong>Normalize by geology</strong></div>
-              <div class="method-cell">Do not compare a Kansas IP directly to a Gulf Coast cumulative barrel label. Compare how good each well is for its basin, play, and vintage.</div>
-              <div class="method-cell">Lets the model learn relative quality across different depositional systems, pressure regimes, and technology eras.</div>
+              <div class="method-cell"><strong>Compare like with like</strong></div>
+              <div class="method-cell">A good result in one basin may be ordinary in another. The model scores each well against its own play, geology, pressure regime, and drilling era.</div>
+              <div class="method-cell">That lets it learn relative quality instead of confusing different kinds of reservoirs, technologies, and time periods.</div>
             </div>
             <div class="method-row">
-              <div class="method-cell"><strong>Hold out space and time</strong></div>
-              <div class="method-cell">Train on older wells or other areas, then predict newer wells or whole regions the model never saw.</div>
-              <div class="method-cell">Forces the model to survive the same conditions as a real capital decision.</div>
+              <div class="method-cell"><strong>Make it predict the unseen</strong></div>
+              <div class="method-cell">Train on older wells or other areas, then ask it to predict newer wells and regions it never saw during training.</div>
+              <div class="method-cell">That is the closest test to a real capital decision: the model must work before the answer exists.</div>
             </div>
             <div class="method-row">
-              <div class="method-cell"><strong>Update with outcomes</strong></div>
-              <div class="method-cell">Every new well, recompletion, failure, and production history becomes another calibration point.</div>
-              <div class="method-cell">The corpus compounds. Each decision teaches which signals were real and which were noise.</div>
+              <div class="method-cell"><strong>Let every well teach it</strong></div>
+              <div class="method-cell">Each new well, recompletion, miss, and production history becomes another before-and-after lesson.</div>
+              <div class="method-cell">The corpus compounds. Over time, the model learns which visual signals were real and which merely looked persuasive.</div>
             </div>
           </div>
-          <p class="scale__note">The practical goal is not perfect prediction. It is better ranking and better calibration: fewer low-probability wells funded, more high-probability intervals pursued, and more honest downside cases.</p>
+          <p class="scale__note">The practical goal is not perfect prediction. It is a better ranking of choices: fewer low-probability wells funded, more high-probability intervals pursued, and downside cases that are visible before capital is spent.</p>
         </div>
       </section>
 
@@ -566,28 +566,28 @@
       <section class="section" id="economics">
         <div class="shell">
           <div class="section__label">The economics</div>
-          <h2 class="section__title">What each step actually costs — from one basin to the whole earth.</h2>
-          <p class="section__intro">Building this is a staged climb — and with today's GPU prices, the first steps are genuinely cheap. You can prove the signal for a few thousand dollars, then scale step by step toward a model of the whole earth. The threshold — where the larger, cross-basin patterns resolve and the gains turn real — sits at petabyte scale, and even that costs far less than the headline numbers suggest.</p>
+          <h2 class="section__title">What each step actually costs — from first signal to global scale.</h2>
+          <p class="section__intro">Building this is a staged climb — and with today's GPU prices, the first steps are genuinely cheap. The early model does not have to be one-basin only: it can start as a small multi-basin sample, then prove whether its rankings help a driller choose better wells or an investor price risk better. The threshold where larger patterns become durable still sits at petabyte scale.</p>
           <div class="ladder">
             <div class="rung">
               <div class="rung__spend">$2&ndash;10k</div>
               <div class="rung__body">
-                <div class="rung__buys"><strong>1 &middot; Prove the signal.</strong> ~0.5&ndash;5 TB from a few public surveys with local wells &middot; a 100&ndash;300M-parameter model &middot; a few hundred GPU-hours on spot.</div>
-                <div class="rung__use">Confirms the rock-to-production signal in one area — buildable by one person.</div>
+                <div class="rung__buys"><strong>1 &middot; Prove the signal.</strong> ~0.5&ndash;5 TB across a small set of contrasting basins &middot; a 100&ndash;300M-parameter model &middot; a few hundred GPU-hours on spot.</div>
+                <div class="rung__use">Tests whether seismic-plus-well context improves rankings over simple offset-well baselines — buildable by one person.</div>
               </div>
             </div>
             <div class="rung">
               <div class="rung__spend">$25&ndash;100k</div>
               <div class="rung__body">
-                <div class="rung__buys"><strong>2 &middot; A basin, end to end.</strong> ~10&ndash;50 TB across one basin &middot; a ~1B-parameter model &middot; a few thousand GPU-hours.</div>
-                <div class="rung__use">The first production-calibrated ranking inside a single basin.</div>
+                <div class="rung__buys"><strong>2 &middot; Decision-grade pilot.</strong> ~10&ndash;50 TB across several basins or plays &middot; a ~1B-parameter model &middot; a few thousand GPU-hours.</div>
+                <div class="rung__use">Ranks wells, acreage, AFEs, or acquisition targets with uncertainty — useful if it changes even one drilling or investment decision.</div>
               </div>
             </div>
             <div class="rung">
               <div class="rung__spend">$250k&ndash;1M<span class="rung__per">/yr</span></div>
               <div class="rung__body">
                 <div class="rung__buys"><strong>3 &middot; Cross several basins.</strong> ~0.1&ndash;0.5 PB over 5&ndash;15 basins &middot; a 1&ndash;3B-parameter multimodal model &middot; tens of thousands of GPU-hours a year.</div>
-                <div class="rung__use">Patterns transfer between basins — production-calibrated ranking, basin by basin.</div>
+                <div class="rung__use">Measures lift against real outcomes: fewer low-probability wells funded, better downside cases, and better capital ranking basin by basin.</div>
               </div>
             </div>
             <div class="rung">
@@ -605,7 +605,7 @@
               </div>
             </div>
           </div>
-          <p class="scale__note">Compute is the surprise: a small model trains in hundreds of GPU-hours, and even a frontier-scale one runs in the low-single-digit millions. What the top of the ladder really buys is petabytes kept online and the discipline to retrain for years — not an impossible compute bill. Against a decision surface where each well is a <strong>$7&ndash;200M</strong> bet, the whole climb is cheap for the edge it buys.</p>
+          <p class="scale__note">The near-term ROI is not magic discovery. It is better decision support: rank drilling candidates, AFEs, acreage, recompletions, and acquisitions before money is committed. If the model improves the odds on even one <strong>$7&ndash;200M</strong> well or asset decision, the early research pays for itself.</p>
         </div>
       </section>
 
@@ -630,7 +630,7 @@
           <div class="section__label">Contact</div>
           <h2>Early-stage, and building.</h2>
           <p>For partnership, data, or diligence inquiries.</p>
-          <a class="btn btn--primary" href="mailto:isabel@statskeybiometrics.com">isabel@statskeybiometrics.com</a>
+          <a class="btn btn--primary" href="mailto:ryanws@statskeybiometrics.com">ryanws@statskeybiometrics.com</a>
         </div>
       </section>
     </main>
