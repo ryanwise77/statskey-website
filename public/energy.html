@@ -217,6 +217,7 @@
       }
       .rung__per { font-size: 0.6em; -webkit-text-fill-color: var(--faint); color: var(--faint); }
       .rung__buys { color: var(--text); font-size: 14.5px; font-weight: 500; letter-spacing: -0.005em; }
+      .rung__buys strong { font-family: "Space Grotesk", sans-serif; font-weight: 600; color: var(--text); }
       .rung__use { color: var(--muted); font-size: 13.5px; margin-top: 5px; }
       .rung--peak { background: linear-gradient(150deg, rgba(48, 213, 200, 0.10), rgba(110, 142, 255, 0.06)); border-color: rgba(48, 213, 200, 0.32); }
       .rung--peak .rung__spend { background: linear-gradient(135deg, #57e1d4, #9b7cff); -webkit-background-clip: text; background-clip: text; }
@@ -558,49 +559,46 @@
       <section class="section" id="economics">
         <div class="shell">
           <div class="section__label">The economics</div>
-          <h2 class="section__title">Start small. The gains begin at the threshold.</h2>
-          <p class="section__intro">You don't need the whole earth on day one. The same model starts on a single region and scales outward — compute, storage, and curation all rising with the corpus. What matters isn't any one line item; it's the threshold. Below it, the model only learns local quirks. Past it, the same architecture starts resolving the larger, cross-basin patterns that actually transfer — and that is where the real gains appear.</p>
-          <div class="metrics metrics--blue">
-            <div class="metric">
-              <div class="metric__v">Compute</div>
-              <h3>Cheap per run, real as a program</h3>
-              <p>A single training run of a billion-parameter seismic model is only days on a modest GPU cluster — tens of thousands of dollars. The cost grows not from one run but from training, ablating, and retraining as the model and the corpus scale toward the whole earth.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">Storage</div>
-              <h3>Scales with the record itself</h3>
-              <p>Every region added is more to keep online — and held several times over, as raw data, analysis-ready cubes, and model checkpoints beside the GPUs. It becomes the dominant recurring cost as the corpus nears the threshold.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">Curation</div>
-              <h3>The work is wiring, not licensing</h3>
-              <p>The record is largely free to obtain. The real cost is converting raw files into analysis-ready form and tying every survey to the wells and production outcomes that make it something the model can be graded against.</p>
-            </div>
-          </div>
+          <h2 class="section__title">What each step actually costs — from one basin to the whole earth.</h2>
+          <p class="section__intro">Building this is a staged climb — and with today's GPU prices, the first steps are genuinely cheap. You can prove the signal for a few thousand dollars, then scale step by step toward a model of the whole earth. The threshold — where the larger, cross-basin patterns resolve and the gains turn real — sits at petabyte scale, and even that costs far less than the headline numbers suggest.</p>
           <div class="ladder">
             <div class="rung">
-              <div class="rung__spend">Start small</div>
+              <div class="rung__spend">$2&ndash;10k</div>
               <div class="rung__body">
-                <div class="rung__buys">One region — a few surveys fused with local wells and production. Modest compute, modest storage.</div>
-                <div class="rung__use">The model learns local structure. Useful, but it hasn't seen enough earth to generalize.</div>
+                <div class="rung__buys"><strong>1 &middot; Prove the signal.</strong> ~0.5&ndash;5 TB from a few public surveys with local wells &middot; a 100&ndash;300M-parameter model &middot; a few hundred GPU-hours on spot.</div>
+                <div class="rung__use">Confirms the rock-to-production signal in one area — buildable by one person.</div>
               </div>
             </div>
             <div class="rung">
-              <div class="rung__spend">Scale up</div>
+              <div class="rung__spend">$25&ndash;100k</div>
               <div class="rung__body">
-                <div class="rung__buys">More basins of contrasting geology, trained together as one growing corpus.</div>
-                <div class="rung__use">Patterns begin to rhyme across basins — the first sign the rock, not the location, is being learned.</div>
+                <div class="rung__buys"><strong>2 &middot; A basin, end to end.</strong> ~10&ndash;50 TB across one basin &middot; a ~1B-parameter model &middot; a few thousand GPU-hours.</div>
+                <div class="rung__use">The first production-calibrated ranking inside a single basin.</div>
+              </div>
+            </div>
+            <div class="rung">
+              <div class="rung__spend">$250k&ndash;1M<span class="rung__per">/yr</span></div>
+              <div class="rung__body">
+                <div class="rung__buys"><strong>3 &middot; Cross several basins.</strong> ~0.1&ndash;0.5 PB over 5&ndash;15 basins &middot; a 1&ndash;3B-parameter multimodal model &middot; tens of thousands of GPU-hours a year.</div>
+                <div class="rung__use">Patterns transfer between basins — production-calibrated ranking, basin by basin.</div>
+              </div>
+            </div>
+            <div class="rung">
+              <div class="rung__spend">$1&ndash;5M<span class="rung__per">/yr</span></div>
+              <div class="rung__body">
+                <div class="rung__buys"><strong>4 &middot; A petabyte corpus.</strong> ~1 PB kept online several times over &middot; a 3&ndash;7B-parameter model retrained continuously &middot; hundreds of thousands of GPU-hours a year.</div>
+                <div class="rung__use">Generalizes to under-drilled acreage inside covered regions — the threshold.</div>
               </div>
             </div>
             <div class="rung rung--peak">
-              <div class="rung__spend">The threshold</div>
+              <div class="rung__spend">$5&ndash;20M<span class="rung__per">/yr</span></div>
               <div class="rung__body">
-                <div class="rung__buys">Enough of the earth, at petabyte scale, seen at once — a multi-billion-parameter model retrained as outcomes arrive.</div>
-                <div class="rung__use">The larger patterns resolve and hold in basins it never trained on. This is where generalization — and the actual gains — begin.</div>
+                <div class="rung__buys"><strong>5 &middot; The global model.</strong> Several-to-tens of PB spanning the world's record &middot; a 7&ndash;70B-parameter multimodal model &middot; low-millions of GPU-hours a year.</div>
+                <div class="rung__use">Predicts where economic oil is and how to drill it — worldwide, in basins it never saw. The revolutionary edge.</div>
               </div>
             </div>
           </div>
-          <p class="scale__note">The threshold is the whole game. Below it, more data buys diminishing, local returns. Cross it, and the same model starts predicting rock it has never seen — and on a surface where each well is a <strong>$7&ndash;200M</strong> bet, even a small edge past that line is the entire return.</p>
+          <p class="scale__note">Compute is the surprise: a small model trains in hundreds of GPU-hours, and even a frontier-scale one runs in the low-single-digit millions. What the top of the ladder really buys is petabytes kept online and the discipline to retrain for years — not an impossible compute bill. Against a decision surface where each well is a <strong>$7&ndash;200M</strong> bet, the whole climb is cheap for the edge it buys.</p>
         </div>
       </section>
 
