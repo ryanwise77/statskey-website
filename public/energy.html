@@ -201,6 +201,26 @@
       .scale__note { margin-top: 22px; max-width: 780px; color: var(--muted); font-size: 15.5px; }
       .scale__note strong { color: var(--text); font-weight: 600; }
 
+      /* ---- spend ladder ---- */
+      .ladder { display: grid; gap: 12px; margin-top: 30px; }
+      .rung {
+        display: grid; grid-template-columns: 150px 1fr; gap: 22px; align-items: center;
+        padding: 18px 22px; border: 1px solid var(--border-soft); border-radius: 14px; background: var(--panel);
+        transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+      }
+      .rung:hover { border-color: rgba(110, 142, 255, 0.32); background: var(--panel-2); transform: translateX(3px); }
+      .rung__spend {
+        font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: clamp(19px, 2.3vw, 23px);
+        letter-spacing: -0.02em; line-height: 1.1; width: fit-content;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .rung__per { font-size: 0.6em; -webkit-text-fill-color: var(--faint); color: var(--faint); }
+      .rung__buys { color: var(--text); font-size: 14.5px; font-weight: 500; letter-spacing: -0.005em; }
+      .rung__use { color: var(--muted); font-size: 13.5px; margin-top: 5px; }
+      .rung--peak { background: linear-gradient(150deg, rgba(48, 213, 200, 0.10), rgba(110, 142, 255, 0.06)); border-color: rgba(48, 213, 200, 0.32); }
+      .rung--peak .rung__spend { background: linear-gradient(135deg, #57e1d4, #9b7cff); -webkit-background-clip: text; background-clip: text; }
+
       .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
       .vision__inner { max-width: 760px; }
       .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
@@ -223,6 +243,8 @@
       @media (max-width: 720px) {
         .cards, .metrics, .gapcards { grid-template-columns: 1fr; }
         .statband { grid-template-columns: repeat(2, 1fr); }
+        .rung { grid-template-columns: 1fr; gap: 8px; }
+        .rung:hover { transform: none; }
         .hero { padding: 62px 0 52px; }
         .section { padding: 48px 0; }
       }
@@ -398,6 +420,32 @@
         </div>
       </section>
 
+      <section class="section" id="why-now">
+        <div class="shell">
+          <div class="section__label">Why now</div>
+          <h2 class="section__title">The compute finally caught up to the rock.</h2>
+          <p class="section__intro">Since 2022, NVIDIA-class accelerated compute made it possible to process 3D seismic the way modern AI processes images and language — many passes over huge data, fast iteration, and reusable subsurface patterns instead of one-off interpretations.</p>
+          <div class="metrics metrics--teal">
+            <div class="metric">
+              <div class="metric__v">80GB</div>
+              <h3>H100 &middot; 2022</h3>
+              <p>HBM3 memory, the FP8 Transformer Engine, and NVLink scale-out. A small team can now rent the class of GPU that used to require a supermajor HPC budget.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">141GB</div>
+              <h3>H200 &middot; 2024</h3>
+              <p>HBM3e and higher bandwidth. For seismic, memory is everything: larger 3D windows, richer attributes, bigger batches, and multi-cube training.</p>
+            </div>
+            <div class="metric">
+              <div class="metric__v">$/hr</div>
+              <h3>Cloud economics</h3>
+              <p>Rent by the hour, push compact model outputs to an object lake, then spin the GPUs back down. No datacenter required to train on real 3D seismic.</p>
+            </div>
+          </div>
+          <div class="banner">Compute is what makes the free public corpus learnable — the data and the edge are still the rock.</div>
+        </div>
+      </section>
+
       <section class="section" id="approach">
         <div class="shell">
           <div class="section__label">How it works</div>
@@ -419,6 +467,37 @@
               <p>Every prediction is validated on geography and time the model never saw, so a number is trustworthy enough to back with capital.</p>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section class="section" id="method">
+        <div class="shell">
+          <div class="section__label">The method</div>
+          <h2 class="section__title">A disciplined analog engine — with memory and calibration.</h2>
+          <p class="section__intro">A geologist compares a prospect to nearby wells, logs, seismic character, and production analogs. The model does the same across millions of examples — then tests whether those similarities would actually have predicted the outcome before it happened.</p>
+          <div class="principles">
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>Separate features from labels.</strong> Use only what was knowable before the bit — seismic, maps, offset logs, basin context — to predict what came after: IP, cumulative production, dry hole, payout. The model only gets credit for what it could have known at decision time.</p>
+            </div>
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>Learn rock patterns, not just locations.</strong> Proximity is only the baseline. The edge is seismic texture, impedance-style attributes, log-derived rock properties, structure, facies, and completion context — because rock physics transfers across counties and leases where coordinates don't.</p>
+            </div>
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>Normalize by geology.</strong> Don't compare a Kansas IP to a Gulf Coast cumulative. Ask how good a well is for its own basin, play, and vintage — so the model learns relative quality across depositional systems and technology eras.</p>
+            </div>
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>Hold out space and time.</strong> Train on older wells and other areas, then predict newer wells and whole regions the model never saw — the same conditions a real capital decision has to survive.</p>
+            </div>
+            <div class="principle">
+              <span class="principle__dot" aria-hidden="true"></span>
+              <p><strong>Update with outcomes.</strong> Every new well, recompletion, failure, and production history is another calibration point. The corpus compounds — the model learns which signals were real and which were noise.</p>
+            </div>
+          </div>
+          <div class="banner banner--blue">The goal isn't perfect prediction. It's better ranking and better calibration — fewer low-probability wells funded, more high-probability intervals pursued, and more honest downside cases.</div>
         </div>
       </section>
 
@@ -472,6 +551,52 @@
             </div>
           </div>
           <div class="banner">Price the rock, and you price the industry.</div>
+        </div>
+      </section>
+
+      <section class="section" id="economics">
+        <div class="shell">
+          <div class="section__label">The economics</div>
+          <h2 class="section__title">Every level of spend buys a sharper prior.</h2>
+          <p class="section__intro">The question isn't whether better subsurface data improves decisions — Exxon, Chevron, TGS, SLB, and the seismic foundation-model wave all point the same way. It's what each level of spend can buy.</p>
+          <div class="ladder">
+            <div class="rung">
+              <div class="rung__spend">$500&ndash;2.5k</div>
+              <div class="rung__body">
+                <div class="rung__buys">A starter Gulf Coast set: 5&ndash;10 public 3D surveys as compact attributes, plus nearby production and well context.</div>
+                <div class="rung__use">Early screening and workflow validation in one target region.</div>
+              </div>
+            </div>
+            <div class="rung">
+              <div class="rung__spend">$5k&ndash;25k</div>
+              <div class="rung__body">
+                <div class="rung__buys">A basin-scale corpus: 50&ndash;100 surveys, public logs, completions, field production, and dry-hole vs. producing outcomes.</div>
+                <div class="rung__use">The first serious ranking layer for acreage, AFEs, recompletions, and acquisition screens.</div>
+              </div>
+            </div>
+            <div class="rung">
+              <div class="rung__spend">$25k&ndash;150k+</div>
+              <div class="rung__body">
+                <div class="rung__buys">Monster-file processing: 50&ndash;90GB cubes, larger 3D windows, richer attributes, H200 memory, ensembles, and seismic&ndash;log fusion.</div>
+                <div class="rung__use">Moves from simple attributes to features that change success-rate and recovery forecasts.</div>
+              </div>
+            </div>
+            <div class="rung">
+              <div class="rung__spend">$250k&ndash;2M<span class="rung__per">/yr</span></div>
+              <div class="rung__body">
+                <div class="rung__buys">A multi-basin industrial corpus: continuous ingestion of seismic, logs, completions, pressure, production, and economics.</div>
+                <div class="rung__use">A production underwriting platform across multiple basins and deal types.</div>
+              </div>
+            </div>
+            <div class="rung rung--peak">
+              <div class="rung__spend">$5M&ndash;25M+</div>
+              <div class="rung__body">
+                <div class="rung__buys">Petabyte-scale foundation-model training across global seismic volumes, logs, completions, and production outcomes.</div>
+                <div class="rung__use">A reusable global subsurface prior — knowledge of rock patterns before it ever sees a new asset.</div>
+              </div>
+            </div>
+          </div>
+          <p class="scale__note">The petabyte-scale version matters because it stops treating each field as an isolated interpretation project. Trained across many volumes, logs, and outcomes, it learns reusable priors — <strong>which seismic textures mean reservoir quality, which log signatures mean productive pay, and which completions merely disguised poor rock.</strong></p>
         </div>
       </section>
 
