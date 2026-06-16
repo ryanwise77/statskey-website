@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/glucose-plan.js": { "maxDuration": 60 },
-    "api/libre-history.js": { "maxDuration": 30 }
+    "api/libre-history.js": { "maxDuration": 30 },
+    "api/dietitian-lead.js": { "maxDuration": 15 }
   },
   "rewrites": [
     { "source": "/privacy", "destination": "/privacy.html" },
@@ -44,6 +45,8 @@
     { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
     { "source": "/energy", "destination": "/energy.html" },
     { "source": "/energy/", "destination": "/energy.html" },
+    { "source": "/for-dietitians", "destination": "/for-dietitians.html" },
+    { "source": "/for-dietitians/", "destination": "/for-dietitians.html" },
     { "source": "/glucose-plan", "destination": "/glucose-plan/index.html" },
     { "source": "/glucose-plan/", "destination": "/glucose-plan/index.html" },
     { "source": "/hardware", "destination": "/index.html" },

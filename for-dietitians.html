@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey for Dietitians | A tool your clients actually keep using</title>
+    <meta name="description" content="StatsKey turns a photo into macros plus 40+ nutrients, then connects CGM glucose, sleep, training, and symptoms — so your clients stay consistent between visits and you get clean, clinical-grade data. Request practitioner access." />
+    <meta property="og:title" content="StatsKey for Dietitians" />
+    <meta property="og:description" content="Give your clients a tool they'll actually keep using between visits — and get clean data instead of recall." />
+    <meta property="og:url" content="https://statskeybiometrics.com/for-dietitians" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      .lead-card { max-width: 660px; margin-inline: auto; }
+      .lead-form { display: grid; gap: 16px; }
+      .lead-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .lead-field { display: block; }
+      .lead-field > span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 13px; }
+      .lead-field .opt { color: var(--muted-2); }
+      .lead-input, .lead-select, .lead-textarea {
+        width: 100%; padding: 13px 15px; border: 1px solid var(--line); border-radius: 14px;
+        background: rgba(255, 255, 255, 0.035); color: var(--ink);
+        font-family: var(--font-sans); font-size: 15px; color-scheme: dark;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+      .lead-textarea { resize: vertical; min-height: 84px; }
+      .lead-input::placeholder, .lead-textarea::placeholder { color: var(--muted-2); }
+      .lead-input:focus, .lead-select:focus, .lead-textarea:focus {
+        outline: none; border-color: rgba(110, 142, 255, 0.55); background: rgba(255, 255, 255, 0.052);
+      }
+      .lead-consent { display: flex; gap: 11px; align-items: flex-start; color: var(--muted); font-size: 13px; line-height: 1.5; }
+      .lead-consent input { margin-top: 3px; accent-color: var(--blue); }
+      .lead-status { margin: 0; text-align: center; color: var(--muted); font-size: 13px; min-height: 18px; }
+      .lead-success { text-align: center; padding: 12px 0; }
+      .lead-success h3 { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -0.03em; }
+      .lead-success p { margin-top: 8px; color: var(--ink-2); font-size: 15px; }
+      .lead-hp { position: absolute; left: -9999px; height: 0; overflow: hidden; }
+      .fine-print { max-width: 660px; margin: 18px auto 0; text-align: center; color: var(--muted-2); font-size: 12px; line-height: 1.6; }
+      .fine-print a { color: var(--blue); }
+      @media (max-width: 620px) { .lead-row { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body class="antialiased">
+    <nav id="nav" class="site-nav">
+      <div class="site-nav__inner">
+        <a href="/" class="site-brand" aria-label="StatsKey home">
+          <span class="site-brand__mark"></span>
+          <span>StatsKey</span>
+        </a>
+        <div class="site-nav__links" aria-label="Primary navigation">
+          <a href="/#platform">Platform</a>
+          <a href="/#intelligence">Intelligence</a>
+          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">iOS app</a>
+          <a href="/app/login">Sign in</a>
+        </div>
+        <a class="site-nav__cta" href="#request">Request access</a>
+        <button id="mobile-menu-btn" class="site-menu-btn" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+      <div id="mobile-menu" class="site-mobile-menu hidden">
+        <a href="/#platform">Platform</a>
+        <a href="/#intelligence">Intelligence</a>
+        <a href="#request">Request access</a>
+        <a href="/app/login">Sign in</a>
+        <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero-section">
+        <div class="hero-orb hero-orb--blue"></div>
+        <div class="hero-orb hero-orb--data"></div>
+        <div class="page-shell hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow reveal">For nutrition professionals</div>
+            <h1 class="hero-title reveal d1">Give clients a tool they'll actually keep using.</h1>
+            <p class="hero-lede reveal d2">
+              StatsKey turns a photo into macros plus 40+ nutrients, then connects CGM glucose, sleep, training, and
+              symptoms into one private model — so your clients stay consistent between visits and you get clean,
+              clinical-grade data instead of recall.
+            </p>
+            <div class="hero-actions reveal d3">
+              <a class="button button--primary" href="#request">Request practitioner access</a>
+              <a class="button button--secondary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">View on the App Store</a>
+            </div>
+            <div class="hero-note reveal d3">
+              Free for your clients to start. Privacy-first — they own their data, and it is never sold. StatsKey is a
+              wellness tool, not a medical device.
+            </div>
+          </div>
+
+          <div class="command-card reveal d2" aria-label="A client's week, compiled in StatsKey">
+            <div class="command-card__top">
+              <div>
+                <div class="panel-label">Client model</div>
+                <div class="command-card__title">This week, compiled</div>
+              </div>
+              <span class="live-pill"><span></span> Between visits</span>
+            </div>
+            <div class="signal-grid" style="margin-top: 22px">
+              <div class="signal-card">
+                <span>Days recorded</span>
+                <strong>6/7</strong>
+                <em>kept it up</em>
+              </div>
+              <div class="signal-card">
+                <span>Glucose in range</span>
+                <strong>84%</strong>
+                <em>70–180 mg/dL</em>
+              </div>
+              <div class="signal-card">
+                <span>Protein, avg</span>
+                <strong>112g</strong>
+                <em>+8g to target</em>
+              </div>
+              <div class="signal-card">
+                <span>Sessions</span>
+                <strong>4</strong>
+                <em>fueled before each</em>
+              </div>
+            </div>
+            <div class="insight-strip">
+              <span class="insight-strip__dot"></span>
+              Higher-fiber dinners are tracking with flatter overnight glucose this week — worth reinforcing on your call.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statement -->
+      <section class="statement-section">
+        <div class="page-shell">
+          <p class="statement-text reveal">The work happens between visits. Now the data does too.</p>
+        </div>
+      </section>
+
+      <!-- What it adds -->
+      <section id="platform" class="section-block">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="eyebrow">The platform</div>
+            <h2>What it adds to your practice.</h2>
+            <p>Low-friction recording at the edge, a connected model underneath, and the patterns that make a session land.</p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card feature-card--large reveal reveal-stagger-1">
+              <div class="feature-icon">01</div>
+              <h3>Recording that survives week one.</h3>
+              <p>Photo, barcode, label, or a sentence — low-friction enough that clients keep it up between sessions, not just the day after they see you.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-2">
+              <div class="feature-icon">02</div>
+              <h3>See the week before the session.</h3>
+              <p>Walk in already knowing what happened, so the conversation starts specific instead of "how did it go?"</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-3">
+              <div class="feature-icon">03</div>
+              <h3>Clinical-grade reports.</h3>
+              <p>Nutrition, glucose, training, and symptoms in a clean format built for review and export.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-4">
+              <div class="feature-icon">04</div>
+              <h3>An assistant that echoes you.</h3>
+              <p>Flow answers from the client's own recorded data, reinforcing your guidance between visits rather than competing with it.</p>
+            </article>
+            <article class="feature-card feature-card--accent reveal reveal-stagger-5">
+              <div class="feature-icon">05</div>
+              <h3>Response, not just intake.</h3>
+              <p>Personal glycemic context turns the same meal, workout, or late dinner into a signal unique to each client.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Segment fit -->
+      <section class="section-block section-block--split">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="eyebrow">Built for your clients</div>
+            <h2>Made for how they actually struggle.</h2>
+            <p>The same connected model, tuned to the work you already do.</p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card reveal reveal-stagger-1">
+              <div class="feature-icon">Sports &amp; performance</div>
+              <h3>Fuel the work.</h3>
+              <p>Honest fueling logs, glycogen and protein timing, and how a meal moved glucose before a session — useful for performance and RED-S risk.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-2">
+              <div class="feature-icon">Gut &amp; IBS / FODMAP</div>
+              <h3>Find the pattern.</h3>
+              <p>Symptoms and Bristol-scale stool recorded alongside food, with a correlation engine that surfaces food-and-symptom patterns across reintroduction windows.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-3">
+              <div class="feature-icon">Diabetes &amp; metabolic</div>
+              <h3>See the response.</h3>
+              <p>Per-meal glucose mapped against what was actually eaten — time-in-range and post-meal patterns your clients can see, not just numbers.</p>
+            </article>
+          </div>
+
+          <div class="exercise-note reveal d2">
+            <div class="exercise-note__label">Why the data's worth trusting</div>
+            <p>
+              Four input methods — photo, barcode, label, and description — each used where it's most accurate. Foods are
+              identified first and enriched separately, so one flaky lookup can't corrupt a meal, and nutrients are
+              grounded in USDA data and official product labels. The more a client records, the sharper their personal
+              model gets.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Request form -->
+      <section id="request" class="section-block">
+        <div class="page-shell">
+          <div class="command-card lead-card reveal">
+            <div class="panel-label">Practitioner access</div>
+            <div class="command-card__title" style="margin-bottom: 6px">Request access</div>
+            <p style="color: var(--ink-2); font-size: 15px; line-height: 1.6; margin-bottom: 22px">
+              Tell us a little about your practice. We'll set you up personally — free — so you can try it with a client
+              or two and tell us where it helps.
+            </p>
+
+            <form id="lead-form" class="lead-form" novalidate>
+              <div class="lead-row">
+                <label class="lead-field">
+                  <span>Name</span>
+                  <input class="lead-input" name="name" type="text" required autocomplete="name" placeholder="Your name" />
+                </label>
+                <label class="lead-field">
+                  <span>Work email</span>
+                  <input class="lead-input" name="email" type="email" required autocomplete="email" placeholder="you@practice.com" />
+                </label>
+              </div>
+
+              <label class="lead-field">
+                <span>Practice or website <span class="opt">(optional)</span></span>
+                <input class="lead-input" name="practice" type="text" autocomplete="organization" placeholder="Practice name or URL" />
+              </label>
+
+              <div class="lead-row">
+                <label class="lead-field">
+                  <span>Your role</span>
+                  <select class="lead-select" name="role">
+                    <option value="RD/RDN">Registered Dietitian (RD/RDN)</option>
+                    <option value="CDCES">Diabetes specialist (CDCES)</option>
+                    <option value="CSSD">Sports dietitian (CSSD)</option>
+                    <option value="Nutritionist">Nutritionist</option>
+                    <option value="Coach">Health / nutrition coach</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </label>
+                <label class="lead-field">
+                  <span>Primary client focus</span>
+                  <select class="lead-select" name="focus">
+                    <option value="Sports/performance">Sports &amp; performance</option>
+                    <option value="Gut/IBS">Gut &amp; IBS / FODMAP</option>
+                    <option value="Diabetes/metabolic">Diabetes &amp; metabolic</option>
+                    <option value="Weight/wellness">Weight &amp; general wellness</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="lead-field">
+                <span>How would you use it with clients? <span class="opt">(optional)</span></span>
+                <textarea class="lead-textarea" name="message" rows="3" placeholder="A sentence or two helps us tailor your setup."></textarea>
+              </label>
+
+              <div class="lead-hp" aria-hidden="true">
+                <label>Company URL<input name="company_url" type="text" tabindex="-1" autocomplete="off" /></label>
+              </div>
+
+              <label class="lead-consent">
+                <input name="consent" type="checkbox" required />
+                <span>I'd like StatsKey to follow up about practitioner access. I can opt out anytime.</span>
+              </label>
+
+              <button type="submit" id="lead-submit" class="button button--primary" style="width: 100%">Request access</button>
+              <p id="lead-status" class="lead-status" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+
+          <p class="fine-print">
+            StatsKey is a wellness and self-tracking tool, not a medical device; it does not diagnose, treat, or replace
+            clinical judgment. Prefer email? Reach us at
+            <a href="mailto:ryanws@statskeybiometrics.com">ryanws@statskeybiometrics.com</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="cta-section">
+        <div class="page-shell cta-card reveal">
+          <div>
+            <div class="eyebrow">Start with one client</div>
+            <h2>Set up your first client, free.</h2>
+            <p>No commitment — try it with one or two clients and tell us where it helps and where it falls short.</p>
+          </div>
+          <div class="cta-card__actions">
+            <a class="button button--primary" href="#request">Request access</a>
+            <a class="button button--secondary" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="page-shell site-footer__inner">
+        <span>StatsKey &copy; 2026</span>
+        <div>
+          <a href="/">Home</a>
+          <a href="https://statskeybiometrics.com/support">Support</a>
+          <a href="https://statskeybiometrics.com/privacy">Privacy</a>
+          <a href="https://statskeybiometrics.com/terms">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var form = document.getElementById('lead-form');
+        if (!form) return;
+        var status = document.getElementById('lead-status');
+        var btn = document.getElementById('lead-submit');
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          status.textContent = '';
+          var data = Object.fromEntries(new FormData(form).entries());
+          if (!data.name || !data.email || !data.consent) {
+            status.textContent = 'Please add your name and email, and check the box.';
+            return;
+          }
+          btn.disabled = true;
+          var label = btn.textContent;
+          btn.textContent = 'Sending…';
+          try {
+            var res = await fetch('/api/dietitian-lead', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify(data),
+            });
+            if (!res.ok) throw new Error('bad_status');
+            form.innerHTML = '<div class="lead-success"><h3>Thanks — you\'re on the list.</h3><p>Ryan will reach out personally to get you set up, usually within a day or two.</p></div>';
+          } catch (err) {
+            btn.disabled = false;
+            btn.textContent = label;
+            status.textContent = 'Something went wrong — please email ryanws@statskeybiometrics.com and we\'ll set you up.';
+          }
+        });
+      })();
+    </script>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

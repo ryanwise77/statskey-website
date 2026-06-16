@@ -73,6 +73,7 @@ export default {
         terms: resolve(__dirname, 'terms.html'),
         webTerms: resolve(__dirname, 'web-terms.html'),
         support: resolve(__dirname, 'support.html'),
+        dietitians: resolve(__dirname, 'for-dietitians.html'),
         nikeRunClub: resolve(__dirname, 'nike-statskey-presentation.html'),
         app: resolve(__dirname, 'app.html'),
       },
