@@ -15,21 +15,29 @@
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-white/[0.04]" style="background:rgba(0,0,0,0.6)">
       <div class="max-w-[1080px] mx-auto px-8 h-11 flex items-center justify-between">
         <a href="/" class="font-display font-semibold text-[14px] tracking-[-0.01em] text-text-primary/80 hover:text-text-primary transition-colors">StatsKey</a>
-        <div class="hidden md:flex items-center gap-8 text-[12px] text-text-muted">
-          <a href="/#features" class="hover:text-text-primary transition-colors">Features</a>
-          <a href="/#intelligence" class="hover:text-text-primary transition-colors">Intelligence</a>
-          <a href="/app" class="hover:text-text-primary transition-colors">Sign in</a>
-          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="text-text-secondary hover:text-text-primary transition-colors">Get the app</a>
+        <div class="flex items-center gap-4">
+          <div class="hidden md:flex items-center gap-8 text-[12px] text-text-muted">
+            <a href="/#features" class="hover:text-text-primary transition-colors">Features</a>
+            <a href="/#intelligence" class="hover:text-text-primary transition-colors">Intelligence</a>
+            <a href="/app" class="hover:text-text-primary transition-colors">Sign in</a>
+            <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="text-text-secondary hover:text-text-primary transition-colors">Get the app</a>
+          </div>
+          <div id="lang-switch" role="group" aria-label="Language / Sprache / 言語 / Idioma">
+            <button type="button" data-lang="en">EN</button>
+            <button type="button" data-lang="de">DE</button>
+            <button type="button" data-lang="ja">日本語</button>
+            <button type="button" data-lang="pt">PT</button>
+          </div>
         </div>
       </div>
     </nav>
 
     <main class="pt-28 pb-24 px-8">
       <div class="max-w-[720px] mx-auto">
-        <h1 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.035em] mb-2">Support</h1>
-        <p class="text-text-muted text-[13px] mb-12">Last Updated: April 2, 2026</p>
+        <h1 id="lp-title" class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.035em] mb-2">Support</h1>
+        <p id="lp-date" class="text-text-muted text-[13px] mb-12">Last Updated: April 2, 2026</p>
 
-        <div class="space-y-12 text-[15px] text-text-secondary leading-relaxed">
+        <div id="lp-content" class="space-y-12 text-[15px] text-text-secondary leading-relaxed">
 
           <!-- Contact -->
           <section>
@@ -178,5 +186,6 @@
     </footer>
 
     <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/i18n/support.js"></script>
   </body>
 </html>

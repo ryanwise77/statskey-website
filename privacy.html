@@ -15,22 +15,30 @@
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-white/[0.04]" style="background:rgba(0,0,0,0.6)">
       <div class="max-w-[1080px] mx-auto px-8 h-11 flex items-center justify-between">
         <a href="/" class="font-display font-semibold text-[14px] tracking-[-0.01em] text-text-primary/80 hover:text-text-primary transition-colors">StatsKey</a>
-        <div class="hidden md:flex items-center gap-6 text-[12px] text-text-muted">
-          <a href="/#features" class="hover:text-text-primary transition-colors">Features</a>
-          <a href="/#intelligence" class="hover:text-text-primary transition-colors">Intelligence</a>
-          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="hover:text-text-primary transition-colors">iOS app</a>
-          <a href="/app/login" class="hover:text-text-primary transition-colors">Sign in</a>
-          <a href="/app/signup" class="inline-flex items-center justify-center h-7 px-3 rounded-full border border-white/15 bg-white/[0.06] text-text-primary hover:bg-white/[0.1] hover:border-white/25 transition-colors">Sign up</a>
+        <div class="flex items-center gap-4">
+          <div class="hidden md:flex items-center gap-6 text-[12px] text-text-muted">
+            <a href="/#features" class="hover:text-text-primary transition-colors">Features</a>
+            <a href="/#intelligence" class="hover:text-text-primary transition-colors">Intelligence</a>
+            <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="hover:text-text-primary transition-colors">iOS app</a>
+            <a href="/app/login" class="hover:text-text-primary transition-colors">Sign in</a>
+            <a href="/app/signup" class="inline-flex items-center justify-center h-7 px-3 rounded-full border border-white/15 bg-white/[0.06] text-text-primary hover:bg-white/[0.1] hover:border-white/25 transition-colors">Sign up</a>
+          </div>
+          <div id="lang-switch" role="group" aria-label="Language / Sprache / 言語 / Idioma">
+            <button type="button" data-lang="en">EN</button>
+            <button type="button" data-lang="de">DE</button>
+            <button type="button" data-lang="ja">日本語</button>
+            <button type="button" data-lang="pt">PT</button>
+          </div>
         </div>
       </div>
     </nav>
 
     <main class="pt-28 pb-24 px-8">
       <div class="max-w-[720px] mx-auto">
-        <h1 class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.035em] mb-2">Privacy Policy</h1>
-        <p class="text-text-muted text-[13px] mb-12">Effective Date: May 15, 2026</p>
+        <h1 id="lp-title" class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.035em] mb-2">Privacy Policy</h1>
+        <p id="lp-date" class="text-text-muted text-[13px] mb-12">Effective Date: June 10, 2026</p>
 
-        <div class="space-y-10 text-[15px] text-text-secondary leading-relaxed legal-content">
+        <div id="lp-content" class="space-y-10 text-[15px] text-text-secondary leading-relaxed legal-content">
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Introduction</h2>
@@ -57,7 +65,7 @@
               <li><strong class="text-text-primary">Health integrations:</strong> Reading and/or writing HealthKit data strictly to power health and fitness features you explicitly enable, including using Apple Health as an optional source for glucose and other historical records.</li>
               <li><strong class="text-text-primary">Analytics and quality:</strong> Understanding feature usage, diagnosing errors, and improving application performance.</li>
               <li><strong class="text-text-primary">Security and fraud prevention:</strong> Validating purchases, preventing abuse, and protecting user accounts.</li>
-              <li><strong class="text-text-primary">Communications:</strong> Sending service-related notices (e.g., subscription status changes, material changes to terms).</li>
+              <li><strong class="text-text-primary">Communications:</strong> Sending service-related notices (e.g., subscription status changes, material changes to terms). We may also send periodic product updates, tips, and promotional emails about StatsKey, and we will obtain your consent to do so where required by law. You can stop these at any time using the unsubscribe link included in every such email; service-related notices may still be sent as needed. HealthKit and glucose data are never used for marketing.</li>
             </ul>
           </section>
 
@@ -222,5 +230,6 @@
     </footer>
 
     <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/i18n/privacy.js"></script>
   </body>
 </html>
