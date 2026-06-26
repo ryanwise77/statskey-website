@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <base href="/esther-briefing/" />
-    <meta name="robots" content="noindex, nofollow" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/esther-briefing/" />
+    <meta name="robots" content="noindex, nofollow" />
     <title>StatsKey — Briefing for Dr. Esther F. Myers</title>
     <meta name="description" content="A private operating model of the body. Briefing prepared for Dr. Esther F. Myers, PhD, RDN, FAND." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -288,10 +288,37 @@
       .loop__a { display: flex; align-items: center; color: var(--cyan); font-size: 17px; }
       @media (max-width: 860px) { .loop { flex-direction: column; } .loop__a { transform: rotate(90deg); justify-content: center; } }
 
-      @media (max-width: 600px) {
+      @media (max-width: 640px) {
+        /* ===== Mobile legibility ===== */
         .chrome--left { left: 14px; } .chrome--right { right: 14px; }
+        .chrome { bottom: 15px; gap: 9px; }
         .hint { display: none; }
-        .slide { padding: 56px 0 88px; }
+        .slide { padding: 50px 0 74px; }
+        .slide__inner { max-height: calc(100vh - 124px); max-height: calc(100dvh - 124px); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .kicker { margin-bottom: 15px; }
+
+        /* Touch-friendly controls + edge zones clear the nav bar */
+        .ctrl { width: 44px; height: 40px; font-size: 17px; }
+        .edge { bottom: 78px; }
+
+        /* Bump dense prose so it reads on a phone */
+        .card p { font-size: 14px; }
+        .card.tight p { font-size: 13px; }
+        .callout p { font-size: 14px; }
+        .note { font-size: 13px; }
+        .src { font-size: 11.5px; line-height: 1.45; }
+        .shot-cap { font-size: 12.5px; }
+        .loop__s p { font-size: 12.5px; }
+        .horizon li { font-size: 13px; }
+
+        /* App visuals larger + tighter stacking */
+        .phone { width: min(80vw, 300px); }
+        .device { width: min(80vw, 300px) !important; }
+        .app-split { gap: 18px; } .callouts { gap: 13px; }
+
+        /* Comparison matrix scrolls horizontally instead of crushing 7 columns */
+        .matrix { min-width: 600px; font-size: 11.5px; }
+        .matrix th, .matrix td { padding: 7px 9px; }
       }
 
       /* Print / PDF export — one slide per 16:9 landscape page, dark design preserved */
@@ -321,7 +348,6 @@
         .shell { width: 90%; }
       }
     </style>
-      <style>#btnNotes,.hint{display:none!important}</style>
   </head>
   <body>
     <div class="ambient" aria-hidden="true">
@@ -531,7 +557,7 @@
                 <span class="chip">Firebase · ~50 Cloud Functions</span>
                 <span class="chip">Shipping v4.6.9</span>
               </div>
-              <p class="note mt14">From diary to decision system — record by photo, barcode, label or text. It even records <span class="em">bowel movements</span> on the Bristol scale, correlating gut signals with food, fiber &amp; glucose — a data point almost no consumer app captures.</p>
+              <p class="note mt14">From diary to decision system — record by photo, barcode, label or text. It even records <span class="em">bowel movements</span> on the Bristol scale, right alongside food, fiber &amp; glucose — a data point almost no consumer app captures, and one you can simply ask the AI about.</p>
             </div>
             <div>
               <div class="device" style="width:224px;"><video src="assets/app-demo.mp4" autoplay loop muted playsinline poster="assets/app-demo-poster.jpg"></video></div>
@@ -638,7 +664,7 @@
               <h2 class="title--sm" style="margin-bottom:4px;">The gut: huge, multifactorial — and the hardest thing to talk about.</h2>
               <div class="callout"><div class="h">A near-universal, hidden burden</div><p>~<b>40%</b> of people have a disorder of gut–brain interaction (&gt;1 in 4 US adults by Rome IV); ~<b>12%</b> have IBS. <b>70%</b> of them name food as a trigger — but every trigger list is <em>individual</em>.</p></div>
               <div class="callout"><div class="h">The hardest thing to say out loud</div><p>In a US study, <b>&gt;60%</b> of patients hid bowel-urgency symptoms from their own doctor out of embarrassment. The field even renamed "functional GI disorders" → "<b>gut–brain interaction</b>" to cut the stigma.</p></div>
-              <div class="callout"><div class="h">Where StatsKey fits</div><p>A judgment-free record that <b>auto-correlates</b> stool &amp; symptoms with food, fiber, glucose and training — surfacing the <b>n-of-1</b> patterns a recall-biased, hand-skimmed paper diary misses. No one has to say a word.</p></div>
+              <div class="callout"><div class="h">Where StatsKey fits</div><p>A judgment-free record that sits in the same timeline as food, fiber, glucose and training — so you can simply <b>ask the AI</b> "what's driving this?" and it reasons over <b>your own</b> data for the <b>n-of-1</b> pattern a recall-biased, hand-skimmed paper diary misses. No one has to say a word.</p></div>
               <p class="src">NIDDK (IBS ~12%) · Rome IV DGBI epidemiology (Sperber 2021; Palsson 2020) · Lilly CONFIDE (bowel-urgency underreporting) · FAST &amp; ESM diary studies on recall bias.</p>
             </div>
           </div>
@@ -735,7 +761,7 @@
           <div class="kicker" data-n="13">The micronutrient bet<b></b></div>
           <h2 class="title--sm">Filling the tail vendors leave blank — <span class="grad">and grading it.</span></h2>
           <p class="lede mt14">Most foods arrive with macros and a few minerals; the rest of the panel is empty. StatsKey uses AI to estimate the missing micronutrients — merged only into blank fields, every value badged and one-tap reversible, never overwriting a measured number.</p>
-          <div class="grid g3 mt28">
+          <div class="grid g2 mt28">
             <div class="card card--green">
               <div class="num" style="color:var(--green)">Where it's accurate</div>
               <p class="mt8">Measured in <b>our own eval harness</b> (internally, "the cage") against <b>USDA ground truth</b>: generics <b>0% median error / 83% coverage</b> via exact USDA pull, branded labels <b>~7% mean error</b>, the micronutrient tail <b>~8%</b>.</p>
@@ -743,10 +769,6 @@
             <div class="card card--amber">
               <div class="num" style="color:var(--amber)">Where it falls short</div>
               <p class="mt8">The fill <b>shipping today is the model's own knowledge</b>, not retrieved; the USDA-grounded cascade is built and eval-validated as the near-term default. Thresholds are coarse and male-referenced today.</p>
-            </div>
-            <div class="card">
-              <div class="num">The discipline</div>
-              <p class="mt8">Our own deficiency-verdict eval showed frontier models cost <b>~20×</b> more for <b>~one</b> flipped flag — so accuracy is bought where it changes a decision, not for show.</p>
             </div>
           </div>
           <p class="quote quote--sm mt28">What your guidance could shape: personalized inadequacy — <span class="grad">sex, age, life-stage, upper limits</span> — grounded enrichment by default, and closing the loop: estimated intake validated against biomarkers via the lab panels.</p>
@@ -1090,6 +1112,28 @@
           else if (k === "n" || k === "N") { toggleNotes(); }
           else if (k === "f" || k === "F") { toggleFs(); }
         });
+
+        // Touch-swipe navigation for phones/tablets.
+        (function () {
+          var sx = 0, sy = 0, st = 0, ok = false;
+          var deckEl = document.querySelector(".deck");
+          if (!deckEl) return;
+          deckEl.addEventListener("touchstart", function (e) {
+            if (e.touches.length !== 1) { ok = false; return; }
+            var t = e.touches[0];
+            sx = t.clientX; sy = t.clientY; st = Date.now();
+            // Let horizontal scrolling work inside the comparison matrix.
+            ok = !(e.target.closest && e.target.closest(".matrix"));
+          }, { passive: true });
+          deckEl.addEventListener("touchend", function (e) {
+            if (!ok || !e.changedTouches.length) return;
+            var t = e.changedTouches[0];
+            var dx = t.clientX - sx, dy = t.clientY - sy;
+            if (Date.now() - st < 700 && Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.7) {
+              if (dx < 0) next(); else prev();
+            }
+          }, { passive: true });
+        })();
 
         // Keep the kicker section number aligned with the slide counter.
         slides.forEach(function (s, idx) {
