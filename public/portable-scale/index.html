@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="StatsKey fold-out restaurant plate scale concept: a portable 5 kg scale with deployable plate supports, integrated display, and a build-ready procurement package.">
+  <meta name="theme-color" content="#071012">
+  <link rel="canonical" href="https://statskeybiometrics.com/portable-scale/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Fold-Out Plate Scale | StatsKey Hardware</title>
+  <style>
+    :root {
+      --bg: #071012;
+      --panel: rgba(255,255,255,.058);
+      --panel-strong: rgba(255,255,255,.09);
+      --line: rgba(255,255,255,.12);
+      --ink: #eef7f8;
+      --soft: #b8c9ce;
+      --muted: #7f9399;
+      --cyan: #30d5c8;
+      --blue: #4ea3ff;
+      --amber: #ffb020;
+      --green: #36d399;
+      --red: #ff5a52;
+      --font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: "Space Grotesk", Inter, sans-serif;
+      --mono: "JetBrains Mono", "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg); color: var(--ink); font-family: var(--font); scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(48,213,200,.18), transparent 28rem),
+        radial-gradient(circle at 88% 18%, rgba(78,163,255,.15), transparent 30rem),
+        linear-gradient(180deg, #071012 0%, #04090b 48%, #000 100%);
+      line-height: 1.5;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.88), transparent 76%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 30;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(7,16,18,.72);
+      backdrop-filter: blur(24px) saturate(160%);
+    }
+    .nav__inner { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand, .nav__links, .eyebrow, .button, .micro { font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; }
+    .brand__mark { width: 20px; height: 20px; border-radius: 8px; background: radial-gradient(circle at 70% 30%, #fff 0 8%, transparent 9%), linear-gradient(135deg, var(--cyan), var(--blue)); }
+    .nav__links { display: flex; align-items: center; gap: 22px; color: rgba(184,201,206,.78); font-size: 10px; font-weight: 600; }
+    .hero { min-height: 92svh; padding: 132px 0 80px; display: grid; align-items: center; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(380px, .82fr); gap: clamp(36px, 7vw, 86px); align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px; color: var(--cyan); font-size: 11px; font-weight: 700; }
+    .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 18px currentColor; }
+    h1, h2, h3 { font-family: var(--display); letter-spacing: -.055em; line-height: .94; }
+    h1 { max-width: 880px; font-size: clamp(3.2rem, 6.2vw, 6.4rem); font-weight: 700; }
+    h2 { max-width: 840px; font-size: clamp(2.3rem, 5vw, 4.9rem); font-weight: 700; }
+    h3 { font-size: clamp(1.4rem, 2vw, 2rem); }
+    .lede { max-width: 720px; margin-top: 26px; color: var(--soft); font-size: clamp(1.05rem, 1.55vw, 1.24rem); line-height: 1.65; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(255,255,255,.055); font-size: 10px; font-weight: 800; }
+    .button--primary { color: #03110e; border-color: transparent; background: linear-gradient(135deg, var(--cyan), #8fd3ff); }
+    .mock {
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    }
+    .scale-body {
+      position: relative;
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+    }
+    .plate {
+      position: absolute;
+      width: min(78%, 340px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.055);
+    }
+    .device {
+      position: relative;
+      width: min(72%, 310px);
+      height: 150px;
+      border-radius: 22px;
+      background: #05090b;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 28px 90px rgba(0,0,0,.34);
+    }
+    .screen {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 34px;
+      border-radius: 7px;
+      background: #021017;
+      border: 1px solid rgba(48,213,200,.28);
+    }
+    .arm { position: absolute; width: 125px; height: 7px; background: rgba(230,237,243,.82); border-radius: 999px; transform-origin: left center; }
+    .arm::after { content:""; position:absolute; right:-12px; top:50%; width:30px; height:30px; transform:translateY(-50%); border-radius:50%; background:#e3e7e5; }
+    .arm--nw { left: 52px; top: 50px; transform: rotate(215deg); }
+    .arm--ne { right: 52px; top: 50px; transform-origin: right center; transform: rotate(-35deg); }
+    .arm--sw { left: 52px; bottom: 50px; transform: rotate(145deg); }
+    .arm--se { right: 52px; bottom: 50px; transform-origin: right center; transform: rotate(35deg); }
+    .section { padding: clamp(72px, 9vw, 120px) 0; }
+    .section-head { display: grid; grid-template-columns: minmax(0, .9fr) minmax(320px, .62fr); gap: 36px; align-items: end; margin-bottom: 34px; }
+    .section-head p, .card p, .wide p { color: var(--soft); font-size: 15px; line-height: 1.72; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card, .wide {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.026));
+    }
+    .card-number { color: var(--cyan); font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+    .card h3 { margin-top: 30px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 24px; }
+    .stat { min-height: 142px; padding: 16px; border: 1px solid rgba(255,255,255,.08); border-radius: 20px; background: rgba(0,0,0,.2); }
+    .stat b { display: block; font-family: var(--display); font-size: 28px; line-height: 1; letter-spacing: -.04em; }
+    .stat span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .wide { margin-top: 14px; }
+    .list { display: grid; gap: 10px; margin-top: 14px; }
+    .list-row { display: grid; grid-template-columns: 220px 1fr; gap: 18px; padding: 14px 0; border-top: 1px solid rgba(255,255,255,.08); }
+    .list-row:first-child { border-top: 0; }
+    .list-row b { color: var(--cyan); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    .list-row span { color: var(--soft); }
+    footer { padding: 42px 0; color: var(--muted); border-top: 1px solid rgba(255,255,255,.08); }
+    @media (max-width: 860px) {
+      .nav__links { display: none; }
+      .hero-grid, .section-head, .grid, .stat-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 104px; }
+      .mock { padding: 12px; }
+      .list-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="shell nav__inner">
+      <a href="/" class="brand"><span class="brand__mark"></span><span>StatsKey</span></a>
+      <div class="nav__links">
+        <a href="/">Home</a>
+        <a href="/hardware">Hardware</a>
+        <a href="#specs">Specs</a>
+        <a href="#build">Build</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow">Hardware concept</div>
+          <h1>Fold-out plate scale for restaurant logging.</h1>
+          <p class="lede">A portable support-scale concept for weighing a full plate before and after eating. The design prioritizes portability, a real 5 kg platform-rated load cell, fold-out moving arms, integrated display, and a build-ready procurement path.</p>
+          <div class="actions">
+            <a class="button button--primary" href="#specs">View specs</a>
+            <a class="button" href="#build">Build package</a>
+          </div>
+        </div>
+        <div class="mock" aria-label="Fold-out scale visual">
+          <div class="scale-body">
+            <div class="plate"></div>
+            <div class="device">
+              <div class="arm arm--nw"></div>
+              <div class="arm arm--ne"></div>
+              <div class="arm arm--sw"></div>
+              <div class="arm arm--se"></div>
+              <div class="screen"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="specs" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Specs</div>
+            <h2>Portable first, honest about accuracy.</h2>
+          </div>
+          <p>The scale can display 0.01 g, but a restaurant table is not a lab bench. The honest target is 0.1 g to sub-gram behavior after calibration, with 0.01 g readability only under stable conditions.</p>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><b>5 kg</b><span>Gross load-cell capacity using a Zemic L6D-C3-5kg single-point platform cell.</span></div>
+          <div class="stat"><b>190 x 92 x 46 mm</b><span>Stowed fixed body, excluding feet and folded arm pad thickness.</span></div>
+          <div class="stat"><b>260 mm</b><span>Dinner-plate footprint used in the render and fit check.</span></div>
+          <div class="stat"><b>$242-$853</b><span>Current prototype procurement range, dominated by calibration-mass choice.</span></div>
+        </div>
+        <div class="wide">
+          <div class="list">
+            <div class="list-row"><b>Load path</b><span>Plate to four pads, fold-out aluminum arms, moving bridge, Zemic load cell, fixed aluminum plate, printed body and feet.</span></div>
+            <div class="list-row"><b>Electronics</b><span>Adafruit ESP32-S3 Reverse TFT Feather, SparkFun Qwiic Scale NAU7802, 500 mAh LiPo, Qwiic cable.</span></div>
+            <div class="list-row"><b>Calibration</b><span>5 kg F1/F2 or borrowed known mass; overload stops set around 0.8 mm to protect the load cell.</span></div>
+            <div class="list-row"><b>Use case</b><span>Center the dinner plate on the pads, tare the plate, add food gently, avoid pressing on the overhanging rim.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="build" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Build package</div>
+            <h2>SCAD, renders, STLs, and procurement are drafted.</h2>
+          </div>
+          <p>The current package lives in the Portable Scale workspace. The Excel workbook separates recommended buys, Amazon/local-friendly items, and custom fabrication tasks.</p>
+        </div>
+        <div class="grid">
+          <div class="card"><div class="card-number">01</div><h3>SCAD model</h3><p>Parametric OpenSCAD model with deployed, stowed, dinner-plate, load-path, and exploded render targets.</p></div>
+          <div class="card"><div class="card-number">02</div><h3>Procurement workbook</h3><p>Excel order package with Zemic load cell, electronics, aluminum, pivots, overload stops, feet, calibration, and Amazon/local guidance.</p></div>
+          <div class="card"><div class="card-number">03</div><h3>Fabrication notes</h3><p>Printed shell and lid; aluminum fixed plate, moving bridge, and four fold-out arms; delivered load cell used as drilling template.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">StatsKey hardware concept. Not legal-for-trade or medical equipment.</div>
+  </footer>
+</body>
+</html>
