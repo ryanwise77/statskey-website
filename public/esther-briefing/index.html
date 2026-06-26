@@ -288,37 +288,115 @@
       .loop__a { display: flex; align-items: center; color: var(--cyan); font-size: 17px; }
       @media (max-width: 860px) { .loop { flex-direction: column; } .loop__a { transform: rotate(90deg); justify-content: center; } }
 
-      @media (max-width: 640px) {
-        /* ===== Mobile legibility ===== */
-        .chrome--left { left: 14px; } .chrome--right { right: 14px; }
-        .chrome { bottom: 15px; gap: 9px; }
-        .hint { display: none; }
-        .slide { padding: 50px 0 74px; }
-        .slide__inner { max-height: calc(100vh - 124px); max-height: calc(100dvh - 124px); overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .kicker { margin-bottom: 15px; }
+      @media (max-width: 760px) {
+        /* ===== Mobile reading mode =====
+           Phones should read like a vertical briefing document, not a 16:9
+           stage. The print rules below still preserve the PDF slide layout. */
+        html, body { height: auto; min-height: 100%; overflow: auto; }
+        body { font-size: 17px; line-height: 1.55; }
+        .progress, .chrome, .edge, .notes-panel { display: none !important; }
+        .deck { height: auto; position: relative; width: 100%; }
+        .slide {
+          position: relative; inset: auto;
+          display: flex !important; opacity: 1 !important;
+          min-height: auto; padding: 44px 0 46px;
+          justify-content: flex-start; animation: none !important;
+          border-bottom: 1px solid var(--line);
+        }
+        .slide__inner {
+          width: min(100% - 30px, 560px);
+          max-height: none; overflow: visible;
+          scrollbar-width: auto;
+        }
+        .shell { width: min(100% - 30px, 560px); }
+        .slide:first-child { padding-top: 52px; }
+        .slide:last-child { border-bottom: 0; padding-bottom: 64px; }
 
-        /* Touch-friendly controls + edge zones clear the nav bar */
-        .ctrl { width: 44px; height: 40px; font-size: 17px; }
-        .edge { bottom: 78px; }
+        /* Actual phone-sized typography. */
+        .kicker {
+          margin-bottom: 14px; font-size: 12px; letter-spacing: 0.14em;
+          line-height: 1.45; flex-wrap: wrap;
+        }
+        .display { font-size: clamp(40px, 12vw, 56px); line-height: 1.02; }
+        .title { font-size: clamp(32px, 9.4vw, 44px); line-height: 1.06; }
+        .title--sm { font-size: clamp(28px, 8.2vw, 36px); line-height: 1.08; }
+        .lede { font-size: 18px; line-height: 1.55; max-width: none; }
+        .quote { font-size: 22px; line-height: 1.35; padding-left: 16px; }
+        .quote--sm { font-size: 18px; }
+        ul.clean { gap: 13px; }
+        ul.clean li, ul.clean.muted li {
+          font-size: 17px; line-height: 1.55; color: var(--ink-2);
+        }
+        .card { padding: 18px 18px 17px; border-radius: 18px; }
+        .card.tight { padding: 16px; }
+        .card .num, .label, .stat span, .horizon .tag, .loop__s .n2 {
+          font-size: 12px; letter-spacing: 0.11em;
+        }
+        .card h3 { font-size: 21px; }
+        .card.tight h3 { font-size: 18px; }
+        .card p, .card.tight p, .callout p, .loop__s p, .horizon li,
+        .stat em, .note, .src, .footnote {
+          font-size: 16px; line-height: 1.58;
+        }
+        .src, .footnote { font-size: 13px; letter-spacing: 0.02em; }
+        .callout { padding-left: 14px; }
+        .callout .h { font-size: 20px; line-height: 1.2; }
+        .pill, .chip { font-size: 13.5px; padding: 7px 11px; }
+        .shot-cap { font-size: 14px; line-height: 1.45; }
+        .meta-grid { grid-template-columns: 1fr; gap: 20px; }
 
-        /* Bump dense prose so it reads on a phone */
-        .card p { font-size: 14px; }
-        .card.tight p { font-size: 13px; }
-        .callout p { font-size: 14px; }
-        .note { font-size: 13px; }
-        .src { font-size: 11.5px; line-height: 1.45; }
-        .shot-cap { font-size: 12.5px; }
-        .loop__s p { font-size: 12.5px; }
-        .horizon li { font-size: 13px; }
+        /* Stack and enlarge app visuals instead of burying them below tiny text. */
+        .grid, .g2, .g3, .g4, .split, .app-split, .two-shots {
+          grid-template-columns: 1fr !important;
+        }
+        .split, .app-split, .two-shots { gap: 24px; }
+        .app-split { justify-items: stretch; }
+        .phone, .device {
+          width: min(92vw, 360px) !important;
+          justify-self: center; margin-left: auto; margin-right: auto;
+        }
+        .device { border-radius: 40px; padding: 8px; }
+        .device > img, .device > video { border-radius: 32px; }
+        .callouts { gap: 16px; }
+        .loop { flex-direction: column; }
+        .loop__a { transform: rotate(90deg); justify-content: center; }
 
-        /* App visuals larger + tighter stacking */
-        .phone { width: min(80vw, 300px); }
-        .device { width: min(80vw, 300px) !important; }
-        .app-split { gap: 18px; } .callouts { gap: 13px; }
-
-        /* Comparison matrix scrolls horizontally instead of crushing 7 columns */
-        .matrix { min-width: 600px; font-size: 11.5px; }
-        .matrix th, .matrix td { padding: 7px 9px; }
+        /* Mobile comparison matrix: cards, not a tiny scroll table. */
+        .matrix, .matrix thead, .matrix tbody, .matrix tr, .matrix td {
+          display: block; width: 100%;
+        }
+        .matrix { border-collapse: separate; border-spacing: 0; font-size: 16px; }
+        .matrix thead { display: none; }
+        .matrix tr {
+          border: 1px solid var(--line);
+          border-radius: 18px; padding: 14px 15px;
+          margin-bottom: 14px; background: var(--panel);
+        }
+        .matrix tr.us {
+          border-color: var(--line-strong);
+          background: linear-gradient(180deg, rgba(110,142,255,.13), rgba(110,142,255,.03));
+        }
+        .matrix th, .matrix td { border-bottom: 0; padding: 7px 0; }
+        .matrix td {
+          display: grid; grid-template-columns: 132px 1fr; gap: 12px;
+          font-size: 15px; line-height: 1.42; color: var(--ink-2);
+        }
+        .matrix td.app {
+          display: block; font-size: 21px; line-height: 1.15;
+          padding-bottom: 11px; margin-bottom: 7px;
+          border-bottom: 1px solid var(--line); white-space: normal;
+        }
+        .matrix td:not(.app)::before {
+          font-family: var(--mono); font-size: 10.5px; line-height: 1.25;
+          letter-spacing: .08em; text-transform: uppercase;
+          color: var(--muted-2); align-self: start;
+        }
+        .matrix td:nth-child(2)::before { content: "Micronutrients"; }
+        .matrix td:nth-child(3)::before { content: "Data source"; }
+        .matrix td:nth-child(4)::before { content: "Deficit detection"; }
+        .matrix td:nth-child(5)::before { content: "Grounded AI"; }
+        .matrix td:nth-child(6)::before { content: "Connected model"; }
+        .matrix td:nth-child(7)::before { content: "Blood / stool"; }
       }
 
       /* Print / PDF export — one slide per 16:9 landscape page, dark design preserved */
