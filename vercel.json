@@ -41,6 +41,8 @@
     { "source": "/nike-statskey-presentation.html", "destination": "/nike-statskey-presentation.html" },
     { "source": "/nike-run-club", "destination": "/nike-run-club/index.html" },
     { "source": "/nike-run-club/", "destination": "/nike-run-club/index.html" },
+    { "source": "/esther-briefing", "destination": "/esther-briefing/index.html" },
+    { "source": "/esther-briefing/", "destination": "/esther-briefing/index.html" },
     { "source": "/bid/alaska-dotpf", "destination": "/bid/alaska-dotpf.html" },
     { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
     { "source": "/energy", "destination": "/energy.html" },

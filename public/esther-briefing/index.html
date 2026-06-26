@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <base href="/esther-briefing/" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey — Briefing for Dr. Esther F. Myers</title>
+    <meta name="description" content="A private operating model of the body. Briefing prepared for Dr. Esther F. Myers, PhD, RDN, FAND." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #060b14;
+        --bg-2: #0a1019;
+        --panel: rgba(255, 255, 255, 0.028);
+        --panel-2: rgba(255, 255, 255, 0.05);
+        --line: rgba(157, 205, 255, 0.14);
+        --line-strong: rgba(120, 218, 255, 0.4);
+        --ink: #eef6ff;
+        --ink-2: #c6d4e6;
+        --muted: #8ea3b8;
+        --muted-2: #61748c;
+        --blue: #6e8eff;
+        --cyan: #5fd0ff;
+        --violet: #a78bfa;
+        --green: #46e2a3;
+        --amber: #ffce6b;
+        --font-display: "Space Grotesk", system-ui, sans-serif;
+        --font-sans: "Inter", system-ui, sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, monospace;
+        --accent: linear-gradient(135deg, var(--cyan), var(--blue) 55%, var(--violet));
+        --shell: min(1180px, 92vw);
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body { height: 100%; }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        overflow: hidden;
+      }
+
+      /* Ambient background */
+      .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+      .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; }
+      .orb--blue { width: 46vw; height: 46vw; top: -14vw; right: -10vw; background: radial-gradient(circle, rgba(110, 142, 255, 0.5), transparent 65%); }
+      .orb--cyan { width: 38vw; height: 38vw; bottom: -16vw; left: -10vw; background: radial-gradient(circle, rgba(95, 208, 255, 0.32), transparent 65%); }
+      .grid-tex {
+        position: absolute; inset: 0;
+        background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 64px 64px;
+        mask-image: radial-gradient(ellipse at 50% 40%, #000 0%, transparent 78%);
+        opacity: 0.35;
+      }
+
+      /* Progress + chrome */
+      .progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 30; background: rgba(255, 255, 255, 0.05); }
+      .progress__bar { height: 100%; width: 100%; transform-origin: left; transform: scaleX(0); background: var(--accent); transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+
+      .chrome { position: fixed; z-index: 30; bottom: 20px; display: flex; align-items: center; gap: 14px; }
+      .chrome--left { left: 26px; }
+      .chrome--right { right: 26px; }
+      .counter { font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; color: var(--muted); }
+      .brand-foot { display: flex; align-items: center; gap: 9px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); }
+      .brand-mark { width: 16px; height: 16px; border-radius: 5px; background: radial-gradient(circle at 70% 28%, #fff 0 14%, transparent 16%), var(--accent); box-shadow: 0 0 18px rgba(110, 142, 255, 0.5); }
+
+      .ctrl { appearance: none; border: 1px solid var(--line); background: var(--panel); color: var(--ink-2); width: 38px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: border-color 0.2s, background 0.2s, color 0.2s; }
+      .ctrl:hover { border-color: var(--line-strong); color: #fff; background: var(--panel-2); }
+      .ctrl[aria-pressed="true"] { border-color: var(--line-strong); color: var(--cyan); }
+      .hint { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; color: var(--muted-2); text-transform: uppercase; }
+      .hint b { color: var(--muted); font-weight: 500; }
+
+      /* Edge navigation */
+      .edge { position: fixed; top: 0; bottom: 64px; width: 13vw; max-width: 150px; z-index: 20; border: 0; background: transparent; cursor: pointer; }
+      .edge--left { left: 0; }
+      .edge--right { right: 0; }
+      .edge:focus-visible { outline: 2px solid var(--line-strong); }
+
+      /* Deck + slides */
+      .deck { position: relative; z-index: 10; height: 100vh; width: 100%; }
+      .slide {
+        position: absolute; inset: 0; display: none;
+        flex-direction: column; justify-content: center;
+        padding: 70px 0 96px;
+        opacity: 0;
+      }
+      .slide.is-active { display: flex; animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+      @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+      .shell { width: var(--shell); margin: 0 auto; }
+      .slide__inner { max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+      .slide__inner::-webkit-scrollbar { width: 6px; }
+      .slide__inner::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
+
+      .kicker { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); margin-bottom: 22px; }
+      .kicker::before { content: attr(data-n); color: var(--muted-2); }
+      .kicker b { width: 22px; height: 1px; background: var(--line-strong); display: inline-block; }
+
+      h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; line-height: 1.06; }
+      .display { font-size: clamp(34px, 5.4vw, 70px); font-weight: 700; letter-spacing: -0.035em; }
+      .title { font-size: clamp(28px, 3.9vw, 50px); line-height: 1.05; }
+      .title--sm { font-size: clamp(25px, 3.1vw, 39px); }
+      .lede { font-size: clamp(16px, 1.55vw, 21px); line-height: 1.5; color: var(--ink-2); font-weight: 300; max-width: 60ch; }
+      .grad { background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .em { color: #fff; font-weight: 500; }
+      p + p { margin-top: 14px; }
+      .mt8 { margin-top: 8px; } .mt14 { margin-top: 14px; } .mt20 { margin-top: 20px; } .mt28 { margin-top: 28px; } .mt36 { margin-top: 36px; }
+
+      .eyebrow-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+
+      /* Cards + grids */
+      .grid { display: grid; gap: 16px; }
+      .g2 { grid-template-columns: repeat(2, 1fr); }
+      .g3 { grid-template-columns: repeat(3, 1fr); }
+      .g4 { grid-template-columns: repeat(4, 1fr); }
+      .split { grid-template-columns: 1.05fr 0.95fr; align-items: start; gap: 34px; }
+      @media (max-width: 860px) { .g2, .g3, .g4, .split { grid-template-columns: 1fr; } }
+
+      .card { border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015)); border-radius: 18px; padding: 20px 20px 18px; }
+      .card--accent { border-color: var(--line-strong); background: linear-gradient(180deg, rgba(110, 142, 255, 0.1), rgba(95, 208, 255, 0.03)); }
+      .card--amber { border-color: rgba(255, 206, 107, 0.4); background: linear-gradient(180deg, rgba(255, 206, 107, 0.08), rgba(255, 206, 107, 0.01)); }
+      .card--green { border-color: rgba(70, 226, 163, 0.34); background: linear-gradient(180deg, rgba(70, 226, 163, 0.08), rgba(70, 226, 163, 0.01)); }
+      .card .num { font-family: var(--mono); font-size: 12px; color: var(--cyan); letter-spacing: 0.12em; }
+      .card h3 { font-size: 18px; margin: 12px 0 7px; letter-spacing: -0.01em; }
+      .card p { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+      .card.tight { padding: 16px 16px 14px; }
+      .card.tight h3 { font-size: 15.5px; margin: 9px 0 5px; }
+      .card.tight p { font-size: 12.5px; }
+
+      .label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted-2); }
+
+      /* Stat cards */
+      .stat { border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px 14px; background: var(--panel); }
+      .stat span { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); }
+      .stat strong { display: block; font-family: var(--font-display); font-size: clamp(26px, 3vw, 38px); font-weight: 700; letter-spacing: -0.03em; margin-top: 8px; line-height: 1; }
+      .stat em { display: block; font-style: normal; font-size: 12px; color: var(--muted); margin-top: 7px; }
+      .stat--green strong { color: var(--green); }
+      .stat--blue strong { color: var(--cyan); }
+
+      /* Lists */
+      ul.clean { list-style: none; display: grid; gap: 11px; }
+      ul.clean li { position: relative; padding-left: 22px; font-size: clamp(14px, 1.35vw, 16px); line-height: 1.5; color: var(--ink-2); }
+      ul.clean li::before { content: ""; position: absolute; left: 0; top: 9px; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
+      ul.clean.muted li { color: var(--muted); font-size: 13.5px; }
+      ul.clean li b { color: #fff; font-weight: 600; }
+
+      .quote { border-left: 2px solid var(--line-strong); padding: 4px 0 4px 20px; font-family: var(--font-display); font-weight: 400; font-size: clamp(17px, 2vw, 24px); line-height: 1.34; letter-spacing: -0.015em; color: #fff; }
+      .quote--sm { font-size: clamp(14px, 1.5vw, 18px); }
+      .src { font-family: var(--mono); font-size: 11px; color: var(--muted-2); letter-spacing: 0.05em; margin-top: 10px; }
+
+      .pill { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; font-size: 12.5px; color: var(--ink-2); background: var(--panel); }
+      .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+      .pills { display: flex; flex-wrap: wrap; gap: 9px; }
+      .chip { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; color: var(--muted); }
+
+      .divider { height: 1px; background: var(--line); margin: 22px 0; }
+      .note { font-size: 12.5px; color: var(--muted-2); line-height: 1.5; }
+      .note b { color: var(--muted); }
+
+      .axis-head { display: flex; align-items: center; gap: 10px; }
+      .axis-num { font-family: var(--mono); font-size: 11px; color: var(--bg); background: var(--accent); border-radius: 6px; padding: 3px 7px; font-weight: 600; }
+
+      .two-col-list { columns: 2; column-gap: 30px; }
+      @media (max-width: 860px) { .two-col-list { columns: 1; } }
+
+      .horizon { border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+      .horizon .tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
+      .horizon--now { border-color: rgba(70, 226, 163, 0.34); }
+      .horizon--now .tag { color: var(--green); }
+      .horizon--mid { border-color: var(--line-strong); }
+      .horizon--mid .tag { color: var(--cyan); }
+      .horizon--long { border-color: rgba(167, 139, 250, 0.4); }
+      .horizon--long .tag { color: var(--violet); }
+      .horizon h3 { font-size: 16px; }
+      .horizon ul { list-style: none; display: grid; gap: 8px; }
+      .horizon li { font-size: 12.8px; line-height: 1.45; color: var(--muted); padding-left: 16px; position: relative; }
+      .horizon li::before { content: ""; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+
+      /* Title slide */
+      .title-slide .brand-lockup { display: flex; align-items: center; gap: 14px; margin-bottom: 30px; }
+      .title-slide .brand-lockup .m { width: 30px; height: 30px; border-radius: 9px; background: radial-gradient(circle at 70% 28%, #fff 0 14%, transparent 16%), var(--accent); box-shadow: 0 0 26px rgba(110, 142, 255, 0.55); }
+      .title-slide .brand-lockup .w { font-family: var(--font-display); font-weight: 600; font-size: 19px; letter-spacing: 0.02em; }
+      .meta-grid { display: grid; grid-template-columns: repeat(3, auto); gap: 0 40px; margin-top: 38px; }
+      @media (max-width: 720px) { .meta-grid { grid-template-columns: 1fr 1fr; gap: 18px 30px; } }
+      .meta-grid div span { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 7px; }
+      .meta-grid div strong { font-weight: 500; font-size: 15px; color: var(--ink); }
+
+      /* Speaker notes */
+      .notes-panel { position: fixed; z-index: 40; left: 50%; bottom: 64px; transform: translateX(-50%) translateY(20px); width: min(940px, 92vw); max-height: 38vh; overflow-y: auto; background: rgba(8, 13, 22, 0.94); backdrop-filter: blur(14px); border: 1px solid var(--line-strong); border-radius: 16px; padding: 18px 22px; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+      .notes-panel.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+      .notes-panel .label { margin-bottom: 10px; color: var(--cyan); }
+      .speaker-notes-body { font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+      .speaker-notes-body ul { list-style: none; display: grid; gap: 7px; }
+      .speaker-notes-body li { padding-left: 16px; position: relative; }
+      .speaker-notes-body li::before { content: "▸"; position: absolute; left: 0; color: var(--muted-2); font-size: 11px; }
+      .speaker-notes-body b { color: #fff; }
+      .speaker-notes { display: none; }
+
+      .footnote { font-family: var(--mono); font-size: 10.5px; color: var(--muted-2); letter-spacing: 0.04em; }
+
+      /* ===== App mockups — faithful English recreations of the live screens ===== */
+      .app-split { display: grid; grid-template-columns: 258px 1fr; gap: 38px; align-items: center; }
+      @media (max-width: 860px) { .app-split { grid-template-columns: 1fr; justify-items: center; } }
+      .phone { width: 258px; flex: 0 0 auto; border-radius: 38px; padding: 8px; background: linear-gradient(160deg, #20283a, #0a0f1a); box-shadow: 0 26px 60px rgba(0,0,0,.55), inset 0 0 0 1.5px rgba(150,200,255,.18); }
+      .phone__screen { position: relative; background: #eef0f3; color: #0c1322; border-radius: 31px; overflow: hidden; height: 472px; display: flex; flex-direction: column; }
+      .phone__bar { display: flex; justify-content: space-between; align-items: center; padding: 7px 16px 2px; font-size: 10px; font-weight: 700; color: #0c1322; }
+      .phone__h { text-align: center; font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: #0c1322; padding: 1px 0 6px; }
+      .phone__body { flex: 1; overflow: hidden; padding: 2px 11px 8px; }
+      .phone__tabs { display: flex; justify-content: space-around; padding: 6px 4px 8px; border-top: 1px solid #dfe2e8; background: #f7f8fa; }
+      .phone__tab { font-size: 8px; color: #9aa3b2; display: flex; flex-direction: column; align-items: center; gap: 3px; font-weight: 600; }
+      .phone__tab .ic { width: 15px; height: 15px; border-radius: 4px; background: #cfd4dd; }
+      .phone__tab.on { color: #2f6df6; } .phone__tab.on .ic { background: #2f6df6; }
+
+      .nf { border: 1.5px solid #0c1322; border-radius: 7px; padding: 7px 9px 4px; background: #fff; }
+      .nf__t { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #0c1322; letter-spacing: -.02em; border-bottom: 7px solid #0c1322; padding-bottom: 1px; }
+      .nf__cal { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 4px solid #0c1322; padding: 2px 0; }
+      .nf__cal b { font-size: 22px; font-family: var(--font-display); font-weight: 700; }
+      .nf__r { display: flex; justify-content: space-between; font-size: 10px; border-bottom: 1px solid #d7dae0; padding: 2px 0; color: #0c1322; }
+      .nf__r.s { padding-left: 12px; color: #41495a; font-weight: 400; }
+      .nf__r b { font-weight: 700; }
+      .nf__micro { display: flex; justify-content: space-between; font-size: 9.5px; color: #41495a; padding: 1.5px 0; }
+      .nf__micro b { color: #0c1322; }
+
+      .mn { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+      .mn__c { background: #fff; border-radius: 11px; padding: 8px 9px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+      .mn__n { display: flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 600; color: #0c1322; }
+      .mn__d { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
+      .mn__v { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #0c1322; margin-top: 2px; }
+      .mn__s { font-size: 9px; margin-top: 1px; font-weight: 600; }
+      .d-def { background: #e5484d; } .s-def { color: #e5484d; }
+      .d-bel { background: #f5a623; } .s-bel { color: #c8730a; }
+      .d-opt { background: #27c07a; } .s-opt { color: #128a52; }
+
+      .gring { width: 138px; height: 138px; border-radius: 50%; margin: 8px auto 4px; background: conic-gradient(#27c07a 0 72%, #f5a623 72% 86%, #e6e8ec 86% 100%); display: flex; align-items: center; justify-content: center; }
+      .gring__in { width: 106px; height: 106px; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .gring__in b { font-size: 27px; font-family: var(--font-display); font-weight: 700; color: #0c1322; line-height: 1; }
+      .gring__in span { font-size: 9px; color: #6b7280; margin-top: 2px; }
+      .gstat { display: flex; justify-content: space-around; margin-top: 6px; }
+      .gstat div { text-align: center; }
+      .gstat b { display: block; font-family: var(--font-display); font-size: 15px; color: #0c1322; }
+      .gstat span { font-size: 8.5px; color: #6b7280; }
+
+      .mini-card { background: #fff; border-radius: 11px; padding: 9px 11px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 7px; }
+      .mini-card .lbl2 { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #8a93a6; font-weight: 700; }
+      .mini-card .big { font-family: var(--font-display); font-weight: 700; font-size: 19px; color: #0c1322; }
+
+      .callouts { display: grid; gap: 15px; }
+      .callout { border-left: 2px solid var(--line-strong); padding-left: 15px; }
+      .callout .h { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #fff; letter-spacing: -.01em; }
+      .callout p { font-size: 13px; color: var(--muted); line-height: 1.48; margin-top: 4px; }
+      .callout p b { color: var(--ink-2); font-weight: 600; }
+
+      /* Real screenshots / screen recording in a device bezel */
+      .device { width: 230px; border-radius: 36px; padding: 7px; background: linear-gradient(160deg, #20283a, #0a0f1a); box-shadow: 0 26px 60px rgba(0,0,0,.55), inset 0 0 0 1.5px rgba(150,200,255,.18); margin: 0 auto; }
+      .device > img, .device > video { display: block; width: 100%; border-radius: 30px; }
+      .shot-cap { text-align: center; font-size: 11.5px; color: var(--muted); margin-top: 11px; letter-spacing: .02em; }
+      .two-shots { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; max-width: 540px; margin: 0 auto; align-items: start; }
+      @media (max-width: 860px) { .two-shots { grid-template-columns: 1fr; } }
+
+      /* ===== Comparison matrix ===== */
+      .matrix { width: 100%; border-collapse: collapse; font-size: 12px; }
+      .matrix th, .matrix td { text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      .matrix th { font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-2); font-weight: 500; }
+      .matrix td { color: var(--ink-2); }
+      .matrix td.app { font-family: var(--font-display); font-weight: 600; color: var(--ink); font-size: 12.5px; white-space: nowrap; }
+      .matrix tr.us { background: linear-gradient(90deg, rgba(110,142,255,.13), transparent 80%); }
+      .matrix tr.us td.app { color: var(--cyan); }
+      .matrix .yes { color: var(--green); font-weight: 600; }
+      .matrix .no { color: var(--muted-2); }
+      .matrix .mid { color: var(--amber); }
+
+      /* ===== Longitudinal loop ===== */
+      .loop { display: flex; align-items: stretch; gap: 9px; }
+      .loop__s { flex: 1; border: 1px solid var(--line); border-radius: 14px; padding: 13px 13px 12px; background: var(--panel); }
+      .loop__s.hl { border-color: var(--line-strong); background: linear-gradient(180deg, rgba(95,208,255,.08), rgba(110,142,255,.02)); }
+      .loop__s .n2 { font-family: var(--mono); font-size: 10px; color: var(--cyan); letter-spacing: .1em; }
+      .loop__s h4 { font-family: var(--font-display); font-size: 14.5px; margin: 7px 0 5px; color: var(--ink); }
+      .loop__s p { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+      .loop__a { display: flex; align-items: center; color: var(--cyan); font-size: 17px; }
+      @media (max-width: 860px) { .loop { flex-direction: column; } .loop__a { transform: rotate(90deg); justify-content: center; } }
+
+      @media (max-width: 600px) {
+        .chrome--left { left: 14px; } .chrome--right { right: 14px; }
+        .hint { display: none; }
+        .slide { padding: 56px 0 88px; }
+      }
+
+      /* Print / PDF export — one slide per 16:9 landscape page, dark design preserved */
+      @media print {
+        @page { size: 13.333in 7.5in; margin: 0; }
+        html, body {
+          overflow: visible;
+          background: #060b14 !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .ambient { display: block !important; position: absolute; }
+        .orb { opacity: 0.32; }
+        .chrome, .edge, .progress, .notes-panel { display: none !important; }
+        .deck { height: auto; position: static; }
+        .slide {
+          position: relative; inset: auto;
+          display: flex !important; opacity: 1 !important;
+          width: 13.333in; height: 7.5in;
+          padding: 0.46in 0; margin: 0;
+          overflow: hidden; animation: none;
+          page-break-after: always; break-after: page;
+          page-break-inside: avoid; break-inside: avoid;
+        }
+        .slide:last-child { page-break-after: auto; break-after: auto; }
+        .slide__inner { max-height: none; overflow: visible; }
+        .shell { width: 90%; }
+      }
+    </style>
+      <style>#btnNotes,.hint{display:none!important}</style>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true">
+      <div class="grid-tex"></div>
+      <div class="orb orb--blue"></div>
+      <div class="orb orb--cyan"></div>
+    </div>
+
+    <div class="progress"><div class="progress__bar" id="bar"></div></div>
+
+    <button class="edge edge--left" id="prevEdge" aria-label="Previous slide"></button>
+    <button class="edge edge--right" id="nextEdge" aria-label="Next slide"></button>
+
+    <main class="deck" id="deck">
+      <!-- 1 — TITLE -->
+      <section class="slide is-active title-slide">
+        <div class="shell">
+          <div class="brand-lockup">
+            <span class="m"></span><span class="w">StatsKey</span>
+          </div>
+          <div class="kicker" data-n="">Confidential briefing<b></b></div>
+          <h1 class="display">A private operating <br />model of the body.</h1>
+          <p class="lede mt20">
+            Nutrition, glucose, training, sleep, and recovery — connected into one legible model,
+            with the evidence behind every number.
+          </p>
+          <div class="meta-grid">
+            <div><span>Prepared for</span><strong>Dr. Esther F. Myers</strong></div>
+            <div><span>Format</span><strong>Zoom briefing — June 26, 2026</strong></div>
+            <div><span>Presented by</span><strong>Ryan Sullivan, Founder</strong></div>
+          </div>
+          <p class="footnote mt28">StatsKey · v4.6.9 · iOS &amp; Apple Watch · A wellness &amp; self-tracking tool — not a medical device.</p>
+        </div>
+      </section>
+
+      <!-- 2 — WHY HER -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="01">Why your read matters<b></b></div>
+          <h2 class="title">You institutionalized the thing I'm trying to<br />do honestly at consumer scale.</h2>
+          <div class="grid g2 mt36">
+            <ul class="clean">
+              <li>Chief Science Officer of the Academy of Nutrition and Dietetics — <b>formerly the American Dietetic Association</b> — from 2000–2012.</li>
+              <li>Architect of the <b>Evidence Analysis Library</b> and the Evidence-Based Nutrition Practice Guidelines: graded, transparent, reproducible systematic reviews.</li>
+              <li>Drove the <b>Nutrition Care Process</b> and <b>IDNT</b> — the standardized language behind nutrition care and electronic health records.</li>
+              <li>Supported the USDA <b>Nutrition Evidence Library</b> behind the 2010 &amp; 2015 Dietary Guidelines for Americans.</li>
+            </ul>
+            <div class="card card--accent">
+              <div class="label">The bridge</div>
+              <p class="quote quote--sm mt14">
+                StatsKey is built on the instincts you made standard: grade the evidence,
+                expose the provenance, refuse to over-claim, and use a shared vocabulary.
+              </p>
+              <p class="note mt20">
+                I'm not here to impress you with the AI. I'm here for your judgment on whether
+                the <span class="em">methodology</span> holds — and where it should go next.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 — THESIS -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="02">The problem<b></b></div>
+          <h2 class="title">Every health app stores one slice — and stops.</h2>
+          <div class="grid g4 mt36">
+            <div class="card tight"><div class="num">Calorie apps</div><h3>Food only</h3><p>Intake, divorced from what it does to you.</p></div>
+            <div class="card tight"><div class="num">Run apps</div><h3>Miles only</h3><p>Output, divorced from how you fueled it.</p></div>
+            <div class="card tight"><div class="num">CGM apps</div><h3>A curve only</h3><p>A glucose trace with no idea what you ate.</p></div>
+            <div class="card tight"><div class="num">Recovery apps</div><h3>A score only</h3><p>A number with no causal context.</p></div>
+          </div>
+          <div class="grid g2 mt36" style="align-items:center; gap:34px;">
+            <p class="quote">"Your body is a living dataset.<br />StatsKey makes it legible."</p>
+            <div>
+              <p class="lede">None of them connect the slices. None of them measure <span class="em">your</span> response.</p>
+              <p class="lede mt14 grad" style="font-weight:500;">Measure response, not just intake.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3.5 — MARKET / WHAT IT'S SOLVING -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="03">What it's solving · the market<b></b></div>
+          <h2 class="title--sm">Accurate or effortless — almost no one is both.</h2>
+          <div class="grid g3 mt28">
+            <div class="card">
+              <div class="num">Cronometer</div>
+              <h3>Verified, but incomplete</h3>
+              <p>~84 nutrients, USDA/NCCDB-verified (±3.5% cal). But un-covered micronutrients are left <b>blank</b> — its own docs warn those values "may be significantly lower than they actually are" — tailoring a value means hand-building a custom food, and key nutrients are dropped from its reports. Accurate ≠ able to find a real deficiency.</p>
+            </div>
+            <div class="card">
+              <div class="num">MyFitnessPal / Cal AI</div>
+              <h3>Effortless, shallow</h3>
+              <p>Huge crowdsourced or AI-photo capture, but macro-first; micronutrient fields often blank, ~23% sample error, reliability ICC 0.35–0.73.</p>
+            </div>
+            <div class="card card--accent">
+              <div class="num">StatsKey</div>
+              <h3>The missing middle</h3>
+              <p>Low-friction capture <span class="em">plus</span> per-nutrient provenance, AI gap-filling, and the connected model — glucose, training, sleep — none of them have.</p>
+            </div>
+          </div>
+          <div class="card card--amber mt20">
+            <div class="label">Why the micronutrient half matters</div>
+            <p class="mt8" style="font-size:14.5px; line-height:1.5; color:var(--ink-2);">
+              NHANES: ~<span class="em">94%</span> of US adults fall below the requirement for vitamin D, ~<span class="em">100%</span> under the AI for potassium, ~<span class="em">52%</span> magnesium, ~<span class="em">44%</span> calcium — <span class="em">even counting supplements</span>. Real, common, and mostly invisible in the apps people actually use.
+            </p>
+          </div>
+          <p class="src">NHANES 2007–2010 / 2003–2018 (Linus Pauling Institute; 2020 DGAC shortfall nutrients) · independent app comparisons &amp; Morello et&nbsp;al. 2025 (ICC reliability).</p>
+        </div>
+      </section>
+
+      <!-- 3.7 — MARKET MATRIX -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="04">The market, precisely<b></b></div>
+          <h2 class="title--sm">Where StatsKey sits — and what only it does.</h2>
+          <table class="matrix mt28">
+            <thead>
+              <tr>
+                <th>Product</th><th>Micronutrients</th><th>Data source / accuracy</th><th>Deficit detection</th><th>Grounded AI</th><th>Connected model</th><th>Blood / stool</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="us">
+                <td class="app">StatsKey</td>
+                <td class="yes">103 modeled · 65+ shown</td>
+                <td>USDA-grounded + per-nutrient provenance</td>
+                <td class="yes">Yes — %IDR badges</td>
+                <td class="yes">Yes — your records</td>
+                <td class="yes">Food·CGM·train·sleep·GI</td>
+                <td class="mid">Roadmap</td>
+              </tr>
+              <tr>
+                <td class="app">Cronometer</td>
+                <td class="yes">~84 · gaps blank</td>
+                <td>USDA/NCCDB verified · ±3.5%</td>
+                <td class="mid">Targets; blanks skew low</td>
+                <td class="no">No</td>
+                <td class="no">Nutrition-centric</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td class="app">MyFitnessPal</td>
+                <td class="no">14–20, often blank</td>
+                <td>Crowdsourced · ~23% err</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td class="app">Cal AI</td>
+                <td class="no">Macro-first</td>
+                <td>AI photo estimate</td>
+                <td class="no">No</td>
+                <td class="mid">Photo only</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td class="app">Zoe</td>
+                <td class="mid">Limited</td>
+                <td>CGM + one-time test</td>
+                <td class="mid">Food scores</td>
+                <td class="mid">Program-bound</td>
+                <td class="mid">CGM + gut test</td>
+                <td class="mid">At-home, gated</td>
+              </tr>
+              <tr>
+                <td class="app">Function · InsideTracker</td>
+                <td class="mid">Via blood</td>
+                <td>CLIA labs</td>
+                <td class="yes">Biomarker-based</td>
+                <td class="mid">Some</td>
+                <td class="no">Labs only, not intake</td>
+                <td class="yes">Blood</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="src mt14">Independent 2026 app comparisons · Morello et&nbsp;al. 2025 (reliability ICC) · vendor materials. StatsKey figures from code &amp; internal evals.</p>
+        </div>
+      </section>
+
+      <!-- 4 — WHAT IT IS -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="05">What StatsKey is<b></b></div>
+          <div class="grid split">
+            <div>
+              <h2 class="title--sm">One connected, private model —<br />plus an AI grounded in your own data.</h2>
+              <div class="pills mt20">
+                <span class="chip">Food</span><span class="chip">Glucose / CGM</span><span class="chip">Training</span>
+                <span class="chip">Sleep</span><span class="chip">Hydration</span><span class="chip">GI / Wellness</span>
+              </div>
+              <p class="lede mt20">
+                Six signals most apps keep apart, recorded into one timeline — then <span class="em">Intelligence</span>,
+                an in-app assistant that answers from <span class="em">your</span> records, in plain language, not generic averages.
+              </p>
+              <div class="divider"></div>
+              <div class="pills">
+                <span class="chip">Native iOS + Apple Watch</span>
+                <span class="chip">Swift / SwiftUI</span>
+                <span class="chip">Firebase · ~50 Cloud Functions</span>
+                <span class="chip">Shipping v4.6.9</span>
+              </div>
+              <p class="note mt14">From diary to decision system — record by photo, barcode, label or text. It even records <span class="em">bowel movements</span> on the Bristol scale, correlating gut signals with food, fiber &amp; glucose — a data point almost no consumer app captures.</p>
+            </div>
+            <div>
+              <div class="device" style="width:224px;"><video src="assets/app-demo.mp4" autoplay loop muted playsinline poster="assets/app-demo-poster.jpg"></video></div>
+              <div class="shot-cap">The live app, in motion — glucose, per-meal response, the full nutrient panel with deficit flags, and AI insights that even factor in <b style="color:var(--ink-2)">bowel movements</b>. Actual screen recording.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4.3 — APP: COMPREHENSIVE NUTRITION -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="06">What it looks like · recording<b></b></div>
+          <div class="app-split">
+            <div>
+              <div class="device" style="width:214px;"><video src="assets/app-recording.mp4" autoplay loop muted playsinline poster="assets/app-recording-poster.jpg"></video></div>
+              <div class="shot-cap">Recording → the full Nutrition Facts panel: macros, vitamins, minerals &amp; amino acids. Actual screen recording.</div>
+            </div>
+            <div class="callouts">
+              <h2 class="title--sm" style="margin-bottom:4px;">One photo becomes a full panel.</h2>
+              <div class="callout"><div class="h">Four ways in, each where it's most accurate</div><p>Snap a meal, scan a barcode or label, or just describe it. AI identifies the food <b>first</b>; a separate grounded step fills the nutrients — so one flaky lookup can't corrupt a meal.</p></div>
+              <div class="callout"><div class="h">A 103-nutrient model, eight categories</div><p>Energy, macros, <b>14 vitamins, 14 minerals, 11 fats</b> (incl. EPA/DHA/ALA), 20 amino acids, 7 carotenoids — far past the 14–20 most apps show. Each food carries whatever it has data for.</p></div>
+              <div class="callout"><div class="h">Every value carries its provenance</div><p>Label, barcode, USDA-grounded, or AI estimate — plus how sure we are of the <b>amount</b> eaten. Estimates are badged and reversible.</p></div>
+              <p class="src">Actual screen recording — the live StatsKey app (English).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4.6 — APP: NUTRIENT DEFICIT DETECTION -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="07">What it looks like · deficit detection<b></b></div>
+          <div class="app-split">
+            <div class="phone" aria-label="StatsKey Micronutrient status screen">
+              <div class="phone__screen">
+                <div class="phone__bar"><span>9:41</span><span style="display:inline-flex;align-items:center;gap:5px;"><span style="font-size:9px;">5G</span><span style="display:inline-block;width:17px;height:9px;border:1.2px solid #0c1322;border-radius:2px;"></span></span></div>
+                <div class="phone__h">Insights</div>
+                <div class="phone__body">
+                  <div style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#8a93a6;font-weight:700;margin:0 2px 7px;">Micronutrient status</div>
+                  <div class="mn">
+                    <div class="mn__c"><div class="mn__n"><span class="mn__d d-opt"></span>Vitamin C</div><div class="mn__v">164 mg</div><div class="mn__s s-opt">182% IDR · Optimal</div></div>
+                    <div class="mn__c"><div class="mn__n"><span class="mn__d d-bel"></span>Fiber</div><div class="mn__v">25 g</div><div class="mn__s s-bel">65% IDR · Below Target</div></div>
+                    <div class="mn__c"><div class="mn__n"><span class="mn__d d-def"></span>Vitamin D</div><div class="mn__v">6.8 mcg</div><div class="mn__s s-def">34% IDR · Deficient</div></div>
+                    <div class="mn__c"><div class="mn__n"><span class="mn__d d-opt"></span>Calcium</div><div class="mn__v">857 mg</div><div class="mn__s s-opt">85% IDR · Optimal</div></div>
+                    <div class="mn__c"><div class="mn__n"><span class="mn__d d-bel"></span>Iron</div><div class="mn__v">20 mg</div><div class="mn__s s-bel">253% IDR · Excess</div></div>
+                    <div class="mn__c"><div class="mn__n"><span class="mn__d d-opt"></span>Potassium</div><div class="mn__v">4827 mg</div><div class="mn__s s-opt">141% IDR · Optimal</div></div>
+                  </div>
+                  <div style="text-align:center;font-size:9.5px;color:#8a93a6;margin-top:9px;">All recorded nutrients · ~65 today</div>
+                </div>
+                <div class="phone__tabs">
+                  <div class="phone__tab"><span class="ic"></span>Record</div>
+                  <div class="phone__tab"><span class="ic"></span>Activity</div>
+                  <div class="phone__tab on"><span class="ic"></span>Insights</div>
+                  <div class="phone__tab"><span class="ic"></span>Intelligence</div>
+                  <div class="phone__tab"><span class="ic"></span>Friends</div>
+                </div>
+              </div>
+            </div>
+            <div class="callouts">
+              <h2 class="title--sm" style="margin-bottom:4px;">Comprehensive nutrient deficit detection.</h2>
+              <div class="callout"><div class="h">How a deficit gets flagged</div><p>Intake ÷ reference intake (IDR), graded <b>&lt;50% Deficient · &lt;80% Below · ≤200% Optimal · &gt;200% Excess</b>, across the <b>~65 nutrients</b> that populate on a typical day — of a 103-nutrient model.</p></div>
+              <div class="callout"><div class="h">Low intake — or missing data?</div><p>Most trackers leave un-covered micronutrients <b>blank</b>, so a nutrient reads low when the data is just absent — Cronometer's own docs warn those values "may be significantly lower than they actually are." StatsKey <b>fills the tail</b> (AI, badged &amp; reversible) and grades provenance, so "low" means low <em>intake</em> — and any value is editable, with the whole record exportable.</p></div>
+              <div class="callout"><div class="h">The honest caveat — your domain</div><p>The reference is still one adult column today. Personalising by <b>sex, age, life-stage &amp; upper limits</b> is where your judgment matters most.</p></div>
+              <p class="src">English recreation of the live Insights → Micronutrient status screen.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4.9 — APP: GLUCOSE + INTELLIGENCE -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="08">What it looks like · glucose &amp; intelligence<b></b></div>
+          <div class="app-split">
+            <div>
+              <div class="device" style="width:214px;"><video src="assets/app-glucose.mp4" autoplay loop muted playsinline poster="assets/app-glucose-poster.jpg"></video></div>
+              <div class="shot-cap">Metabolic-day ring + Food ⇄ Glucose per-meal response. Actual screen recording.</div>
+            </div>
+            <div class="callouts">
+              <h2 class="title--sm" style="margin-bottom:2px;">Glucose is one connected signal — and the AI reads your record.</h2>
+              <div class="callout"><div class="h">Response, not just a curve</div><p>The same meal's actual effect on <b>you</b>: incremental AUC, peak, recovery, second-meal effects — Dexcom, Libre or Nightscout, never the headline.</p></div>
+              <div class="card" style="padding:13px 15px;">
+                <div class="label">Intelligence · grounded in your records</div>
+                <div style="background:linear-gradient(135deg,var(--cyan),var(--blue));color:#04122b;font-size:11.5px;font-weight:600;border-radius:12px 12px 4px 12px;padding:7px 11px;margin:9px 0 9px auto;max-width:78%;">"Is my long-distance training competitive?"</div>
+                <div style="font-size:12px;color:var(--ink-2);line-height:1.5;">"Here's your assessment, Ryan — Training load (91 days): <b style="color:#fff;">CTL 111.9</b>, elite aerobic base; ACWR 0.49. PRs: 5K 22:24 · 10K 45:19 · Half 1:42:36."</div>
+                <p class="src" style="margin-top:8px;">Answers from your own data; cites methods; refuses to fabricate numbers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 — DATA MODEL -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="09">The data model<b></b></div>
+          <h2 class="title--sm">Structured, typed, and physiologically aware.</h2>
+          <div class="grid g3 mt36">
+            <div class="card">
+              <div class="num">Structure</div>
+              <h3>~30 typed collections, per user</h3>
+              <p>Meals, glucose, workouts, sleep, vitals, weights, body metrics, wellness, water — each a defined schema, not a freeform blob.</p>
+            </div>
+            <div class="card">
+              <div class="num">Nutrition</div>
+              <h3>Meal → FoodItem → a 103-nutrient model</h3>
+              <p>Eight categories: energy, macros, 14 vitamins, 14 minerals, 11 fats/lipids (incl. EPA/DHA/ALA), 20 amino acids, 7 carotenoids — ~65 populate on a typical day.</p>
+            </div>
+            <div class="card">
+              <div class="num">Physiology</div>
+              <h3>A clinically-aware profile</h3>
+              <p>BMR/TDEE via a Mifflin–St Jeor–led 3-formula ensemble; Fitzpatrick skin type → vitamin-D synthesis; allergies, intolerances &amp; conditions feed the AI.</p>
+            </div>
+          </div>
+          <div class="card card--accent mt20">
+            <div class="label">Why this matters for evidence</div>
+            <p class="mt8" style="font-size:15px; line-height:1.55; color:var(--ink-2);">
+              Macro targets are <span class="em">versioned</span> with append-only snapshots — so intake is always compared to
+              the target that was <span class="em">active at the time</span>, never silently rewritten. The history is auditable.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 — PROVENANCE (CENTERPIECE) -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="10">Evidence &amp; provenance — the core idea<b></b></div>
+          <h2 class="title--sm">We store a number <span class="grad">and how it was known.</span></h2>
+          <p class="lede mt14">Every food record carries a three-axis trust model — three independent kinds of evidence, each graded by its own confidence.</p>
+          <div class="grid g3 mt28">
+            <div class="card">
+              <div class="axis-head"><span class="axis-num">01</span><h3 style="margin:0;font-size:16px;">Identity</h3></div>
+              <p class="mt14">What food is this? <br /><span class="label">barcode match · label · visual recognition · grounded search</span></p>
+            </div>
+            <div class="card">
+              <div class="axis-head"><span class="axis-num">02</span><h3 style="margin:0;font-size:16px;">Nutrients</h3></div>
+              <p class="mt14">Where do the values come from? <br /><span class="label">barcode DB · official label · USDA grounded · AI estimate</span></p>
+            </div>
+            <div class="card">
+              <div class="axis-head"><span class="axis-num">03</span><h3 style="margin:0;font-size:16px;">Quantity</h3></div>
+              <p class="mt14">How sure are we about the amount eaten? <br /><span class="label">user-adjusted · label serving assumed · visual estimate</span></p>
+            </div>
+          </div>
+          <p class="quote quote--sm mt28">
+            "A barcode or label can strengthen the <span class="grad">source</span> of nutrition facts without
+            proving the user consumed the default serving."
+          </p>
+          <p class="src">— design comment, FoodItem trust model · This is evidence grading, applied to consumer food records.</p>
+        </div>
+      </section>
+
+      <!-- 7 — GROUNDING / ANTI-FABRICATION -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="11">Grounding &amp; anti-fabrication<b></b></div>
+          <h2 class="title--sm">Grounded in USDA data — and built to say<br />"I don't know" instead of inventing.</h2>
+          <div class="grid g2 mt36">
+            <div class="card card--green">
+              <div class="num" style="color:var(--green)">Source</div>
+              <h3>USDA FoodData Central (SR Legacy)</h3>
+              <p>The primary nutrient source is the USDA database accessed via grounded search — the same evidence base you supported for the Dietary Guidelines — not model guesswork.</p>
+            </div>
+            <div class="card card--amber">
+              <div class="num" style="color:var(--amber)">Guardrail</div>
+              <h3>No fabricated labels</h3>
+              <p>For branded/packaged items, the system never estimates label values. If the official label can't be verified, it returns an <span class="em">empty</span> nutrients object rather than invent one.</p>
+            </div>
+          </div>
+          <div class="grid g2 mt20">
+            <div class="card tight"><h3>Identify first, enrich separately</h3><p>Food identity and nutrient lookup are decoupled, so "one flaky lookup can't corrupt a meal."</p></div>
+            <div class="card tight"><h3>Estimates are labeled &amp; reversible</h3><p>AI micronutrient fills are visibly flagged and can be undone — never silently mixed into "fact."</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7.5 — MICRONUTRIENT GAP / THE AI BET -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="12">The micronutrient bet<b></b></div>
+          <h2 class="title--sm">Filling the tail vendors leave blank — <span class="grad">and grading it.</span></h2>
+          <p class="lede mt14">Most foods arrive with macros and a few minerals; the rest of the panel is empty. StatsKey uses AI to estimate the missing micronutrients — merged only into blank fields, every value badged and one-tap reversible, never overwriting a measured number.</p>
+          <div class="grid g3 mt28">
+            <div class="card card--green">
+              <div class="num" style="color:var(--green)">Where it's accurate</div>
+              <p class="mt8">Measured in <b>our own eval harness</b> (internally, "the cage") against <b>USDA ground truth</b>: generics <b>0% median error / 83% coverage</b> via exact USDA pull, branded labels <b>~7% mean error</b>, the micronutrient tail <b>~8%</b>.</p>
+            </div>
+            <div class="card card--amber">
+              <div class="num" style="color:var(--amber)">Where it falls short</div>
+              <p class="mt8">The fill <b>shipping today is the model's own knowledge</b>, not retrieved; the USDA-grounded cascade is built and eval-validated as the near-term default. Thresholds are coarse and male-referenced today.</p>
+            </div>
+            <div class="card">
+              <div class="num">The discipline</div>
+              <p class="mt8">Our own deficiency-verdict eval showed frontier models cost <b>~20×</b> more for <b>~one</b> flipped flag — so accuracy is bought where it changes a decision, not for show.</p>
+            </div>
+          </div>
+          <p class="quote quote--sm mt28">What your guidance could shape: personalized inadequacy — <span class="grad">sex, age, life-stage, upper limits</span> — grounded enrichment by default, and closing the loop: estimated intake validated against biomarkers via the lab panels.</p>
+          <p class="src">Photo portions are the known weak link — independent 2025 studies put general vision-LLM energy error at ~25–40% (macros worse); our trust model encodes that as low quantity confidence.</p>
+        </div>
+      </section>
+
+      <!-- 8 — SCIENTIFIC HONESTY -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="13">The scientific-honesty doctrine<b></b></div>
+          <h2 class="title--sm">No fake percentiles. Cited methods, named sources.</h2>
+          <div class="grid split mt28">
+            <div>
+              <p class="quote quote--sm">
+                "Never show a percentile unless the source actually supports percentile interpretation."
+              </p>
+              <p class="note mt14">Personal history, friend comparisons, and external references are kept <span class="em">distinct</span> — never blended into an invented number.</p>
+              <div class="label mt20">Reference sources — real datasets, not invented norms</div>
+              <div class="pills mt14">
+                <span class="chip">NHANES / WWEIA</span><span class="chip">Cooper Institute / ACSM</span>
+                <span class="chip">RunRepeat (~35M races)</span><span class="chip">AASM / SRS</span>
+                <span class="chip">CDC / HHS</span><span class="chip">WMA age-grading</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="label">Methods are cited, not asserted</div>
+              <ul class="clean mt14">
+                <li><b>Glucose response:</b> trapezoidal iAUC above a personal baseline, with a valid-rise check — grounded in free-living CGM research (PREDICT/ZOE; ADA/ATTD; Staub–Traugott).</li>
+                <li><b>Amino-acid reference intakes:</b> WHO/FAO/UNU 2007.</li>
+                <li><b>Energy expenditure:</b> Mifflin–St Jeor (within a 3-formula BMR ensemble).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 — BOUNDARIES / PRIVACY -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="14">Boundaries &amp; privacy<b></b></div>
+          <h2 class="title--sm">Disciplined about the line between<br />wellness and medicine.</h2>
+          <div class="grid g3 mt36">
+            <div class="card">
+              <div class="num">The line</div>
+              <h3>Wellness, not a device</h3>
+              <p>StatsKey does not diagnose, treat, or replace clinical judgment. The AI is told not to diagnose, prescribe, or claim certainty from correlation.</p>
+            </div>
+            <div class="card">
+              <div class="num">Privacy by default</div>
+              <h3>Strictest setting wins</h3>
+              <p>Sensitive records — GI, symptoms, wellness — are never friend-visible by default. Data is never sold. Export or true deletion anytime (GDPR Art. 17 / CCPA).</p>
+            </div>
+            <div class="card">
+              <div class="num">Design ethic</div>
+              <h3>Trauma-informed tracking</h3>
+              <p>Bristol Stool Scale and symptom recording follow a peer-reviewed internal memo (PMC / JMIR / PLOS Digital Health) — no gamifying serious body data.</p>
+            </div>
+          </div>
+          <p class="note mt28">This restraint is a feature, not a limitation. The credibility of the wellness claim depends on not pretending to be the clinical one.</p>
+        </div>
+      </section>
+
+      <!-- 10 — HONEST RECKONING -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="15">The honest reckoning<b></b></div>
+          <h2 class="title--sm">What's real today — and what isn't yet.</h2>
+          <div class="grid g2 mt36">
+            <div class="card card--green">
+              <div class="num" style="color:var(--green)">Real today</div>
+              <ul class="clean mt8" style="gap:9px;">
+                <li>Clean, multi-source ingest across food, CGM, training, sleep, wellness.</li>
+                <li>Deep, mature training analytics (GPS, HR zones, load/recovery).</li>
+                <li>Graded, USDA-grounded nutrition with provenance.</li>
+                <li>An AI that accurately narrates a user's <b>own</b> recorded data.</li>
+              </ul>
+            </div>
+            <div class="card card--amber">
+              <div class="num" style="color:var(--amber)">Not real yet</div>
+              <ul class="clean mt8" style="gap:9px;">
+                <li>The "coherent model of you" is today largely an <b>LLM narrating fetched data</b> — not a validated physiological model.</li>
+                <li>Current glucose "response" is still a simple delta heuristic, not a fitted curve.</li>
+                <li>No app-population norms yet (deferred until they can be done with real privacy thresholds).</li>
+              </ul>
+            </div>
+          </div>
+          <p class="quote quote--sm mt28">The named moat is to build a <span class="grad">real n-of-1 statistical layer</span> — and stop over-claiming until it exists.</p>
+        </div>
+      </section>
+
+      <!-- 11 — WHERE IT'S HEADED -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="16">Where it's headed — three horizons<b></b></div>
+          <h2 class="title--sm">From legible records → validated inference → a body-intelligence platform.</h2>
+          <div class="grid g3 mt28">
+            <div class="horizon horizon--now">
+              <span class="tag">Now · trust &amp; activation</span>
+              <h3>Make recording a durable habit</h3>
+              <ul>
+                <li>Deepen week-one retention; recording that survives.</li>
+                <li>Clean, exportable reports for the user, a coach, or a clinician.</li>
+                <li>Scrub residual over-claims; tighten provenance UI.</li>
+              </ul>
+            </div>
+            <div class="horizon horizon--mid">
+              <span class="tag">Mid · intelligence</span>
+              <h3>Make the "model of you" real</h3>
+              <ul>
+                <li>The validated n-of-1 statistical layer (the moat).</li>
+                <li>The AI as a daily companion: "why am I dragging this week?"</li>
+                <li>Adaptive targets that move with load &amp; recovery.</li>
+                <li>Self-hosted USDA / Open Food Facts mirror — compliant, free, grounded.</li>
+              </ul>
+            </div>
+            <div class="horizon horizon--long">
+              <span class="tag">Long · platform</span>
+              <h3>Interpret biology against behavior</h3>
+              <ul>
+                <li>At-home blood &amp; stool panels read <em>against</em> nutrition, CGM &amp; training — via a CLIA/CAP partner lab.</li>
+                <li>Clinician / coach portal.</li>
+                <li>Considered partnership &amp; international expansion.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note mt20">The through-line: every horizon adds <span class="em">interpretation</span> on top of signals we already ingest cleanly — never claims ahead of evidence.</p>
+        </div>
+      </section>
+
+      <!-- 11.5 — LONGITUDINAL BLOOD/STOOL -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="17">Longitudinally · closing the loop<b></b></div>
+          <h2 class="title--sm">From estimated intake to <span class="grad">measured biology</span> — and back.</h2>
+          <div class="loop mt28">
+            <div class="loop__s hl"><div class="n2">01 · DAILY</div><h4>Estimate</h4><p>Recording + deficit detection flag likely shortfalls — vitamin D <b style="color:#fff;">Deficient</b>, fiber <b style="color:#fff;">Below Target</b> — from food alone.</p></div>
+            <div class="loop__a">→</div>
+            <div class="loop__s"><div class="n2">02 · PERIODIC</div><h4>Measure</h4><p>At-home blood &amp; stool kits via a <b style="color:#fff;">CLIA/CAP</b> partner lab confirm what intake can only estimate.</p></div>
+            <div class="loop__a">→</div>
+            <div class="loop__s"><div class="n2">03 · INTERPRET</div><h4>Read against behavior</h4><p>Labs interpreted <em>against</em> your nutrition, CGM, training &amp; sleep history — not isolated numbers on a portal.</p></div>
+            <div class="loop__a">→</div>
+            <div class="loop__s"><div class="n2">04 · CORRECT</div><h4>Adjust &amp; re-measure</h4><p>One targeted change, then retest — a personal, longitudinal feedback loop on the actual body.</p></div>
+          </div>
+          <div class="grid g2 mt20">
+            <div class="card tight"><div class="num">Baseline Blood · $149</div><p>Lipids incl. <b>ApoB</b>; fasting glucose, <b>HbA1c</b>, insulin; <b>hs-CRP</b>; ferritin/iron; <b>vitamin D</b>, B12; TSH; comprehensive metabolic panel.</p></div>
+            <div class="card tight"><div class="num">GI Read · $199</div><p>Validated stool <b>microbiome</b> + <b>calprotectin</b> inflammation — conservative, symptom-linked, no over-claiming from composition alone.</p></div>
+          </div>
+          <p class="quote quote--sm mt20">Estimated intake → measured status → personalized correction → re-measure. <span class="grad">No calorie app and no lab company does the whole loop</span> — that's the opening.</p>
+          <p class="src">Year-1 stays out of assay development: partner labs test under CLIA/CAP; StatsKey owns ordering, ingestion, interpretation &amp; education — within the wellness boundary.</p>
+        </div>
+      </section>
+
+      <!-- 12 — TERMINOLOGY / NCP BRIDGE -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="18">The bridge to your life's work<b></b></div>
+          <h2 class="title--sm">A consumer data stream a dietitian can<br />actually read, trust, and act on.</h2>
+          <div class="grid g2 mt36">
+            <div class="card">
+              <div class="num">Standardized language</div>
+              <h3>Toward IDNT alignment</h3>
+              <p>StatsKey already keeps a rigorous internal data dictionary. The natural next step is mapping our nutrition records toward standardized nutrition &amp; dietetics terminology — so the data is interoperable and clinically legible, not a proprietary silo.</p>
+            </div>
+            <div class="card">
+              <div class="num">Process</div>
+              <h3>Reports shaped by the Nutrition Care Process</h3>
+              <p>Structure "clinical-grade reports" around assessment → diagnosis → intervention → monitoring &amp; evaluation, so what a client brings to a session fits how dietitians already think.</p>
+            </div>
+          </div>
+          <p class="quote quote--sm mt28">
+            The opportunity: graded, sourced, between-visit data — delivered in the profession's
+            <span class="grad">shared vocabulary</span>, not yet another app's private one.
+          </p>
+        </div>
+      </section>
+
+      <!-- 13 — THE ASK -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="19">The ask<b></b></div>
+          <h2 class="title--sm">Your judgment, not your endorsement.</h2>
+          <div class="grid g2 mt36">
+            <div class="card tight"><div class="num">01 · Evidence lens</div><h3>Pressure-test the grading</h3><p>Critique our provenance model and scientific-honesty rules the way EAL pressure-tests a conclusion statement.</p></div>
+            <div class="card tight"><div class="num">02 · Validation design</div><h3>Define defensible claims</h3><p>Help design how we'd responsibly validate an n-of-1 statistical layer — what's claimable, what's over-reach.</p></div>
+            <div class="card tight"><div class="num">03 · Terminology &amp; NCP</div><h3>Align to the standards</h3><p>Advise on mapping our data dictionary and reports to standardized language and the Nutrition Care Process.</p></div>
+            <div class="card tight"><div class="num">04 · Boundaries</div><h3>Keep us honest</h3><p>Hold the wellness/medical line and flag where copy or features drift past the evidence.</p></div>
+          </div>
+          <p class="note mt28"><span class="em">Framing:</span> advisory and cause-first — low-pressure, exploratory, and shaped around your time. We can start with a single domain (e.g. the provenance model) and see if it's a fit.</p>
+        </div>
+      </section>
+
+      <!-- 14 — CLOSE -->
+      <section class="slide title-slide">
+        <div class="shell">
+          <div class="kicker" data-n="20">In one line<b></b></div>
+          <h2 class="display" style="font-size:clamp(30px,4.4vw,58px);">
+            Most apps store records.<br /><span class="grad">StatsKey is trying to build a model.</span>
+          </h2>
+          <p class="lede mt20">Graded, sourced, and legible. I'd like your help making the intelligence real — and the science unimpeachable.</p>
+          <div class="meta-grid" style="grid-template-columns:repeat(2,auto);">
+            <div><span>Ryan Sullivan · Founder</span><strong>ryanws@statskeybiometrics.com</strong></div>
+            <div><span>Product</span><strong>statskeybiometrics.com</strong></div>
+          </div>
+          <p class="footnote mt28">Wellness &amp; self-tracking — not a medical device. AI estimates are approximate.</p>
+        </div>
+      </section>
+
+      <!-- 15 — APPENDIX -->
+      <section class="slide">
+        <div class="shell slide__inner">
+          <div class="kicker" data-n="21">Appendix — facts &amp; citations<b></b></div>
+          <h2 class="title--sm">Reference sheet</h2>
+          <div class="grid g3 mt28">
+            <div class="card tight">
+              <div class="label">Platform</div>
+              <ul class="clean muted mt8">
+                <li>iOS + Apple Watch (Swift/SwiftUI), v4.6.9</li>
+                <li>Firebase + Cloud Functions (Node 22), ~50 functions</li>
+                <li>Multi-LLM: Gemini, Claude, OpenAI, Grok</li>
+                <li>Metered AI via a token ledger</li>
+              </ul>
+            </div>
+            <div class="card tight">
+              <div class="label">Nutrient model — 103 / 8 categories</div>
+              <ul class="clean muted mt8">
+                <li>Energy 2 · Macros 10 · Vitamins 14</li>
+                <li>Minerals 14 · Fats/Lipids 11 (EPA/DHA/ALA)</li>
+                <li>Amino acids 20 · Carotenoids 7 · Other 25</li>
+              </ul>
+            </div>
+            <div class="card tight">
+              <div class="label">Cited methods &amp; scales</div>
+              <ul class="clean muted mt8">
+                <li>USDA FoodData Central (SR Legacy)</li>
+                <li>Mifflin–St Jeor (BMR ensemble) · WHO/FAO/UNU 2007</li>
+                <li>Trapezoidal iAUC (PREDICT/ZOE, ADA/ATTD)</li>
+                <li>Bristol Stool Scale · Fitzpatrick · WMA age-grading</li>
+              </ul>
+            </div>
+          </div>
+          <div class="grid g2 mt20">
+            <div class="card tight">
+              <div class="label">Reference datasets</div>
+              <p class="mt8" style="font-size:12.5px;color:var(--muted);">NHANES / WWEIA · Cooper Institute / ACSM · RunRepeat (~35M race results) · AASM / SRS · CDC / HHS guidelines.</p>
+            </div>
+            <div class="card tight">
+              <div class="label">Model &amp; boundary</div>
+              <p class="mt8" style="font-size:12.5px;color:var(--muted);">Free core; optional Pro ($4.99/mo or $39.99/yr) and Pro+ ($19.99/mo); AI token packs. Wellness &amp; self-tracking tool — not a medical device; not for diagnosis or treatment.</p>
+            </div>
+          </div>
+          <p class="footnote mt20">Dr. Esther F. Myers, PhD, RDN, FAND — CSO, Academy of Nutrition and Dietetics (formerly American Dietetic Association), 2000–2012; architect of the Evidence Analysis Library, NCP &amp; IDNT; 2020 Marjorie Hulsizer Copher Award.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Speaker notes overlay -->
+    <div class="notes-panel" id="notesPanel" role="region" aria-label="Speaker notes">
+      <div class="label">Speaker notes — press N to hide</div>
+      <div class="speaker-notes-body" id="notesBody"></div>
+    </div>
+
+    <!-- Chrome -->
+    <div class="chrome chrome--left">
+      <span class="counter" id="counter">01 / 22</span>
+      <span class="brand-foot"><span class="brand-mark"></span> StatsKey</span>
+    </div>
+    <div class="chrome chrome--right">
+      <span class="hint"><b>← →</b> navigate &nbsp; <b>N</b> notes &nbsp; <b>F</b> full screen</span>
+      <button class="ctrl" id="btnPrev" aria-label="Previous">‹</button>
+      <button class="ctrl" id="btnNotes" aria-label="Toggle speaker notes" aria-pressed="false">N</button>
+      <button class="ctrl" id="btnFs" aria-label="Toggle full screen">⤢</button>
+      <button class="ctrl" id="btnNext" aria-label="Next">›</button>
+    </div>
+
+    <noscript>
+      <style>.slide { display: flex !important; position: relative; opacity: 1 !important; min-height: 90vh; border-bottom: 1px solid var(--line); } body { overflow: auto; } .chrome, .edge, .progress { display: none; }</style>
+    </noscript>
+
+    <script>
+      (function () {
+        var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+        var total = slides.length;
+        var i = 0;
+        var notesOn = false;
+
+        var bar = document.getElementById("bar");
+        var counter = document.getElementById("counter");
+        var notesPanel = document.getElementById("notesPanel");
+        var notesBody = document.getElementById("notesBody");
+        var btnNotes = document.getElementById("btnNotes");
+
+        function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+        function renderNotes() {
+          if (!notesOn) { notesPanel.classList.remove("show"); return; }
+          var n = slides[i].querySelector(".speaker-notes");
+          notesBody.innerHTML = n ? n.innerHTML : "<em>No notes for this slide.</em>";
+          notesPanel.classList.add("show");
+        }
+
+        function show(n) {
+          i = Math.max(0, Math.min(total - 1, n));
+          slides.forEach(function (s, idx) { s.classList.toggle("is-active", idx === i); });
+          counter.textContent = pad(i + 1) + " / " + pad(total);
+          bar.style.transform = "scaleX(" + (i + 1) / total + ")";
+          var inner = slides[i].querySelector(".slide__inner");
+          if (inner) inner.scrollTop = 0;
+          renderNotes();
+          if (history.replaceState) history.replaceState(null, "", "#" + (i + 1));
+        }
+        function next() { show(i + 1); }
+        function prev() { show(i - 1); }
+
+        function toggleNotes() {
+          notesOn = !notesOn;
+          btnNotes.setAttribute("aria-pressed", notesOn ? "true" : "false");
+          renderNotes();
+        }
+        function toggleFs() {
+          if (!document.fullscreenElement) {
+            (document.documentElement.requestFullscreen || function () {}).call(document.documentElement);
+          } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        }
+
+        document.getElementById("btnNext").addEventListener("click", next);
+        document.getElementById("btnPrev").addEventListener("click", prev);
+        document.getElementById("nextEdge").addEventListener("click", next);
+        document.getElementById("prevEdge").addEventListener("click", prev);
+        document.getElementById("btnFs").addEventListener("click", toggleFs);
+        btnNotes.addEventListener("click", toggleNotes);
+
+        document.addEventListener("keydown", function (e) {
+          var k = e.key;
+          if (k === "ArrowRight" || k === "PageDown" || k === " ") { e.preventDefault(); next(); }
+          else if (k === "ArrowLeft" || k === "PageUp") { e.preventDefault(); prev(); }
+          else if (k === "Home") { e.preventDefault(); show(0); }
+          else if (k === "End") { e.preventDefault(); show(total - 1); }
+          else if (k === "n" || k === "N") { toggleNotes(); }
+          else if (k === "f" || k === "F") { toggleFs(); }
+        });
+
+        // Keep the kicker section number aligned with the slide counter.
+        slides.forEach(function (s, idx) {
+          var k = s.querySelector(".kicker");
+          if (k) k.setAttribute("data-n", idx === 0 ? "" : pad(idx + 1));
+        });
+
+        // Deep-link / jump to a slide via hash (e.g. #6), even after load.
+        window.addEventListener("hashchange", function () {
+          var n = parseInt((location.hash || "").replace("#", ""), 10);
+          if (!isNaN(n) && n - 1 !== i) show(n - 1);
+        });
+
+        var start = parseInt((location.hash || "").replace("#", ""), 10);
+        show(isNaN(start) ? 0 : start - 1);
+      })();
+    </script>
+  </body>
+</html>
