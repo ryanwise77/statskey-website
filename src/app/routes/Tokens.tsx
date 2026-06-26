@@ -33,7 +33,7 @@ const TOKEN_PACKS: TokenPack[] = [
     name: 'Power month',
     tokens: '5M',
     price: '$29.99',
-    subtitle: 'The cleanest option for heavy managed AI use.',
+    subtitle: 'The cleanest option for heavy Intelligence use.',
     bestFor: 'Frequent deep analysis',
     featured: true,
   },
@@ -132,7 +132,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
     <div className="max-w-[940px] space-y-8">
       <header className="space-y-3">
         <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-data">
-          Managed AI tokens
+          Store · Intelligence tokens
         </div>
         {testMode && (
           <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
@@ -146,7 +146,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
           <p className="max-w-[680px] text-[15px] leading-relaxed text-text-secondary">
             {testMode
               ? 'This hidden route uses Stripe test keys and fake cards. It only grants tokens for Firebase UIDs in the server allowlist.'
-              : "Buy web-only Stripe top-ups for StatsKey's managed Claude, ChatGPT, and Grok routes. Tokens are added to the same account you use in the iOS app."}
+              : "Buy web-only Stripe top-ups for Intelligence — StatsKey's managed Claude, ChatGPT, and Grok routes. Tokens are added to the same account you use in the iOS app."}
           </p>
         </div>
       </header>
@@ -157,7 +157,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
           <div className="font-display text-[30px] font-bold tracking-[-0.04em] text-text-primary">
             {tokenState.loading ? 'Loading…' : formatTokens(tokenState.tokens?.balance ?? 0)}
           </div>
-          <p className="text-[12px] text-text-muted">Managed AI token balance</p>
+          <p className="text-[12px] text-text-muted">Intelligence token balance</p>
         </div>
         <div className="panel space-y-1">
           <span className="card-title">Lifetime used</span>
@@ -266,7 +266,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
         <div className="panel space-y-3">
           <span className="card-title">Already subscribed?</span>
           <p className="text-[14px] leading-relaxed text-text-secondary">
-            Pro+ remains the normal power-user plan with 2M managed tokens every month.
+            Pro+ remains the normal power-user plan with 2M Intelligence tokens every month.
             Packs are for spikes when you need more without bringing your own provider key.
           </p>
           <Link to="/profile" className="link text-[13px] font-medium">
