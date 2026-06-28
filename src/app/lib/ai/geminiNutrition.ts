@@ -338,7 +338,47 @@ function extractFirstBalancedJsonValue(text: string): string | undefined {
   return undefined
 }
 
-function fileToBase64(file: File): Promise<string> {
+// Downscale + JPEG-compress before upload, like the iOS app. A raw phone photo
+// is several MB; sending it full-resolution dominated the analyze time (the
+// model itself returns in a couple of seconds). 1280px is plenty for food
+// recognition and portion/reference-object scale.
+const MAX_IMAGE_DIM = 1280
+const IMAGE_JPEG_QUALITY = 0.72
+
+async function fileToBase64(file: File): Promise<string> {
+  try {
+    return await downscaleToJpegBase64(file, MAX_IMAGE_DIM, IMAGE_JPEG_QUALITY)
+  } catch {
+    // HEIC or canvas-unavailable: fall back to the raw bytes so analysis still works.
+    return await readRawBase64(file)
+  }
+}
+
+async function downscaleToJpegBase64(file: File, maxDim: number, quality: number): Promise<string> {
+  const bitmap = await createImageBitmap(file)
+  try {
+    const longest = Math.max(bitmap.width, bitmap.height)
+    const scale = longest > maxDim ? maxDim / longest : 1
+    const w = Math.max(1, Math.round(bitmap.width * scale))
+    const h = Math.max(1, Math.round(bitmap.height * scale))
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('Canvas 2D context unavailable')
+    ctx.drawImage(bitmap, 0, 0, w, h)
+    const dataUrl = canvas.toDataURL('image/jpeg', quality)
+    const comma = dataUrl.indexOf(',')
+    if (comma === -1 || !dataUrl.startsWith('data:image/jpeg')) {
+      throw new Error('JPEG encoding failed')
+    }
+    return dataUrl.slice(comma + 1)
+  } finally {
+    bitmap.close()
+  }
+}
+
+function readRawBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
