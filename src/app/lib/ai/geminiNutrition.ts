@@ -11,7 +11,16 @@ interface GeminiNutritionRequest {
   packagingText?: string
   preferToolSearch?: boolean
   searchQuery?: string
+  model?: string
 }
+
+// Match the iOS app's fast vision/enrichment model. The old server default
+// (gemini-2.5-pro) was slow enough on photos to blow the callable deadline.
+const NUTRITION_MODEL = 'gemini-3.1-flash-lite'
+
+// Photo analysis can take 30-60s; the Firebase callable default (70s) is what
+// surfaced as `deadline-exceeded`. Give it real headroom (function caps at 180s).
+const CALLABLE_TIMEOUT_MS = 120_000
 
 interface GeminiNutritionResponse {
   success: boolean
@@ -124,7 +133,8 @@ const NUTRIENT_KEY_ALIASES: Record<string, string> = {
 
 const callGeminiNutrition = httpsCallable<GeminiNutritionRequest, GeminiNutritionResponse>(
   functions,
-  'geminiNutrition'
+  'geminiNutrition',
+  { timeout: CALLABLE_TIMEOUT_MS }
 )
 
 export async function analyzeNutritionInput(
@@ -132,7 +142,7 @@ export async function analyzeNutritionInput(
   source: FoodSource,
   itemCategory: ItemCategory = 'food'
 ): Promise<FoodItem[]> {
-  const { data } = await callGeminiNutrition(req)
+  const { data } = await callGeminiNutrition({ model: NUTRITION_MODEL, ...req })
   if (!data.success) throw new Error('Nutrition analysis failed.')
   return parseGeminiFoods(data.content).map((food) => toFoodItem(food, source, itemCategory))
 }

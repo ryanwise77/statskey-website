@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '../../lib/auth'
 import { analyzeNutritionInput, filesToBase64 } from '../../lib/ai/geminiNutrition'
 import { useFoodLibrary } from '../../lib/data/useFoodLibrary'
@@ -106,6 +106,23 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
   const [analyzing, setAnalyzing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Visibility of system status (Nielsen #1): track elapsed time so a long
+  // photo analysis keeps showing progress instead of a frozen-looking button.
+  const [analyzeStartAt, setAnalyzeStartAt] = useState<number | null>(null)
+  const [analyzeElapsed, setAnalyzeElapsed] = useState(0)
+  const [retryable, setRetryable] = useState(false)
+
+  useEffect(() => {
+    if (analyzeStartAt == null) {
+      setAnalyzeElapsed(0)
+      return
+    }
+    setAnalyzeElapsed(0)
+    const id = setInterval(() => {
+      setAnalyzeElapsed(Math.floor((Date.now() - analyzeStartAt) / 1000))
+    }, 1000)
+    return () => clearInterval(id)
+  }, [analyzeStartAt])
 
   function update<K extends keyof Draft>(idx: number, key: K, value: Draft[K]) {
     setItems((prev) => prev.map((it, i) => (i === idx ? { ...it, [key]: value } : it)))
@@ -185,7 +202,9 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
 
   async function analyze() {
     setAnalyzing(true)
+    setAnalyzeStartAt(Date.now())
     setError(null)
+    setRetryable(false)
     try {
       if (inputMode === 'aiSearch') {
         if (!query.trim() && selectedFiles.length === 0) {
@@ -250,9 +269,13 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
         )
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
+      // Error recovery (Nielsen #9): translate raw codes like `deadline-exceeded`
+      // into a plain, actionable message and offer a one-tap retry.
+      setError(friendlyError(e))
+      setRetryable(true)
     } finally {
       setAnalyzing(false)
+      setAnalyzeStartAt(null)
     }
   }
 
@@ -333,7 +356,8 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
       await saveMeal(user.uid, meal)
       onSaved(meal)
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
+      setError(friendlyError(e))
+      setRetryable(false)
     } finally {
       setSaving(false)
     }
@@ -395,6 +419,19 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
           onAddLibraryItem={addFromLibrary}
           onAddLibraryMeal={addMealFromLibrary}
         />
+        {analyzing && <AnalyzingStatus mode={inputMode} elapsed={analyzeElapsed} />}
+        {retryable && error && !analyzing && (
+          <div className="error-banner flex items-center justify-between gap-3">
+            <span>{error}</span>
+            <button
+              className="btn btn-secondary !py-1 !px-3 text-[12px] whitespace-nowrap"
+              type="button"
+              onClick={analyze}
+            >
+              Try again
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -531,7 +568,7 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
         </div>
       )}
 
-      {error && <div className="error-banner">{error}</div>}
+      {error && !retryable && <div className="error-banner">{error}</div>}
 
       <div className="flex justify-end gap-2">
         {onCancel && (
@@ -1028,6 +1065,74 @@ function ServingUnitInput({ item, onChange }: { item: Draft; onChange: (unit: st
       </datalist>
     </>
   )
+}
+
+function AnalyzingStatus({ mode, elapsed }: { mode: InputMode; elapsed: number }) {
+  return (
+    <div className="rounded-xl border border-accent/30 bg-accent/[0.06] p-3 flex items-center gap-3">
+      <Spinner />
+      <div className="min-w-0">
+        <div className="text-text-primary text-[13px] font-medium">{analyzingMessage(mode, elapsed)}</div>
+        <div className="text-text-muted text-[11px] mt-0.5">
+          {elapsed < 8
+            ? 'This usually takes a few seconds.'
+            : `Working — ${elapsed}s elapsed. Photos can take up to a minute.`}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Spinner() {
+  return (
+    <svg
+      className="animate-spin shrink-0"
+      style={{ color: 'var(--color-accent)' }}
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="3" />
+      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// Staged messages give a sense of forward progress (goal-gradient effect) and
+// loosely mirror the iOS app's vision → portion → nutrition pipeline.
+function analyzingMessage(mode: InputMode, elapsed: number): string {
+  if (mode === 'barcode') return elapsed < 6 ? 'Looking up the barcode…' : 'Pulling nutrition facts…'
+  if (elapsed < 3) return 'Uploading…'
+  if (elapsed < 9) return 'Reading your food…'
+  if (elapsed < 18) return 'Estimating portions…'
+  if (elapsed < 34) return 'Pulling nutrition facts…'
+  return 'Almost there — finishing up…'
+}
+
+// Translate transport/server error codes into plain, recoverable guidance.
+function friendlyError(e: unknown): string {
+  const raw = e instanceof Error ? e.message : String(e)
+  const code =
+    typeof e === 'object' && e && 'code' in e ? String((e as { code: unknown }).code) : ''
+  const hay = `${code} ${raw}`.toLowerCase()
+  if (hay.includes('deadline') || hay.includes('timeout')) {
+    return 'That took longer than expected. Try again — one clear photo at a time is fastest.'
+  }
+  if (hay.includes('unauthenticated') || hay.includes('permission-denied')) {
+    return 'Your session may have expired. Refresh the page and sign in again.'
+  }
+  if (hay.includes('resource-exhausted') || hay.includes('quota') || hay.includes('rate')) {
+    return 'A lot of requests are coming through right now. Wait a few seconds and try again.'
+  }
+  if (hay.includes('unavailable') || hay.includes('internal') || hay.includes('empty response')) {
+    return 'The analyzer had a brief hiccup. Please try again.'
+  }
+  if (hay.includes('network') || hay.includes('failed to fetch')) {
+    return 'Network issue reaching the analyzer. Check your connection and try again.'
+  }
+  return raw
 }
 
 function emptyDraft(source: FoodSource = 'manual'): Draft {
