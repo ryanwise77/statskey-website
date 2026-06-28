@@ -1,7 +1,7 @@
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import { firebaseApp } from '../firebase'
 import { newId } from '../writers'
-import type { FoodItem, FoodSource, ItemCategory } from '../types'
+import type { FoodItem, FoodSource, ItemCategory, PortionEstimate } from '../types'
 
 const functions = getFunctions(firebaseApp, 'us-central1')
 
@@ -30,6 +30,11 @@ interface GeminiFood {
   servingUnit?: string
   gramWeight?: number
   gramsPerCup?: number
+  // Independent gram drafts the vision model considered before choosing the
+  // final amount — the spread is a portion confidence interval. Mirrors the
+  // iOS `portionDraftGrams` field (GeminiService.swift) so the same photo
+  // portion uncertainty surfaces on the web.
+  portionDraftGrams?: unknown
   product?: {
     name?: string
     brand?: string
@@ -39,6 +44,9 @@ interface GeminiFood {
     amount?: number
     unit?: string
     grams?: number
+    lowGram?: number
+    highGram?: number
+    portionDraftGrams?: unknown
   }
   nutrients?: Record<string, unknown>
   dataQuality?: {
@@ -162,6 +170,11 @@ function toFoodItem(food: GeminiFood, source: FoodSource, itemCategory: ItemCate
   )
   const brand = firstText(food.brand, food.product?.brand)
   const explanation = firstText(food.geminiExplanation, food.dataQuality?.notes)
+  const portionEstimate = buildPortionEstimate(
+    food.portionDraftGrams ?? food.serving?.portionDraftGrams,
+    asNumber(food.serving?.lowGram),
+    asNumber(food.serving?.highGram)
+  )
 
   return {
     id: newId(),
@@ -181,9 +194,35 @@ function toFoodItem(food: GeminiFood, source: FoodSource, itemCategory: ItemCate
     itemCategory,
     notes: food.notes,
     geminiExplanation: explanation,
+    quantityWasUserAdjusted: false,
+    portionEstimate,
     createdAt: now,
     updatedAt: now,
   }
+}
+
+/**
+ * Builds a PortionEstimate from the model's independent gram drafts (and any
+ * explicit low/high bounds). Matches the iOS parse in GeminiService.swift —
+ * keep any positive, finite drafts; the trust model derives the ± range from
+ * their spread. Returns undefined when there's nothing usable.
+ */
+function buildPortionEstimate(
+  rawDrafts: unknown,
+  lowGram: number | undefined,
+  highGram: number | undefined
+): PortionEstimate | undefined {
+  const drafts = Array.isArray(rawDrafts)
+    ? rawDrafts.map(asNumber).filter((g): g is number => g != null && g > 0)
+    : []
+  const estimate: PortionEstimate = {}
+  if (drafts.length) estimate.draftGrams = drafts
+  if (lowGram != null && lowGram > 0) estimate.lowGram = lowGram
+  if (highGram != null && highGram > 0) estimate.highGram = highGram
+  if (!estimate.draftGrams && estimate.lowGram == null && estimate.highGram == null) {
+    return undefined
+  }
+  return estimate
 }
 
 function cleanNutrients(input: Record<string, unknown> | undefined): Record<string, number> {

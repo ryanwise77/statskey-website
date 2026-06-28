@@ -2,9 +2,18 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '../../lib/auth'
 import { analyzeNutritionInput, filesToBase64 } from '../../lib/ai/geminiNutrition'
 import { useFoodLibrary } from '../../lib/data/useFoodLibrary'
+import { clearFillProvenance } from '../../lib/provenance'
 import { availableServingUnits, convertServingAmount, nutrientsForServing } from '../../lib/serving'
 import { newId, saveFoodToLibrary, saveMeal } from '../../lib/writers'
-import type { AnalysisMode, FoodItem, FoodSource, ItemCategory, Meal } from '../../lib/types'
+import { TrustBadge } from '../TrustBadge'
+import type {
+  AnalysisMode,
+  FoodItem,
+  FoodSource,
+  ItemCategory,
+  Meal,
+  PortionEstimate,
+} from '../../lib/types'
 
 type LibrarySubTab = 'foods' | 'meals'
 type LibraryFilter = 'saved' | 'recents' | 'favorites'
@@ -26,6 +35,18 @@ interface Draft {
   baseServingUnit?: string
   gramWeight?: number
   gramsPerCup?: number
+  // 4.7 trust/provenance — round-tripped so a web edit keeps the item's
+  // confidence signals and iOS-recorded provenance intact.
+  quantityWasUserAdjusted?: boolean
+  hiddenFromFriends?: boolean
+  aiEstimatedNutrientKeys?: string[]
+  nutrientFillSources?: Record<string, string>
+  nutrientFillConfidence?: Record<string, string>
+  nutrientErrPct?: Record<string, number>
+  enrichmentMethod?: string
+  enrichmentCitation?: string
+  enrichmentSchemaVersion?: number
+  portionEstimate?: PortionEstimate
 }
 
 const INPUT_OPTIONS = [
@@ -95,14 +116,19 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
       prev.map((it, i) => {
         if (i !== idx) return it
         const nutrients = { ...it.nutrients, [key]: Number(value) || 0 }
-        return {
-          ...it,
-          nutrients,
-          baseNutrients: nutrients,
-          baseServingSize: Number(it.servingSize) || 1,
-          baseServingUnit: it.servingUnit,
-          gramWeight: currentDraftGramWeight(it),
-        }
+        // A hand-corrected value is no longer our estimate — drop its fill
+        // provenance so it stops being badged as estimated (mirrors iOS).
+        return clearFillProvenance(
+          {
+            ...it,
+            nutrients,
+            baseNutrients: nutrients,
+            baseServingSize: Number(it.servingSize) || 1,
+            baseServingUnit: it.servingUnit,
+            gramWeight: currentDraftGramWeight(it),
+          },
+          [key]
+        )
       })
     )
   }
@@ -116,6 +142,9 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
           ...it,
           servingSize,
           nutrients: nutrientsForServing(it, servingSize, it.servingUnit),
+          // The amount is now user-confirmed, so photo-portion uncertainty no
+          // longer applies (mirrors FoodItem.scaled(by:)).
+          quantityWasUserAdjusted: true,
         }
       })
     )
@@ -130,6 +159,7 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
           ...it,
           servingUnit,
           nutrients: nutrientsForServing(it, it.servingSize, servingUnit),
+          quantityWasUserAdjusted: true,
         }
       })
     )
@@ -296,6 +326,10 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
       }
       if (initialMeal?.glucoseResponse) meal.glucoseResponse = initialMeal.glucoseResponse
       if (initialMeal?.photoURLs?.length) meal.photoURLs = initialMeal.photoURLs
+      if (initialMeal?.totalNutrientsOverride) meal.totalNutrientsOverride = initialMeal.totalNutrientsOverride
+      if (initialMeal?.hiddenItemCount != null) meal.hiddenItemCount = initialMeal.hiddenItemCount
+      if (initialMeal?.aiExplanation) meal.aiExplanation = initialMeal.aiExplanation
+      if (initialMeal?.aiItemInsights) meal.aiItemInsights = initialMeal.aiItemInsights
       await saveMeal(user.uid, meal)
       onSaved(meal)
     } catch (e) {
@@ -388,7 +422,10 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
             <div className="flex items-center justify-between">
               <div>
                 <span className="card-title">Item {idx + 1}</span>
-                <span className="block text-text-muted text-[11px]">{sourceLabel(it.source)}</span>
+                <span className="flex items-center gap-2 text-text-muted text-[11px]">
+                  {sourceLabel(it.source)}
+                  <TrustBadge item={draftToFoodItem(it)} className="text-[11px]" />
+                </span>
               </div>
               {items.length > 1 && (
                 <button className="btn btn-ghost text-[12px]" onClick={() => removeItem(idx)}>
@@ -1037,6 +1074,16 @@ function itemToDraft(item: FoodItem): Draft {
     baseServingUnit: item.baseServingUnit ?? item.servingUnit,
     gramWeight: item.gramWeight ?? currentItemGramWeight(item),
     gramsPerCup: item.gramsPerCup,
+    quantityWasUserAdjusted: item.quantityWasUserAdjusted,
+    hiddenFromFriends: item.hiddenFromFriends,
+    aiEstimatedNutrientKeys: item.aiEstimatedNutrientKeys,
+    nutrientFillSources: item.nutrientFillSources,
+    nutrientFillConfidence: item.nutrientFillConfidence,
+    nutrientErrPct: item.nutrientErrPct,
+    enrichmentMethod: item.enrichmentMethod,
+    enrichmentCitation: item.enrichmentCitation,
+    enrichmentSchemaVersion: item.enrichmentSchemaVersion,
+    portionEstimate: item.portionEstimate,
   }
 }
 
@@ -1059,11 +1106,21 @@ function draftToFoodItem(draft: Draft): FoodItem {
     gramWeight: draft.gramWeight ?? currentDraftGramWeight(draft),
     gramsPerCup: draft.gramsPerCup,
     isFavorite: false,
+    hiddenFromFriends: draft.hiddenFromFriends,
     useCount: 0,
     source: draft.source,
     itemCategory: draft.itemCategory,
     notes: draft.notes.trim() || undefined,
     geminiExplanation: draft.geminiExplanation,
+    quantityWasUserAdjusted: draft.quantityWasUserAdjusted ?? false,
+    aiEstimatedNutrientKeys: draft.aiEstimatedNutrientKeys,
+    nutrientFillSources: draft.nutrientFillSources,
+    nutrientFillConfidence: draft.nutrientFillConfidence,
+    nutrientErrPct: draft.nutrientErrPct,
+    enrichmentMethod: draft.enrichmentMethod,
+    enrichmentCitation: draft.enrichmentCitation,
+    enrichmentSchemaVersion: draft.enrichmentSchemaVersion,
+    portionEstimate: draft.portionEstimate,
     createdAt: now,
     updatedAt: now,
   }

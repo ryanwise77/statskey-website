@@ -41,6 +41,66 @@ export type FoodSource =
 
 export type ItemCategory = 'food' | 'supplement' | 'medication'
 
+// MARK: - Trust & provenance (mirrors FoodItem.swift + NutrientProvenance.swift)
+
+export type FoodTrustLevel = 'unknown' | 'low' | 'medium' | 'high'
+
+export type FoodIdentityEvidence =
+  | 'unknown'
+  | 'userEntered'
+  | 'visualRecognition'
+  | 'barcodeMatch'
+  | 'nutritionLabel'
+  | 'groundedSearch'
+  | 'savedLibrary'
+  | 'sharedCache'
+
+export type FoodNutrientEvidence =
+  | 'unknown'
+  | 'userEntered'
+  | 'visualEstimate'
+  | 'barcodeDatabase'
+  | 'nutritionLabel'
+  | 'groundedSource'
+  | 'savedLibrary'
+  | 'sharedCache'
+  | 'aiEstimated'
+
+export type FoodQuantityEvidence =
+  | 'unknown'
+  | 'userEntered'
+  | 'userAdjusted'
+  | 'visualEstimate'
+  | 'labelServingAssumed'
+  | 'databaseServingAssumed'
+  | 'savedServingReused'
+
+/**
+ * Separates "what food/nutrients did we identify?" from "how sure are we about
+ * the amount eaten?" Mirrors FoodTrustMetadata in
+ * biometrics/StatsKey/Models/FoodItem.swift so iOS decodes web records natively.
+ */
+export interface FoodTrustMetadata {
+  identityEvidence: FoodIdentityEvidence
+  nutrientEvidence: FoodNutrientEvidence
+  quantityEvidence: FoodQuantityEvidence
+  identityConfidence: FoodTrustLevel
+  nutrientConfidence: FoodTrustLevel
+  quantityConfidence: FoodTrustLevel
+  notes: string[]
+}
+
+/**
+ * The AI's photo portion (amount-eaten) estimate. The spread between the
+ * independent gram drafts is a confidence interval on the portion, kept
+ * separate from the per-nutrient source error. Mirrors PortionEstimate.
+ */
+export interface PortionEstimate {
+  draftGrams?: number[]
+  lowGram?: number
+  highGram?: number
+}
+
 export interface FoodItem {
   id: string
   name: string
@@ -55,12 +115,30 @@ export interface FoodItem {
   gramWeight?: number
   gramsPerCup?: number
   isFavorite: boolean
+  hiddenFromFriends?: boolean
   useCount: number
   lastUsed?: Date
   source: FoodSource
   itemCategory: ItemCategory
   notes?: string
   geminiExplanation?: string
+  /** True once the user confirms/adjusts the amount eaten — removes portion
+   *  uncertainty for that item (mirrors FoodItem.scaled(by:)). */
+  quantityWasUserAdjusted?: boolean
+  trustMetadata?: FoodTrustMetadata
+  /** Nutrient keys filled by the AI micronutrient estimator (badged estimated). */
+  aiEstimatedNutrientKeys?: string[]
+  /** Per-key data source for each filled nutrient ("usda", "web", "web_micro",
+   *  "web_per100", "ai_grounded"). */
+  nutrientFillSources?: Record<string, string>
+  /** Per-key coarse confidence ("high"/"medium"). Firestore key: `nutrientConfidence`. */
+  nutrientFillConfidence?: Record<string, string>
+  /** Per-key estimated error (percent) for each filled nutrient. */
+  nutrientErrPct?: Record<string, number>
+  enrichmentMethod?: string
+  enrichmentCitation?: string
+  enrichmentSchemaVersion?: number
+  portionEstimate?: PortionEstimate
   createdAt: Date
   updatedAt: Date
   consumedAt?: Date
@@ -89,6 +167,13 @@ export interface Meal {
   glucoseResponse?: GlucoseResponse
   photoURLs?: string[]
   analysisMode?: AnalysisMode
+  /** Friend-privacy snapshot of totals when some items are hidden from friends. */
+  totalNutrientsOverride?: Record<string, number>
+  hiddenItemCount?: number
+  /** Pro/Pro+ one-line AI meal summary, generated on demand. */
+  aiExplanation?: string
+  /** Pro/Pro+ per-food AI insight, keyed by FoodItem.id. */
+  aiItemInsights?: Record<string, string>
   createdAt: Date
   updatedAt: Date
 }

@@ -6,6 +6,7 @@ import { MealLogForm } from '../components/log/MealLogForm'
 import { mealDisplayName, mealTotal } from '../lib/aggregates'
 import { deleteMeal } from '../lib/writers'
 import { NUTRIENT_KEYS, type FoodItem } from '../lib/types'
+import { TrustBadge } from '../components/TrustBadge'
 
 export function MealDetail() {
   const { user } = useAuth()
@@ -41,7 +42,7 @@ export function MealDetail() {
   const fiber = Math.round(mealTotal(meal, NUTRIENT_KEYS.fiber))
 
   async function handleDelete() {
-    if (!user || deleting) return
+    if (!user || deleting || !meal) return
     if (!window.confirm('Delete this meal? This cannot be undone.')) return
 
     setDeleting(true)
@@ -120,6 +121,13 @@ export function MealDetail() {
         <Stat label="Fiber" value={`${fiber}g`} />
       </div>
 
+      {meal.aiExplanation && (
+        <div className="panel">
+          <span className="card-title">Meal insight</span>
+          <p className="text-text-secondary text-[13px] mt-2">{meal.aiExplanation}</p>
+        </div>
+      )}
+
       {meal.photoURLs && meal.photoURLs.length > 0 && (
         <div className="panel">
           <span className="card-title">Photos</span>
@@ -143,7 +151,14 @@ export function MealDetail() {
           {meal.items.length === 0 ? (
             <p className="text-text-muted text-[13px]">No items.</p>
           ) : (
-            meal.items.map((item, idx) => <FoodItemRow key={item.id || idx} item={item} multiplier={meal.multiplier} />)
+            meal.items.map((item, idx) => (
+              <FoodItemRow
+                key={item.id || idx}
+                item={item}
+                multiplier={meal.multiplier}
+                insight={meal.aiItemInsights?.[item.id]}
+              />
+            ))
           )}
         </div>
       </div>
@@ -160,7 +175,15 @@ function Stat({ label, value }: { label: string; value: string | number }) {
   )
 }
 
-function FoodItemRow({ item, multiplier }: { item: FoodItem; multiplier: number }) {
+function FoodItemRow({
+  item,
+  multiplier,
+  insight,
+}: {
+  item: FoodItem
+  multiplier: number
+  insight?: string
+}) {
   const cal = Math.round((item.nutrients[NUTRIENT_KEYS.calories] ?? 0) * multiplier)
   const protein = Math.round((item.nutrients[NUTRIENT_KEYS.protein] ?? 0) * multiplier)
   const servings = `${item.servingSize} ${item.servingUnit}`
@@ -175,12 +198,14 @@ function FoodItemRow({ item, multiplier }: { item: FoodItem; multiplier: number 
             {item.brand && ` · ${item.brand}`}
             {item.itemCategory !== 'food' && ` · ${item.itemCategory}`}
           </div>
+          <TrustBadge item={item} className="card-subtext mt-1" />
         </div>
         <div className="text-right card-subtext font-variant-numeric-tabular whitespace-nowrap">
           {cal > 0 && <div className="text-text-primary">{cal} cal</div>}
           {protein > 0 && <div>{protein}g protein</div>}
         </div>
       </div>
+      {insight && <p className="text-text-muted text-[12px] mt-1.5">{insight}</p>}
     </div>
   )
 }

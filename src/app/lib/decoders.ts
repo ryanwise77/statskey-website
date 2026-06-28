@@ -1,12 +1,18 @@
 import { toDate, toDateOrNow } from './firestore'
+import { deriveTrustMetadata } from './provenance'
 import type {
   AnalysisMode,
   BowelMovementEntry,
   BristolType,
   CadenceSample,
   EnergyEntry,
+  FoodIdentityEvidence,
   FoodItem,
+  FoodNutrientEvidence,
+  FoodQuantityEvidence,
   FoodSource,
+  FoodTrustLevel,
+  FoodTrustMetadata,
   GlucoseReading,
   GlucoseResponse,
   GlucoseSource,
@@ -18,6 +24,7 @@ import type {
   Meal,
   MoodEntry,
   PaceZoneDistribution,
+  PortionEstimate,
   RouteDifficulty,
   RoutePoint,
   SavedRoute,
@@ -60,7 +67,66 @@ function strArray(v: unknown): string[] {
   return v.filter((x): x is string => typeof x === 'string')
 }
 
+function numArray(v: unknown): number[] {
+  if (!Array.isArray(v)) return []
+  return v.filter((x): x is number => typeof x === 'number' && Number.isFinite(x))
+}
+
+function strMap(v: unknown): Record<string, string> {
+  const out: Record<string, string> = {}
+  const raw = asRaw(v)
+  if (!raw) return out
+  for (const [k, val] of Object.entries(raw)) {
+    if (typeof val === 'string') out[k] = val
+  }
+  return out
+}
+
+function optStrMap(v: unknown): Record<string, string> | undefined {
+  const map = strMap(v)
+  return Object.keys(map).length ? map : undefined
+}
+
+function optNumMap(v: unknown): Record<string, number> | undefined {
+  const map = numMap(v)
+  return Object.keys(map).length ? map : undefined
+}
+
 // MARK: - FoodItem
+
+const TRUST_LEVELS = new Set<FoodTrustLevel>(['unknown', 'low', 'medium', 'high'])
+
+function trustLevel(v: unknown): FoodTrustLevel {
+  const s = str(v)
+  return s && TRUST_LEVELS.has(s as FoodTrustLevel) ? (s as FoodTrustLevel) : 'unknown'
+}
+
+function decodeTrustMetadata(v: unknown): FoodTrustMetadata | undefined {
+  const r = asRaw(v)
+  if (!r) return undefined
+  return {
+    identityEvidence: (str(r.identityEvidence) as FoodIdentityEvidence | undefined) ?? 'unknown',
+    nutrientEvidence: (str(r.nutrientEvidence) as FoodNutrientEvidence | undefined) ?? 'unknown',
+    quantityEvidence: (str(r.quantityEvidence) as FoodQuantityEvidence | undefined) ?? 'unknown',
+    identityConfidence: trustLevel(r.identityConfidence),
+    nutrientConfidence: trustLevel(r.nutrientConfidence),
+    quantityConfidence: trustLevel(r.quantityConfidence),
+    notes: strArray(r.notes),
+  }
+}
+
+function decodePortionEstimate(v: unknown): PortionEstimate | undefined {
+  const r = asRaw(v)
+  if (!r) return undefined
+  const drafts = numArray(r.draftGrams)
+  const est: PortionEstimate = {
+    draftGrams: drafts.length ? drafts : undefined,
+    lowGram: num(r.lowGram),
+    highGram: num(r.highGram),
+  }
+  if (!est.draftGrams && est.lowGram == null && est.highGram == null) return undefined
+  return est
+}
 
 export function decodeFoodItem(raw: Raw, idFallback: string): FoodItem {
   const source = (str(raw.source) as FoodSource | undefined) ?? 'manual'
@@ -69,8 +135,9 @@ export function decodeFoodItem(raw: Raw, idFallback: string): FoodItem {
   const name = str(raw.name) ?? str(raw.description) ?? ''
   const servingSize = num(raw.servingSize) ?? num(raw.quantity) ?? 1
   const servingUnit = str(raw.servingUnit) ?? str(raw.unit) ?? 'serving'
+  const aiEstimatedKeys = strArray(raw.aiEstimatedNutrientKeys)
 
-  return {
+  const item: FoodItem = {
     id: str(raw.id) ?? idFallback,
     name,
     brand: str(raw.brand),
@@ -84,16 +151,32 @@ export function decodeFoodItem(raw: Raw, idFallback: string): FoodItem {
     gramWeight: num(raw.gramWeight),
     gramsPerCup: num(raw.gramsPerCup),
     isFavorite: bool(raw.isFavorite) ?? false,
+    hiddenFromFriends: bool(raw.hiddenFromFriends),
     useCount: num(raw.useCount) ?? 0,
     lastUsed: toDate(raw.lastUsed),
     source,
     itemCategory,
     notes: str(raw.notes),
     geminiExplanation: str(raw.geminiExplanation),
+    quantityWasUserAdjusted: bool(raw.quantityWasUserAdjusted),
+    trustMetadata: decodeTrustMetadata(raw.trustMetadata),
+    aiEstimatedNutrientKeys: aiEstimatedKeys.length ? aiEstimatedKeys : undefined,
+    nutrientFillSources: optStrMap(raw.nutrientFillSources),
+    // iOS persists `nutrientFillConfidence` under the Firestore key `nutrientConfidence`.
+    nutrientFillConfidence: optStrMap(raw.nutrientConfidence),
+    nutrientErrPct: optNumMap(raw.nutrientErrPct),
+    enrichmentMethod: str(raw.enrichmentMethod),
+    enrichmentCitation: str(raw.enrichmentCitation),
+    enrichmentSchemaVersion: num(raw.enrichmentSchemaVersion),
+    portionEstimate: decodePortionEstimate(raw.portionEstimate),
     createdAt: toDateOrNow(raw.createdAt),
     updatedAt: toDateOrNow(raw.updatedAt),
     consumedAt: toDate(raw.consumedAt),
   }
+  // Mirror iOS: older records without persisted trust metadata derive it on read
+  // so confidence/estimated badges work everywhere.
+  if (!item.trustMetadata) item.trustMetadata = deriveTrustMetadata(item)
+  return item
 }
 
 // MARK: - Meal
@@ -132,6 +215,10 @@ export function decodeMeal(raw: Raw, id: string): Meal {
     glucoseResponse,
     photoURLs: strArray(raw.photoURLs).length ? strArray(raw.photoURLs) : undefined,
     analysisMode: str(raw.analysisMode) as AnalysisMode | undefined,
+    totalNutrientsOverride: optNumMap(raw.totalNutrientsOverride),
+    hiddenItemCount: num(raw.hiddenItemCount),
+    aiExplanation: str(raw.aiExplanation),
+    aiItemInsights: optStrMap(raw.aiItemInsights),
     createdAt: toDateOrNow(raw.createdAt),
     updatedAt: toDateOrNow(raw.updatedAt),
   }

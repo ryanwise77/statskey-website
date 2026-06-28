@@ -10,9 +10,11 @@ import {
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { localDateString, startOfDay } from './firestore'
+import { deriveTrustMetadata } from './provenance'
 import type {
   FoodItem,
   Meal,
+  PortionEstimate,
   RoutePoint,
   SavedRoute,
   SubstanceEntry,
@@ -21,10 +23,20 @@ import type {
   WorkoutSession,
 } from './types'
 
+function encodePortionEstimate(est: PortionEstimate): Record<string, unknown> {
+  const out: Record<string, unknown> = {}
+  if (est.draftGrams && est.draftGrams.length) out.draftGrams = est.draftGrams
+  if (est.lowGram != null) out.lowGram = est.lowGram
+  if (est.highGram != null) out.highGram = est.highGram
+  return out
+}
+
 /**
  * Encodes a FoodItem back into a plain Firestore payload. Matches the fields
  * written by biometrics/StatsKey/Models/FoodItem.swift so iOS can read the
- * item natively.
+ * item natively — including the 4.7 trust/provenance/portion metadata, so
+ * web-recorded meals carry the same confidence signals and iOS-recorded
+ * provenance survives a web edit instead of being stripped.
  */
 export function encodeFoodItem(item: FoodItem): Record<string, unknown> {
   const out: Record<string, unknown> = {
@@ -34,9 +46,14 @@ export function encodeFoodItem(item: FoodItem): Record<string, unknown> {
     servingUnit: item.servingUnit,
     nutrients: item.nutrients,
     isFavorite: item.isFavorite,
+    hiddenFromFriends: item.hiddenFromFriends ?? false,
     useCount: item.useCount,
     source: item.source,
     itemCategory: item.itemCategory,
+    // iOS always re-derives + persists these on save (sanitizedForPersistence),
+    // so the recorded amount is correctly classified and trust stays consistent.
+    quantityWasUserAdjusted: item.quantityWasUserAdjusted ?? false,
+    trustMetadata: deriveTrustMetadata(item),
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
   }
@@ -51,6 +68,17 @@ export function encodeFoodItem(item: FoodItem): Record<string, unknown> {
   if (item.notes) out.notes = item.notes
   if (item.geminiExplanation) out.geminiExplanation = item.geminiExplanation
   if (item.consumedAt) out.consumedAt = item.consumedAt
+  // Enrichment / backfill provenance — preserved on round-trip so an iOS-filled
+  // item edited on the web keeps its per-nutrient sources and confidence.
+  if (item.aiEstimatedNutrientKeys?.length) out.aiEstimatedNutrientKeys = item.aiEstimatedNutrientKeys
+  if (item.nutrientFillSources) out.nutrientFillSources = item.nutrientFillSources
+  // iOS CodingKey maps `nutrientFillConfidence` to the Firestore key `nutrientConfidence`.
+  if (item.nutrientFillConfidence) out.nutrientConfidence = item.nutrientFillConfidence
+  if (item.nutrientErrPct) out.nutrientErrPct = item.nutrientErrPct
+  if (item.enrichmentMethod) out.enrichmentMethod = item.enrichmentMethod
+  if (item.enrichmentCitation) out.enrichmentCitation = item.enrichmentCitation
+  if (item.enrichmentSchemaVersion != null) out.enrichmentSchemaVersion = item.enrichmentSchemaVersion
+  if (item.portionEstimate) out.portionEstimate = encodePortionEstimate(item.portionEstimate)
   return out
 }
 
@@ -74,6 +102,12 @@ export async function saveMeal(uid: string, meal: Meal): Promise<void> {
   if (meal.glucoseResponse) payload.glucoseResponse = meal.glucoseResponse
   if (meal.photoURLs && meal.photoURLs.length) payload.photoURLs = meal.photoURLs
   if (meal.analysisMode) payload.analysisMode = meal.analysisMode
+  // Friend-privacy + on-demand AI fields — round-tripped so a web edit doesn't
+  // strip the meal's hidden-item snapshot or its Pro/Pro+ insights.
+  payload.hiddenItemCount = meal.hiddenItemCount ?? 0
+  if (meal.totalNutrientsOverride) payload.totalNutrientsOverride = meal.totalNutrientsOverride
+  if (meal.aiExplanation) payload.aiExplanation = meal.aiExplanation
+  if (meal.aiItemInsights) payload.aiItemInsights = meal.aiItemInsights
 
   await setDoc(doc(db, 'users', uid, 'meals', meal.id), payload, { merge: true })
 }
