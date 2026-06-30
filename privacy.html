@@ -23,8 +23,9 @@
             <a href="/app/login" class="hover:text-text-primary transition-colors">Sign in</a>
             <a href="/app/signup" class="inline-flex items-center justify-center h-7 px-3 rounded-full border border-white/15 bg-white/[0.06] text-text-primary hover:bg-white/[0.1] hover:border-white/25 transition-colors">Sign up</a>
           </div>
-          <div id="lang-switch" role="group" aria-label="Language / Sprache / 言語 / Idioma">
+          <div id="lang-switch" role="group" aria-label="Language / Idioma / Sprache / 言語">
             <button type="button" data-lang="en">EN</button>
+            <button type="button" data-lang="es">ES</button>
             <button type="button" data-lang="de">DE</button>
             <button type="button" data-lang="ja">日本語</button>
             <button type="button" data-lang="pt">PT</button>
@@ -36,7 +37,7 @@
     <main class="pt-28 pb-24 px-8">
       <div class="max-w-[720px] mx-auto">
         <h1 id="lp-title" class="font-display text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.035em] mb-2">Privacy Policy</h1>
-        <p id="lp-date" class="text-text-muted text-[13px] mb-12">Effective Date: June 10, 2026</p>
+        <p id="lp-date" class="text-text-muted text-[13px] mb-12">Effective Date: June 30, 2026</p>
 
         <div id="lp-content" class="space-y-10 text-[15px] text-text-secondary leading-relaxed legal-content">
 
@@ -48,9 +49,9 @@
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">2. Information We Collect</h2>
             <p class="mb-3"><strong class="text-text-primary">Account Information.</strong> Name (optional), email address, password (stored as a salted hash by Firebase Authentication when you sign up with email and password), federated sign-in identifiers (Apple ID or Google), and an internal user ID.</p>
-            <p class="mb-3"><strong class="text-text-primary">Health &amp; Fitness Data.</strong> Meals and nutrition entries, food photographs and text descriptions, exercise activities, durations, caloric estimates, weight and body metrics, custom goals, current and historical continuous glucose monitor (CGM) and glucose records, wellness logs, and — if you grant permission — Apple HealthKit data (including but not limited to energy, macronutrients, weight, heart rate, glucose, and workout data).</p>
+            <p class="mb-3"><strong class="text-text-primary">Health &amp; Fitness Data.</strong> Meals and nutrition entries, food photographs and text descriptions, exercise activities, durations, caloric estimates, weight and body metrics, custom goals, current and historical continuous glucose monitor (CGM) and glucose records, wellness logs, and — if you grant permission — Apple HealthKit (on iOS) or Android Health Connect (on Android) data (including but not limited to energy, macronutrients, weight, heart rate, glucose, and workout data).</p>
             <p class="mb-3"><strong class="text-text-primary">Location Data.</strong> If you enable location services, we collect GPS data during active workout recording to track route, distance, pace, and elevation. Background location access occurs only while a workout session is in progress and ceases when the session ends or is paused. We do not collect location data outside of workout recording.</p>
-            <p class="mb-3"><strong class="text-text-primary">Subscription &amp; Transaction Data.</strong> Purchase history, subscription status, billing channel (App Store or Stripe), Apple receipt tokens (for App Store subscriptions), Stripe customer and subscription identifiers (for web subscriptions), and limited device and application identifiers used for receipt validation, billing reconciliation, and fraud prevention. We do not store full payment card details; card data is processed and stored by Apple or Stripe.</p>
+            <p class="mb-3"><strong class="text-text-primary">Subscription &amp; Transaction Data.</strong> Purchase history, subscription status, billing channel (App Store, Google Play, or Stripe), Apple receipt tokens (for App Store subscriptions), Google Play purchase tokens (for Google Play subscriptions), Stripe customer and subscription identifiers (for web subscriptions), and limited device and application identifiers used for receipt validation, billing reconciliation, and fraud prevention. We do not store full payment card details; card data is processed and stored by Apple, Google, or Stripe.</p>
             <p class="mb-3"><strong class="text-text-primary">Device &amp; Usage Data.</strong> Device model, operating system version, application version, feature usage patterns, and performance event data.</p>
             <p class="mb-3"><strong class="text-text-primary">Diagnostics.</strong> Crash logs, error reports, and performance diagnostics.</p>
             <p><strong class="text-text-primary">Support Communications.</strong> Messages and attachments you send to our support channels.</p>
@@ -62,7 +63,7 @@
               <li><strong class="text-text-primary">Service delivery:</strong> Account creation, authentication, data synchronization, and core application functionality.</li>
               <li><strong class="text-text-primary">AI-powered analysis:</strong> Processing food photographs, text descriptions, chat messages, and relevant historical health records, including glucose records, through third-party AI services to generate nutritional estimates, summaries, and conversational responses. These outputs are approximations only and should not be relied upon for medical, dietary, or clinical decisions.</li>
               <li><strong class="text-text-primary">Personalization:</strong> Tailoring recommendations and goals based on your profile and historical data.</li>
-              <li><strong class="text-text-primary">Health integrations:</strong> Reading and/or writing HealthKit data strictly to power health and fitness features you explicitly enable, including using Apple Health as an optional source for glucose and other historical records.</li>
+              <li><strong class="text-text-primary">Health integrations:</strong> Reading and/or writing Apple HealthKit (on iOS) or Android Health Connect (on Android) data strictly to power health and fitness features you explicitly enable, including using Apple Health or Health Connect as an optional source for glucose and other historical records.</li>
               <li><strong class="text-text-primary">Analytics and quality:</strong> Understanding feature usage, diagnosing errors, and improving application performance.</li>
               <li><strong class="text-text-primary">Security and fraud prevention:</strong> Validating purchases, preventing abuse, and protecting user accounts.</li>
               <li><strong class="text-text-primary">Communications:</strong> Sending service-related notices (e.g., subscription status changes, material changes to terms). We may also send periodic product updates, tips, and promotional emails about StatsKey, and we will obtain your consent to do so where required by law. You can stop these at any time using the unsubscribe link included in every such email; service-related notices may still be sent as needed. HealthKit and glucose data are never used for marketing.</li>
@@ -70,13 +71,13 @@
           </section>
 
           <section>
-            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">4. Apple HealthKit Disclosure</h2>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">4. Apple HealthKit &amp; Android Health Connect Disclosure</h2>
             <ul class="list-disc pl-5 space-y-2">
-              <li>HealthKit data is used exclusively to provide or improve health and fitness features within the application, including importing historical glucose records when you grant the relevant Apple Health permission.</li>
-              <li>HealthKit data is never used for marketing, advertising, or data brokering and is never sold to any party.</li>
-              <li>HealthKit data is not shared with third parties except as necessary to process it on your behalf to provide the service, and never for independent use by those parties.</li>
-              <li>Glucose and other HealthKit records that you choose to sync may be backed up to your StatsKey account using Firebase / Google Cloud Platform so they are available across devices and to enabled StatsKey features, including AI conversation features.</li>
-              <li>You may revoke Health permissions at any time through Apple Health settings. Revocation stops new data flows but does not automatically delete previously stored data — see Section 10 ("Your Rights").</li>
+              <li>Data accessed through Apple HealthKit (iOS) or Android Health Connect (Android) is used exclusively to provide or improve health and fitness features within the application, including importing historical glucose records when you grant the relevant Apple Health or Health Connect permission.</li>
+              <li>This health data is never used for marketing, advertising, or data brokering and is never sold to any party.</li>
+              <li>This health data is not shared with third parties except as necessary to process it on your behalf to provide the service, and never for independent use by those parties.</li>
+              <li>Glucose and other health records that you choose to sync may be backed up to your StatsKey account using Firebase / Google Cloud Platform so they are available across devices and to enabled StatsKey features, including AI conversation features.</li>
+              <li>You may revoke these permissions at any time through Apple Health settings (iOS) or Android Health Connect settings (Android). Revocation stops new data flows but does not automatically delete previously stored data — see Section 10 ("Your Rights").</li>
             </ul>
           </section>
 
@@ -84,13 +85,13 @@
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5. AI Processing</h2>
             <p class="mb-3">When you use an AI-powered feature in the app (Intelligence chat, food photo analysis, nutrition-label scanning, AI-generated training plans, AI-generated nutrition insights), we transmit the content the active feature needs to one or more third-party AI processors so they can compute a response. The current set of AI processors is:</p>
             <ul class="list-disc pl-5 space-y-2 mb-3">
-              <li><strong class="text-text-primary">Google LLC</strong> — Gemini, accessed through Firebase AI Logic and the Google Generative AI API. <a href="https://policies.google.com/privacy" class="text-teal-600 hover:underline" target="_blank" rel="noopener">Google Privacy Policy</a>.</li>
-              <li><strong class="text-text-primary">Anthropic, PBC</strong> — Claude, accessed through Anthropic's API. <a href="https://www.anthropic.com/legal/privacy" class="text-teal-600 hover:underline" target="_blank" rel="noopener">Anthropic Privacy Policy</a>.</li>
-              <li><strong class="text-text-primary">OpenAI OpCo, LLC</strong> — ChatGPT models, accessed through the OpenAI API (including the Responses API for image-based food analysis fallback). <a href="https://openai.com/policies/row-privacy-policy/" class="text-teal-600 hover:underline" target="_blank" rel="noopener">OpenAI Privacy Policy</a>.</li>
-              <li><strong class="text-text-primary">xAI Corp.</strong> — Grok, accessed through the xAI API. <a href="https://x.ai/legal/privacy-policy" class="text-teal-600 hover:underline" target="_blank" rel="noopener">xAI Privacy Policy</a>.</li>
+              <li><strong class="text-text-primary">Google LLC</strong> — Gemini, accessed through Firebase AI Logic and the Google Generative AI API. <a href="https://policies.google.com/privacy" class="text-accent hover:underline" target="_blank" rel="noopener">Google Privacy Policy</a>.</li>
+              <li><strong class="text-text-primary">Anthropic, PBC</strong> — Claude, accessed through Anthropic's API. <a href="https://www.anthropic.com/legal/privacy" class="text-accent hover:underline" target="_blank" rel="noopener">Anthropic Privacy Policy</a>.</li>
+              <li><strong class="text-text-primary">OpenAI OpCo, LLC</strong> — ChatGPT models, accessed through the OpenAI API (including the Responses API for image-based food analysis fallback). <a href="https://openai.com/policies/row-privacy-policy/" class="text-accent hover:underline" target="_blank" rel="noopener">OpenAI Privacy Policy</a>.</li>
+              <li><strong class="text-text-primary">xAI Corp.</strong> — Grok, accessed through the xAI API. <a href="https://x.ai/legal/privacy-policy" class="text-accent hover:underline" target="_blank" rel="noopener">xAI Privacy Policy</a>.</li>
             </ul>
             <p class="mb-3">Categories of personal content we may transmit to the providers above include: messages and prompts you type into the AI chat; photos you capture or pick for food / nutrition-label analysis; summaries of your nutrition, weight, hydration, supplement, and glucose logs; historical glucose records and related trends when relevant to your request; summaries of your workouts, pace, heart-rate, and training plan; and basic profile fields you provided in onboarding (name, biological sex, weight, height, goals).</p>
-            <p class="mb-3">Before we transmit any content to these processors for the first time, the iOS app presents an in-app disclosure that names the processors and the categories of content above and asks you to grant permission. You can review or revoke this permission at any time from <em>Settings &rarr; AI &amp; Privacy &rarr; AI Features</em>. Revoking permission disables every AI-powered feature in the app while leaving the rest of the app fully functional.</p>
+            <p class="mb-3">Before we transmit any content to these processors for the first time, the app presents an in-app disclosure that names the processors and the categories of content above and asks you to grant permission. You can review or revoke this permission at any time from <em>Settings &rarr; AI &amp; Privacy &rarr; AI Features</em>. Revoking permission disables every AI-powered feature in the app while leaving the rest of the app fully functional.</p>
             <ul class="list-disc pl-5 space-y-2">
               <li>We do not send account identifiers, contact details, or other personal identifiers with the content the AI processors receive.</li>
               <li>AI-generated outputs are estimates and approximations. They may be inaccurate, incomplete, or incorrect. You should not rely on them for medical, clinical, or critical dietary decisions.</li>
@@ -105,9 +106,10 @@
             <ul class="list-disc pl-5 space-y-2">
               <li><strong class="text-text-primary">Firebase / Google Cloud Platform:</strong> Authentication, secure data storage, including synced historical glucose records, analytics, and crash reporting.</li>
               <li><strong class="text-text-primary">Apple App Store:</strong> Subscription billing for users who subscribe through the iOS app.</li>
+              <li><strong class="text-text-primary">Google Play:</strong> Subscription billing for users who subscribe through the Android app.</li>
               <li><strong class="text-text-primary">Stripe:</strong> Subscription billing and payment processing for users who subscribe through the website. Stripe receives card details, billing address, and an opaque user identifier; we receive only customer and subscription IDs and high-level status.</li>
               <li><strong class="text-text-primary">AI Providers (Google Gemini, Anthropic Claude, OpenAI ChatGPT, xAI Grok):</strong> AI-powered food analysis, nutrition estimation, training plan generation, and conversational features. See Section 5 for the per-provider links and the in-app permission flow.</li>
-              <li><strong class="text-text-primary">Apple HealthKit:</strong> Optional health data synchronization with your explicit permission.</li>
+              <li><strong class="text-text-primary">Apple HealthKit &amp; Android Health Connect:</strong> Optional health data synchronization with your explicit permission.</li>
               <li><strong class="text-text-primary">CGM Providers (Dexcom, Abbott, Nightscout):</strong> Optional continuous glucose monitor data integration with your explicit permission.</li>
               <li><strong class="text-text-primary">Nutrition data sources:</strong> Public or licensed databases to enrich nutritional information. We transmit only food context, not personal identifiers.</li>
             </ul>
@@ -168,7 +170,7 @@
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">12. Consumer Health Data (Washington, Nevada, Connecticut, and similar laws)</h2>
             <p class="mb-3">If you are a resident of a state with a consumer health data law — including the Washington My Health My Data Act (MHMDA), Nevada SB 370, and the Connecticut Data Privacy Act (as amended) — this section describes the additional categories of information we treat as "consumer health data" and your rights with respect to that information. Glucose values, continuous glucose monitor (CGM) records, and related metabolic data are treated as consumer health data under this Privacy Policy regardless of your state of residence.</p>
-            <p class="mb-3"><strong class="text-text-primary">Categories of consumer health data we collect.</strong> Glucose readings and CGM trend data (current and historical, whether imported from Apple Health, Dexcom Share, Abbott LibreLinkUp, Nightscout, or entered manually); food, beverage, supplement, and hydration logs that may reveal health condition or treatment patterns; weight, body composition, and biometric measurements; symptoms, energy, mood, sleep, and wellness logs; workout, heart rate, and other physical activity records; and any other information you provide that identifies your past, present, or future physical or mental health status, conditions, or treatments.</p>
+            <p class="mb-3"><strong class="text-text-primary">Categories of consumer health data we collect.</strong> Glucose readings and CGM trend data (current and historical, whether imported from Apple Health, Android Health Connect, Dexcom Share, Abbott LibreLinkUp, Nightscout, or entered manually); food, beverage, supplement, and hydration logs that may reveal health condition or treatment patterns; weight, body composition, and biometric measurements; symptoms, energy, mood, sleep, and wellness logs; workout, heart rate, and other physical activity records; and any other information you provide that identifies your past, present, or future physical or mental health status, conditions, or treatments.</p>
             <p class="mb-3"><strong class="text-text-primary">How we use it.</strong> Consumer health data is processed only to (i) provide the application features you have explicitly enabled, (ii) sync your data across your devices, (iii) generate the personal nutrition, wellness, and AI summaries you request, and (iv) maintain account security and prevent abuse. We do not sell consumer health data, share it with third parties for cross-context behavioral advertising, or use it to target advertising on our behalf or anyone else's behalf.</p>
             <p class="mb-3"><strong class="text-text-primary">Sharing.</strong> Consumer health data is disclosed only to the processors described in Sections 5 and 6 (Firebase / Google Cloud Platform for secure storage, AI providers when you actively use AI features, and Stripe / Apple for billing — none of which receive raw glucose data for the purpose of training models on you), and only as required to provide the application or comply with applicable law.</p>
             <p class="mb-3"><strong class="text-text-primary">Your rights.</strong> You have the right to (a) confirm whether we are collecting, sharing, or selling your consumer health data and access that data, (b) withdraw consent for our collection and sharing of consumer health data, (c) have your consumer health data deleted, including from our processors that hold the data on our behalf, and (d) appeal a decision we make about your request. We do not sell consumer health data, so there is no separate opt-out of sale to exercise. To exercise these rights, contact us at <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a>; we will respond within the timeframes required by the applicable state law. If we deny a request, you may appeal by replying to that decision with the word "Appeal" in the subject line, and you may also file a complaint with the attorney general of your state of residence.</p>
@@ -181,7 +183,7 @@
             <p class="mb-3">Our legal bases for processing personal data include:</p>
             <ul class="list-disc pl-5 space-y-2">
               <li><strong class="text-text-primary">Contract:</strong> To provide the application and fulfill our agreement with you.</li>
-              <li><strong class="text-text-primary">Consent:</strong> For HealthKit access, location services, and certain analytics.</li>
+              <li><strong class="text-text-primary">Consent:</strong> For HealthKit or Health Connect access, location services, and certain analytics.</li>
               <li><strong class="text-text-primary">Legitimate interests:</strong> Application safety, fraud prevention, quality improvement — balanced against your rights.</li>
               <li><strong class="text-text-primary">Legal obligation:</strong> Compliance with applicable laws.</li>
             </ul>

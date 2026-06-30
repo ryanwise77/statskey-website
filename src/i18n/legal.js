@@ -8,7 +8,7 @@
 // Language resolution order: ?lang= query  ->  saved choice  ->  device language
 // ->  English. The choice persists in localStorage and is reflected in the URL so
 // App Store Connect can link a deterministic per-locale URL (e.g. /privacy?lang=ja).
-const SUPPORTED = ['en', 'de', 'ja', 'pt']
+const SUPPORTED = ['en', 'es', 'de', 'ja', 'pt']
 const STORE_KEY = 'sk_lang'
 
 function detectLang() {
@@ -27,7 +27,7 @@ function detectLang() {
 export function applyI18n(translations) {
   // Collect every element id referenced by any language.
   const ids = new Set()
-  for (const lang of ['de', 'ja', 'pt']) {
+  for (const lang of Object.keys(translations)) {
     const dict = translations[lang]
     if (dict) for (const k of Object.keys(dict)) if (!k.startsWith('__')) ids.add(k)
   }

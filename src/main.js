@@ -1,4 +1,9 @@
 import './style.css'
+import { applyStoreLinks } from './storeLinks.js'
+
+// Reveal/point any Google Play buttons once their URL is configured (no-op
+// while the Play listing is unset, keeping those buttons hidden site-wide).
+applyStoreLinks()
 
 const revealObserver = new IntersectionObserver(
   (entries) => {

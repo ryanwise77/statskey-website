@@ -17,13 +17,14 @@
         <a href="/" class="font-display font-semibold text-[14px] tracking-[-0.01em] text-text-primary/80 hover:text-text-primary transition-colors">StatsKey</a>
         <div class="flex items-center gap-4">
           <div class="hidden md:flex items-center gap-8 text-[12px] text-text-muted">
-            <a href="/#features" class="hover:text-text-primary transition-colors">Features</a>
+            <a href="/#platform" class="hover:text-text-primary transition-colors">Features</a>
             <a href="/#intelligence" class="hover:text-text-primary transition-colors">Intelligence</a>
             <a href="/app" class="hover:text-text-primary transition-colors">Sign in</a>
             <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="text-text-secondary hover:text-text-primary transition-colors">Get the app</a>
           </div>
-          <div id="lang-switch" role="group" aria-label="Language / Sprache / 言語 / Idioma">
+          <div id="lang-switch" role="group" aria-label="Language / Idioma / Sprache / 言語">
             <button type="button" data-lang="en">EN</button>
+            <button type="button" data-lang="es">ES</button>
             <button type="button" data-lang="de">DE</button>
             <button type="button" data-lang="ja">日本語</button>
             <button type="button" data-lang="pt">PT</button>
@@ -45,7 +46,7 @@
             <div class="glass p-6">
               <p class="mb-2"><strong class="text-text-primary">Email:</strong> <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a></p>
               <p class="mb-4"><strong class="text-text-primary">Response Time:</strong> Within 24–48 hours</p>
-              <p class="text-[14px] text-text-muted">For fastest support, please include your device model (e.g., iPhone 15 Pro), iOS version, a description of the issue, and screenshots if applicable.</p>
+              <p class="text-[14px] text-text-muted">For fastest support, please include your device model (e.g., iPhone 15 Pro or Pixel 8), iOS or Android version, a description of the issue, and screenshots if applicable.</p>
             </div>
           </section>
 
@@ -66,12 +67,12 @@
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Can I use StatsKey offline?</h3>
-                <p>Core features work offline, including viewing logged meals and exercises. AI analysis and cloud sync require an internet connection.</p>
+                <p>Core features work offline, including viewing recorded meals and exercises. AI analysis and cloud sync require an internet connection.</p>
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">How do I sync with Apple Health?</h3>
-                <p>Go to Settings &rarr; Integrations &rarr; Apple Health. Grant permissions for the data types you want to sync. You can change these at any time in your iPhone's Settings.</p>
+                <h3 class="font-medium text-text-primary mb-1">How do I sync with Apple Health or Health Connect?</h3>
+                <p>Go to Settings &rarr; Integrations &rarr; Apple Health (iOS) or Health Connect (Android). Grant permissions for the data types you want to sync. You can change these at any time in your device's Settings.</p>
               </div>
 
               <div>
@@ -81,12 +82,27 @@
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Why isn't the camera working?</h3>
-                <p>Go to iPhone Settings &rarr; StatsKey &rarr; Enable Camera. You may need to restart the app after granting permission.</p>
+                <p>On iPhone, go to Settings &rarr; StatsKey &rarr; Enable Camera. On Android, go to Settings &rarr; Apps &rarr; StatsKey &rarr; Permissions &rarr; Camera. You may need to restart the app after granting permission.</p>
               </div>
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Why isn't my data syncing?</h3>
                 <p>Ensure you're signed in with Apple or Google and have an internet connection. Try Settings &rarr; Force Sync.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">Which glucose sensors does StatsKey support?</h3>
+                <p>StatsKey connects to Dexcom (via Dexcom Share), Abbott FreeStyle Libre (via LibreLinkUp), and Nightscout. You can also record glucose manually. CGM is optional — StatsKey works fully without it.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">What languages does StatsKey support?</h3>
+                <p>StatsKey is fully localized in English, Spanish, German, Japanese, and Brazilian Portuguese — including recording, training, your weekly recap, reminders, and exported reports.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">What's the difference between Pro and Pro+?</h3>
+                <p>StatsKey is free to start. Pro adds deeper food analysis, complete nutrition, meal plans, the route finder, social features, and a monthly allotment of AI tokens. Pro+ adds a much larger monthly token allotment, every premium Intelligence model, and automatic background micronutrient enrichment. Tokens power AI features, and you can top them up anytime.</p>
               </div>
 
             </div>
@@ -113,7 +129,7 @@
                   <li>Check Settings &rarr; Privacy &rarr; Health &rarr; StatsKey</li>
                   <li>Ensure all permissions are enabled</li>
                   <li>Force close and reopen StatsKey</li>
-                  <li>Restart your iPhone if issues persist</li>
+                  <li>Restart your device if issues persist</li>
                 </ul>
               </div>
 
@@ -131,7 +147,7 @@
                 <h3 class="font-medium text-text-primary mb-3">App Crashing</h3>
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>Update to the latest version</li>
-                  <li>Restart your iPhone</li>
+                  <li>Restart your device</li>
                   <li>Delete and reinstall the app</li>
                   <li>Contact support if the issue persists</li>
                 </ul>
@@ -158,7 +174,7 @@
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>What you were doing when it happened</li>
                   <li>Error messages and screenshots</li>
-                  <li>Device model, iOS version</li>
+                  <li>Device model, iOS or Android version</li>
                   <li>Steps to reproduce the issue</li>
                 </ul>
               </div>

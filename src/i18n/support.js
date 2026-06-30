@@ -13,7 +13,7 @@ const de = {
             <div class="glass p-6">
               <p class="mb-2"><strong class="text-text-primary">E-Mail:</strong> <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a></p>
               <p class="mb-4"><strong class="text-text-primary">Antwortzeit:</strong> Innerhalb von 24–48 Stunden</p>
-              <p class="text-[14px] text-text-muted">Für den schnellsten Support gib bitte dein Gerätemodell (z. B. iPhone 15 Pro), die iOS-Version, eine Beschreibung des Problems und ggf. Screenshots an.</p>
+              <p class="text-[14px] text-text-muted">Für den schnellsten Support gib bitte dein Gerätemodell (z. B. iPhone 15 Pro oder Pixel 8), die iOS- oder Android-Version, eine Beschreibung des Problems und ggf. Screenshots an.</p>
             </div>
           </section>
 
@@ -37,8 +37,8 @@ const de = {
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">Wie synchronisiere ich mit Apple Health?</h3>
-                <p>Gehe zu Einstellungen &rarr; Integrationen &rarr; Apple Health. Erteile Berechtigungen für die Datentypen, die du synchronisieren möchtest. Du kannst diese jederzeit in den Einstellungen deines iPhones ändern.</p>
+                <h3 class="font-medium text-text-primary mb-1">Wie synchronisiere ich mit Apple Health oder Health Connect?</h3>
+                <p>Gehe zu Einstellungen &rarr; Integrationen &rarr; Apple Health (iOS) oder Health Connect (Android). Erteile Berechtigungen für die Datentypen, die du synchronisieren möchtest. Du kannst diese jederzeit in den Einstellungen deines Geräts ändern.</p>
               </div>
 
               <div>
@@ -48,12 +48,27 @@ const de = {
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Warum funktioniert die Kamera nicht?</h3>
-                <p>Gehe zu iPhone-Einstellungen &rarr; StatsKey &rarr; Kamera aktivieren. Möglicherweise musst du die App nach Erteilung der Berechtigung neu starten.</p>
+                <p>Gehe auf dem iPhone zu Einstellungen &rarr; StatsKey &rarr; Kamera aktivieren. Auf Android gehe zu Einstellungen &rarr; Apps &rarr; StatsKey &rarr; Berechtigungen &rarr; Kamera. Möglicherweise musst du die App nach Erteilung der Berechtigung neu starten.</p>
               </div>
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Warum werden meine Daten nicht synchronisiert?</h3>
                 <p>Stelle sicher, dass du mit Apple oder Google angemeldet bist und eine Internetverbindung hast. Versuche Einstellungen &rarr; Synchronisierung erzwingen.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">Welche Glukose-Sensoren unterstützt StatsKey?</h3>
+                <p>StatsKey verbindet sich mit Dexcom (über Dexcom Share), Abbott FreeStyle Libre (über LibreLinkUp) und Nightscout. Du kannst Glukose auch manuell erfassen. CGM ist optional — StatsKey funktioniert auch vollständig ohne.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">Welche Sprachen unterstützt StatsKey?</h3>
+                <p>StatsKey ist vollständig lokalisiert in Englisch, Spanisch, Deutsch, Japanisch und brasilianischem Portugiesisch — einschließlich Erfassung, Training, deinem wöchentlichen Rückblick, Erinnerungen und exportierten Berichten.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">Was ist der Unterschied zwischen Pro und Pro+?</h3>
+                <p>StatsKey ist kostenlos nutzbar. Pro bietet zusätzlich eine genauere Essensanalyse, vollständige Nährwerte, Ernährungspläne, den Routenfinder, soziale Funktionen und ein monatliches Kontingent an KI-Tokens. Pro+ bietet ein deutlich größeres monatliches Token-Kontingent, alle Premium-Intelligence-Modelle und die automatische Nährstoffanreicherung im Hintergrund. Tokens treiben die KI-Funktionen an, und du kannst sie jederzeit aufladen.</p>
               </div>
 
             </div>
@@ -79,7 +94,7 @@ const de = {
                   <li>Prüfe Einstellungen &rarr; Datenschutz &rarr; Health &rarr; StatsKey</li>
                   <li>Stelle sicher, dass alle Berechtigungen aktiviert sind</li>
                   <li>StatsKey vollständig schließen und neu öffnen</li>
-                  <li>iPhone neu starten, wenn das Problem bestehen bleibt</li>
+                  <li>Gerät neu starten, wenn das Problem bestehen bleibt</li>
                 </ul>
               </div>
 
@@ -97,7 +112,7 @@ const de = {
                 <h3 class="font-medium text-text-primary mb-3">App stürzt ab</h3>
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>Auf die neueste Version aktualisieren</li>
-                  <li>iPhone neu starten</li>
+                  <li>Gerät neu starten</li>
                   <li>App löschen und neu installieren</li>
                   <li>Support kontaktieren, wenn das Problem bestehen bleibt</li>
                 </ul>
@@ -123,7 +138,7 @@ const de = {
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>Was du getan hast, als es passierte</li>
                   <li>Fehlermeldungen und Screenshots</li>
-                  <li>Gerätemodell, iOS-Version</li>
+                  <li>Gerätemodell, iOS- oder Android-Version</li>
                   <li>Schritte zur Reproduktion des Problems</li>
                 </ul>
               </div>
@@ -146,7 +161,7 @@ const ja = {
             <div class="glass p-6">
               <p class="mb-2"><strong class="text-text-primary">メール:</strong> <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a></p>
               <p class="mb-4"><strong class="text-text-primary">応答時間:</strong> 24〜48時間以内</p>
-              <p class="text-[14px] text-text-muted">最も迅速なサポートのため、デバイスのモデル（例: iPhone 15 Pro）、iOSのバージョン、問題の説明、該当する場合はスクリーンショットを記載してください。</p>
+              <p class="text-[14px] text-text-muted">最も迅速なサポートのため、デバイスのモデル（例: iPhone 15 ProまたはPixel 8）、iOSまたはAndroidのバージョン、問題の説明、該当する場合はスクリーンショットを記載してください。</p>
             </div>
           </section>
 
@@ -170,8 +185,8 @@ const ja = {
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">Apple Healthと同期するには？</h3>
-                <p>設定 &rarr; 連携 &rarr; Apple Health に移動します。同期したいデータタイプの許可を与えてください。これらはiPhoneの設定でいつでも変更できます。</p>
+                <h3 class="font-medium text-text-primary mb-1">Apple HealthまたはHealth Connectと同期するには？</h3>
+                <p>設定 &rarr; 連携 &rarr; Apple Health（iOS）またはHealth Connect（Android）に移動します。同期したいデータタイプの許可を与えてください。これらはお使いのデバイスの設定でいつでも変更できます。</p>
               </div>
 
               <div>
@@ -181,12 +196,27 @@ const ja = {
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">カメラが動作しないのはなぜですか？</h3>
-                <p>iPhoneの設定 &rarr; StatsKey &rarr; カメラを有効にする に移動します。許可を与えた後、アプリの再起動が必要な場合があります。</p>
+                <p>iPhoneでは、設定 &rarr; StatsKey &rarr; カメラを有効にする に移動します。Androidでは、設定 &rarr; アプリ &rarr; StatsKey &rarr; 権限 &rarr; カメラ に移動します。許可を与えた後、アプリの再起動が必要な場合があります。</p>
               </div>
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">データが同期されないのはなぜですか？</h3>
                 <p>AppleまたはGoogleでサインインしており、インターネットに接続されていることを確認してください。設定 &rarr; 同期を強制 をお試しください。</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">StatsKeyはどのグルコースセンサーに対応していますか？</h3>
+                <p>StatsKeyはDexcom（Dexcom Share経由）、Abbott FreeStyle Libre（LibreLinkUp経由）、Nightscoutに接続できます。グルコースを手動で記録することもできます。CGMは任意で、StatsKeyはCGMなしでも完全に動作します。</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">StatsKeyはどの言語に対応していますか？</h3>
+                <p>StatsKeyは英語、スペイン語、ドイツ語、日本語、ブラジルポルトガル語に完全対応しています。記録、トレーニング、週間まとめ、リマインダー、エクスポートしたレポートまで含まれます。</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">ProとPro+の違いは何ですか？</h3>
+                <p>StatsKeyは無料で始められます。Proでは、より詳しい食事分析、完全な栄養情報、食事プラン、ルートファインダー、ソーシャル機能、毎月のAIトークン枠が追加されます。Pro+では、さらに大きな毎月のトークン枠、すべてのプレミアムIntelligenceモデル、バックグラウンドでの自動栄養素補完が追加されます。トークンはAI機能を動かすもので、いつでも追加購入できます。</p>
               </div>
 
             </div>
@@ -212,7 +242,7 @@ const ja = {
                   <li>設定 &rarr; プライバシー &rarr; ヘルスケア &rarr; StatsKey を確認</li>
                   <li>すべての許可が有効になっているか確認</li>
                   <li>StatsKeyを完全に終了して再度開く</li>
-                  <li>問題が続く場合はiPhoneを再起動</li>
+                  <li>問題が続く場合はデバイスを再起動</li>
                 </ul>
               </div>
 
@@ -230,7 +260,7 @@ const ja = {
                 <h3 class="font-medium text-text-primary mb-3">アプリがクラッシュする</h3>
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>最新バージョンに更新する</li>
-                  <li>iPhoneを再起動する</li>
+                  <li>デバイスを再起動する</li>
                   <li>アプリを削除して再インストール</li>
                   <li>問題が続く場合はサポートに連絡</li>
                 </ul>
@@ -256,7 +286,7 @@ const ja = {
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>発生時に行っていたこと</li>
                   <li>エラーメッセージとスクリーンショット</li>
-                  <li>デバイスのモデル、iOSのバージョン</li>
+                  <li>デバイスのモデル、iOSまたはAndroidのバージョン</li>
                   <li>問題を再現する手順</li>
                 </ul>
               </div>
@@ -279,7 +309,7 @@ const pt = {
             <div class="glass p-6">
               <p class="mb-2"><strong class="text-text-primary">E-mail:</strong> <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a></p>
               <p class="mb-4"><strong class="text-text-primary">Tempo de resposta:</strong> Em até 24–48 horas</p>
-              <p class="text-[14px] text-text-muted">Para um atendimento mais rápido, inclua o modelo do seu dispositivo (por exemplo, iPhone 15 Pro), a versão do iOS, uma descrição do problema e capturas de tela, se aplicável.</p>
+              <p class="text-[14px] text-text-muted">Para um atendimento mais rápido, inclua o modelo do seu dispositivo (por exemplo, iPhone 15 Pro ou Pixel 8), a versão do iOS ou do Android, uma descrição do problema e capturas de tela, se aplicável.</p>
             </div>
           </section>
 
@@ -303,8 +333,8 @@ const pt = {
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">Como sincronizo com o Apple Health?</h3>
-                <p>Vá em Ajustes &rarr; Integrações &rarr; Apple Health. Conceda permissões para os tipos de dados que deseja sincronizar. Você pode alterá-las a qualquer momento nos Ajustes do seu iPhone.</p>
+                <h3 class="font-medium text-text-primary mb-1">Como sincronizo com o Apple Health ou o Health Connect?</h3>
+                <p>Vá em Ajustes &rarr; Integrações &rarr; Apple Health (iOS) ou Health Connect (Android). Conceda permissões para os tipos de dados que deseja sincronizar. Você pode alterá-las a qualquer momento nos Ajustes do seu dispositivo.</p>
               </div>
 
               <div>
@@ -314,12 +344,27 @@ const pt = {
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Por que a câmera não está funcionando?</h3>
-                <p>Vá em Ajustes do iPhone &rarr; StatsKey &rarr; Ativar Câmera. Talvez seja necessário reiniciar o app após conceder a permissão.</p>
+                <p>No iPhone, vá em Ajustes &rarr; StatsKey &rarr; Ativar Câmera. No Android, vá em Configurações &rarr; Apps &rarr; StatsKey &rarr; Permissões &rarr; Câmera. Talvez seja necessário reiniciar o app após conceder a permissão.</p>
               </div>
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Por que meus dados não estão sincronizando?</h3>
                 <p>Verifique se você entrou com a Apple ou o Google e se tem conexão com a internet. Tente Ajustes &rarr; Forçar Sincronização.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">Quais sensores de glicose o StatsKey suporta?</h3>
+                <p>O StatsKey se conecta ao Dexcom (via Dexcom Share), ao Abbott FreeStyle Libre (via LibreLinkUp) e ao Nightscout. Você também pode registrar a glicose manualmente. O CGM é opcional — o StatsKey funciona totalmente sem ele.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">Quais idiomas o StatsKey suporta?</h3>
+                <p>O StatsKey é totalmente localizado em inglês, espanhol, alemão, japonês e português do Brasil — incluindo registro, treino, seu resumo semanal, lembretes e relatórios exportados.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">Qual é a diferença entre o Pro e o Pro+?</h3>
+                <p>O StatsKey é gratuito para começar. O Pro adiciona análise de alimentos mais detalhada, nutrição completa, planos de refeições, o localizador de rotas, recursos sociais e uma cota mensal de tokens de IA. O Pro+ adiciona uma cota mensal de tokens muito maior, todos os modelos premium do Intelligence e o preenchimento automático de micronutrientes em segundo plano. Os tokens alimentam os recursos de IA, e você pode recarregá-los a qualquer momento.</p>
               </div>
 
             </div>
@@ -345,7 +390,7 @@ const pt = {
                   <li>Verifique Ajustes &rarr; Privacidade &rarr; Saúde &rarr; StatsKey</li>
                   <li>Confirme que todas as permissões estão ativadas</li>
                   <li>Force o fechamento e reabra o StatsKey</li>
-                  <li>Reinicie o iPhone se o problema persistir</li>
+                  <li>Reinicie o dispositivo se o problema persistir</li>
                 </ul>
               </div>
 
@@ -363,7 +408,7 @@ const pt = {
                 <h3 class="font-medium text-text-primary mb-3">App Travando</h3>
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>Atualize para a versão mais recente</li>
-                  <li>Reinicie o iPhone</li>
+                  <li>Reinicie o dispositivo</li>
                   <li>Exclua e reinstale o app</li>
                   <li>Entre em contato com o suporte se o problema persistir</li>
                 </ul>
@@ -389,7 +434,7 @@ const pt = {
                 <ul class="list-disc pl-4 space-y-1 text-[14px]">
                   <li>O que você estava fazendo quando aconteceu</li>
                   <li>Mensagens de erro e capturas de tela</li>
-                  <li>Modelo do dispositivo, versão do iOS</li>
+                  <li>Modelo do dispositivo, versão do iOS ou Android</li>
                   <li>Passos para reproduzir o problema</li>
                 </ul>
               </div>
@@ -402,4 +447,152 @@ const pt = {
   `,
 }
 
-applyI18n({ de, ja, pt })
+const es = {
+  __title: 'Soporte — StatsKey',
+  'lp-title': 'Soporte',
+  'lp-date': 'Última actualización: 2 de abril de 2026',
+  'lp-content': `
+          <section>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">Contáctanos</h2>
+            <div class="glass p-6">
+              <p class="mb-2"><strong class="text-text-primary">Correo electrónico:</strong> <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a></p>
+              <p class="mb-4"><strong class="text-text-primary">Tiempo de respuesta:</strong> En un plazo de 24 a 48 horas</p>
+              <p class="text-[14px] text-text-muted">Para una atención más rápida, indica el modelo de tu dispositivo (p. ej., iPhone 15 Pro o Pixel 8), la versión de iOS o Android, una descripción del problema y capturas de pantalla si procede.</p>
+            </div>
+          </section>
+
+          <section>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-6">Preguntas frecuentes</h2>
+            <div class="space-y-6">
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Qué precisión tiene el análisis de alimentos con IA?</h3>
+                <p>Nuestra IA ofrece estimaciones basadas en el análisis visual y en tamaños de ración habituales. Todos los valores nutricionales son aproximaciones y no deben usarse con fines médicos o clínicos. Para valores exactos, consulta el envase del alimento o usa la introducción manual.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Están seguros mis datos?</h3>
+                <p>Todos los datos se cifran en tránsito y en reposo. Nunca vendemos tu información personal. Consulta nuestra <a href="/privacy" class="text-accent hover:underline">Política de Privacidad</a> para conocer todos los detalles.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Puedo usar StatsKey sin conexión?</h3>
+                <p>Las funciones principales funcionan sin conexión, incluida la consulta de comidas y ejercicios registrados. El análisis con IA y la sincronización en la nube requieren conexión a internet.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Cómo sincronizo con Apple Health o Health Connect?</h3>
+                <p>Ve a Ajustes &rarr; Integraciones &rarr; Apple Health (iOS) o Health Connect (Android). Concede permisos para los tipos de datos que quieras sincronizar. Puedes cambiarlos en cualquier momento en los Ajustes de tu dispositivo.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Cómo elimino mi cuenta?</h3>
+                <p>Ajustes &rarr; Cuenta &rarr; Eliminar cuenta. Esto elimina de forma permanente todos tus datos de nuestros servidores en un plazo de 30 días.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Por qué no funciona la cámara?</h3>
+                <p>En el iPhone, ve a Ajustes &rarr; StatsKey &rarr; Activar cámara. En Android, ve a Ajustes &rarr; Aplicaciones &rarr; StatsKey &rarr; Permisos &rarr; Cámara. Es posible que tengas que reiniciar la app después de conceder el permiso.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Por qué no se sincronizan mis datos?</h3>
+                <p>Asegúrate de haber iniciado sesión con Apple o Google y de tener conexión a internet. Prueba Ajustes &rarr; Forzar sincronización.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Qué sensores de glucosa admite StatsKey?</h3>
+                <p>StatsKey se conecta con Dexcom (mediante Dexcom Share), Abbott FreeStyle Libre (mediante LibreLinkUp) y Nightscout. También puedes registrar la glucosa manualmente. El MCG es opcional: StatsKey funciona por completo sin él.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Qué idiomas admite StatsKey?</h3>
+                <p>StatsKey está totalmente localizado en inglés, español, alemán, japonés y portugués de Brasil, incluidos el registro, el entrenamiento, tu resumen semanal, los recordatorios y los informes exportados.</p>
+              </div>
+
+              <div>
+                <h3 class="font-medium text-text-primary mb-1">¿Cuál es la diferencia entre Pro y Pro+?</h3>
+                <p>StatsKey es gratis para empezar. Pro añade un análisis de alimentos más detallado, nutrición completa, planes de comidas, el buscador de rutas, funciones sociales y una asignación mensual de tokens de IA. Pro+ añade una asignación mensual de tokens mucho mayor, todos los modelos premium de Intelligence y el enriquecimiento automático de micronutrientes en segundo plano. Los tokens impulsan las funciones de IA y puedes recargarlos cuando quieras.</p>
+              </div>
+
+            </div>
+          </section>
+
+          <section>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-6">Solución de problemas</h2>
+            <div class="grid sm:grid-cols-2 gap-4">
+
+              <div class="glass p-6">
+                <h3 class="font-medium text-text-primary mb-3">No se reconoce el alimento</h3>
+                <ul class="list-disc pl-4 space-y-1 text-[14px]">
+                  <li>Toma las fotos con buena iluminación</li>
+                  <li>Centra el alimento en el encuadre</li>
+                  <li>Evita las fotos borrosas</li>
+                  <li>Prueba a describir el alimento con texto</li>
+                </ul>
+              </div>
+
+              <div class="glass p-6">
+                <h3 class="font-medium text-text-primary mb-3">HealthKit no se sincroniza</h3>
+                <ul class="list-disc pl-4 space-y-1 text-[14px]">
+                  <li>Revisa Ajustes &rarr; Privacidad &rarr; Salud &rarr; StatsKey</li>
+                  <li>Asegúrate de que todos los permisos estén activados</li>
+                  <li>Fuerza el cierre y vuelve a abrir StatsKey</li>
+                  <li>Reinicia tu dispositivo si el problema persiste</li>
+                </ul>
+              </div>
+
+              <div class="glass p-6">
+                <h3 class="font-medium text-text-primary mb-3">No puedo iniciar sesión</h3>
+                <ul class="list-disc pl-4 space-y-1 text-[14px]">
+                  <li>Comprueba la conexión a internet</li>
+                  <li>Con Apple: revisa Ajustes &rarr; Iniciar sesión con Apple</li>
+                  <li>Con Google: asegúrate de que la cuenta de Google es válida</li>
+                  <li>Prueba a eliminar y reinstalar la app</li>
+                </ul>
+              </div>
+
+              <div class="glass p-6">
+                <h3 class="font-medium text-text-primary mb-3">La app se cierra inesperadamente</h3>
+                <ul class="list-disc pl-4 space-y-1 text-[14px]">
+                  <li>Actualiza a la última versión</li>
+                  <li>Reinicia tu dispositivo</li>
+                  <li>Elimina y reinstala la app</li>
+                  <li>Contacta con soporte si el problema persiste</li>
+                </ul>
+              </div>
+
+            </div>
+          </section>
+
+          <section>
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">Solicitudes de funciones e informes de errores</h2>
+            <p class="mb-4">Agradecemos tus comentarios. Escríbenos a <a href="mailto:ryanws@statskeybiometrics.com" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a>.</p>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="glass p-6">
+                <h3 class="font-medium text-text-primary mb-3">Solicitudes de funciones</h3>
+                <ul class="list-disc pl-4 space-y-1 text-[14px]">
+                  <li>Descripción de la función</li>
+                  <li>Cómo ayudaría en tu camino hacia la salud</li>
+                  <li>Ejemplos de otras apps, si los hay</li>
+                </ul>
+              </div>
+              <div class="glass p-6">
+                <h3 class="font-medium text-text-primary mb-3">Informes de errores</h3>
+                <ul class="list-disc pl-4 space-y-1 text-[14px]">
+                  <li>Qué estabas haciendo cuando ocurrió</li>
+                  <li>Mensajes de error y capturas de pantalla</li>
+                  <li>Modelo del dispositivo y versión de iOS o Android</li>
+                  <li>Pasos para reproducir el problema</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="pt-4 border-t border-white/[0.06]">
+            <p class="text-text-muted text-[13px]">StatsKey no es un dispositivo médico y no está destinado a diagnosticar, tratar, curar ni prevenir ninguna enfermedad. Toda la información nutricional es aproximada. Consulta siempre a un profesional sanitario para tomar decisiones médicas. Consulta nuestros <a href="/terms" class="text-accent hover:underline">Términos del Servicio</a> y nuestra <a href="/privacy" class="text-accent hover:underline">Política de Privacidad</a> para conocer todos los detalles.</p>
+          </section>
+  `,
+}
+
+applyI18n({ es, de, ja, pt })

@@ -80,6 +80,22 @@ body::after {
 
 a { color: inherit; text-decoration: none; }
 
+/* Legal & support pages mark inline links with Tailwind's `.text-accent`
+   utility (+ `hover:underline`). Those utilities live in a cascade layer, so
+   the unlayered `a` reset above would otherwise outrank them and render links
+   as plain gray body text with no hover affordance. Restate the intent here,
+   unlayered and scoped to the legal/support content containers, so policy
+   links read as the brand accent and underline on hover — without touching
+   the homepage's per-component link styling. */
+#lp-content a.text-accent,
+.legal-content a.text-accent {
+  color: var(--color-accent);
+}
+#lp-content a.text-accent:hover,
+.legal-content a.text-accent:hover {
+  text-decoration: underline;
+}
+
 .page-shell {
   width: min(1160px, calc(100% - 40px));
   margin-inline: auto;
