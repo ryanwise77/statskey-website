@@ -41,9 +41,10 @@ const de = {
                 <p>Gehe zu Einstellungen &rarr; Integrationen &rarr; Apple Health (iOS) oder Health Connect (Android). Erteile Berechtigungen für die Datentypen, die du synchronisieren möchtest. Du kannst diese jederzeit in den Einstellungen deines Geräts ändern.</p>
               </div>
 
-              <div>
+              <div id="delete-account">
                 <h3 class="font-medium text-text-primary mb-1">Wie lösche ich mein Konto?</h3>
-                <p>Einstellungen &rarr; Konto &rarr; Konto löschen. Dadurch werden alle deine Daten innerhalb von 30 Tagen dauerhaft von unseren Servern entfernt.</p>
+                <p>In der App: Einstellungen &rarr; Konto &rarr; Konto löschen. Dadurch werden alle deine Daten innerhalb von 30 Tagen dauerhaft von unseren Servern entfernt.</p>
+                <p class="mt-2">Hast du die App nicht mehr installiert? Schreib eine E-Mail an <a href="mailto:ryanws@statskeybiometrics.com?subject=Delete%20My%20Account" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a> mit dem Betreff „Delete My Account“, und wir löschen dein Konto sowie die zugehörigen Daten innerhalb von 30 Tagen.</p>
               </div>
 
               <div>
@@ -189,9 +190,10 @@ const ja = {
                 <p>設定 &rarr; 連携 &rarr; Apple Health（iOS）またはHealth Connect（Android）に移動します。同期したいデータタイプの許可を与えてください。これらはお使いのデバイスの設定でいつでも変更できます。</p>
               </div>
 
-              <div>
+              <div id="delete-account">
                 <h3 class="font-medium text-text-primary mb-1">アカウントを削除するには？</h3>
-                <p>設定 &rarr; アカウント &rarr; アカウントを削除。これにより、すべてのデータが30日以内に当社のサーバーから完全に削除されます。</p>
+                <p>アプリ内で: 設定 &rarr; アカウント &rarr; アカウントを削除。これにより、すべてのデータが30日以内に当社のサーバーから完全に削除されます。</p>
+                <p class="mt-2">アプリをすでにアンインストールした場合は、件名を「Delete My Account」として<a href="mailto:ryanws@statskeybiometrics.com?subject=Delete%20My%20Account" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a> までメールしてください。30日以内にアカウントと関連データを削除します。</p>
               </div>
 
               <div>
@@ -337,9 +339,10 @@ const pt = {
                 <p>Vá em Ajustes &rarr; Integrações &rarr; Apple Health (iOS) ou Health Connect (Android). Conceda permissões para os tipos de dados que deseja sincronizar. Você pode alterá-las a qualquer momento nos Ajustes do seu dispositivo.</p>
               </div>
 
-              <div>
+              <div id="delete-account">
                 <h3 class="font-medium text-text-primary mb-1">Como excluo minha conta?</h3>
-                <p>Ajustes &rarr; Conta &rarr; Excluir Conta. Isso remove permanentemente todos os seus dados dos nossos servidores em até 30 dias.</p>
+                <p>No app: Ajustes &rarr; Conta &rarr; Excluir Conta. Isso remove permanentemente todos os seus dados dos nossos servidores em até 30 dias.</p>
+                <p class="mt-2">Não tem mais o app instalado? Envie um e-mail para <a href="mailto:ryanws@statskeybiometrics.com?subject=Delete%20My%20Account" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a> com o assunto "Delete My Account" e excluiremos sua conta e os dados associados em até 30 dias.</p>
               </div>
 
               <div>
@@ -485,9 +488,10 @@ const es = {
                 <p>Ve a Ajustes &rarr; Integraciones &rarr; Apple Health (iOS) o Health Connect (Android). Concede permisos para los tipos de datos que quieras sincronizar. Puedes cambiarlos en cualquier momento en los Ajustes de tu dispositivo.</p>
               </div>
 
-              <div>
+              <div id="delete-account">
                 <h3 class="font-medium text-text-primary mb-1">¿Cómo elimino mi cuenta?</h3>
-                <p>Ajustes &rarr; Cuenta &rarr; Eliminar cuenta. Esto elimina de forma permanente todos tus datos de nuestros servidores en un plazo de 30 días.</p>
+                <p>En la app: Ajustes &rarr; Cuenta &rarr; Eliminar cuenta. Esto elimina de forma permanente todos tus datos de nuestros servidores en un plazo de 30 días.</p>
+                <p class="mt-2">¿Ya no tienes la app instalada? Envía un correo a <a href="mailto:ryanws@statskeybiometrics.com?subject=Delete%20My%20Account" class="text-accent hover:underline">ryanws@statskeybiometrics.com</a> con el asunto "Delete My Account" y eliminaremos tu cuenta y los datos asociados en un plazo de 30 días.</p>
               </div>
 
               <div>
