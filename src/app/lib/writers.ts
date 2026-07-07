@@ -4,22 +4,35 @@ import {
   doc,
   deleteDoc,
   getDoc,
+  getDocs,
   increment,
+  limit,
+  orderBy,
+  query,
   setDoc,
   Timestamp,
+  where,
+  writeBatch,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import { localDateString, startOfDay } from './firestore'
+import { decodeWaterEntry } from './decoders'
+import { endOfDay, localDateString, startOfDay } from './firestore'
 import { deriveTrustMetadata } from './provenance'
 import type {
   FoodItem,
+  GlucoseReading,
+  MacroTargets,
   Meal,
   PortionEstimate,
+  ReportTopic,
   RoutePoint,
   SavedRoute,
   SubstanceEntry,
+  WaterEntry,
+  WeightEntry,
   WellnessData,
   WellnessEntry,
+  WorkoutComment,
   WorkoutSession,
 } from './types'
 
@@ -130,31 +143,199 @@ export async function saveFoodToLibrary(uid: string, food: FoodItem): Promise<vo
   )
 }
 
+/** Persists edits to an existing library food without inflating its use count. */
+export async function updateLibraryFood(uid: string, food: FoodItem): Promise<void> {
+  await setDoc(
+    doc(db, 'users', uid, 'foodLibrary', food.id),
+    encodeFoodItem({ ...food, updatedAt: new Date() }),
+    { merge: true }
+  )
+}
+
+export async function deleteLibraryFood(uid: string, foodId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'foodLibrary', foodId))
+}
+
 export async function saveDailyItem(uid: string, item: FoodItem): Promise<void> {
   await setDoc(doc(db, 'users', uid, 'dailyItems', item.id), encodeFoodItem(item), { merge: true })
 }
 
-/**
- * Water is stored at users/{uid}/water/{YYYY-MM-DD} with a cumulative `amount`.
- * This helper ADDS to the existing amount atomically using FieldValue.increment.
- * The doc ID matches biometrics/StatsKey/Services/DatabaseService.swift:137-141.
- */
-export async function addWaterOz(uid: string, flOz: number, day: Date = new Date()): Promise<void> {
-  const id = localDateString(day)
+export async function deleteDailyItem(uid: string, itemId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'dailyItems', itemId))
+}
+
+/** Flips the favorite flag on a saved meal without rewriting the whole doc. */
+export async function setMealFavorite(uid: string, mealId: string, isFavorite: boolean): Promise<void> {
   await setDoc(
-    doc(db, 'users', uid, 'water', id),
-    { amount: increment(flOz), date: Timestamp.fromDate(startOfDay(day)) },
+    doc(db, 'users', uid, 'meals', mealId),
+    { isFavorite, updatedAt: new Date() },
     { merge: true }
   )
 }
 
-export async function setWaterOz(uid: string, flOz: number, day: Date = new Date()): Promise<void> {
-  const id = localDateString(day)
-  await setDoc(
-    doc(db, 'users', uid, 'water', id),
-    { amount: flOz, date: Timestamp.fromDate(startOfDay(day)) },
+/**
+ * Water pipeline — mirrors DatabaseService.swift's per-entry tracking.
+ * Per-entry docs live at users/{uid}/waterEntries/{entryId}; the daily rollup
+ * at users/{uid}/water/{YYYY-MM-DD} (field `amount`) is kept in sync so every
+ * existing reader (dashboards, friends, iOS listeners) still works.
+ */
+
+function encodeWaterEntry(entry: WaterEntry): Record<string, unknown> {
+  return {
+    id: entry.id,
+    userId: entry.userId,
+    amount: entry.amount,
+    date: entry.date,
+    createdAt: entry.createdAt,
+    updatedAt: new Date(),
+  }
+}
+
+/** Records a new water entry + atomically bumps the day rollup in one batch. */
+export async function logWaterEntry(uid: string, flOz: number, date: Date = new Date()): Promise<void> {
+  const now = new Date()
+  const entry: WaterEntry = {
+    id: newId(),
+    userId: uid,
+    amount: flOz,
+    date,
+    createdAt: now,
+    updatedAt: now,
+  }
+  const batch = writeBatch(db)
+  batch.set(doc(db, 'users', uid, 'waterEntries', entry.id), encodeWaterEntry(entry))
+  batch.set(
+    doc(db, 'users', uid, 'water', localDateString(date)),
+    { amount: increment(flOz), date: Timestamp.fromDate(startOfDay(date)) },
     { merge: true }
   )
+  await batch.commit()
+}
+
+/** Legacy quick-add kept for dashboard buttons — now records a real entry. */
+export async function addWaterOz(uid: string, flOz: number, day: Date = new Date()): Promise<void> {
+  await logWaterEntry(uid, flOz, day)
+}
+
+async function fetchWaterEntriesForDay(uid: string, day: Date): Promise<WaterEntry[]> {
+  const snap = await getDocs(
+    query(
+      collection(db, 'users', uid, 'waterEntries'),
+      where('date', '>=', Timestamp.fromDate(startOfDay(day))),
+      where('date', '<=', Timestamp.fromDate(endOfDay(day))),
+      orderBy('date', 'asc')
+    )
+  )
+  return snap.docs.map((d) => decodeWaterEntry(d.data() as Record<string, unknown>, d.id))
+}
+
+/** Rebuilds the day rollup from its entries (after edits/deletes). */
+async function recomputeDailyWaterTotal(uid: string, day: Date): Promise<void> {
+  const entries = await fetchWaterEntriesForDay(uid, day)
+  const total = entries.reduce((sum, e) => sum + e.amount, 0)
+  await setDoc(
+    doc(db, 'users', uid, 'water', localDateString(day)),
+    { amount: total, date: Timestamp.fromDate(startOfDay(day)) },
+    { merge: true }
+  )
+}
+
+/** Persists an edit to an existing entry, then rebuilds affected day rollups. */
+export async function updateWaterEntry(uid: string, entry: WaterEntry, originalDate: Date): Promise<void> {
+  await setDoc(doc(db, 'users', uid, 'waterEntries', entry.id), encodeWaterEntry(entry))
+  await recomputeDailyWaterTotal(uid, entry.date)
+  if (localDateString(originalDate) !== localDateString(entry.date)) {
+    await recomputeDailyWaterTotal(uid, originalDate)
+  }
+}
+
+export async function deleteWaterEntry(uid: string, entryId: string, date: Date): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'waterEntries', entryId))
+  await recomputeDailyWaterTotal(uid, date)
+}
+
+/** Wipes every per-entry record for the day and zeroes the rollup ("Reset"). */
+export async function deleteAllWaterEntries(uid: string, day: Date): Promise<void> {
+  const entries = await fetchWaterEntriesForDay(uid, day)
+  const batch = writeBatch(db)
+  for (const e of entries) {
+    batch.delete(doc(db, 'users', uid, 'waterEntries', e.id))
+  }
+  batch.set(
+    doc(db, 'users', uid, 'water', localDateString(day)),
+    { amount: 0, date: Timestamp.fromDate(startOfDay(day)) },
+    { merge: true }
+  )
+  await batch.commit()
+}
+
+/**
+ * One-time-per-day backfill mirroring materializeLegacyWaterIfNeeded: if the
+ * day has a legacy rollup total but no per-entry records, materialize it as a
+ * single entry pinned to the start of day. Idempotent.
+ */
+export async function materializeLegacyWaterIfNeeded(uid: string, day: Date): Promise<boolean> {
+  const existing = await fetchWaterEntriesForDay(uid, day)
+  if (existing.length > 0) return false
+
+  const rollup = await getDoc(doc(db, 'users', uid, 'water', localDateString(day))).catch(() => null)
+  const legacyTotal = rollup?.exists() ? Number(rollup.data()?.amount ?? 0) : 0
+  if (!(legacyTotal > 0)) return false
+
+  const now = new Date()
+  const entry: WaterEntry = {
+    id: newId(),
+    userId: uid,
+    amount: legacyTotal,
+    date: startOfDay(day),
+    createdAt: now,
+    updatedAt: now,
+  }
+  await setDoc(doc(db, 'users', uid, 'waterEntries', entry.id), encodeWaterEntry(entry))
+  return true
+}
+
+// MARK: - Weight writes
+// users/{uid}/weights has a strict field allowlist in firestore.rules:
+// ["id", "weightLbs", "bodyFatPercent", "muscleMassKg", "date", "source",
+//  "_syncHash", "_syncUpdatedAt"] — do not add fields here.
+
+export async function saveWeightEntry(uid: string, entry: WeightEntry): Promise<void> {
+  const payload: Record<string, unknown> = {
+    id: entry.id,
+    weightLbs: entry.weightLbs,
+    date: Timestamp.fromDate(entry.date),
+    source: entry.source ?? 'Manual',
+  }
+  if (entry.bodyFatPercent != null) payload.bodyFatPercent = entry.bodyFatPercent
+  if (entry.muscleMassKg != null) payload.muscleMassKg = entry.muscleMassKg
+  await setDoc(doc(db, 'users', uid, 'weights', entry.id), payload)
+}
+
+export async function deleteWeightEntry(uid: string, entryId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'weights', entryId))
+}
+
+// MARK: - Glucose writes
+// users/{uid}/glucoseReadings enforces hasOnly(["id", "value", "timestamp",
+// "source", "trend", "_syncHash", "_syncUpdatedAt"]) + value in 20...600.
+
+export async function saveGlucoseReading(uid: string, reading: GlucoseReading): Promise<void> {
+  if (!(reading.value >= 20 && reading.value <= 600)) {
+    throw new Error('Glucose must be between 20 and 600 mg/dL.')
+  }
+  const payload: Record<string, unknown> = {
+    id: reading.id,
+    value: reading.value,
+    timestamp: Timestamp.fromDate(reading.timestamp),
+    source: reading.source,
+  }
+  if (reading.trend) payload.trend = reading.trend
+  await setDoc(doc(db, 'users', uid, 'glucoseReadings', reading.id), payload)
+}
+
+export async function deleteGlucoseReading(uid: string, readingId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'glucoseReadings', readingId))
 }
 
 // MARK: - Wellness writes
@@ -182,6 +363,7 @@ function encodeWellnessData(data: WellnessData): Record<string, unknown> {
         type: 'mood',
         mood: {
           rating: data.entry.rating,
+          stress: data.entry.stress ?? null,
           tags: data.entry.tags,
           notes: data.entry.notes ?? null,
         },
@@ -192,6 +374,7 @@ function encodeWellnessData(data: WellnessData): Record<string, unknown> {
         energy: {
           level: data.entry.level,
           crashTime: data.entry.crashTime ?? null,
+          tags: data.entry.tags ?? [],
           notes: data.entry.notes ?? null,
         },
       }
@@ -204,6 +387,10 @@ function encodeWellnessData(data: WellnessData): Record<string, unknown> {
           urgency: data.entry.urgency ?? null,
           durationInSeconds: data.entry.durationInSeconds ?? null,
           notes: data.entry.notes ?? null,
+          estimatedSize: data.entry.estimatedSize ?? null,
+          // iOS-only private photo attachment survives web edits.
+          photoStoragePath: data.entry.photoStoragePath ?? null,
+          photoCreatedAt: data.entry.photoCreatedAt ?? null,
         },
       }
     case 'sleep':
@@ -260,6 +447,203 @@ export async function saveSubstanceEntry(uid: string, entry: SubstanceEntry): Pr
   if (entry.notes) payload.notes = entry.notes
 
   await setDoc(doc(db, 'users', uid, 'substances', entry.id), payload, { merge: true })
+}
+
+export async function deleteSubstanceEntry(uid: string, entryId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'substances', entryId))
+}
+
+// MARK: - Macro targets
+
+function encodeMacroTargets(t: MacroTargets): Record<string, unknown> {
+  return {
+    calories: t.calories,
+    protein: t.protein,
+    carbs: t.carbs,
+    fat: t.fat,
+    fiber: t.fiber,
+    water: t.water,
+    isAIAdaptive: t.isAIAdaptive,
+    isWaterCustom: t.isWaterCustom,
+    goalType: t.goalType,
+    weeklyWeightChangeLbs: t.weeklyWeightChangeLbs,
+    proteinGramsPerKg: t.proteinGramsPerKg,
+    fatPercentage: t.fatPercentage,
+    carbPreference: t.carbPreference,
+    exerciseCalorieStrategy: t.exerciseCalorieStrategy,
+    calorieFloor: t.calorieFloor,
+    usesNetCarbs: t.usesNetCarbs,
+  }
+}
+
+function macroTargetsChanged(a: MacroTargets, b: MacroTargets): boolean {
+  return (
+    Math.round(a.calories) !== Math.round(b.calories) ||
+    Math.round(a.protein) !== Math.round(b.protein) ||
+    Math.round(a.carbs) !== Math.round(b.carbs) ||
+    Math.round(a.fat) !== Math.round(b.fat) ||
+    Math.round(a.fiber) !== Math.round(b.fiber) ||
+    Math.round(a.water) !== Math.round(b.water) ||
+    a.isAIAdaptive !== b.isAIAdaptive ||
+    a.goalType !== b.goalType
+  )
+}
+
+/**
+ * Saves users/{uid}/settings/macroTargets and appends a MacroTargetSnapshot to
+ * users/{uid}/macroTargetHistory when the target meaningfully changed —
+ * matching recordMacroTargetSnapshotIfChanged in DatabaseService.swift so
+ * iOS reports keep comparing intake against the target active at the time.
+ */
+export async function saveMacroTargets(
+  uid: string,
+  targets: MacroTargets,
+  reason: string = 'Edited on web'
+): Promise<void> {
+  await setDoc(doc(db, 'users', uid, 'settings', 'macroTargets'), encodeMacroTargets(targets))
+
+  try {
+    const latestSnap = await getDocs(
+      query(collection(db, 'users', uid, 'macroTargetHistory'), orderBy('effectiveAt', 'desc'), limit(1))
+    )
+    if (!latestSnap.empty) {
+      const latestTargets = latestSnap.docs[0].data()?.targets as Record<string, unknown> | undefined
+      if (latestTargets) {
+        const prev = { ...targets, ...latestTargets } as MacroTargets
+        if (!macroTargetsChanged(prev, targets)) return
+      }
+    }
+    const snapshotId = newId()
+    await setDoc(doc(db, 'users', uid, 'macroTargetHistory', snapshotId), {
+      id: snapshotId,
+      targets: encodeMacroTargets(targets),
+      effectiveAt: Timestamp.fromDate(new Date()),
+      recordedAt: Timestamp.fromDate(new Date()),
+      source: 'manual',
+      reason,
+    })
+  } catch {
+    // History is best-effort; the live target doc is already saved.
+  }
+}
+
+// MARK: - Workout social (kudos + comments)
+
+/**
+ * Toggles the caller's kudo on a workout. Matches toggleKudo at
+ * DatabaseService.swift:1712 — doc ID is the kudo-giver's UID.
+ */
+export async function toggleWorkoutKudo(params: {
+  workoutOwnerId: string
+  workoutId: string
+  kudoUserId: string
+  userName: string
+}): Promise<boolean> {
+  const { workoutOwnerId, workoutId, kudoUserId, userName } = params
+  const ref = doc(db, 'users', workoutOwnerId, 'workoutSessions', workoutId, 'kudos', kudoUserId)
+  const existing = await getDoc(ref)
+  if (existing.exists()) {
+    await deleteDoc(ref)
+    return false
+  }
+  await setDoc(ref, {
+    id: kudoUserId,
+    userId: kudoUserId,
+    userName,
+    workoutId,
+    createdAt: Timestamp.fromDate(new Date()),
+  })
+  return true
+}
+
+export async function addWorkoutComment(params: {
+  workoutOwnerId: string
+  comment: WorkoutComment
+}): Promise<void> {
+  const { workoutOwnerId, comment } = params
+  await setDoc(
+    doc(db, 'users', workoutOwnerId, 'workoutSessions', comment.workoutId, 'comments', comment.id),
+    {
+      id: comment.id,
+      userId: comment.userId,
+      userName: comment.userName,
+      workoutId: comment.workoutId,
+      text: comment.text,
+      createdAt: Timestamp.fromDate(comment.createdAt),
+    }
+  )
+}
+
+// MARK: - Deep Dive reports
+
+/**
+ * Queues a remote Deep Dive job at users/{uid}/reportJobs/{jobId}. The
+ * processReportJob Cloud Function runs Claude server-side and writes the
+ * finished report to users/{uid}/reports/{jobId} (same doc ID).
+ */
+export async function createReportJob(uid: string, params: {
+  topic: ReportTopic
+  title: string
+  systemPrompt: string
+  userPrompt: string
+  modelId: string
+  modelLabel: string
+  rangeStart: Date
+  rangeEnd: Date
+}): Promise<string> {
+  const jobId = newId()
+  await setDoc(doc(db, 'users', uid, 'reportJobs', jobId), {
+    id: jobId,
+    userId: uid,
+    topicRaw: params.topic,
+    title: params.title,
+    promptUsed: params.userPrompt,
+    systemPrompt: params.systemPrompt,
+    userPrompt: params.userPrompt,
+    modelId: params.modelId,
+    modelLabel: params.modelLabel,
+    rangeStart: Timestamp.fromDate(params.rangeStart),
+    rangeEnd: Timestamp.fromDate(params.rangeEnd),
+    status: 'queued',
+    createdAt: Timestamp.fromDate(new Date()),
+  })
+  return jobId
+}
+
+export async function deleteReport(uid: string, reportId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'reports', reportId))
+  await deleteDoc(doc(db, 'users', uid, 'reportJobs', reportId)).catch(() => {})
+}
+
+// MARK: - Account deletion (soft delete, mirrors iOS pendingDeletionAt flow)
+
+export async function requestAccountDeletion(uid: string): Promise<void> {
+  await setDoc(
+    doc(db, 'users', uid),
+    { pendingDeletionAt: Timestamp.fromDate(new Date()) },
+    { merge: true }
+  )
+}
+
+export async function cancelAccountDeletion(uid: string): Promise<void> {
+  await setDoc(doc(db, 'users', uid), { pendingDeletionAt: null }, { merge: true })
+}
+
+// MARK: - Social profile
+
+export async function saveSocialProfile(uid: string, social: {
+  username?: string
+  displayName?: string
+  isDiscoverable: boolean
+  avatarURL?: string
+}): Promise<void> {
+  const payload: Record<string, unknown> = {
+    isDiscoverable: social.isDiscoverable,
+  }
+  if (social.username !== undefined) payload.username = social.username
+  if (social.displayName !== undefined) payload.displayName = social.displayName
+  if (social.avatarURL !== undefined) payload.avatarURL = social.avatarURL
+  await setDoc(doc(db, 'users', uid, 'social', 'profile'), payload, { merge: true })
 }
 
 // MARK: - Workout writes
@@ -352,6 +736,11 @@ export async function saveRoute(uid: string, route: SavedRoute): Promise<void> {
   } else {
     await deleteDoc(doc(db, 'publicRoutes', route.id)).catch(() => {})
   }
+}
+
+export async function deleteRoute(uid: string, routeId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'routes', routeId))
+  await deleteDoc(doc(db, 'publicRoutes', routeId)).catch(() => {})
 }
 
 // MARK: - Friendships

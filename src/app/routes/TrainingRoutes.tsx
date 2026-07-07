@@ -4,7 +4,7 @@ import L from 'leaflet'
 import { useAuth } from '../lib/auth'
 import { usePublicRoutes, useSavedRoutes } from '../lib/data/useRoutes'
 import { formatDistance, formatDuration } from '../lib/format'
-import { newId, saveRoute } from '../lib/writers'
+import { deleteRoute, newId, saveRoute } from '../lib/writers'
 import { RouteMap } from '../components/RouteMap'
 import {
   sportAccentColor,
@@ -261,7 +261,7 @@ export function TrainingRoutes() {
         </aside>
       </div>
 
-      <RouteLibrary title="My routes" state={saved} />
+      <RouteLibrary title="My routes" state={saved} canDelete uid={user?.uid} />
       <RouteLibrary title="Discover" state={publicRoutes} emptyText="No public routes yet." />
     </div>
   )
@@ -350,10 +350,14 @@ function RouteLibrary({
   title,
   state,
   emptyText = 'No saved routes yet.',
+  canDelete = false,
+  uid,
 }: {
   title: string
   state: { routes: SavedRoute[]; loading: boolean; error: string | null }
   emptyText?: string
+  canDelete?: boolean
+  uid?: string
 }) {
   return (
     <section className="space-y-3">
@@ -370,7 +374,7 @@ function RouteLibrary({
       ) : (
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
           {state.routes.map((route) => (
-            <RouteCard key={route.id} route={route} />
+            <RouteCard key={route.id} route={route} canDelete={canDelete} uid={uid} />
           ))}
         </div>
       )}
@@ -378,8 +382,15 @@ function RouteLibrary({
   )
 }
 
-function RouteCard({ route }: { route: SavedRoute }) {
+function RouteCard({ route, canDelete, uid }: { route: SavedRoute; canDelete?: boolean; uid?: string }) {
   const accent = sportAccentColor(route.sportType)
+
+  async function remove() {
+    if (!uid) return
+    if (!window.confirm(`Delete route "${route.name}"?`)) return
+    await deleteRoute(uid, route.id).catch(() => {})
+  }
+
   return (
     <article className="panel space-y-3">
       <RouteMap route={route.routePoints} color={accent} height={140} preview />
@@ -399,7 +410,12 @@ function RouteCard({ route }: { route: SavedRoute }) {
       </div>
       <div className="flex items-center justify-between text-[12px]">
         <span className="text-text-muted">{route.isPublic ? 'Public' : 'Private'}</span>
-        <button className="link" onClick={() => downloadGPX(route)}>Export GPX</button>
+        <div className="flex items-center gap-3">
+          {canDelete && (
+            <button className="text-red-300 hover:underline" onClick={remove}>Delete</button>
+          )}
+          <button className="link" onClick={() => downloadGPX(route)}>Export GPX</button>
+        </div>
       </div>
     </article>
   )

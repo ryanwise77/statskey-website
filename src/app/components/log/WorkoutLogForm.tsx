@@ -17,19 +17,36 @@ const SPORTS = [
   'other',
 ]
 
-export function WorkoutLogForm({ onSaved }: { onSaved: () => void }) {
+interface WorkoutLogFormProps {
+  onSaved: () => void
+  /** When present the form edits this workout instead of creating a new one. */
+  initialWorkout?: WorkoutSession
+  onCancel?: () => void
+}
+
+export function WorkoutLogForm({ onSaved, initialWorkout, onCancel }: WorkoutLogFormProps) {
   const { user } = useAuth()
+  const isEditing = initialWorkout != null
   const now = new Date()
-  const [title, setTitle] = useState('')
-  const [sport, setSport] = useState('running')
-  const [startDate, setStartDate] = useState(now)
-  const [durationMin, setDurationMin] = useState(30)
-  const [distance, setDistance] = useState(0)
-  const [calories, setCalories] = useState(0)
-  const [notes, setNotes] = useState('')
-  const [isIndoor, setIsIndoor] = useState(false)
+  const [title, setTitle] = useState(initialWorkout?.title ?? '')
+  const [sport, setSport] = useState(initialWorkout?.sportType ?? 'running')
+  const [startDate, setStartDate] = useState(initialWorkout?.startDate ?? now)
+  const [durationMin, setDurationMin] = useState(
+    initialWorkout ? Math.round(initialWorkout.duration / 60) : 30
+  )
+  const [distance, setDistance] = useState(initialWorkout?.distance ?? 0)
+  const [calories, setCalories] = useState(initialWorkout?.calories ?? 0)
+  const [notes, setNotes] = useState(initialWorkout?.notes ?? '')
+  const [isIndoor, setIsIndoor] = useState(initialWorkout?.isIndoor ?? false)
+  const [perceivedEffort, setPerceivedEffort] = useState<number | undefined>(
+    initialWorkout?.perceivedEffort
+  )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // A GPS/HealthKit recording's metrics come from sensors — only let the user
+  // retitle/annotate those, matching WorkoutEditView on iOS.
+  const metricsLocked = isEditing && initialWorkout!.source !== 'manual'
 
   async function save() {
     if (!user) return
@@ -44,38 +61,60 @@ export function WorkoutLogForm({ onSaved }: { onSaved: () => void }) {
       const pace = distance > 0 && durationSec > 0 ? durationSec / distance : 0
       const speed = pace > 0 ? 3600 / pace : 0
 
-      const workout: WorkoutSession = {
+      const base: WorkoutSession = initialWorkout ?? {
         id: newId(),
         userId: user.uid,
-        title: title.trim() || sport,
+        title: '',
         sportType: sport,
         startDate,
-        endDate: new Date(startDate.getTime() + durationSec * 1000),
-        duration: durationSec,
-        movingTime: durationSec,
-        distance,
+        duration: 0,
+        movingTime: 0,
+        distance: 0,
         elevationGain: 0,
         elevationLoss: 0,
-        calories,
-        averagePace: pace,
-        bestPace: pace,
-        averageSpeed: speed,
-        maxSpeed: speed,
+        calories: 0,
+        averagePace: 0,
+        bestPace: 0,
+        averageSpeed: 0,
+        maxSpeed: 0,
         averageHeartRate: 0,
         maxHeartRate: 0,
         averageCadence: 0,
         isFavorite: false,
-        notes: notes.trim() || undefined,
         relativeEffort: 0,
-        gradeAdjustedPace: pace,
+        gradeAdjustedPace: 0,
         photoURLs: [],
         source: 'manual',
-        isIndoor,
+        isIndoor: false,
         recordingMode: 'standard',
         createdAt: new Date(),
         routeCoordinates: [],
         splits: [],
       }
+
+      const workout: WorkoutSession = {
+        ...base,
+        title: title.trim() || sport,
+        sportType: sport,
+        notes: notes.trim() || undefined,
+        isIndoor,
+        perceivedEffort,
+      }
+
+      if (!metricsLocked) {
+        workout.startDate = startDate
+        workout.endDate = new Date(startDate.getTime() + durationSec * 1000)
+        workout.duration = durationSec
+        workout.movingTime = durationSec
+        workout.distance = distance
+        workout.calories = calories
+        workout.averagePace = pace
+        workout.bestPace = pace
+        workout.averageSpeed = speed
+        workout.maxSpeed = speed
+        workout.gradeAdjustedPace = pace
+      }
+
       await saveWorkout(user.uid, workout)
       onSaved()
     } catch (e) {
@@ -87,6 +126,13 @@ export function WorkoutLogForm({ onSaved }: { onSaved: () => void }) {
 
   return (
     <div className="space-y-4">
+      {metricsLocked && (
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-[12px] text-text-secondary">
+          This workout was recorded with sensors ({initialWorkout!.source}). Title, notes, effort, and
+          sport can be edited; measured metrics stay as recorded.
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Title">
           <input
@@ -98,6 +144,7 @@ export function WorkoutLogForm({ onSaved }: { onSaved: () => void }) {
         </Field>
         <Field label="Sport">
           <select className="input" value={sport} onChange={(e) => setSport(e.target.value)}>
+            {SPORTS.includes(sport) ? null : <option value={sport}>{sport}</option>}
             {SPORTS.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -105,42 +152,67 @@ export function WorkoutLogForm({ onSaved }: { onSaved: () => void }) {
             ))}
           </select>
         </Field>
-        <Field label="Start">
-          <input
-            className="input"
-            type="datetime-local"
-            value={toDatetimeLocal(startDate)}
-            onChange={(e) => setStartDate(fromDatetimeLocal(e.target.value))}
-          />
-        </Field>
-        <Field label="Duration (minutes)">
-          <input
-            className="input"
-            type="number"
-            min={0}
-            value={durationMin}
-            onChange={(e) => setDurationMin(Number(e.target.value))}
-          />
-        </Field>
-        <Field label="Distance (miles)">
-          <input
-            className="input"
-            type="number"
-            step="0.01"
-            min={0}
-            value={distance}
-            onChange={(e) => setDistance(Number(e.target.value))}
-          />
-        </Field>
-        <Field label="Calories">
-          <input
-            className="input"
-            type="number"
-            min={0}
-            value={calories}
-            onChange={(e) => setCalories(Number(e.target.value))}
-          />
-        </Field>
+        {!metricsLocked && (
+          <>
+            <Field label="Start">
+              <input
+                className="input"
+                type="datetime-local"
+                value={toDatetimeLocal(startDate)}
+                onChange={(e) => setStartDate(fromDatetimeLocal(e.target.value))}
+              />
+            </Field>
+            <Field label="Duration (minutes)">
+              <input
+                className="input"
+                type="number"
+                min={0}
+                value={durationMin}
+                onChange={(e) => setDurationMin(Number(e.target.value))}
+              />
+            </Field>
+            <Field label="Distance (miles)">
+              <input
+                className="input"
+                type="number"
+                step="0.01"
+                min={0}
+                value={distance}
+                onChange={(e) => setDistance(Number(e.target.value))}
+              />
+            </Field>
+            <Field label="Calories">
+              <input
+                className="input"
+                type="number"
+                min={0}
+                value={calories}
+                onChange={(e) => setCalories(Number(e.target.value))}
+              />
+            </Field>
+          </>
+        )}
+      </div>
+
+      <div>
+        <span className="text-text-muted text-[11px] uppercase tracking-wider block mb-1.5">
+          Perceived effort {perceivedEffort != null ? `(${perceivedEffort}/10)` : '(not recorded)'}
+        </span>
+        <div className="flex flex-wrap gap-1.5">
+          {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={
+                'btn !px-3 !py-1.5 text-[12px] ' +
+                (perceivedEffort === n ? 'btn-primary' : 'btn-secondary')
+              }
+              onClick={() => setPerceivedEffort(perceivedEffort === n ? undefined : n)}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
       </div>
 
       <label className="flex items-center gap-2 text-[13px] text-text-secondary">
@@ -163,9 +235,14 @@ export function WorkoutLogForm({ onSaved }: { onSaved: () => void }) {
 
       {error && <div className="error-banner">{error}</div>}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+          <button className="btn btn-ghost" type="button" onClick={onCancel} disabled={saving}>
+            Cancel
+          </button>
+        )}
         <button className="btn btn-primary" onClick={save} disabled={saving}>
-          {saving ? 'Saving…' : 'Save workout'}
+          {saving ? 'Saving…' : isEditing ? 'Save changes' : 'Save workout'}
         </button>
       </div>
     </div>

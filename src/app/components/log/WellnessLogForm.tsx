@@ -3,6 +3,7 @@ import { useAuth } from '../../lib/auth'
 import { newId, saveWellness } from '../../lib/writers'
 import type {
   BowelMovementEntry,
+  BowelMovementSize,
   BristolType,
   EnergyEntry,
   MoodEntry,
@@ -76,7 +77,7 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
   )
   const [symptom, setSymptom] = useState<SymptomEntry>({
     symptom: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.symptom : '',
-    severity: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.severity : 3,
+    severity: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.severity : 5,
     duration: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.duration : undefined,
     bodyArea: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.bodyArea : undefined,
     triggers: initialEntry?.data.kind === 'symptom' ? initialEntry.data.entry.triggers : [],
@@ -88,6 +89,10 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
     urgency: initialBowel?.urgency,
     durationInSeconds: initialBowel?.durationInSeconds,
     notes: initialBowel?.notes,
+    estimatedSize: initialBowel?.estimatedSize,
+    // Preserve the iOS-only private photo attachment across web edits.
+    photoStoragePath: initialBowel?.photoStoragePath,
+    photoCreatedAt: initialBowel?.photoCreatedAt,
   })
   const [bowelDurationMinutes, setBowelDurationMinutes] = useState(Math.floor(initialDuration / 60))
   const [bowelDurationSeconds, setBowelDurationSeconds] = useState(initialDuration % 60)
@@ -176,12 +181,37 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
       </div>
 
       {kind === 'mood' && (
-        <RatingRow
-          label="Mood"
-          value={mood.rating}
-          labels={['Very bad', 'Bad', 'Neutral', 'Good', 'Great']}
-          onChange={(v) => setMood({ ...mood, rating: v })}
-        />
+        <div className="space-y-4">
+          <RatingRow
+            label="Mood"
+            value={mood.rating}
+            labels={['Very bad', 'Bad', 'Neutral', 'Good', 'Great']}
+            onChange={(v) => setMood({ ...mood, rating: v })}
+          />
+          <div>
+            <span className="text-text-muted text-[11px] uppercase tracking-wider block mb-1.5">
+              Stress (0–10) {mood.stress != null ? '' : '(not recorded)'}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from({ length: 11 }, (_, n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={
+                    'btn !px-3 !py-1.5 text-[12px] ' +
+                    (mood.stress === n ? 'btn-primary' : 'btn-secondary')
+                  }
+                  onClick={() => setMood({ ...mood, stress: mood.stress === n ? undefined : n })}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+            <p className="text-text-muted text-[12px] mt-1.5">
+              Stress is the gut-brain axis's central mediator — recording it with mood powers gut correlations.
+            </p>
+          </div>
+        </div>
       )}
 
       {kind === 'energy' && (
@@ -203,12 +233,26 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
               onChange={(e) => setSymptom({ ...symptom, symptom: e.target.value })}
             />
           </Field>
-          <RatingRow
-            label="Severity"
-            value={symptom.severity}
-            labels={['1', '2', '3', '4', '5']}
-            onChange={(v) => setSymptom({ ...symptom, severity: v })}
-          />
+          <div>
+            <span className="text-text-muted text-[11px] uppercase tracking-wider block mb-1.5">
+              Severity (0 = none, 10 = very severe)
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from({ length: 11 }, (_, n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={
+                    'btn !px-3 !py-1.5 text-[12px] ' +
+                    (symptom.severity === n ? 'btn-primary' : 'btn-secondary')
+                  }
+                  onClick={() => setSymptom({ ...symptom, severity: n })}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
           <Field label="Body area (optional)">
             <input
               className="input"
@@ -275,6 +319,28 @@ export function WellnessLogForm({ onSaved, initialEntry, onCancel }: WellnessLog
                   }
                 >
                   {level === 1 ? 'Normal' : level === 2 ? 'Moderate' : 'Urgent'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <span className="text-text-muted text-[11px] uppercase tracking-wider block mb-1.5">
+              Size {bowel.estimatedSize ? '' : '(not recorded)'}
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {(['small', 'medium', 'large', 'veryLarge'] as BowelMovementSize[]).map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  className={
+                    'btn ' + (bowel.estimatedSize === size ? 'btn-primary' : 'btn-secondary') + ' text-[12px]'
+                  }
+                  onClick={() =>
+                    setBowel({ ...bowel, estimatedSize: bowel.estimatedSize === size ? undefined : size })
+                  }
+                >
+                  {size === 'veryLarge' ? 'Very large' : size[0].toUpperCase() + size.slice(1)}
                 </button>
               ))}
             </div>

@@ -185,7 +185,33 @@ export interface WaterDoc {
   date: Date
 }
 
+/** Single timestamped water record at users/{uid}/waterEntries/{id}.
+ *  Mirrors biometrics/StatsKey/Models/WaterEntry.swift. */
+export interface WaterEntry {
+  id: string
+  userId: string
+  amount: number // fluid ounces
+  date: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+// MARK: - Weight (users/{uid}/weights — validated field list in firestore.rules)
+
+export interface WeightEntry {
+  id: string
+  weightLbs: number
+  bodyFatPercent?: number
+  muscleMassKg?: number
+  date: Date
+  source?: string
+}
+
 // MARK: - MacroTargets (users/{uid}/settings/macroTargets)
+
+export type NutritionGoalType = 'maintain' | 'fatLoss' | 'muscleGain' | 'performance'
+export type NutritionCarbPreference = 'balanced' | 'performance' | 'lowerCarb' | 'ketogenic'
+export type ExerciseCalorieStrategy = 'activityInclusive' | 'addAboveBaseline' | 'fixedBudget'
 
 export interface MacroTargets {
   calories: number
@@ -196,6 +222,14 @@ export interface MacroTargets {
   water: number // fl oz
   isAIAdaptive: boolean
   isWaterCustom: boolean
+  goalType: NutritionGoalType
+  weeklyWeightChangeLbs: number
+  proteinGramsPerKg: number
+  fatPercentage: number
+  carbPreference: NutritionCarbPreference
+  exerciseCalorieStrategy: ExerciseCalorieStrategy
+  calorieFloor: number
+  usesNetCarbs: boolean
 }
 
 export const DEFAULT_MACRO_TARGETS: MacroTargets = {
@@ -207,6 +241,14 @@ export const DEFAULT_MACRO_TARGETS: MacroTargets = {
   water: 64,
   isAIAdaptive: true,
   isWaterCustom: false,
+  goalType: 'maintain',
+  weeklyWeightChangeLbs: 0,
+  proteinGramsPerKg: 2.0,
+  fatPercentage: 0.25,
+  carbPreference: 'balanced',
+  exerciseCalorieStrategy: 'activityInclusive',
+  calorieFloor: 0,
+  usesNetCarbs: false,
 }
 
 // MARK: - Glucose
@@ -240,9 +282,12 @@ export type StoolColor =
 // Bristol type is stored as an integer 1..7.
 export type BristolType = 1 | 2 | 3 | 4 | 5 | 6 | 7
 
+export type BowelMovementSize = 'small' | 'medium' | 'large' | 'veryLarge'
+
 export interface SymptomEntry {
   symptom: string
-  severity: number // 1..5
+  /** Severity on the 0–10 numeric rating scale iOS uses (older entries were 1–5). */
+  severity: number
   duration?: string
   bodyArea?: string
   triggers: string[]
@@ -250,6 +295,8 @@ export interface SymptomEntry {
 
 export interface MoodEntry {
   rating: number // 1..5
+  /** Perceived stress 0–10 — the gut-brain check-in pairs it with mood. */
+  stress?: number
   tags: string[]
   notes?: string
 }
@@ -257,6 +304,7 @@ export interface MoodEntry {
 export interface EnergyEntry {
   level: number // 1..5
   crashTime?: Date
+  tags?: string[]
   notes?: string
 }
 
@@ -266,6 +314,10 @@ export interface BowelMovementEntry {
   urgency?: number
   durationInSeconds?: number
   notes?: string
+  estimatedSize?: BowelMovementSize
+  /** iOS-only private photo attachment — preserved on web round-trips. */
+  photoStoragePath?: string
+  photoCreatedAt?: Date
 }
 
 export type WellnessData =
@@ -515,6 +567,62 @@ export function sportDisplayName(sportType: string): string {
     case 'other': return 'Workout'
     default: return sportType.charAt(0).toUpperCase() + sportType.slice(1)
   }
+}
+
+// MARK: - Workout social (users/{owner}/workoutSessions/{id}/kudos|comments)
+
+export interface WorkoutKudo {
+  id: string
+  userId: string
+  userName: string
+  workoutId: string
+  createdAt: Date
+}
+
+export interface WorkoutComment {
+  id: string
+  userId: string
+  userName: string
+  workoutId: string
+  text: string
+  createdAt: Date
+}
+
+// MARK: - Deep Dive reports (users/{uid}/reports + reportJobs)
+
+/** Raw topic strings match ReportTopic raw values in
+ *  biometrics/StatsKey/Models/AIContext.swift. */
+export const REPORT_TOPICS = [
+  'GI & Digestion',
+  'Nutrition Deep Dive',
+  'Training & Performance',
+  'Recovery & Wellness',
+  'Body Composition',
+  'Custom Analysis',
+] as const
+
+export type ReportTopic = (typeof REPORT_TOPICS)[number]
+
+export interface SavedReport {
+  id: string
+  userId: string
+  topicRaw: string
+  title: string
+  promptUsed: string
+  content: string
+  modelLabel: string
+  modelId: string
+  rangeStart: Date
+  rangeEnd: Date
+  tokensUsed: number
+  createdAt: Date
+}
+
+export type ReportJobStatus = 'queued' | 'running' | 'done' | 'error'
+
+export interface ReportJobState {
+  status: ReportJobStatus
+  error?: string
 }
 
 export function sportAccentColor(sportType: string): string {

@@ -8,6 +8,7 @@ import { useTodayWellness } from '../lib/data/useTodayWellness'
 import { useRecentWorkouts } from '../lib/data/useRecentWorkouts'
 import { useLatestGlucose } from '../lib/data/useLatestGlucose'
 import { useHealthDailyForDay } from '../lib/data/useHealthDaily'
+import { useStreak } from '../lib/data/useStreak'
 import { dailyTotals } from '../lib/aggregates'
 import { addWaterOz } from '../lib/writers'
 import { MacroCard } from '../components/MacroCard'
@@ -32,6 +33,7 @@ export function Dashboard() {
   const glucoseState = useLatestGlucose(uid)
   const todayDate = useMemo(() => new Date(), [])
   const healthState = useHealthDailyForDay(uid, todayDate)
+  const streak = useStreak(uid)
 
   const totals = useMemo(() => dailyTotals(mealsState.meals), [mealsState.meals])
 
@@ -60,9 +62,17 @@ export function Dashboard() {
           <h1 className="font-display text-[28px] font-bold tracking-[-0.02em]">
             {firstName ? `Hello, ${firstName}` : 'Today'}
           </h1>
-          <p className="text-text-secondary text-[14px] mt-1">{today}</p>
+          <p className="text-text-secondary text-[14px] mt-1">
+            {today}
+            {!streak.loading && streak.currentStreakDays > 0 && (
+              <span className="ml-2 text-data">
+                🔥 {streak.currentStreakDays}-day recording streak
+                {!streak.recordedToday && ' — record a meal to keep it going'}
+              </span>
+            )}
+          </p>
         </div>
-        <Link to="/record" className="btn btn-primary">+ Log</Link>
+        <Link to="/record" className="btn btn-primary">+ Record</Link>
       </header>
 
       <div className="grid md:grid-cols-3 gap-4">
@@ -99,8 +109,8 @@ export function Dashboard() {
           <p className="text-text-muted text-[13px]">Loading…</p>
         ) : timeline.length === 0 ? (
           <EmptyState
-            title="Nothing logged yet today"
-            subtitle="Meals and wellness entries will show up here as you log them on iOS."
+            title="Nothing recorded yet today"
+            subtitle="Meals and wellness entries show up here as you record them — on the web or on iOS."
           />
         ) : (
           <div className="timeline">
@@ -128,7 +138,7 @@ export function Dashboard() {
           <div className="panel">
             <EmptyState
               title="No workouts yet"
-              subtitle="Runs, rides, and other sessions you log on iOS appear here."
+              subtitle="Runs, rides, and other sessions appear here — recorded on the web, iOS, or Apple Watch."
             />
           </div>
         ) : (

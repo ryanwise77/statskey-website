@@ -39,7 +39,7 @@ export function WellnessDetail() {
   })
 
   async function handleDelete() {
-    if (!user || deleting) return
+    if (!user || deleting || !entry) return
     if (!window.confirm('Delete this entry? This cannot be undone.')) return
 
     setDeleting(true)
@@ -166,6 +166,7 @@ function detailRows(data: WellnessData): Array<{ label: string; value: string | 
       ]
       if (entry.color) rows.push({ label: 'Color', value: stoolColorLabel(entry.color) })
       if (entry.urgency != null) rows.push({ label: 'Urgency', value: urgencyLabel(entry.urgency) })
+      if (entry.estimatedSize) rows.push({ label: 'Size', value: sizeLabel(entry.estimatedSize) })
       if (entry.durationInSeconds != null && entry.durationInSeconds > 0) {
         rows.push({ label: 'Duration', value: formatDuration(entry.durationInSeconds) })
       }
@@ -176,7 +177,7 @@ function detailRows(data: WellnessData): Array<{ label: string; value: string | 
       const entry = data.entry
       const rows: Array<{ label: string; value: string | number }> = [
         { label: 'Symptom', value: entry.symptom || 'Symptom' },
-        { label: 'Severity', value: `${entry.severity}/5` },
+        { label: 'Severity', value: `${entry.severity}/10` },
       ]
       if (entry.bodyArea) rows.push({ label: 'Body area', value: entry.bodyArea })
       if (entry.duration) rows.push({ label: 'Duration', value: entry.duration })
@@ -185,6 +186,7 @@ function detailRows(data: WellnessData): Array<{ label: string; value: string | 
     }
     case 'mood': {
       const rows = [{ label: 'Mood', value: `${data.entry.rating}/5` }]
+      if (data.entry.stress != null) rows.push({ label: 'Stress', value: `${data.entry.stress}/10` })
       if (data.entry.tags.length) rows.push({ label: 'Tags', value: data.entry.tags.join(', ') })
       if (data.entry.notes) rows.push({ label: 'Mood notes', value: data.entry.notes })
       return rows
@@ -278,4 +280,8 @@ function stoolColorLabel(color: string): string {
     default:
       return color.charAt(0).toUpperCase() + color.slice(1)
   }
+}
+
+function sizeLabel(size: string): string {
+  return size === 'veryLarge' ? 'Very large' : size.charAt(0).toUpperCase() + size.slice(1)
 }

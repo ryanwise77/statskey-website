@@ -890,7 +890,7 @@ function FoodResults({
   if (foods.length === 0) {
     return (
       <p className="text-text-muted text-[13px]">
-        No foods match. Log a meal or save foods to your library to populate this list.
+        No foods match. Record a meal or save foods to your library to populate this list.
       </p>
     )
   }

@@ -16,14 +16,16 @@ export function Shell() {
         <div className="max-w-[1080px] mx-auto px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <a href="/" className="font-display font-semibold text-[14px] tracking-[-0.01em] text-text-primary/80 hover:text-text-primary transition-colors">StatsKey</a>
-            <div className="flex items-center gap-5 text-[13px] text-text-muted">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px] text-text-muted">
               <NavLink to="/" end className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Dashboard</NavLink>
               <NavLink to="/record" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Record</NavLink>
+              <NavLink to="/insights" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Insights</NavLink>
               <NavLink to="/flow" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Intelligence</NavLink>
-              <NavLink to="/tokens" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Store</NavLink>
+              <NavLink to="/library" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Library</NavLink>
               <NavLink to="/friends" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Friends</NavLink>
               <NavLink to="/routes" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Routes</NavLink>
               <NavLink to="/history" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>History</NavLink>
+              <NavLink to="/tokens" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Store</NavLink>
               <NavLink to="/profile" className={({ isActive }) => isActive ? 'text-text-primary' : 'hover:text-text-primary transition-colors'}>Profile</NavLink>
             </div>
           </div>

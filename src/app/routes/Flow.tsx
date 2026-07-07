@@ -9,7 +9,7 @@ import { useRecentWorkouts } from '../lib/data/useRecentWorkouts'
 import { useLatestGlucose } from '../lib/data/useLatestGlucose'
 import { dailyTotals } from '../lib/aggregates'
 import { buildSystemPrompt } from '../lib/ai/context'
-import { anthropicChat, type AnthropicMessage, type ClaudeModel } from '../lib/ai/anthropic'
+import { CHAT_MODELS, sendChat, type ChatModelOption, type ChatTurn } from '../lib/ai/providers'
 import {
   saveChatSession,
   titleFromFirstMessage,
@@ -18,13 +18,8 @@ import {
   type ChatSessionMessage,
 } from '../lib/data/useChatSessions'
 
-const MODELS: { value: ClaudeModel; label: string }[] = [
-  { value: 'claude-sonnet-4-6', label: 'Sonnet' },
-  { value: 'claude-opus-4-7', label: 'Opus' },
-]
-
 export function Flow() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const uid = user?.uid
   const [searchParams] = useSearchParams()
   const resumeId = searchParams.get('session') ?? undefined
@@ -35,7 +30,7 @@ export function Flow() {
   const [messages, setMessages] = useState<ChatSessionMessage[]>([])
   const [title, setTitle] = useState<string>('')
   const [createdAt, setCreatedAt] = useState<Date>(new Date())
-  const [model, setModel] = useState<ClaudeModel>('claude-sonnet-4-6')
+  const [model, setModel] = useState<ChatModelOption>(CHAT_MODELS[0])
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -66,7 +61,7 @@ export function Flow() {
   const systemPrompt = useMemo(
     () =>
       buildSystemPrompt({
-        profile: null, // Avoid passing PII unless relevant; can wire from AuthProvider later.
+        profile: profile ?? null,
         macroTargets: targetsState.targets,
         todayMeals: mealsState.meals,
         todayWellness: wellnessState.entries,
@@ -76,6 +71,7 @@ export function Flow() {
         latestGlucose: glucoseState.reading,
       }),
     [
+      profile,
       targetsState.targets,
       mealsState.meals,
       wellnessState.entries,
@@ -112,22 +108,18 @@ export function Flow() {
     if (!title) setTitle(sessionTitle)
 
     try {
-      const payloadMessages: AnthropicMessage[] = history.map((m) => ({
+      const turns: ChatTurn[] = history.map((m) => ({
         role: m.role === 'user' ? 'user' : 'assistant',
         content: m.content,
       }))
 
-      const resp = await anthropicChat({
-        messages: payloadMessages,
-        systemPrompt,
-        model,
-      })
+      const resp = await sendChat({ model, systemPrompt, turns })
 
       const assistantMsg: ChatSessionMessage = {
         id: crypto.randomUUID(),
         role: 'model',
         content: resp.content,
-        provider: 'Claude',
+        provider: resp.providerLabel,
         timestamp: new Date(),
       }
       const updated = [...history, assistantMsg]
@@ -139,7 +131,7 @@ export function Flow() {
         title: sessionTitle,
         messages: updated,
         mode: 'general',
-        lastProvider: 'Claude',
+        lastProvider: resp.providerLabel,
         createdAt,
         updatedAt: new Date(),
       }
@@ -171,16 +163,20 @@ export function Flow() {
         </div>
         <div className="flex items-center gap-3">
           <div className="tab-strip">
-            {MODELS.map((m) => (
+            {CHAT_MODELS.map((m) => (
               <button
-                key={m.value}
-                className={model === m.value ? 'active' : ''}
-                onClick={() => setModel(m.value)}
+                key={m.modelId}
+                className={model.modelId === m.modelId ? 'active' : ''}
+                onClick={() => setModel(m)}
+                title={m.providerLabel}
               >
                 {m.label}
               </button>
             ))}
           </div>
+          <Link to="/reports" className="btn btn-secondary text-[12px] !py-1.5 !px-3">
+            Reports
+          </Link>
           <Link to="/flow/history" className="btn btn-secondary text-[12px] !py-1.5 !px-3">
             History
           </Link>
@@ -190,7 +186,8 @@ export function Flow() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto panel space-y-4">
         {messages.length === 0 && !existing.loading && (
           <div className="text-text-muted text-[13px] text-center py-6">
-            Start a conversation. Claude can see your today's totals, recent workouts, and wellness entries via the system prompt.
+            Start a conversation. Intelligence can see your profile, today's totals, recent workouts, and
+            wellness entries — and you can switch between Claude, ChatGPT, and Grok.
           </div>
         )}
         {messages.map((m) => (

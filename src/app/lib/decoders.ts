@@ -3,9 +3,11 @@ import { deriveTrustMetadata } from './provenance'
 import type {
   AnalysisMode,
   BowelMovementEntry,
+  BowelMovementSize,
   BristolType,
   CadenceSample,
   EnergyEntry,
+  ExerciseCalorieStrategy,
   FoodIdentityEvidence,
   FoodItem,
   FoodNutrientEvidence,
@@ -23,18 +25,28 @@ import type {
   MacroTargets,
   Meal,
   MoodEntry,
+  NutritionCarbPreference,
+  NutritionGoalType,
   PaceZoneDistribution,
   PortionEstimate,
   RouteDifficulty,
   RoutePoint,
+  SavedReport,
   SavedRoute,
   Split,
   StoolColor,
+  SubstanceEntry,
+  SubstanceKind,
+  SubstanceMethod,
   SymptomEntry,
   WaterDoc,
+  WaterEntry,
+  WeightEntry,
   WellnessData,
   WellnessEntry,
   WellnessType,
+  WorkoutComment,
+  WorkoutKudo,
   WorkoutSession,
   WorkoutSource,
 } from './types'
@@ -233,9 +245,41 @@ export function decodeWater(raw: Raw): WaterDoc {
   }
 }
 
+export function decodeWaterEntry(raw: Raw, id: string): WaterEntry {
+  const date = toDateOrNow(raw.date)
+  return {
+    id: str(raw.id) ?? id,
+    userId: str(raw.userId) ?? '',
+    amount: num(raw.amount) ?? 0,
+    date,
+    createdAt: toDate(raw.createdAt) ?? date,
+    updatedAt: toDate(raw.updatedAt) ?? date,
+  }
+}
+
+// MARK: - Weight
+
+export function decodeWeightEntry(raw: Raw, id: string): WeightEntry {
+  return {
+    id: str(raw.id) ?? id,
+    weightLbs: num(raw.weightLbs) ?? 0,
+    bodyFatPercent: num(raw.bodyFatPercent),
+    muscleMassKg: num(raw.muscleMassKg),
+    date: toDateOrNow(raw.date),
+    source: str(raw.source),
+  }
+}
+
 // MARK: - MacroTargets
 
+const GOAL_TYPES = new Set<NutritionGoalType>(['maintain', 'fatLoss', 'muscleGain', 'performance'])
+const CARB_PREFS = new Set<NutritionCarbPreference>(['balanced', 'performance', 'lowerCarb', 'ketogenic'])
+const EXERCISE_STRATEGIES = new Set<ExerciseCalorieStrategy>(['activityInclusive', 'addAboveBaseline', 'fixedBudget'])
+
 export function decodeMacroTargets(raw: Raw): MacroTargets {
+  const goalType = str(raw.goalType)
+  const carbPreference = str(raw.carbPreference)
+  const strategy = str(raw.exerciseCalorieStrategy)
   return {
     calories: num(raw.calories) ?? DEFAULT_MACRO_TARGETS.calories,
     protein: num(raw.protein) ?? DEFAULT_MACRO_TARGETS.protein,
@@ -245,6 +289,20 @@ export function decodeMacroTargets(raw: Raw): MacroTargets {
     water: num(raw.water) ?? DEFAULT_MACRO_TARGETS.water,
     isAIAdaptive: bool(raw.isAIAdaptive) ?? true,
     isWaterCustom: bool(raw.isWaterCustom) ?? false,
+    goalType: goalType && GOAL_TYPES.has(goalType as NutritionGoalType) ? (goalType as NutritionGoalType) : 'maintain',
+    weeklyWeightChangeLbs: num(raw.weeklyWeightChangeLbs) ?? 0,
+    proteinGramsPerKg: num(raw.proteinGramsPerKg) ?? 2.0,
+    fatPercentage: num(raw.fatPercentage) ?? 0.25,
+    carbPreference:
+      carbPreference && CARB_PREFS.has(carbPreference as NutritionCarbPreference)
+        ? (carbPreference as NutritionCarbPreference)
+        : 'balanced',
+    exerciseCalorieStrategy:
+      strategy && EXERCISE_STRATEGIES.has(strategy as ExerciseCalorieStrategy)
+        ? (strategy as ExerciseCalorieStrategy)
+        : 'activityInclusive',
+    calorieFloor: num(raw.calorieFloor) ?? 0,
+    usesNetCarbs: bool(raw.usesNetCarbs) ?? false,
   }
 }
 
@@ -282,6 +340,7 @@ function decodeWellnessData(raw: Raw): WellnessData | undefined {
       if (!e) return undefined
       const entry: MoodEntry = {
         rating: num(e.rating) ?? 3,
+        stress: num(e.stress),
         tags: strArray(e.tags),
         notes: str(e.notes),
       }
@@ -293,6 +352,7 @@ function decodeWellnessData(raw: Raw): WellnessData | undefined {
       const entry: EnergyEntry = {
         level: num(e.level) ?? 3,
         crashTime: toDate(e.crashTime),
+        tags: strArray(e.tags),
         notes: str(e.notes),
       }
       return { kind: 'energy', entry }
@@ -307,6 +367,9 @@ function decodeWellnessData(raw: Raw): WellnessData | undefined {
         urgency: num(e.urgency),
         durationInSeconds: num(e.durationInSeconds),
         notes: str(e.notes),
+        estimatedSize: str(e.estimatedSize) as BowelMovementSize | undefined,
+        photoStoragePath: str(e.photoStoragePath),
+        photoCreatedAt: toDate(e.photoCreatedAt),
       }
       return { kind: 'bowelMovement', entry }
     }
@@ -549,5 +612,67 @@ export function decodeSamplesPayload(raw: Raw): WorkoutSamplesPayload {
   return {
     heartRateSamples: decodeHRSamples(raw.heartRateSamples),
     cadenceSamples: decodeCadenceSamples(raw.cadenceSamples),
+  }
+}
+
+// MARK: - Substances
+
+export function decodeSubstance(raw: Raw, id: string): SubstanceEntry {
+  const date = toDateOrNow(raw.date)
+  return {
+    id: str(raw.id) ?? id,
+    userId: str(raw.userId) ?? '',
+    kind: (str(raw.kind) as SubstanceKind | undefined) ?? 'other',
+    name: str(raw.name),
+    method: str(raw.method) as SubstanceMethod | undefined,
+    amount: num(raw.amount),
+    unit: str(raw.unit),
+    notes: str(raw.notes),
+    isPrivate: bool(raw.isPrivate) ?? true,
+    date,
+    createdAt: toDate(raw.createdAt) ?? date,
+    updatedAt: toDate(raw.updatedAt) ?? date,
+  }
+}
+
+// MARK: - Workout social
+
+export function decodeWorkoutKudo(raw: Raw, id: string): WorkoutKudo {
+  return {
+    id: str(raw.id) ?? id,
+    userId: str(raw.userId) ?? id,
+    userName: str(raw.userName) ?? '',
+    workoutId: str(raw.workoutId) ?? '',
+    createdAt: toDateOrNow(raw.createdAt),
+  }
+}
+
+export function decodeWorkoutComment(raw: Raw, id: string): WorkoutComment {
+  return {
+    id: str(raw.id) ?? id,
+    userId: str(raw.userId) ?? '',
+    userName: str(raw.userName) ?? '',
+    workoutId: str(raw.workoutId) ?? '',
+    text: str(raw.text) ?? '',
+    createdAt: toDateOrNow(raw.createdAt),
+  }
+}
+
+// MARK: - Reports
+
+export function decodeSavedReport(raw: Raw, id: string): SavedReport {
+  return {
+    id: str(raw.id) ?? id,
+    userId: str(raw.userId) ?? '',
+    topicRaw: str(raw.topicRaw) ?? 'Custom Analysis',
+    title: str(raw.title) ?? str(raw.topicRaw) ?? 'Report',
+    promptUsed: str(raw.promptUsed) ?? '',
+    content: str(raw.content) ?? '',
+    modelLabel: str(raw.modelLabel) ?? 'Claude',
+    modelId: str(raw.modelId) ?? '',
+    rangeStart: toDateOrNow(raw.rangeStart),
+    rangeEnd: toDateOrNow(raw.rangeEnd),
+    tokensUsed: num(raw.tokensUsed) ?? 0,
+    createdAt: toDateOrNow(raw.createdAt),
   }
 }

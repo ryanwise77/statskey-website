@@ -53,11 +53,16 @@ export interface UserProfile {
   activityLevel: ActivityLevel
   appFocus: AppFocus
   dietaryPreferences: string[]
+  foodAllergies: string[]
+  foodIntolerances: string[]
+  medicalConditions: string[]
+  healthNotes: string
   skinType?: number // 1..6 (Fitzpatrick)
   typicalOutdoorMinutes?: number
   latitude?: number
   isPro: boolean
   onboardingComplete: boolean
+  pendingDeletionAt?: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -84,11 +89,19 @@ function defaultProfile(user: User): UserProfile {
     activityLevel: 'moderatelyActive',
     appFocus: 'both',
     dietaryPreferences: [],
+    foodAllergies: [],
+    foodIntolerances: [],
+    medicalConditions: [],
+    healthNotes: '',
     isPro: false,
     onboardingComplete: false,
     createdAt: now,
     updatedAt: now,
   }
+}
+
+function strArr(v: unknown): string[] {
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []
 }
 
 function decodeProfile(data: Record<string, unknown>, uid: string): UserProfile {
@@ -135,15 +148,18 @@ function decodeProfile(data: Record<string, unknown>, uid: string): UserProfile 
     hormoneProfile: (data.hormoneProfile as HormoneProfile) ?? undefined,
     activityLevel: (data.activityLevel as ActivityLevel) ?? 'moderatelyActive',
     appFocus: (data.appFocus as AppFocus) ?? 'both',
-    dietaryPreferences: Array.isArray(data.dietaryPreferences)
-      ? (data.dietaryPreferences as string[])
-      : [],
+    dietaryPreferences: strArr(data.dietaryPreferences),
+    foodAllergies: strArr(data.foodAllergies),
+    foodIntolerances: strArr(data.foodIntolerances),
+    medicalConditions: strArr(data.medicalConditions),
+    healthNotes: typeof data.healthNotes === 'string' ? (data.healthNotes as string) : '',
     skinType: typeof data.skinType === 'number' ? (data.skinType as number) : undefined,
     typicalOutdoorMinutes:
       typeof data.typicalOutdoorMinutes === 'number' ? (data.typicalOutdoorMinutes as number) : undefined,
     latitude: typeof data.latitude === 'number' ? (data.latitude as number) : undefined,
     isPro: Boolean(data.isPro),
     onboardingComplete: Boolean(data.onboardingComplete),
+    pendingDeletionAt: toDate(data.pendingDeletionAt),
     createdAt: toDate(data.createdAt) ?? new Date(),
     updatedAt: toDate(data.updatedAt) ?? new Date(),
   }
@@ -162,6 +178,10 @@ function encodeProfile(profile: UserProfile): Record<string, unknown> {
     activityLevel: profile.activityLevel,
     appFocus: profile.appFocus,
     dietaryPreferences: profile.dietaryPreferences,
+    foodAllergies: profile.foodAllergies,
+    foodIntolerances: profile.foodIntolerances,
+    medicalConditions: profile.medicalConditions,
+    healthNotes: profile.healthNotes,
     isPro: profile.isPro,
     onboardingComplete: profile.onboardingComplete,
     createdAt: profile.createdAt,

@@ -4,7 +4,7 @@ import { useAuth } from '../lib/auth'
 import { useMealDetail } from '../lib/data/useMealDetail'
 import { MealLogForm } from '../components/log/MealLogForm'
 import { mealDisplayName, mealTotal } from '../lib/aggregates'
-import { deleteMeal } from '../lib/writers'
+import { deleteMeal, setMealFavorite } from '../lib/writers'
 import { NUTRIENT_KEYS, type FoodItem } from '../lib/types'
 import { TrustBadge } from '../components/TrustBadge'
 
@@ -92,6 +92,17 @@ export function MealDetail() {
         <div className="flex items-start justify-between gap-3 mt-1">
           <h1 className="font-display text-[26px] font-bold tracking-[-0.02em]">{mealDisplayName(meal)}</h1>
           <div className="flex gap-2">
+            <button
+              className="btn btn-ghost text-[14px] !py-1.5 !px-2"
+              title={meal.isFavorite ? 'Unfavorite' : 'Favorite'}
+              onClick={() =>
+                user && setMealFavorite(user.uid, meal.id, !meal.isFavorite).catch((e) =>
+                  setActionError(e instanceof Error ? e.message : String(e))
+                )
+              }
+            >
+              {meal.isFavorite ? '★' : '☆'}
+            </button>
             <button className="btn btn-secondary text-[12px] !py-1.5 !px-3" onClick={() => setIsEditing(true)}>
               Edit
             </button>

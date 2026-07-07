@@ -1,14 +1,19 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
 import { useAuth } from '../lib/auth'
 import { useWorkoutDetail } from '../lib/data/useWorkoutDetail'
 import { useWorkoutRoute } from '../lib/data/useWorkoutRoute'
 import { useWorkoutSamples } from '../lib/data/useWorkoutSamples'
+import { useWorkoutSocial } from '../lib/data/useWorkoutSocial'
+import { addWorkoutComment, deleteWorkout, newId, toggleWorkoutKudo } from '../lib/writers'
 import {
   sportAccentColor,
   sportDisplayName,
   sportUsesGPS,
   sportUsesPace,
   sportUsesSpeed,
+  type WorkoutComment,
+  type WorkoutKudo,
   type WorkoutSession,
 } from '../lib/types'
 import { formatDistance, formatDuration, formatPace } from '../lib/format'
@@ -17,13 +22,19 @@ import { SplitsTable } from '../components/SplitsTable'
 import { HeartRateChart } from '../components/HeartRateChart'
 import { ElevationChart } from '../components/ElevationChart'
 import { HeartRateZones, PaceZones } from '../components/ZoneBars'
+import { WorkoutLogForm } from '../components/log/WorkoutLogForm'
 
 export function WorkoutDetail() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const navigate = useNavigate()
   const { ownerUid, id } = useParams<{ ownerUid: string; id: string }>()
   const { workout, loading, notFound, error } = useWorkoutDetail(ownerUid, id)
   const { route, loading: routeLoading } = useWorkoutRoute(workout)
   const { heartRateSamples } = useWorkoutSamples(workout)
+  const social = useWorkoutSocial(ownerUid, id)
+  const [isEditing, setIsEditing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   if (loading) return <p className="text-text-secondary text-sm">Loading…</p>
   if (error) return <div className="error-banner">{error}</div>
@@ -49,6 +60,44 @@ export function WorkoutDetail() {
     hour: 'numeric',
     minute: '2-digit',
   })
+
+  async function handleDelete() {
+    if (!user || !isOwner || deleting || !workout) return
+    if (!window.confirm('Delete this workout? This cannot be undone.')) return
+    setDeleting(true)
+    setActionError(null)
+    try {
+      await deleteWorkout(user.uid, workout.id)
+      navigate('/history', { replace: true })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e))
+      setDeleting(false)
+    }
+  }
+
+  if (isEditing && isOwner) {
+    return (
+      <div className="space-y-6 max-w-[760px]">
+        <header>
+          <button
+            className="text-text-muted hover:text-text-primary text-[12px]"
+            type="button"
+            onClick={() => setIsEditing(false)}
+          >
+            ← Back to workout
+          </button>
+          <h1 className="font-display text-[26px] font-bold tracking-[-0.02em] mt-1">Edit Workout</h1>
+        </header>
+        <div className="panel">
+          <WorkoutLogForm
+            initialWorkout={workout}
+            onSaved={() => setIsEditing(false)}
+            onCancel={() => setIsEditing(false)}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4 max-w-[760px]">
@@ -76,8 +125,27 @@ export function WorkoutDetail() {
               {` · ${sourceLabel(workout.source)}`}
             </p>
           </div>
+          {isOwner && (
+            <div className="flex gap-2">
+              <button
+                className="btn btn-secondary text-[12px] !py-1.5 !px-3"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+              <button
+                className="btn btn-ghost text-[12px] !py-1.5 !px-3 text-red-300"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          )}
         </div>
       </header>
+
+      {actionError && <div className="error-banner">{actionError}</div>}
 
       {usesGPS && (
         route.length >= 2 ? (
@@ -162,6 +230,132 @@ export function WorkoutDetail() {
           </div>
         </div>
       )}
+
+      <SocialPanel
+        ownerUid={ownerUid!}
+        workout={workout}
+        currentUid={user?.uid}
+        currentName={profile?.name || user?.displayName || 'Someone'}
+        kudos={social.kudos}
+        comments={social.comments}
+      />
+    </div>
+  )
+}
+
+function SocialPanel({
+  ownerUid,
+  workout,
+  currentUid,
+  currentName,
+  kudos,
+  comments,
+}: {
+  ownerUid: string
+  workout: WorkoutSession
+  currentUid?: string
+  currentName: string
+  kudos: WorkoutKudo[]
+  comments: WorkoutComment[]
+}) {
+  const [commentDraft, setCommentDraft] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [socialError, setSocialError] = useState<string | null>(null)
+  const hasKudoed = currentUid != null && kudos.some((k) => k.userId === currentUid)
+
+  async function onToggleKudo() {
+    if (!currentUid) return
+    setBusy(true)
+    setSocialError(null)
+    try {
+      await toggleWorkoutKudo({
+        workoutOwnerId: ownerUid,
+        workoutId: workout.id,
+        kudoUserId: currentUid,
+        userName: currentName,
+      })
+    } catch (e) {
+      setSocialError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function onComment() {
+    if (!currentUid) return
+    const text = commentDraft.trim()
+    if (!text) return
+    setBusy(true)
+    setSocialError(null)
+    try {
+      await addWorkoutComment({
+        workoutOwnerId: ownerUid,
+        comment: {
+          id: newId(),
+          userId: currentUid,
+          userName: currentName,
+          workoutId: workout.id,
+          text,
+          createdAt: new Date(),
+        },
+      })
+      setCommentDraft('')
+    } catch (e) {
+      setSocialError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="panel space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="card-title">Kudos & comments</span>
+        <button
+          className={'btn text-[12px] !py-1.5 !px-3 ' + (hasKudoed ? 'btn-primary' : 'btn-secondary')}
+          onClick={onToggleKudo}
+          disabled={busy || !currentUid}
+        >
+          👍 {kudos.length > 0 ? kudos.length : ''} {hasKudoed ? 'Kudoed' : 'Kudos'}
+        </button>
+      </div>
+
+      {kudos.length > 0 && (
+        <p className="text-text-muted text-[12px]">
+          {kudos.map((k) => k.userName || 'Someone').join(', ')} gave kudos
+        </p>
+      )}
+
+      {comments.length > 0 && (
+        <div className="space-y-3">
+          {comments.map((c) => (
+            <div key={c.id} className="text-[13px]">
+              <span className="text-text-primary font-medium">{c.userName || 'Someone'}</span>
+              <span className="text-text-muted text-[11px] ml-2">
+                {c.createdAt.toLocaleDateString([], { month: 'short', day: 'numeric' })}
+              </span>
+              <p className="text-text-secondary mt-0.5">{c.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <input
+          className="input flex-1"
+          placeholder="Add a comment…"
+          value={commentDraft}
+          onChange={(e) => setCommentDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !busy) onComment()
+          }}
+        />
+        <button className="btn btn-secondary" onClick={onComment} disabled={busy || !commentDraft.trim()}>
+          Post
+        </button>
+      </div>
+
+      {socialError && <div className="error-banner">{socialError}</div>}
     </div>
   )
 }

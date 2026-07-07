@@ -6,16 +6,29 @@ import {
   useWellnessHistory,
   useWorkoutsHistory,
 } from '../lib/data/useHistory'
+import { useSubstancesHistory } from '../lib/data/useSubstances'
+import { useWeights } from '../lib/data/useWeights'
+import { useGlucoseRange, glucoseStats } from '../lib/data/useGlucoseRange'
 import { addDays, localDateString } from '../lib/firestore'
 import { dailyTotals } from '../lib/aggregates'
+import { deleteSubstanceEntry, deleteWeightEntry } from '../lib/writers'
 import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
 import { WorkoutCard } from '../components/WorkoutCard'
 import { EmptyState } from '../components/EmptyState'
-import type { Meal, WellnessEntry } from '../lib/types'
+import type { Meal, SubstanceEntry, WellnessEntry } from '../lib/types'
 
-type Tab = 'meals' | 'workouts' | 'wellness'
+type Tab = 'meals' | 'workouts' | 'wellness' | 'weight' | 'glucose' | 'substances'
 type Range = 7 | 30 | 90
 type MealBrowseMode = 'range' | 'day'
+
+const TABS: Array<{ id: Tab; label: string }> = [
+  { id: 'meals', label: 'Meals' },
+  { id: 'workouts', label: 'Workouts' },
+  { id: 'wellness', label: 'Wellness' },
+  { id: 'weight', label: 'Weight' },
+  { id: 'glucose', label: 'Glucose' },
+  { id: 'substances', label: 'Substances' },
+]
 
 export function History() {
   const { user } = useAuth()
@@ -38,19 +51,19 @@ export function History() {
       <header>
         <h1 className="font-display text-[28px] font-bold tracking-[-0.02em]">History</h1>
         <p className="text-text-secondary text-[14px] mt-1">
-          Browse meals, workouts, and wellness logs from the last {range} days.
+          Browse everything you've recorded from the last {range} days.
         </p>
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="tab-strip">
-          {(['meals', 'workouts', 'wellness'] as Tab[]).map((t) => (
+          {TABS.map((t) => (
             <button
-              key={t}
-              className={tab === t ? 'active' : ''}
-              onClick={() => setTab(t)}
+              key={t.id}
+              className={tab === t.id ? 'active' : ''}
+              onClick={() => setTab(t.id)}
             >
-              {t[0].toUpperCase() + t.slice(1)}
+              {t.label}
             </button>
           ))}
         </div>
@@ -135,6 +148,9 @@ export function History() {
       )}
       {tab === 'workouts' && <WorkoutsHistory uid={uid} start={start} end={end} />}
       {tab === 'wellness' && <PanelWrap><WellnessHistory uid={uid} start={start} end={end} /></PanelWrap>}
+      {tab === 'weight' && <PanelWrap><WeightHistory uid={uid} start={start} end={end} /></PanelWrap>}
+      {tab === 'glucose' && <PanelWrap><GlucoseHistory uid={uid} start={start} end={end} /></PanelWrap>}
+      {tab === 'substances' && <PanelWrap><SubstancesHistory uid={uid} start={start} end={end} /></PanelWrap>}
     </div>
   )
 }
@@ -236,4 +252,150 @@ function WellnessHistory({ uid, start, end }: { uid?: string; start: Date; end: 
       ))}
     </div>
   )
+}
+
+function WeightHistory({ uid, start, end }: { uid?: string; start: Date; end: Date }) {
+  const { weights, loading, error } = useWeights(uid, start, end)
+  if (loading) return <p className="text-text-muted text-[13px]">Loading…</p>
+  if (error) return <div className="error-banner">{error}</div>
+  if (weights.length === 0) {
+    return (
+      <EmptyState
+        title="No weight entries in this range"
+        subtitle="Record weight from the Record tab; entries synced from Apple Health show here too."
+      />
+    )
+  }
+
+  async function remove(id: string) {
+    if (!uid) return
+    if (!window.confirm('Delete this weight entry?')) return
+    await deleteWeightEntry(uid, id).catch(() => {})
+  }
+
+  return (
+    <div className="divide-y divide-white/[0.04]">
+      {weights.map((w) => (
+        <div key={w.id} className="py-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[14px] text-text-primary">
+              {w.weightLbs.toFixed(1)} lb
+              {w.bodyFatPercent != null && (
+                <span className="text-text-muted text-[12px] ml-2">{w.bodyFatPercent.toFixed(1)}% BF</span>
+              )}
+            </div>
+            <div className="card-subtext mt-0.5">
+              {w.date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+              {w.source && ` · ${w.source}`}
+            </div>
+          </div>
+          <button className="btn btn-ghost text-[12px] !py-1 !px-2 text-red-300" onClick={() => remove(w.id)}>
+            Delete
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function GlucoseHistory({ uid, start, end }: { uid?: string; start: Date; end: Date }) {
+  const { readings, loading, error } = useGlucoseRange(uid, start, end)
+  if (loading) return <p className="text-text-muted text-[13px]">Loading…</p>
+  if (error) return <div className="error-banner">{error}</div>
+  if (readings.length === 0) {
+    return (
+      <EmptyState
+        title="No glucose readings in this range"
+        subtitle="Record readings manually from the Record tab, or connect a CGM in the iOS app."
+      />
+    )
+  }
+
+  const byDay = groupByDay(
+    readings.map((r) => ({ ...r, date: r.timestamp }))
+  )
+
+  return (
+    <div className="space-y-5">
+      {Array.from(byDay.entries()).map(([dayKey, dayReadings]) => {
+        const stats = glucoseStats(dayReadings)
+        return (
+          <div key={dayKey}>
+            <div className="flex items-baseline justify-between mb-1">
+              <h3 className="card-title">{formatDayHeader(dayKey)}</h3>
+              {stats && (
+                <span className="card-subtext">
+                  {dayReadings.length} readings · avg {Math.round(stats.average)} · {Math.round(stats.min)}–
+                  {Math.round(stats.max)} mg/dL · {Math.round(stats.timeInRangePercent)}% in range
+                </span>
+              )}
+            </div>
+          </div>
+        )
+      })}
+      <p className="text-text-muted text-[12px]">
+        Full glucose charts live on the Insights page.
+      </p>
+    </div>
+  )
+}
+
+function SubstancesHistory({ uid, start, end }: { uid?: string; start: Date; end: Date }) {
+  const { entries, loading, error } = useSubstancesHistory(uid, start, end)
+  if (loading) return <p className="text-text-muted text-[13px]">Loading…</p>
+  if (error) return <div className="error-banner">{error}</div>
+  if (entries.length === 0) {
+    return (
+      <EmptyState
+        title="No substance entries in this range"
+        subtitle="Substance entries stay private by default — only you can see them."
+      />
+    )
+  }
+
+  async function remove(entry: SubstanceEntry) {
+    if (!uid) return
+    if (!window.confirm('Delete this entry?')) return
+    await deleteSubstanceEntry(uid, entry.id).catch(() => {})
+  }
+
+  const groups = groupByDay(entries)
+  return (
+    <div className="space-y-6">
+      {Array.from(groups.entries()).map(([dayKey, dayEntries]: [string, SubstanceEntry[]]) => (
+        <div key={dayKey}>
+          <h3 className="card-title mb-1">{formatDayHeader(dayKey)}</h3>
+          <div className="divide-y divide-white/[0.04]">
+            {dayEntries.map((entry) => (
+              <div key={entry.id} className="py-3 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[14px] text-text-primary">
+                    {substanceLabel(entry)}
+                    {entry.isPrivate && <span className="timeline-badge ml-2">Private</span>}
+                  </div>
+                  <div className="card-subtext mt-0.5">
+                    {entry.date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                    {entry.method && ` · ${entry.method}`}
+                    {entry.amount != null && ` · ${entry.amount}${entry.unit ? ` ${entry.unit}` : ''}`}
+                  </div>
+                  {entry.notes && <div className="card-subtext mt-0.5">{entry.notes}</div>}
+                </div>
+                <button
+                  className="btn btn-ghost text-[12px] !py-1 !px-2 text-red-300"
+                  onClick={() => remove(entry)}
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function substanceLabel(entry: SubstanceEntry): string {
+  const kind = entry.kind[0].toUpperCase() + entry.kind.slice(1)
+  return entry.name ? `${entry.name} (${kind})` : kind
 }
