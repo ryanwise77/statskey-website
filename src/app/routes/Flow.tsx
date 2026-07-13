@@ -8,7 +8,7 @@ import { useMacroTargets } from '../lib/data/useMacroTargets'
 import { useRecentWorkouts } from '../lib/data/useRecentWorkouts'
 import { useLatestGlucose } from '../lib/data/useLatestGlucose'
 import { dailyTotals } from '../lib/aggregates'
-import { buildSystemPrompt, type ChatMode } from '../lib/ai/context'
+import { buildSystemPrompt } from '../lib/ai/context'
 import { CHAT_MODELS, type ChatModelOption } from '../lib/ai/providers'
 import { runAgentTurn, type AgentStep } from '../lib/ai/agent'
 import type { AnthropicMonthlyUsage } from '../lib/ai/anthropic'
@@ -52,7 +52,6 @@ export function Flow() {
   const [title, setTitle] = useState<string>('')
   const [createdAt, setCreatedAt] = useState<Date>(new Date())
   const [model, setModel] = useState<ChatModelOption>(CHAT_MODELS[0])
-  const [mode, setMode] = useState<ChatMode>('general')
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [liveSteps, setLiveSteps] = useState<AgentStep[]>([])
@@ -91,7 +90,6 @@ export function Flow() {
       setMessages(existing.session.messages)
       setTitle(existing.session.title)
       setCreatedAt(existing.session.createdAt)
-      if (existing.session.mode === 'training') setMode('training')
     }
   }, [resumeId, existing.session])
 
@@ -129,7 +127,6 @@ export function Flow() {
         latestGlucose: glucoseState.reading,
         memoryNotes,
         toolsEnabled: true,
-        mode,
       }),
     [
       profile,
@@ -141,7 +138,6 @@ export function Flow() {
       workoutsState.workouts,
       glucoseState.reading,
       memoryNotes,
-      mode,
     ]
   )
 
@@ -231,7 +227,7 @@ export function Flow() {
         id: sessionId,
         title: sessionTitle,
         messages: updated,
-        mode,
+        mode: 'general',
         lastProvider: providerLabel,
         createdAt,
         updatedAt: new Date(),
@@ -273,14 +269,6 @@ export function Flow() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="tab-strip">
-            <button className={mode === 'general' ? 'active' : ''} onClick={() => setMode('general')}>
-              General
-            </button>
-            <button className={mode === 'training' ? 'active' : ''} onClick={() => setMode('training')}>
-              Training coach
-            </button>
-          </div>
           <div className="relative" ref={modelMenuRef}>
             <button
               className="intel-model-trigger"
