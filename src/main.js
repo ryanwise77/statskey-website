@@ -1,9 +1,14 @@
 import './style.css'
 import { applyStoreLinks } from './storeLinks.js'
+import { initShowcase } from './showcase.js'
 
 // Reveal/point any Google Play buttons once their URL is configured (no-op
 // while the Play listing is unset, keeping those buttons hidden site-wide).
 applyStoreLinks()
+
+// Live showcase widgets (agent console, fusion panel, glucose lab, count-ups,
+// spotlight). Every init is null-guarded, so pages without the markup no-op.
+initShowcase()
 
 const revealObserver = new IntersectionObserver(
   (entries) => {

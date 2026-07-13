@@ -63,7 +63,7 @@
             <div class="hero-note reveal d3">Free today, with optional Pro ($4.99/mo) and Pro+ ($19.99/mo) — annual plans for less, and the web costs less than the App Store. Free access is introductory and may move to paid pricing as StatsKey grows.</div>
           </div>
 
-          <div class="command-card reveal d2" aria-label="StatsKey data model preview">
+          <div class="command-card tilt-card reveal d2" id="hero-card" aria-label="StatsKey data model preview">
             <div class="command-card__top">
               <div>
                 <div class="panel-label">Metabolic model</div>
@@ -71,37 +71,41 @@
               </div>
               <span class="live-pill"><span></span> Live inputs</span>
             </div>
-            <div class="score-ring" aria-hidden="true">
+            <div class="score-ring" id="hero-ring" aria-hidden="true">
               <div class="score-ring__inner">
-                <span>83</span>
+                <span data-count-to="83" data-count-dur="1600">83</span>
                 <small>readiness</small>
               </div>
             </div>
             <div class="signal-grid">
               <div class="signal-card">
                 <span>Protein</span>
-                <strong>118g</strong>
+                <strong data-count-to="118" data-count-suffix="g">118g</strong>
                 <em>+22g to target</em>
               </div>
               <div class="signal-card">
                 <span>Glucose peak</span>
-                <strong>131</strong>
+                <strong data-count-to="131">131</strong>
                 <em>smooth response</em>
               </div>
               <div class="signal-card">
                 <span>Water</span>
-                <strong>2.4L</strong>
+                <strong data-count-to="2.4" data-count-decimals="1" data-count-suffix="L">2.4L</strong>
                 <em>on pace</em>
               </div>
               <div class="signal-card">
                 <span>Training</span>
-                <strong>47m</strong>
+                <strong data-count-to="47" data-count-suffix="m">47m</strong>
                 <em>zone 2 base</em>
               </div>
             </div>
             <div class="insight-strip">
               <span class="insight-strip__dot"></span>
-              Dinner patterns with 30g+ fiber correlate with flatter overnight glucose this week.
+              <span class="rot" data-rotator>
+                <span class="rot-item on">Dinner patterns with 30g+ fiber correlate with flatter overnight glucose this week.</span>
+                <span class="rot-item">Maintenance revised +140 kcal — your weight trend says the formula ran low.</span>
+                <span class="rot-item">Recovery day detected: protein target held, carbs eased 12%.</span>
+              </span>
             </div>
           </div>
         </div>
@@ -110,19 +114,19 @@
       <section class="spec-section">
         <div class="page-shell">
           <div class="spec-strip reveal">
-            <div class="spec"><b>103</b><span>nutrient model</span></div>
-            <div class="spec"><b>8</b><span>nutrient categories</span></div>
+            <div class="spec"><b data-count-to="103">103</b><span>nutrient model</span></div>
+            <div class="spec"><b data-count-to="8">8</b><span>nutrient categories</span></div>
             <div class="spec"><b>USDA</b><span>FoodData Central</span></div>
-            <div class="spec"><b>4</b><span>Intelligence models</span></div>
+            <div class="spec"><b data-count-to="4">4</b><span>Intelligence models</span></div>
             <div class="spec"><b>iOS</b><span>+ Apple Watch</span></div>
-            <div class="spec"><b>5</b><span>languages</span></div>
+            <div class="spec"><b data-count-to="5">5</b><span>languages</span></div>
           </div>
         </div>
       </section>
 
       <section class="statement-section">
         <div class="page-shell">
-          <p class="statement-text reveal">
+          <p class="statement-text reveal" data-sweep>
             Most health products store records. StatsKey builds a private operating model of you: meals, micronutrients, CGM, activity, sleep, hydration, symptoms, training, and the decisions that connect them.
           </p>
         </div>
@@ -193,7 +197,7 @@
               <div class="cmp-row"><span class="m m--no">—</span> Per-nutrient provenance</div>
               <div class="cmp-row"><span class="m m--no">—</span> Deficit detection</div>
               <div class="cmp-row"><span class="m m--no">—</span> Connected model</div>
-              <div class="cmp-row"><span class="m m--mid">~</span> AI grounded in your data</div>
+              <div class="cmp-row"><span class="m m--mid">~</span> Intelligence grounded in your data</div>
               <div class="cmp-row"><span class="m m--no">—</span> Blood &amp; stool labs</div>
             </div>
             <div class="cmp-col cmp-col--us">
@@ -203,7 +207,7 @@
               <div class="cmp-row"><span class="m m--yes">✓</span> Per-nutrient provenance</div>
               <div class="cmp-row"><span class="m m--yes">✓</span> Deficit detection</div>
               <div class="cmp-row"><span class="m m--yes">✓</span> Connected model</div>
-              <div class="cmp-row"><span class="m m--yes">✓</span> AI grounded in your data</div>
+              <div class="cmp-row"><span class="m m--yes">✓</span> Intelligence grounded in your data</div>
               <div class="cmp-row"><span class="m m--mid">~</span> Blood &amp; stool labs <span style="color:var(--muted-2)">· roadmap</span></div>
             </div>
             <div class="cmp-col">
@@ -213,7 +217,7 @@
               <div class="cmp-row"><span class="m m--yes">✓</span> Per-nutrient provenance</div>
               <div class="cmp-row"><span class="m m--yes">✓</span> Deficit detection</div>
               <div class="cmp-row"><span class="m m--no">—</span> Connected model</div>
-              <div class="cmp-row"><span class="m m--mid">~</span> AI grounded in your data</div>
+              <div class="cmp-row"><span class="m m--mid">~</span> Intelligence grounded in your data</div>
               <div class="cmp-row"><span class="m m--yes">✓</span> Blood &amp; stool labs</div>
             </div>
           </div>
@@ -231,6 +235,17 @@
               <div class="axis"><span>Identity</span><p>What the food is — barcode match, official label, visual recognition, or grounded search.</p></div>
               <div class="axis"><span>Nutrients</span><p>Where each value came from — barcode database, the official label, USDA-grounded data, or an Intelligence estimate, each with its own confidence.</p></div>
               <div class="axis"><span>Quantity</span><p>How sure we are of the amount you ate — user-adjusted, an assumed serving, or a visual estimate.</p></div>
+            </div>
+            <div class="prov-demo" aria-hidden="true">
+              <div class="prov-demo__row">
+                <span>Greek yogurt · 170g</span>
+                <em>resolved · sourced</em>
+              </div>
+              <div class="prov-chips">
+                <div class="prov-chip" style="--fill: 96%; --i: 0"><span>Identity</span><b>Barcode match</b><i></i></div>
+                <div class="prov-chip" style="--fill: 92%; --i: 1"><span>Nutrients</span><b>Official label</b><i></i></div>
+                <div class="prov-chip" style="--fill: 84%; --i: 2"><span>Quantity</span><b>User-adjusted</b><i></i></div>
+              </div>
             </div>
             <p class="src-note">Grounded in USDA FoodData Central. For branded items StatsKey never fabricates a label — if it can't be verified, it returns nothing. Intelligence estimates are flagged and reversible.</p>
           </div>
@@ -252,10 +267,10 @@
             <h2>Most of us are short on something. Few apps can tell.</h2>
             <p>StatsKey grades your intake against reference levels and flags likely shortfalls across the nutrients that populate on a typical day — the gaps nutrition science has named for decades and most trackers still leave blank.</p>
             <div class="signal-grid" style="margin-top: 24px">
-              <div class="signal-card"><span>Vitamin D</span><strong>~94%</strong><em>of US adults below the requirement</em></div>
-              <div class="signal-card"><span>Potassium</span><strong>~100%</strong><em>under the adequate intake</em></div>
-              <div class="signal-card"><span>Magnesium</span><strong>~52%</strong><em>below the requirement</em></div>
-              <div class="signal-card"><span>Calcium</span><strong>~44%</strong><em>below the requirement</em></div>
+              <div class="signal-card"><span>Vitamin D</span><strong data-count-to="94" data-count-prefix="~" data-count-suffix="%">~94%</strong><em>of US adults below the requirement</em></div>
+              <div class="signal-card"><span>Potassium</span><strong data-count-to="100" data-count-prefix="~" data-count-suffix="%">~100%</strong><em>under the adequate intake</em></div>
+              <div class="signal-card"><span>Magnesium</span><strong data-count-to="52" data-count-prefix="~" data-count-suffix="%">~52%</strong><em>below the requirement</em></div>
+              <div class="signal-card"><span>Calcium</span><strong data-count-to="44" data-count-prefix="~" data-count-suffix="%">~44%</strong><em>below the requirement</em></div>
             </div>
             <p class="src-note">NHANES 2007–2010 / 2003–2018 (Linus Pauling Institute; 2020 DGAC shortfall nutrients) — even counting supplements.</p>
           </div>
@@ -284,6 +299,42 @@
               </div>
               <div class="app-cap">A metabolic day, and food ⇄ glucose analysis Intelligence can read back to you. Actual screen recording.</div>
             </div>
+          </div>
+        </div>
+        <div class="page-shell" style="margin-top: clamp(40px, 6vw, 72px)">
+          <div class="glucose-lab reveal" id="glucose-lab" aria-label="Interactive glucose response demonstration — illustrative">
+            <div class="glucose-lab__head">
+              <div>
+                <div class="panel-label">Glucose response lab</div>
+                <b>Same carbs. Different curve. Try it.</b>
+              </div>
+              <div class="glucose-lab__toggle" role="group" aria-label="Choose a meal variant">
+                <button type="button" class="on" data-meal="0" aria-pressed="true">Rice bowl, alone</button>
+                <button type="button" data-meal="1" aria-pressed="false">Fat &amp; fiber first</button>
+              </div>
+            </div>
+            <div class="glucose-lab__chart">
+              <svg id="gl-svg" viewBox="0 0 720 240" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gl-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(48, 213, 200, 0.34)" />
+                    <stop offset="100%" stop-color="rgba(48, 213, 200, 0)" />
+                  </linearGradient>
+                </defs>
+                <line id="gl-base" x1="0" x2="720" y1="180" y2="180" />
+                <path id="gl-area" fill="url(#gl-fill)" d="" />
+                <path id="gl-line" fill="none" d="" />
+                <circle id="gl-dot" r="5" cx="0" cy="0" />
+              </svg>
+              <div class="glucose-lab__axis" aria-hidden="true"><span>meal</span><span>+1h</span><span>+2h</span><span>+3h</span></div>
+            </div>
+            <div class="glucose-lab__stats">
+              <div><span>Peak</span><b id="gl-peak">+52</b><em>mg/dL over baseline</em></div>
+              <div><span>iAUC</span><b id="gl-iauc">142</b><em>incremental area</em></div>
+              <div><span>Recovery</span><b id="gl-rec">118m</b><em>back to baseline</em></div>
+              <div><span>Dip</span><b id="gl-dip">−14</b><em>reactive low</em></div>
+            </div>
+            <p class="src-note">Illustrative interaction. In the app, these are computed from your own CGM for every recorded meal — iAUC, peak, recovery, dips, and second-meal effects.</p>
           </div>
         </div>
       </section>
@@ -332,36 +383,117 @@
             <h2>It cites its work — or says it doesn't know.</h2>
             <p>Answers stay grounded in your own records, cite their methods, and refuse to invent numbers or percentiles. Deeper analysis and Deep Dives run on metered Intelligence tokens from the Store.</p>
           </div>
-          <div class="flow-card flow-card--premium reveal d2">
-            <div class="chat-message chat-message--user">Why did my glucose crash overnight last Tuesday?</div>
-            <div class="chat-message chat-message--ai">
-              Your dinner at 8:47 PM had 94g carbs with only 12g fat. Meals above 80g carbs with under 20g fat correlate with overnight drops below 60 mg/dL <strong>83% of the time</strong> in your recent records.
+          <div class="agent-console reveal d2" id="agent-console" aria-label="Scripted demonstration of an Intelligence session">
+            <div class="agent-console__bar">
+              <span class="ac-dot"></span><span class="ac-dot"></span><span class="ac-dot"></span>
+              <span class="agent-console__title">Intelligence · grounded session</span>
+              <span class="agent-console__model"><i></i><b id="ac-model">Auto · frontier routing</b></span>
             </div>
-            <div class="chat-tools">
-              <span>nutrition</span>
-              <span>CGM</span>
-              <span>sleep</span>
-              <span>training</span>
-              <span>wellness</span>
+            <div class="agent-console__body" id="ac-body">
+              <div class="ac-msg ac-msg--user">Why did my glucose crash overnight last Tuesday?</div>
+              <div class="ac-tool is-done"><i class="ac-tool__st"></i><code>search_records("dinner · last tuesday")</code><span>1 meal · 8:47 PM</span></div>
+              <div class="ac-tool is-done"><i class="ac-tool__st"></i><code>glucose_timeline(tue 20:00 → wed 08:00)</code><span>low 58 mg/dL · 03:12</span></div>
+              <div class="ac-tool is-done"><i class="ac-tool__st"></i><code>correlate(carbs&gt;80g, fat&lt;20g, overnight_low)</code><span>83% · 12 nights</span></div>
+              <div class="ac-msg ac-msg--ai">Your dinner at 8:47 PM had <strong>94g carbs</strong> with only 12g fat. Meals above 80g carbs with under 20g fat correlate with overnight drops below 60 mg/dL <strong>83% of the time</strong> in your recent records.</div>
+              <div class="ac-chips"><span>nutrition</span><span>CGM</span><span>sleep</span></div>
+            </div>
+            <div class="agent-console__foot">
+              <span>grounded in your records</span>
+              <span>cites its methods</span>
+              <span>refuses to invent numbers</span>
             </div>
           </div>
         </div>
+
+        <div class="page-shell fusion-layout" style="margin-top: clamp(48px, 7vw, 88px)">
+          <div class="flow-copy reveal">
+            <h2>Adaptive Intelligence. Targets that keep themselves honest.</h2>
+            <p>Set a goal and StatsKey maintains the math: a formula ensemble tuned to your body, thirty days of Apple Watch activity, and your gap-aware weight trend, reconciled into one maintenance number. When measured reality disagrees with the formula, reality wins — in proportion to the evidence.</p>
+            <p class="src-note">Confidence gates the correction: Baseline (formula) → Medium (+ Watch) → High (+ weight trend). Manual edits always win — flip one switch and it's your number again.</p>
+          </div>
+          <div class="fusion-panel reveal d2" id="fusion-panel" aria-label="Adaptive Intelligence signal fusion — illustrative">
+            <div class="fusion-src">
+              <div class="fusion-node" data-node="0">
+                <span>Formula ensemble</span>
+                <em>Katch-McArdle · Ten Haaf · Mifflin</em>
+              </div>
+              <div class="fusion-node" data-node="1">
+                <span>Apple Watch</span>
+                <em>30-day activity · TEF from your macros</em>
+              </div>
+              <div class="fusion-node" data-node="2">
+                <span>Weight trend</span>
+                <em>gap-aware smoothing · outlier-safe</em>
+              </div>
+            </div>
+            <svg class="fusion-wires" viewBox="0 0 120 240" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M2 42 C 66 42, 54 120, 118 120" />
+              <path d="M2 120 C 60 120, 60 120, 118 120" />
+              <path d="M2 198 C 66 198, 54 120, 118 120" />
+            </svg>
+            <div class="fusion-out">
+              <div class="panel-label">Maintenance, reconciled</div>
+              <div class="fusion-kcal"><b id="fusion-kcal">2,872</b><span>kcal</span></div>
+              <div class="fusion-delta" id="fusion-delta">weight trend pulled +25 kcal</div>
+              <div class="fusion-macros" aria-hidden="true">
+                <div><span>Protein</span><i style="--w: 78%"></i><b>172g</b></div>
+                <div><span>Carbs</span><i style="--w: 88%"></i><b>348g</b></div>
+                <div><span>Fat</span><i style="--w: 62%"></i><b>84g</b></div>
+              </div>
+              <div class="fusion-conf" id="fusion-conf" data-tier="3">
+                <div class="fusion-conf__bars"><span></span><span></span><span></span></div>
+                <div class="fusion-conf__label" id="fusion-conf-label">High confidence — cross-validated by your weight trend</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-shell" style="margin-top: clamp(44px, 6vw, 76px)">
+          <div class="tools-strip reveal">
+            <div class="tools-strip__head">
+              <span class="panel-label">The agent's toolbox</span>
+              <b>Forty tools over your own record — search it, read it, correlate it, dispatch subagents across it.</b>
+            </div>
+            <div class="marquee" aria-hidden="true">
+              <div class="marquee__track">
+                <span>search_records</span><span>semantic_search</span><span>chunk_read</span><span>meal_trends</span><span>nutrient_totals</span><span>glucose_timeline</span><span>glucose_response</span><span>training_load</span><span>acwr_balance</span><span>workout_detail</span><span>route_splits</span><span>best_efforts</span><span>power_curve</span><span>food_frequency</span><span>meals_before_symptom</span><span>wellness_timeline</span><span>gut_brain_correlate</span><span>weight_history</span><span>water_history</span><span>streak_status</span>
+                <span>search_records</span><span>semantic_search</span><span>chunk_read</span><span>meal_trends</span><span>nutrient_totals</span><span>glucose_timeline</span><span>glucose_response</span><span>training_load</span><span>acwr_balance</span><span>workout_detail</span><span>route_splits</span><span>best_efforts</span><span>power_curve</span><span>food_frequency</span><span>meals_before_symptom</span><span>wellness_timeline</span><span>gut_brain_correlate</span><span>weight_history</span><span>water_history</span><span>streak_status</span>
+              </div>
+            </div>
+            <div class="marquee marquee--reverse" aria-hidden="true">
+              <div class="marquee__track">
+                <span>scratchpad_memory</span><span>dispatch_subagent</span><span>deep_dive</span><span>meal_plan_draft</span><span>training_plan</span><span>supplement_history</span><span>sleep_timeline</span><span>heart_rate_zones</span><span>vo2max_history</span><span>cgm_raw_window</span><span>provenance_check</span><span>target_engine</span><span>fueling_engine</span><span>weekly_recap</span><span>report_builder</span><span>friend_workouts</span><span>trophy_case</span><span>segment_compare</span><span>percentile_lookup</span><span>second_meal_effect</span>
+                <span>scratchpad_memory</span><span>dispatch_subagent</span><span>deep_dive</span><span>meal_plan_draft</span><span>training_plan</span><span>supplement_history</span><span>sleep_timeline</span><span>heart_rate_zones</span><span>vo2max_history</span><span>cgm_raw_window</span><span>provenance_check</span><span>target_engine</span><span>fueling_engine</span><span>weekly_recap</span><span>report_builder</span><span>friend_workouts</span><span>trophy_case</span><span>segment_compare</span><span>percentile_lookup</span><span>second_meal_effect</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="page-shell" style="margin-top: clamp(48px, 7vw, 88px)">
           <div class="feature-grid">
-            <article class="feature-card reveal reveal-stagger-1">
+            <article class="feature-card feature-card--half reveal reveal-stagger-1">
               <div class="feature-icon">01 · Grounded</div>
               <h3>It already knows your data.</h3>
               <p>Today's totals, recent workouts, glucose, and wellness are in context on every question — and it keeps a running set of notes about you, so it doesn't start cold each session.</p>
             </article>
-            <article class="feature-card reveal reveal-stagger-2">
+            <article class="feature-card feature-card--half reveal reveal-stagger-2">
               <div class="feature-icon">02 · Models</div>
               <h3>Pick the model.</h3>
               <p>Claude Sonnet or Opus on the web, plus managed Gemini, OpenAI, and Grok routes in the app — no API key to manage, metered by Intelligence tokens.</p>
             </article>
-            <article class="feature-card reveal reveal-stagger-3">
+            <article class="feature-card feature-card--half reveal reveal-stagger-3">
               <div class="feature-icon">03 · On demand</div>
               <h3>Insight on any meal.</h3>
               <p>Tap Insight for a per-food read and a one-line summary in the style you set — detail level, emphasis, even your own instructions. It runs only when you ask, never automatically.</p>
+            </article>
+            <article class="feature-card feature-card--half feature-card--violet reveal reveal-stagger-4">
+              <div class="feature-icon">04 · Deep Dive</div>
+              <h3>Point it at everything.</h3>
+              <p>Deep Dive fans subagents out across your entire timeline — month by month — then synthesizes what actually changed. One report, grounded in all of it.</p>
+              <div class="dd-strip" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                <i class="dd-synth"></i>
+              </div>
             </article>
           </div>
         </div>
@@ -501,7 +633,7 @@
       </section>
 
       <section id="download" class="cta-section">
-        <div class="page-shell cta-card reveal">
+        <div class="page-shell cta-card cta-card--aurora reveal">
           <div>
             <div class="eyebrow">Start measuring what matters</div>
             <h2>Build the model your body has been asking for.</h2>
