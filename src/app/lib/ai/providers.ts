@@ -1,6 +1,6 @@
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import { firebaseApp } from '../firebase'
-import { anthropicChat, type AnthropicMessage } from './anthropic'
+import { anthropicChat, type AnthropicMessage, type ClaudeModel } from './anthropic'
 
 const functions = getFunctions(firebaseApp, 'us-central1')
 
@@ -18,14 +18,18 @@ export interface ChatModelOption {
   label: string
   /** Provider display name persisted on messages. */
   providerLabel: string
+  /** True when this route runs the full tool-calling agent loop. */
+  agentic: boolean
+  /** Dot color for the picker, mirroring the iOS provider colors. */
+  dotColor: string
 }
 
 export const CHAT_MODELS: ChatModelOption[] = [
-  { provider: 'claude', modelId: 'claude-sonnet-4-6', label: 'Sonnet', providerLabel: 'Claude' },
-  { provider: 'claude', modelId: 'claude-opus-4-7', label: 'Opus', providerLabel: 'Claude' },
-  { provider: 'chatgpt', modelId: 'gpt-5.4', label: 'GPT-5.4', providerLabel: 'ChatGPT' },
-  { provider: 'chatgpt', modelId: 'gpt-5.4-mini', label: 'GPT-5.4 mini', providerLabel: 'ChatGPT' },
-  { provider: 'grok', modelId: 'grok-4.3', label: 'Grok', providerLabel: 'Grok' },
+  { provider: 'claude', modelId: 'claude-sonnet-5', label: 'Auto', providerLabel: 'Auto', agentic: true, dotColor: '#8B5CF6' },
+  { provider: 'claude', modelId: 'claude-sonnet-4-6', label: 'Sonnet', providerLabel: 'Claude', agentic: true, dotColor: '#D97757' },
+  { provider: 'claude', modelId: 'claude-opus-4-7', label: 'Opus', providerLabel: 'Claude', agentic: true, dotColor: '#D97757' },
+  { provider: 'chatgpt', modelId: 'gpt-5.4', label: 'GPT-5.4', providerLabel: 'ChatGPT', agentic: false, dotColor: '#10A37F' },
+  { provider: 'grok', modelId: 'grok-4.3', label: 'Grok', providerLabel: 'Grok', agentic: false, dotColor: '#f5f5f7' },
 ]
 
 export interface ChatTurn {
@@ -78,7 +82,7 @@ export async function sendChat(params: {
     const resp = await anthropicChat({
       messages,
       systemPrompt,
-      model: model.modelId as 'claude-sonnet-4-6' | 'claude-opus-4-7',
+      model: model.modelId as ClaudeModel,
     })
     return { content: resp.content, providerLabel: model.providerLabel }
   }

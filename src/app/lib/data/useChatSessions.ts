@@ -12,12 +12,25 @@ import {
 import { db } from '../firebase'
 import { toDate, toDateOrNow } from '../firestore'
 
+/** Persisted trace of one agent tool call (status is always terminal here). */
+export interface ChatMessageStep {
+  name: string
+  summary: string
+  resultMeta?: string
+  failed?: boolean
+  sub?: boolean
+}
+
 export interface ChatSessionMessage {
   id: string
   role: 'user' | 'model'
   content: string
   provider?: string
   timestamp: Date
+  /** Agent tool activity behind this assistant message. */
+  steps?: ChatMessageStep[]
+  /** Metered Intelligence credits this turn cost. */
+  creditsCharged?: number
 }
 
 export interface ChatSession {
@@ -32,6 +45,16 @@ export interface ChatSession {
 
 type Raw = Record<string, unknown>
 
+function decodeStep(raw: Raw): ChatMessageStep {
+  return {
+    name: typeof raw.name === 'string' ? raw.name : 'tool',
+    summary: typeof raw.summary === 'string' ? raw.summary : '',
+    resultMeta: typeof raw.resultMeta === 'string' ? raw.resultMeta : undefined,
+    failed: raw.failed === true ? true : undefined,
+    sub: raw.sub === true ? true : undefined,
+  }
+}
+
 function decodeMessage(raw: Raw): ChatSessionMessage {
   return {
     id: typeof raw.id === 'string' ? raw.id : crypto.randomUUID(),
@@ -39,6 +62,8 @@ function decodeMessage(raw: Raw): ChatSessionMessage {
     content: typeof raw.content === 'string' ? raw.content : '',
     provider: typeof raw.provider === 'string' ? raw.provider : undefined,
     timestamp: toDate(raw.timestamp) ?? new Date(),
+    steps: Array.isArray(raw.steps) ? raw.steps.map((s) => decodeStep(s as Raw)) : undefined,
+    creditsCharged: typeof raw.creditsCharged === 'number' ? raw.creditsCharged : undefined,
   }
 }
 
@@ -136,6 +161,20 @@ export async function saveChatSession(uid: string, session: ChatSession): Promis
       content: m.content,
       timestamp: m.timestamp,
       ...(m.provider ? { provider: m.provider } : {}),
+      ...(m.steps && m.steps.length > 0
+        ? {
+            steps: m.steps.map((s) => ({
+              name: s.name,
+              summary: s.summary,
+              ...(s.resultMeta ? { resultMeta: s.resultMeta } : {}),
+              ...(s.failed ? { failed: true } : {}),
+              ...(s.sub ? { sub: true } : {}),
+            })),
+          }
+        : {}),
+      ...(typeof m.creditsCharged === 'number' && m.creditsCharged > 0
+        ? { creditsCharged: m.creditsCharged }
+        : {}),
     })),
     mode: session.mode,
     createdAt: session.createdAt,

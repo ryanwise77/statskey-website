@@ -10,12 +10,14 @@ import type {
 import type { UserProfile as Profile } from '../profile'
 
 /**
- * Builds a plain-text system prompt matching the section format iOS uses in
- * biometrics/StatsKey/Services/AIContextBuilder.swift. Simpler than iOS —
- * no tool instructions (Phase 3 web chat is tool-free for now), no vitamin D
- * estimator, no complete nutrient dump. Enough for Claude to be useful for
- * questions about today and the recent past.
+ * Builds the plain-text system prompt for the web Intelligence agent,
+ * mirroring the section format and grounding rules iOS uses in
+ * biometrics/StatsKey/Services/AIContextBuilder.swift. Today's snapshot is
+ * inlined; everything else is reachable through the agent toolbox
+ * (lib/ai/tools.ts), and persistent memory is injected when present.
  */
+export type ChatMode = 'general' | 'training'
+
 export interface ContextInputs {
   profile: Profile | null
   macroTargets: MacroTargets
@@ -25,6 +27,11 @@ export interface ContextInputs {
   todayWater: WaterDoc | null
   recentWorkouts: WorkoutSession[]
   latestGlucose: GlucoseReading | null
+  /** Persistent scratch-pad memory (users/{uid}/settings/aiScratchPad). */
+  memoryNotes?: string
+  /** Whether the agent toolbox is attached to this conversation. */
+  toolsEnabled?: boolean
+  mode?: ChatMode
 }
 
 function fmtTimeOfDay(d: Date): string {
@@ -34,13 +41,48 @@ function fmtTimeOfDay(d: Date): string {
 export function buildSystemPrompt(inputs: ContextInputs): string {
   const sections: string[] = []
 
+  const identity = [
+    '--- IDENTITY ---',
+    'You are StatsKey Intelligence — the intelligence layer over the user\'s own recorded nutrition, training, glucose, and wellness data.',
+    'Be concise, specific, and honest. Prefer short answers unless the user asks for depth.',
+  ]
+  if (inputs.mode === 'training') {
+    identity.push(
+      'You are in TRAINING COACH mode: lead with training load, pacing execution, recovery balance, and fueling relative to sessions. Read recent workouts closely before advising.'
+    )
+  }
+  sections.push(identity.join('\n'))
+
   sections.push(
     [
-      '--- IDENTITY ---',
-      'You are StatsKey Intelligence — an AI assistant that helps the user understand their nutrition, training, and biometric data.',
-      'Be concise, specific, and honest. Prefer short answers unless the user asks for depth.',
+      '--- GROUNDING RULES ---',
+      'Ground every quantitative claim in the context below or in tool results. If the data is not there, say you do not know — never invent numbers, meals, workouts, or percentiles.',
+      'When you state a finding, cite where it came from in plain language ("your recorded dinners this week", "the March 14 run splits").',
+      'StatsKey is a wellness tool, not a medical device: no diagnoses. For concerning symptoms, suggest a clinician while still reading the recorded data honestly.',
+      'Recorded nutrition has known error bars (portions, estimates). Treat small differences as noise; flag patterns only when the signal is clear.',
     ].join('\n')
   )
+
+  if (inputs.toolsEnabled) {
+    sections.push(
+      [
+        '--- TOOLS ---',
+        "You have tools over the user's full StatsKey record (about a year of meals, workouts, wellness, weights, glucose) plus persistent memory.",
+        'Below you only see TODAY\'s snapshot — anything historical must come from tools. Prefer: index_manifest to scope, keyword_search + chunk_read for named things, get_daily_overview for broad ranges before drilling in, and the specific getters for detail.',
+        'Use run_subagent for deep side-investigations so the main thread stays focused. Keep tool calls purposeful; do not re-fetch what you already have.',
+        'Memory: read get_scratch_pad when useful; call update_scratch_pad (full overwrite) when you learn durable preferences, goals, or confirmed patterns worth keeping across sessions.',
+      ].join('\n')
+    )
+  }
+
+  if (inputs.memoryNotes && inputs.memoryNotes.trim().length > 0) {
+    sections.push(
+      [
+        '--- MEMORY (persistent scratch pad, shared with the iOS app) ---',
+        inputs.memoryNotes.trim(),
+      ].join('\n')
+    )
+  }
 
   const now = new Date()
   sections.push(
@@ -78,7 +120,7 @@ export function buildSystemPrompt(inputs: ContextInputs): string {
       `Calories: ${Math.round(t.calories)} cal`,
       `Protein: ${Math.round(t.protein)}g · Carbs: ${Math.round(t.carbs)}g · Fat: ${Math.round(t.fat)}g · Fiber: ${Math.round(t.fiber)}g`,
       `Water: ${Math.round(t.water)} fl oz`,
-      t.isAIAdaptive ? 'Targets are AI-adaptive' : 'Targets are user-set',
+      t.isAIAdaptive ? 'Targets are maintained by Adaptive Intelligence' : 'Targets are user-set',
     ].join('\n')
   )
 
