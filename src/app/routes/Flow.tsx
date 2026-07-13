@@ -30,6 +30,15 @@ const SUGGESTIONS: Array<{ title: string; prompt: string }> = [
   { title: 'Nutrient gaps', prompt: 'Am I consistently short on any nutrient this month? Check the usual suspects.' },
 ]
 
+const MODEL_HINTS: Record<string, string> = {
+  Auto: 'Picks the right model for the question — recommended',
+  'Sonnet 5': 'Fast frontier Claude',
+  'Opus 4.8': 'Deepest Claude for hard analysis',
+  'GPT-5.6 Terra': 'Balanced OpenAI frontier',
+  'GPT-5.6 Sol': 'Highest-capability OpenAI route',
+  'Grok 4.5': 'xAI frontier',
+}
+
 export function Flow() {
   const { user, profile } = useAuth()
   const uid = user?.uid
@@ -51,7 +60,26 @@ export function Flow() {
   const [error, setError] = useState<string | null>(null)
   const [usage, setUsage] = useState<AnthropicMonthlyUsage | null>(null)
   const [memoryOpen, setMemoryOpen] = useState(false)
+  const [modelMenuOpen, setModelMenuOpen] = useState(false)
+  const modelMenuRef = useRef<HTMLDivElement>(null)
   const stopRequested = useRef(false)
+
+  // Close the model menu on outside click or Escape.
+  useEffect(() => {
+    if (!modelMenuOpen) return
+    const onPointer = (e: PointerEvent) => {
+      if (modelMenuRef.current && !modelMenuRef.current.contains(e.target as Node)) setModelMenuOpen(false)
+    }
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setModelMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointer)
+    document.addEventListener('keydown', onEsc)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer)
+      document.removeEventListener('keydown', onEsc)
+    }
+  }, [modelMenuOpen])
 
   // Load resumed session when it becomes available.
   const loadedResumeId = useRef<string | null>(null)
@@ -253,20 +281,39 @@ export function Flow() {
               Training coach
             </button>
           </div>
-          <div className="tab-strip">
-            {CHAT_MODELS.map((m) => (
-              <button
-                key={m.label}
-                className={model.label === m.label ? 'active' : ''}
-                onClick={() => setModel(m)}
-                title={`${m.providerLabel} · full toolbox`}
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: m.dotColor }} />
-                  {m.label}
-                </span>
-              </button>
-            ))}
+          <div className="relative" ref={modelMenuRef}>
+            <button
+              className="intel-model-trigger"
+              onClick={() => setModelMenuOpen((v) => !v)}
+              aria-expanded={modelMenuOpen}
+              aria-haspopup="menu"
+              title="Choose model"
+            >
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: model.dotColor }} />
+              {model.label}
+              <span className={`intel-model-trigger__chev ${modelMenuOpen ? 'open' : ''}`}>▾</span>
+            </button>
+            {modelMenuOpen && (
+              <div className="intel-menu" role="menu">
+                {CHAT_MODELS.map((m) => (
+                  <button
+                    key={m.label}
+                    role="menuitemradio"
+                    aria-checked={model.label === m.label}
+                    className={model.label === m.label ? 'active' : ''}
+                    onClick={() => {
+                      setModel(m)
+                      setModelMenuOpen(false)
+                    }}
+                  >
+                    <span className="intel-menu__dot" style={{ background: m.dotColor }} />
+                    <span className="intel-menu__name">{m.label}</span>
+                    <span className="intel-menu__hint">{MODEL_HINTS[m.label] ?? m.providerLabel}</span>
+                    {model.label === m.label && <span className="intel-menu__check">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <button
             className="btn btn-secondary text-[12px] !py-1.5 !px-3"
