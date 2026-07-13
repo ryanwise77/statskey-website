@@ -24,12 +24,16 @@ export interface ChatModelOption {
   dotColor: string
 }
 
+// Latest managed models, matching the iOS picker exactly
+// (biometrics/StatsKey/Models/AIContext.swift + AnthropicService.swift):
+// Sonnet 5 / Opus 4.8, GPT-5.6 Terra / Sol, Grok 4.5.
 export const CHAT_MODELS: ChatModelOption[] = [
   { provider: 'claude', modelId: 'claude-sonnet-5', label: 'Auto', providerLabel: 'Auto', agentic: true, dotColor: '#8B5CF6' },
-  { provider: 'claude', modelId: 'claude-sonnet-4-6', label: 'Sonnet', providerLabel: 'Claude', agentic: true, dotColor: '#D97757' },
-  { provider: 'claude', modelId: 'claude-opus-4-7', label: 'Opus', providerLabel: 'Claude', agentic: true, dotColor: '#D97757' },
-  { provider: 'chatgpt', modelId: 'gpt-5.4', label: 'GPT-5.4', providerLabel: 'ChatGPT', agentic: false, dotColor: '#10A37F' },
-  { provider: 'grok', modelId: 'grok-4.3', label: 'Grok', providerLabel: 'Grok', agentic: false, dotColor: '#f5f5f7' },
+  { provider: 'claude', modelId: 'claude-sonnet-5', label: 'Sonnet 5', providerLabel: 'Claude', agentic: true, dotColor: '#D97757' },
+  { provider: 'claude', modelId: 'claude-opus-4-8', label: 'Opus 4.8', providerLabel: 'Claude', agentic: true, dotColor: '#D97757' },
+  { provider: 'chatgpt', modelId: 'gpt-5.6-terra', label: 'GPT-5.6 Terra', providerLabel: 'ChatGPT', agentic: true, dotColor: '#10A37F' },
+  { provider: 'chatgpt', modelId: 'gpt-5.6-sol', label: 'GPT-5.6 Sol', providerLabel: 'ChatGPT', agentic: true, dotColor: '#0F766E' },
+  { provider: 'grok', modelId: 'grok-4.5', label: 'Grok 4.5', providerLabel: 'Grok', agentic: true, dotColor: '#f5f5f7' },
 ]
 
 export interface ChatTurn {

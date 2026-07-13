@@ -18,8 +18,8 @@ const RANGE_OPTIONS: Array<{ days: RangeDays; label: string }> = [
 ]
 
 const MODEL_OPTIONS = [
-  { id: 'claude-sonnet-4-6', label: 'Claude Sonnet (fast)' },
-  { id: 'claude-opus-4-8', label: 'Claude Opus (deepest)' },
+  { id: 'claude-sonnet-5', label: 'Claude Sonnet 5 (fast)' },
+  { id: 'claude-opus-4-8', label: 'Claude Opus 4.8 (deepest)' },
 ]
 
 export function Reports() {

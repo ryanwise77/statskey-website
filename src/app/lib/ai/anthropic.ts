@@ -57,6 +57,8 @@ export interface AnthropicChatRequest {
   tools?: AnthropicToolDef[]
   max_output_tokens?: number
   reasoning_effort?: 'low' | 'medium' | 'high'
+  /** Pro+ fair-use flag for the Auto route (validated server-side). */
+  unlimitedAuto?: boolean
 }
 
 export interface AnthropicUsage {

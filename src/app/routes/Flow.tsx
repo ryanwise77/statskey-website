@@ -9,9 +9,9 @@ import { useRecentWorkouts } from '../lib/data/useRecentWorkouts'
 import { useLatestGlucose } from '../lib/data/useLatestGlucose'
 import { dailyTotals } from '../lib/aggregates'
 import { buildSystemPrompt, type ChatMode } from '../lib/ai/context'
-import { CHAT_MODELS, sendChat, type ChatModelOption, type ChatTurn } from '../lib/ai/providers'
+import { CHAT_MODELS, type ChatModelOption } from '../lib/ai/providers'
 import { runAgentTurn, type AgentStep } from '../lib/ai/agent'
-import type { AnthropicMonthlyUsage, ClaudeModel } from '../lib/ai/anthropic'
+import type { AnthropicMonthlyUsage } from '../lib/ai/anthropic'
 import { getScratchPad, updateScratchPad } from '../lib/ai/scratchPad'
 import { Markdown } from '../components/Markdown'
 import {
@@ -23,11 +23,11 @@ import {
   type ChatSessionMessage,
 } from '../lib/data/useChatSessions'
 
-const SUGGESTIONS = [
-  'What actually drove my energy this week?',
-  'Analyze my last run — pacing, drift, and what to fix.',
-  'Which foods show up before my GI symptoms?',
-  'Am I consistently short on any nutrient this month?',
+const SUGGESTIONS: Array<{ title: string; prompt: string }> = [
+  { title: 'Energy audit', prompt: 'What actually drove my energy this week? Check meals, training, sleep, and glucose.' },
+  { title: 'Run analysis', prompt: 'Analyze my last run — pacing execution, drift, elevation, and one thing to fix.' },
+  { title: 'GI triggers', prompt: 'Which foods show up most often in the hours before my GI symptoms?' },
+  { title: 'Nutrient gaps', prompt: 'Am I consistently short on any nutrient this month? Check the usual suspects.' },
 ]
 
 export function Flow() {
@@ -47,6 +47,7 @@ export function Flow() {
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [liveSteps, setLiveSteps] = useState<AgentStep[]>([])
+  const [liveText, setLiveText] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [usage, setUsage] = useState<AnthropicMonthlyUsage | null>(null)
   const [memoryOpen, setMemoryOpen] = useState(false)
@@ -77,7 +78,7 @@ export function Flow() {
   const totals = useMemo(() => dailyTotals(mealsState.meals), [mealsState.meals])
 
   // Persistent memory — loaded once, refreshed after each turn (the agent may
-  // have updated it through update_scratch_pad).
+  // have rewritten it through update_scratch_pad).
   const [memoryNotes, setMemoryNotes] = useState('')
   const [memoryDraft, setMemoryDraft] = useState<string | null>(null)
   useEffect(() => {
@@ -99,7 +100,7 @@ export function Flow() {
         recentWorkouts: workoutsState.workouts,
         latestGlucose: glucoseState.reading,
         memoryNotes,
-        toolsEnabled: model.agentic,
+        toolsEnabled: true,
         mode,
       }),
     [
@@ -112,7 +113,6 @@ export function Flow() {
       workoutsState.workouts,
       glucoseState.reading,
       memoryNotes,
-      model.agentic,
       mode,
     ]
   )
@@ -120,7 +120,7 @@ export function Flow() {
   const scrollRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, sending, liveSteps])
+  }, [messages, sending, liveSteps, liveText])
 
   async function send(textOverride?: string) {
     if (!uid || sending) return
@@ -138,6 +138,7 @@ export function Flow() {
     setDraft('')
     setSending(true)
     setLiveSteps([])
+    setLiveText('')
     setError(null)
     stopRequested.current = false
 
@@ -145,58 +146,58 @@ export function Flow() {
     if (!title) setTitle(sessionTitle)
 
     try {
-      const priorTurns: ChatTurn[] = messages.map((m) => ({
-        role: m.role === 'user' ? 'user' : 'assistant',
+      const priorTurns = messages.map((m) => ({
+        role: m.role === 'user' ? ('user' as const) : ('assistant' as const),
         content: m.content,
       }))
 
-      let content: string
-      let steps: ChatMessageStep[] | undefined
-      let creditsCharged: number | undefined
-      let providerLabel = model.providerLabel
+      const result = await runAgentTurn({
+        uid,
+        provider: model.provider,
+        modelId: model.modelId,
+        systemPrompt,
+        priorTurns,
+        userText: text,
+        onStep: setLiveSteps,
+        onText: setLiveText,
+        shouldStop: () => stopRequested.current,
+        unlimitedAuto: model.label === 'Auto',
+      })
 
-      if (model.agentic) {
-        const result = await runAgentTurn({
-          uid,
-          model: model.modelId as ClaudeModel,
-          systemPrompt,
-          priorTurns,
-          userText: text,
-          onStep: setLiveSteps,
-          shouldStop: () => stopRequested.current,
-        })
-        content = result.content
-        creditsCharged = result.creditsCharged
-        if (result.monthlyUsage) setUsage(result.monthlyUsage)
-        steps = result.steps.map((s) => ({
-          name: s.name,
-          summary: s.summary,
-          resultMeta: s.resultMeta,
-          failed: s.status === 'error' ? true : undefined,
-          sub: s.sub,
-        }))
-        if (model.label === 'Auto') providerLabel = 'Auto · Claude'
-        // The agent may have rewritten its memory — refresh for the next turn.
-        getScratchPad(uid)
-          .then((pad) => setMemoryNotes(pad.notes))
-          .catch(() => {})
-      } else {
-        const resp = await sendChat({ model, systemPrompt, turns: [...priorTurns, { role: 'user', content: text }] })
-        content = resp.content
-      }
+      if (result.monthlyUsage) setUsage(result.monthlyUsage)
+
+      const steps: ChatMessageStep[] | undefined =
+        result.steps.length > 0
+          ? result.steps.map((s) => ({
+              name: s.name,
+              summary: s.summary,
+              resultMeta: s.resultMeta,
+              failed: s.status === 'error' ? true : undefined,
+              sub: s.sub,
+            }))
+          : undefined
+
+      const providerLabel = model.label === 'Auto' ? 'Auto · Claude' : model.providerLabel
 
       const assistantMsg: ChatSessionMessage = {
         id: crypto.randomUUID(),
         role: 'model',
-        content,
+        content: result.content,
         provider: providerLabel,
         timestamp: new Date(),
         steps,
-        creditsCharged,
+        creditsCharged: result.creditsCharged || undefined,
+        citations: result.citations.length > 0 ? result.citations : undefined,
       }
       const updated = [...history, assistantMsg]
       setMessages(updated)
       setLiveSteps([])
+      setLiveText('')
+
+      // The agent may have rewritten its memory — refresh for the next turn.
+      getScratchPad(uid)
+        .then((pad) => setMemoryNotes(pad.notes))
+        .catch(() => {})
 
       const session: ChatSession = {
         id: sessionId,
@@ -229,11 +230,13 @@ export function Flow() {
     setMemoryDraft(null)
   }
 
+  const working = sending && (liveSteps.length > 0 || liveText.length > 0)
+
   return (
-    <div className="space-y-4 h-[calc(100vh-8rem)] flex flex-col">
+    <div className="intel-page space-y-4 h-[calc(100vh-8rem)] flex flex-col">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <IntelligenceMark />
+          <span className="intel-mark w-10 h-10 text-[16px]">✦</span>
           <div>
             <h1 className="font-display text-[24px] font-bold tracking-[-0.02em]">Intelligence</h1>
             <p className="text-text-secondary text-[13px] mt-0.5">
@@ -253,10 +256,10 @@ export function Flow() {
           <div className="tab-strip">
             {CHAT_MODELS.map((m) => (
               <button
-                key={m.modelId + m.label}
+                key={m.label}
                 className={model.label === m.label ? 'active' : ''}
                 onClick={() => setModel(m)}
-                title={m.agentic ? `${m.providerLabel} · full toolbox` : m.providerLabel}
+                title={`${m.providerLabel} · full toolbox`}
               >
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: m.dotColor }} />
@@ -284,12 +287,12 @@ export function Flow() {
       </header>
 
       {memoryOpen && (
-        <div className="panel !py-4 space-y-2">
+        <div className="intel-panel !py-4 space-y-2 intel-in">
           <div className="flex items-center justify-between gap-3">
             <div>
               <span className="card-title">Persistent memory</span>
               <p className="text-text-muted text-[12px] mt-0.5">
-                The agent reads this every session and can rewrite it as it learns. Shared with the iOS app.
+                The agent reads this every session and rewrites it as it learns. Shared with the iOS app.
               </p>
             </div>
             {memoryDraft == null ? (
@@ -301,7 +304,7 @@ export function Flow() {
                 <button className="btn btn-secondary text-[12px] !py-1.5 !px-3" onClick={() => setMemoryDraft(null)}>
                   Cancel
                 </button>
-                <button className="btn btn-primary text-[12px] !py-1.5 !px-3" onClick={saveMemory}>
+                <button className="btn btn-intel text-[12px] !py-1.5 !px-3" onClick={saveMemory}>
                   Save
                 </button>
               </div>
@@ -322,28 +325,24 @@ export function Flow() {
         </div>
       )}
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto panel space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto intel-panel space-y-4">
         {messages.length === 0 && !existing.loading && (
-          <div className="py-10 text-center space-y-5">
+          <div className="py-10 text-center space-y-6 intel-in">
             <div className="flex justify-center">
-              <IntelligenceMark large />
+              <span className="intel-mark w-16 h-16 text-[26px]">✦</span>
             </div>
             <div>
-              <p className="text-text-primary text-[15px] font-medium">Ask your own data.</p>
-              <p className="text-text-muted text-[13px] mt-1 max-w-md mx-auto">
+              <p className="font-display text-text-primary text-[20px] font-bold tracking-[-0.02em]">Ask your own data.</p>
+              <p className="text-text-muted text-[13px] mt-1.5 max-w-md mx-auto leading-relaxed">
                 Intelligence searches your record, reads glucose timelines, analyzes runs, correlates meals with
-                symptoms, and remembers what matters — every step shown as it works.
+                symptoms, dispatches subagents, and remembers what matters — every step shown as it works.
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
+            <div className="grid sm:grid-cols-2 gap-2.5 max-w-xl mx-auto text-left">
               {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  className="btn btn-secondary text-[12px] !py-1.5 !px-3"
-                  onClick={() => send(s)}
-                  disabled={sending || !uid}
-                >
-                  {s}
+                <button key={s.title} className="intel-suggestion" onClick={() => send(s.prompt)} disabled={sending || !uid}>
+                  <b>{s.title}</b>
+                  {s.prompt}
                 </button>
               ))}
             </div>
@@ -355,15 +354,23 @@ export function Flow() {
         ))}
 
         {sending && (
-          <div className="max-w-[92%] space-y-2">
+          <div className="max-w-[92%] space-y-2.5 intel-in">
             {liveSteps.length > 0 && <StepList steps={liveSteps} live />}
-            <div className="text-text-muted text-[13px] animate-pulse">
-              {liveSteps.length > 0
-                ? liveSteps.some((s) => s.status === 'running')
-                  ? 'Working through your record…'
-                  : 'Synthesizing…'
-                : 'Thinking…'}
-            </div>
+            {liveText ? (
+              <div className="px-4 py-3 rounded-2xl intel-bubble-ai">
+                <Markdown text={liveText} />
+                <span className="intel-caret" />
+              </div>
+            ) : (
+              <div className="intel-status">
+                <span className="intel-dot intel-dot--running" />
+                {working
+                  ? liveSteps.some((s) => s.status === 'running')
+                    ? 'Working through your record…'
+                    : 'Synthesizing…'
+                  : 'Thinking…'}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -371,31 +378,29 @@ export function Flow() {
       {error && <div className="error-banner">{error}</div>}
 
       <div className="space-y-1.5">
-        <div className="flex items-end gap-2">
+        <div className="intel-composer">
           <textarea
-            className="input flex-1 resize-none"
             rows={2}
-            placeholder={model.agentic ? 'Ask anything about your record…' : `Ask ${model.providerLabel} (no tools on this route)…`}
+            placeholder="Ask anything about your record…"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={onKey}
             disabled={sending}
           />
-          {sending && model.agentic ? (
+          {sending ? (
             <button className="btn btn-secondary" onClick={() => (stopRequested.current = true)}>
               Stop
             </button>
           ) : (
-            <button className="btn btn-primary" onClick={() => send()} disabled={sending || !draft.trim()}>
+            <button className="btn btn-intel" onClick={() => send()} disabled={sending || !draft.trim()}>
               Send
             </button>
           )}
         </div>
         <div className="flex justify-between text-[11px] text-text-muted px-1">
           <span>
-            {model.agentic
-              ? `${model.label === 'Auto' ? 'Auto routing · ' : ''}full toolbox over ~1 year of your record`
-              : 'Direct chat — switch to Auto, Sonnet, or Opus for tool use'}
+            {model.label === 'Auto' ? 'Auto routing · ' : `${model.label} · `}
+            full toolbox over ~1 year of your record
           </span>
           {usage && (
             <span>
@@ -408,41 +413,23 @@ export function Flow() {
   )
 }
 
-function IntelligenceMark({ large }: { large?: boolean }) {
-  const size = large ? 'w-14 h-14 text-[22px]' : 'w-9 h-9 text-[14px]'
-  return (
-    <span
-      className={`${size} rounded-full inline-flex items-center justify-center text-white shrink-0`}
-      style={{ background: 'linear-gradient(135deg, #7C3AED, #6366F1)', boxShadow: '0 6px 24px rgba(124, 58, 237, 0.35)' }}
-      aria-hidden="true"
-    >
-      ✦
-    </span>
-  )
-}
-
 function StepList({ steps, live }: { steps: Array<AgentStep | ChatMessageStep>; live?: boolean }) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-black/30 divide-y divide-white/[0.04] overflow-hidden">
+    <div className="intel-steps">
       {steps.map((s, i) => {
         const running = live && 'status' in s && s.status === 'running'
         const failed = ('status' in s && s.status === 'error') || ('failed' in s && s.failed)
+        const ms = 'ms' in s && typeof s.ms === 'number' ? s.ms : null
         return (
-          <div key={'id' in s ? s.id : `${s.name}-${i}`} className={`flex items-center gap-2.5 px-3 py-2 ${s.sub ? 'pl-8' : ''}`}>
-            <span
-              className={`w-3 h-3 rounded-full shrink-0 border ${
-                running
-                  ? 'border-[#8B5CF6] border-t-transparent animate-spin'
-                  : failed
-                  ? 'border-red-400/60 bg-red-400/20'
-                  : 'border-transparent bg-[#8B5CF6]/25'
-              }`}
-            >
-              {!running && !failed && <span className="block w-full h-full rounded-full scale-50 bg-[#a78bfa]" />}
-            </span>
-            <code className="font-mono text-[11.5px] text-[#a78bfa] truncate">{s.summary || s.name}</code>
-            <span className="ml-auto shrink-0 font-mono text-[10.5px] text-text-muted">
+          <div
+            key={'id' in s ? s.id : `${s.name}-${i}`}
+            className={`intel-step ${s.sub ? 'intel-step--sub' : ''} ${running ? 'intel-step--running' : ''}`}
+          >
+            <span className={`intel-dot ${running ? 'intel-dot--running' : failed ? 'intel-dot--error' : ''}`} />
+            <code className="intel-step__code">{s.summary || s.name}</code>
+            <span className="intel-step__meta">
               {running ? 'running' : failed ? 'failed' : s.resultMeta ?? 'done'}
+              {!running && ms != null ? ` · ${ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`}` : ''}
             </span>
           </div>
         )
@@ -456,8 +443,8 @@ function MessageBubble({ message }: { message: ChatSessionMessage }) {
   const [stepsOpen, setStepsOpen] = useState(false)
   if (isUser) {
     return (
-      <div className="flex justify-end">
-        <div className="max-w-[85%] px-4 py-3 rounded-2xl whitespace-pre-wrap text-[14px] leading-relaxed bg-accent/20 text-text-primary border border-accent/30">
+      <div className="flex justify-end intel-in">
+        <div className="max-w-[85%] px-4 py-3 rounded-2xl whitespace-pre-wrap text-[14px] leading-relaxed text-text-primary intel-bubble-user">
           {message.content}
         </div>
       </div>
@@ -465,15 +452,11 @@ function MessageBubble({ message }: { message: ChatSessionMessage }) {
   }
   const stepCount = message.steps?.length ?? 0
   return (
-    <div className="flex justify-start">
+    <div className="flex justify-start intel-in">
       <div className="max-w-[92%] w-full space-y-2">
         {(message.provider || stepCount > 0) && (
-          <div className="flex items-center gap-2 text-[11px] text-text-muted">
-            {message.provider && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 px-2 py-0.5 text-[#a78bfa] font-mono">
-                ✦ {message.provider}
-              </span>
-            )}
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-muted">
+            {message.provider && <span className="intel-provider-pill">✦ {message.provider}</span>}
             {stepCount > 0 && (
               <button className="hover:text-text-primary transition-colors font-mono" onClick={() => setStepsOpen((v) => !v)}>
                 {stepCount} tool call{stepCount === 1 ? '' : 's'} {stepsOpen ? '▾' : '▸'}
@@ -485,10 +468,33 @@ function MessageBubble({ message }: { message: ChatSessionMessage }) {
           </div>
         )}
         {stepsOpen && message.steps && <StepList steps={message.steps} />}
-        <div className="px-4 py-3 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
+        <div className="px-4 py-3 rounded-2xl intel-bubble-ai">
           <Markdown text={message.content} />
         </div>
+        {message.citations && message.citations.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 text-[11px]">
+            {message.citations.slice(0, 4).map((url) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-text-muted hover:text-text-primary transition-colors font-mono truncate max-w-[220px] border border-white/[0.07] rounded-full px-2 py-0.5"
+              >
+                {hostOf(url)}
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
+}
+
+function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
 }

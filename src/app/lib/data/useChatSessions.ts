@@ -31,6 +31,8 @@ export interface ChatSessionMessage {
   steps?: ChatMessageStep[]
   /** Metered Intelligence credits this turn cost. */
   creditsCharged?: number
+  /** Web citations the model consulted (URL list). */
+  citations?: string[]
 }
 
 export interface ChatSession {
@@ -64,6 +66,7 @@ function decodeMessage(raw: Raw): ChatSessionMessage {
     timestamp: toDate(raw.timestamp) ?? new Date(),
     steps: Array.isArray(raw.steps) ? raw.steps.map((s) => decodeStep(s as Raw)) : undefined,
     creditsCharged: typeof raw.creditsCharged === 'number' ? raw.creditsCharged : undefined,
+    citations: Array.isArray(raw.citations) ? raw.citations.filter((c): c is string => typeof c === 'string') : undefined,
   }
 }
 
@@ -175,6 +178,7 @@ export async function saveChatSession(uid: string, session: ChatSession): Promis
       ...(typeof m.creditsCharged === 'number' && m.creditsCharged > 0
         ? { creditsCharged: m.creditsCharged }
         : {}),
+      ...(m.citations && m.citations.length > 0 ? { citations: m.citations } : {}),
     })),
     mode: session.mode,
     createdAt: session.createdAt,
