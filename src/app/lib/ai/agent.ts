@@ -8,7 +8,6 @@ import {
   type AnthropicToolUseBlock,
   type ClaudeModel,
 } from './anthropic'
-import { streamAnthropicRound } from './stream'
 import { AGENT_TOOLS, SUBAGENT_TOOLS, AgentDataCache, executeTool } from './tools'
 import type { ChatProvider } from './providers'
 
@@ -16,8 +15,8 @@ import type { ChatProvider } from './providers'
  * The web Intelligence agent loop — the counterpart of the iOS
  * ChatToolRouter round-trip, for every managed provider:
  *
- *   - Claude routes stream token-by-token through anthropicChatStream (same
- *     SSE endpoint iOS uses) with a non-streaming callable fallback.
+ *   - Claude routes through the same reliable callable tool loop iOS uses.
+ *     Only the finished answer is progressively revealed in the chat UI.
  *   - ChatGPT and Grok route through their callables with Chat-Completions
  *     tool calling (converted server-side to the Responses API).
  *
@@ -143,10 +142,8 @@ async function executeToolWithSubagent(
 }
 
 // ---------------------------------------------------------------------------
-// Claude — streaming rounds with callable fallback
+// Claude — reliable callable rounds; only the final answer is revealed
 // ---------------------------------------------------------------------------
-
-let streamingHealthy = true
 
 async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> {
   const { uid, modelId, systemPrompt, priorTurns, userText, onStep, onText, shouldStop, unlimitedAuto } = params
@@ -164,10 +161,6 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
   const preambles: string[] = []
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
-    let text: string
-    let contentBlocks: AnthropicContentBlock[]
-    let toolUses: AnthropicToolUseBlock[]
-
     const request = {
       messages,
       systemPrompt,
@@ -177,57 +170,33 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
       ...(unlimitedAuto ? { unlimitedAuto: true } : {}),
     }
 
-    let streamed = false
-    if (streamingHealthy) {
-      try {
-        const round_ = await streamAnthropicRound(request, {
-          onText,
-          onToolOpen: (id, name) => log.open(id, name, `${name}(…)`),
-        })
-        text = round_.text
-        contentBlocks = round_.contentBlocks
-        toolUses = round_.toolUse
-        creditsCharged += round_.creditsCharged
-        if (round_.monthlyUsage) monthlyUsage = round_.monthlyUsage
-        streamed = true
-      } catch (e) {
-        // Streaming path failed (network/proxy/token) — remember and fall
-        // back to the non-streaming callable for the rest of the session.
-        streamingHealthy = false
-        console.warn('[Intelligence] streaming unavailable, falling back to callable:', e)
-        text = ''
-        contentBlocks = []
-        toolUses = []
-      }
-    } else {
-      text = ''
-      contentBlocks = []
-      toolUses = []
-    }
+    const resp = await anthropicChat(request)
+    const text = resp.content ?? ''
+    const toolUses = (resp.toolUse ?? []) as AnthropicToolUseBlock[]
+    creditsCharged += resp.creditsCharged ?? 0
+    if (resp.monthlyUsage) monthlyUsage = resp.monthlyUsage
+    for (const c of resp.citations ?? []) citations.add(c)
 
-    if (!streamed) {
-      const resp = await anthropicChat(request)
-      text = resp.content ?? ''
-      contentBlocks = (resp.contentBlocks ?? []) as AnthropicContentBlock[]
-      toolUses = (resp.toolUse ?? []) as AnthropicToolUseBlock[]
-      creditsCharged += resp.creditsCharged ?? 0
-      if (resp.monthlyUsage) monthlyUsage = resp.monthlyUsage
-      for (const c of resp.citations ?? []) citations.add(c)
-      if (text) onText?.(text)
-    }
-
-    // The returned tool blocks are authoritative. `message_delta.stop_reason`
-    // is useful streaming metadata, but it may be absent when an intermediary
-    // buffers or trims an SSE frame; don't discard a valid tool turn over it.
     if (toolUses.length === 0) {
       const content = text.trim() || preambles.join('\n\n').trim()
+      await revealAnswer(content, onText, shouldStop)
       return { content, steps: log.steps, creditsCharged, monthlyUsage, citations: [...citations], rounds: round + 1 }
     }
 
     if (text) preambles.push(text)
-    onText?.('')
 
-    messages.push({ role: 'assistant', content: contentBlocks })
+    // Mirror the proven iOS continuation shape. Prefer the callable's complete
+    // content blocks (which preserve adaptive-thinking signatures); use a
+    // strict text + tool_use fallback only when those blocks are unavailable.
+    const fallbackContent: AnthropicContentBlock[] = [
+      ...(text ? [{ type: 'text' as const, text }] : []),
+      ...toolUses,
+    ]
+    const assistantContent =
+      resp.contentBlocks && resp.contentBlocks.length > 0
+        ? (resp.contentBlocks as AnthropicContentBlock[])
+        : fallbackContent
+    messages.push({ role: 'assistant', content: assistantContent })
 
     const resultBlocks: AnthropicContentBlock[] = []
     for (const call of toolUses) {
@@ -327,7 +296,7 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
 
     if (toolCalls.length === 0) {
       const content = text.trim() || preambles.join('\n\n').trim()
-      if (content) onText?.(content)
+      await revealAnswer(content, onText, shouldStop)
       return { content, steps: log.steps, creditsCharged, monthlyUsage, citations: [...citations], rounds: round + 1 }
     }
 
@@ -375,6 +344,31 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
     citations: [...citations],
     rounds: MAX_ROUNDS,
   }
+}
+
+/**
+ * Reveal only the finished answer. Data retrieval stays invisible, while the
+ * response still arrives with the smooth live-chat cadence the user expects.
+ */
+async function revealAnswer(
+  text: string,
+  onText?: (text: string) => void,
+  shouldStop?: () => boolean
+): Promise<void> {
+  if (!onText || !text) return
+
+  const chunks = text.match(/\S+\s*/g) ?? [text]
+  const batchSize = Math.max(1, Math.ceil(chunks.length / 120))
+  let visible = ''
+
+  for (let i = 0; i < chunks.length; i += batchSize) {
+    if (shouldStop?.()) break
+    visible += chunks.slice(i, i + batchSize).join('')
+    onText(visible)
+    await new Promise<void>((resolve) => window.setTimeout(resolve, 14))
+  }
+
+  if (!shouldStop?.()) onText(text)
 }
 
 // ---------------------------------------------------------------------------

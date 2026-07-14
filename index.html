@@ -383,24 +383,10 @@
             <h2>It cites its work — or says it doesn't know.</h2>
             <p>Answers stay grounded in your own records, cite their methods, and refuse to invent numbers or percentiles. Deeper analysis and Deep Dives run on metered Intelligence tokens from the Store.</p>
           </div>
-          <div class="agent-console reveal d2" id="agent-console" aria-label="Scripted demonstration of an Intelligence session">
-            <div class="agent-console__bar">
-              <span class="ac-dot"></span><span class="ac-dot"></span><span class="ac-dot"></span>
-              <span class="agent-console__title">Intelligence · grounded session</span>
-              <span class="agent-console__model"><i></i><b id="ac-model">Auto · frontier routing</b></span>
-            </div>
+          <div class="agent-console reveal d2" id="agent-console" aria-label="Scripted demonstration of an Intelligence answer">
             <div class="agent-console__body" id="ac-body">
               <div class="ac-msg ac-msg--user">Why did my glucose crash overnight last Tuesday?</div>
-              <div class="ac-tool is-done"><i class="ac-tool__st"></i><code>search_records("dinner · last tuesday")</code><span>1 meal · 8:47 PM</span></div>
-              <div class="ac-tool is-done"><i class="ac-tool__st"></i><code>glucose_timeline(tue 20:00 → wed 08:00)</code><span>low 58 mg/dL · 03:12</span></div>
-              <div class="ac-tool is-done"><i class="ac-tool__st"></i><code>correlate(carbs&gt;80g, fat&lt;20g, overnight_low)</code><span>83% · 12 nights</span></div>
               <div class="ac-msg ac-msg--ai">Your dinner at 8:47 PM had <strong>94g carbs</strong> with only 12g fat. Meals above 80g carbs with under 20g fat correlate with overnight drops below 60 mg/dL <strong>83% of the time</strong> in your recent records.</div>
-              <div class="ac-chips"><span>nutrition</span><span>CGM</span><span>sleep</span></div>
-            </div>
-            <div class="agent-console__foot">
-              <span>grounded in your records</span>
-              <span>cites its methods</span>
-              <span>refuses to invent numbers</span>
             </div>
           </div>
         </div>
@@ -448,27 +434,6 @@
           </div>
         </div>
 
-        <div class="page-shell" style="margin-top: clamp(44px, 6vw, 76px)">
-          <div class="tools-strip reveal">
-            <div class="tools-strip__head">
-              <span class="panel-label">The agent's toolbox</span>
-              <b>Forty tools over your own record — search it, read it, correlate it, dispatch subagents across it.</b>
-            </div>
-            <div class="marquee" aria-hidden="true">
-              <div class="marquee__track">
-                <span>search_records</span><span>semantic_search</span><span>chunk_read</span><span>meal_trends</span><span>nutrient_totals</span><span>glucose_timeline</span><span>glucose_response</span><span>training_load</span><span>acwr_balance</span><span>workout_detail</span><span>route_splits</span><span>best_efforts</span><span>power_curve</span><span>food_frequency</span><span>meals_before_symptom</span><span>wellness_timeline</span><span>gut_brain_correlate</span><span>weight_history</span><span>water_history</span><span>streak_status</span>
-                <span>search_records</span><span>semantic_search</span><span>chunk_read</span><span>meal_trends</span><span>nutrient_totals</span><span>glucose_timeline</span><span>glucose_response</span><span>training_load</span><span>acwr_balance</span><span>workout_detail</span><span>route_splits</span><span>best_efforts</span><span>power_curve</span><span>food_frequency</span><span>meals_before_symptom</span><span>wellness_timeline</span><span>gut_brain_correlate</span><span>weight_history</span><span>water_history</span><span>streak_status</span>
-              </div>
-            </div>
-            <div class="marquee marquee--reverse" aria-hidden="true">
-              <div class="marquee__track">
-                <span>scratchpad_memory</span><span>dispatch_subagent</span><span>deep_dive</span><span>meal_plan_draft</span><span>training_plan</span><span>supplement_history</span><span>sleep_timeline</span><span>heart_rate_zones</span><span>vo2max_history</span><span>cgm_raw_window</span><span>provenance_check</span><span>target_engine</span><span>fueling_engine</span><span>weekly_recap</span><span>report_builder</span><span>friend_workouts</span><span>trophy_case</span><span>segment_compare</span><span>percentile_lookup</span><span>second_meal_effect</span>
-                <span>scratchpad_memory</span><span>dispatch_subagent</span><span>deep_dive</span><span>meal_plan_draft</span><span>training_plan</span><span>supplement_history</span><span>sleep_timeline</span><span>heart_rate_zones</span><span>vo2max_history</span><span>cgm_raw_window</span><span>provenance_check</span><span>target_engine</span><span>fueling_engine</span><span>weekly_recap</span><span>report_builder</span><span>friend_workouts</span><span>trophy_case</span><span>segment_compare</span><span>percentile_lookup</span><span>second_meal_effect</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div class="page-shell" style="margin-top: clamp(48px, 7vw, 88px)">
           <div class="feature-grid">
             <article class="feature-card feature-card--half reveal reveal-stagger-1">
@@ -489,7 +454,7 @@
             <article class="feature-card feature-card--half feature-card--violet reveal reveal-stagger-4">
               <div class="feature-icon">04 · Deep Dive</div>
               <h3>Point it at everything.</h3>
-              <p>Deep Dive fans subagents out across your entire timeline — month by month — then synthesizes what actually changed. One report, grounded in all of it.</p>
+              <p>Deep Dive reads your timeline month by month, then synthesizes what actually changed. One report, grounded in all of it.</p>
               <div class="dd-strip" aria-hidden="true">
                 <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
                 <i class="dd-synth"></i>
