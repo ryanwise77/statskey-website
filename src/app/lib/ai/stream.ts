@@ -143,10 +143,21 @@ export async function streamAnthropicRound(
     }
   }
 
-  if (!done) {
-    // Stream ended without a done event (connection drop) — return what we
-    // have so the caller can decide whether to fall back.
-    return { text, contentBlocks: [], toolUse: [], stopReason, creditsCharged: 0 }
+  // `done` is assigned from the nested SSE handler, which TypeScript's
+  // control-flow analysis cannot observe across the closure.
+  const terminal = done as StreamRoundResult | null
+
+  if (!terminal) {
+    // Do not represent a truncated SSE response as a valid, empty model turn.
+    // The agent loop will catch this and rerun the same round through the
+    // reliable callable endpoint. Returning an empty result here previously
+    // allowed a completed tool call to be followed by a blank assistant reply.
+    throw new Error('Intelligence stream ended before completion.')
   }
-  return done
+
+  if (terminal.contentBlocks.length === 0 && terminal.text.trim().length === 0) {
+    throw new Error('Intelligence stream completed without a model response.')
+  }
+
+  return terminal
 }

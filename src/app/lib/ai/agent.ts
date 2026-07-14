@@ -167,7 +167,6 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
     let text: string
     let contentBlocks: AnthropicContentBlock[]
     let toolUses: AnthropicToolUseBlock[]
-    let stopReason: string | null
 
     const request = {
       messages,
@@ -188,7 +187,6 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
         text = round_.text
         contentBlocks = round_.contentBlocks
         toolUses = round_.toolUse
-        stopReason = round_.stopReason
         creditsCharged += round_.creditsCharged
         if (round_.monthlyUsage) monthlyUsage = round_.monthlyUsage
         streamed = true
@@ -200,13 +198,11 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
         text = ''
         contentBlocks = []
         toolUses = []
-        stopReason = null
       }
     } else {
       text = ''
       contentBlocks = []
       toolUses = []
-      stopReason = null
     }
 
     if (!streamed) {
@@ -214,14 +210,16 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
       text = resp.content ?? ''
       contentBlocks = (resp.contentBlocks ?? []) as AnthropicContentBlock[]
       toolUses = (resp.toolUse ?? []) as AnthropicToolUseBlock[]
-      stopReason = resp.stopReason ?? null
       creditsCharged += resp.creditsCharged ?? 0
       if (resp.monthlyUsage) monthlyUsage = resp.monthlyUsage
       for (const c of resp.citations ?? []) citations.add(c)
       if (text) onText?.(text)
     }
 
-    if (toolUses.length === 0 || stopReason !== 'tool_use') {
+    // The returned tool blocks are authoritative. `message_delta.stop_reason`
+    // is useful streaming metadata, but it may be absent when an intermediary
+    // buffers or trims an SSE frame; don't discard a valid tool turn over it.
+    if (toolUses.length === 0) {
       const content = text.trim() || preambles.join('\n\n').trim()
       return { content, steps: log.steps, creditsCharged, monthlyUsage, citations: [...citations], rounds: round + 1 }
     }
