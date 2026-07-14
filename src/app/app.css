@@ -507,6 +507,37 @@ body {
 
 @keyframes intel-spin { to { transform: rotate(360deg); } }
 
+.intel-retrieval {
+  max-width: 520px;
+  overflow: hidden;
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  border-radius: 14px;
+  background: rgba(10, 7, 18, 0.46);
+}
+
+.intel-retrieval__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(139, 92, 246, 0.07);
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+}
+
+.intel-retrieval__row:first-child {
+  border-top: 0;
+}
+
+.intel-retrieval__state {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
 .intel-caret {
   display: inline-block;
   width: 7px;

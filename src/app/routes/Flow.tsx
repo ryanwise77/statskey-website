@@ -10,7 +10,7 @@ import { useLatestGlucose } from '../lib/data/useLatestGlucose'
 import { dailyTotals } from '../lib/aggregates'
 import { buildSystemPrompt } from '../lib/ai/context'
 import { CHAT_MODELS, type ChatModelOption } from '../lib/ai/providers'
-import { runAgentTurn } from '../lib/ai/agent'
+import { runAgentTurn, type AgentStep } from '../lib/ai/agent'
 import { getScratchPad, updateScratchPad } from '../lib/ai/scratchPad'
 import { Markdown } from '../components/Markdown'
 import {
@@ -52,6 +52,7 @@ export function Flow() {
   const [model, setModel] = useState<ChatModelOption>(CHAT_MODELS[0])
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
+  const [liveSteps, setLiveSteps] = useState<AgentStep[]>([])
   const [liveText, setLiveText] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [memoryOpen, setMemoryOpen] = useState(false)
@@ -140,7 +141,7 @@ export function Flow() {
   const scrollRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, sending, liveText])
+  }, [messages, sending, liveSteps, liveText])
 
   async function send(textOverride?: string) {
     if (!uid || sending) return
@@ -157,6 +158,7 @@ export function Flow() {
     setMessages(history)
     setDraft('')
     setSending(true)
+    setLiveSteps([])
     setLiveText('')
     setError(null)
     stopRequested.current = false
@@ -177,7 +179,7 @@ export function Flow() {
         systemPrompt,
         priorTurns,
         userText: text,
-        onStep: () => {},
+        onStep: setLiveSteps,
         onText: setLiveText,
         shouldStop: () => stopRequested.current,
         unlimitedAuto: model.label === 'Auto',
@@ -196,6 +198,7 @@ export function Flow() {
       }
       const updated = [...history, assistantMsg]
       setMessages(updated)
+      setLiveSteps([])
       setLiveText('')
 
       // The agent may have rewritten its memory — refresh for the next turn.
@@ -368,6 +371,7 @@ export function Flow() {
 
         {sending && (
           <div className="max-w-[92%] space-y-2.5 intel-in">
+            {!liveText && liveSteps.length > 0 && <RetrievalStatus steps={liveSteps} />}
             {liveText ? (
               <div className="px-4 py-3 rounded-2xl intel-bubble-ai">
                 <Markdown text={liveText} />
@@ -412,6 +416,54 @@ export function Flow() {
           </span>
         </div>
       </div>
+    </div>
+  )
+}
+
+const RETRIEVAL_LABELS: Record<string, string> = {
+  index_manifest: 'Checking your connected record',
+  keyword_search: 'Finding the most relevant records',
+  chunk_read: 'Reading the relevant details',
+  get_meals: 'Reviewing meals and nutrition',
+  get_meals_for_date: 'Reviewing meals and nutrition',
+  get_daily_overview: 'Reviewing your recent patterns',
+  search_food_history: 'Comparing foods across your history',
+  get_workouts: 'Reviewing workouts and training',
+  get_workout_detail: 'Reading workout details',
+  analyze_run_segments: 'Analyzing pacing and splits',
+  get_glucose_readings: 'Reading your glucose history',
+  get_wellness: 'Reviewing wellness entries',
+  get_meals_before_event: 'Connecting meals with symptoms',
+  get_weight_history: 'Reviewing weight trends',
+  get_nutrient_totals: 'Calculating nutrient patterns',
+  get_scratch_pad: 'Recalling what matters to you',
+  update_scratch_pad: 'Remembering this for later',
+  run_subagent: 'Comparing patterns more deeply',
+}
+
+function RetrievalStatus({ steps }: { steps: AgentStep[] }) {
+  const rows = new Map<string, AgentStep['status']>()
+  for (const step of steps) {
+    const label = RETRIEVAL_LABELS[step.name] ?? 'Reviewing your connected record'
+    const current = rows.get(label)
+    if (!current || step.status === 'running' || current === 'error') rows.set(label, step.status)
+  }
+
+  return (
+    <div className="intel-retrieval" aria-live="polite" aria-label="Reading your data">
+      {[...rows].map(([label, status]) => (
+        <div className="intel-retrieval__row" key={label}>
+          <span
+            className={`intel-dot ${
+              status === 'running' ? 'intel-dot--running' : status === 'error' ? 'intel-dot--error' : ''
+            }`}
+          />
+          <span>{label}</span>
+          <span className="intel-retrieval__state">
+            {status === 'running' ? 'reading' : status === 'error' ? 'skipped' : 'ready'}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
