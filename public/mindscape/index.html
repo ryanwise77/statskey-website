@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StatsKey | For Mindscape Listeners</title>
+  <meta name="description" content="You are an open system far from equilibrium. StatsKey is an instrument for the process that is you." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090f;
+      --panel: #0f141f;
+      --panel-2: #131a28;
+      --ink: #f6f7fb;
+      --muted: #a8b1c5;
+      --quiet: #68748e;
+      --line: rgba(255, 255, 255, .1);
+      --line-strong: rgba(255, 255, 255, .22);
+      --cyan: #40d9c8;
+      --blue: #78a6ff;
+      --red: #ff7a7a;
+      --green: #9ee493;
+      --max: 1060px;
+      --display: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 16% 8%, rgba(120, 166, 255, .13), transparent 36%),
+        radial-gradient(circle at 88% 30%, rgba(64, 217, 200, .09), transparent 34%),
+        linear-gradient(160deg, #06080d 0%, #0a0f18 55%, #07090f 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    .wrap { width: min(var(--max), calc(100% - 48px)); margin: 0 auto; }
+
+    /* ── top bar ── */
+    .top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 26px 0 0;
+    }
+    .brand {
+      font-family: var(--display); font-weight: 700; font-size: 15px;
+      letter-spacing: .05em; color: var(--ink); text-decoration: none;
+    }
+    .brand span { color: var(--quiet); font-weight: 500; }
+    .unlisted {
+      font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--quiet);
+      border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px;
+    }
+
+    /* ── hero ── */
+    .hero { padding: 92px 0 40px; }
+    .eyebrow {
+      color: var(--cyan); font-size: 12.5px; font-weight: 800;
+      letter-spacing: .2em; text-transform: uppercase; margin: 0 0 22px;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(42px, 6.4vw, 78px);
+      letter-spacing: -.04em; line-height: 1.0;
+      max-width: 940px;
+    }
+    .hero .lede {
+      color: var(--muted);
+      font-size: clamp(19px, 2.1vw, 25px); line-height: 1.4;
+      max-width: 820px; margin: 28px 0 0;
+    }
+    .hero .lede b { color: var(--ink); font-weight: 600; }
+
+    /* ── equation strip ── */
+    .eqs {
+      margin: 56px 0 0; padding: 22px 0;
+      border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      display: flex; flex-wrap: wrap; gap: 14px 44px;
+      align-items: baseline; justify-content: space-between;
+    }
+    .eq { font-family: var(--mono); font-size: 15px; color: var(--muted); white-space: nowrap; }
+    .eq i { color: var(--quiet); font-style: normal; font-size: 12px; display: block; margin-top: 4px; letter-spacing: .04em; }
+    .eq b { color: var(--cyan); font-weight: 500; }
+
+    /* ── principles ── */
+    .principles { padding: 84px 0 8px; }
+    .sect-kicker {
+      color: var(--cyan); font-size: 12.5px; font-weight: 800;
+      letter-spacing: .2em; text-transform: uppercase; margin: 0 0 14px;
+    }
+    h2 {
+      margin: 0 0 8px;
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(30px, 4vw, 46px); letter-spacing: -.035em; line-height: 1.04;
+      max-width: 860px;
+    }
+    .principle {
+      display: grid; grid-template-columns: 92px minmax(0, 1fr);
+      gap: 26px; padding: 44px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .principle:last-child { border-bottom: none; }
+    .pnum {
+      font-family: var(--mono); color: var(--quiet);
+      font-size: 14px; letter-spacing: .08em; padding-top: 8px;
+    }
+    .pnum b { display: block; color: var(--cyan); font-size: 26px; font-weight: 500; letter-spacing: 0; }
+    h3 {
+      margin: 0 0 12px;
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(22px, 2.6vw, 30px); letter-spacing: -.025em; line-height: 1.12;
+    }
+    .principle p { color: var(--muted); font-size: 17.5px; line-height: 1.6; max-width: 760px; margin: 0 0 14px; }
+    .principle p:last-child { margin-bottom: 0; }
+    .principle p b { color: var(--ink); font-weight: 600; }
+    .pquote {
+      font-family: var(--mono); font-size: 14.5px; color: var(--cyan);
+      border-left: 2px solid var(--cyan); padding-left: 16px; margin-top: 18px;
+    }
+    .mini-stats { display: flex; flex-wrap: wrap; gap: 14px 40px; margin-top: 22px; }
+    .ms .v { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -.03em; line-height: 1; }
+    .ms .l { color: var(--quiet); font-size: 13.5px; margin-top: 6px; max-width: 220px; }
+    .ms.red .v { color: var(--red); }
+    .ms.green .v { color: var(--green); }
+
+    /* ── instrument (screenshots) ── */
+    .instrument { padding: 88px 0 20px; }
+    .instrument .intro { color: var(--muted); font-size: 18px; max-width: 760px; margin: 14px 0 0; }
+    .shots {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 26px; margin-top: 46px;
+    }
+    .shot { display: grid; gap: 12px; justify-items: center; align-content: start; }
+    .shot img {
+      width: 100%; max-width: 300px; height: auto; display: block;
+      border-radius: 26px; border: 1px solid var(--line-strong);
+      background: var(--panel);
+    }
+    .shot .cap { color: var(--quiet); font-size: 13.5px; text-align: center; max-width: 280px; line-height: 1.45; }
+    .shot .cap b { color: var(--muted); font-weight: 600; }
+
+    /* ── offer ── */
+    .offer { padding: 88px 0; }
+    .offer-grid {
+      display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+      gap: 44px; align-items: start;
+    }
+    .offer p { color: var(--muted); font-size: 17.5px; line-height: 1.6; margin: 0 0 14px; max-width: 640px; }
+    .offer p b { color: var(--ink); font-weight: 600; }
+    .cta-card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 24px; padding: 28px;
+    }
+    .cta-card .t { font-family: var(--display); font-weight: 700; font-size: 19px; margin: 0 0 6px; }
+    .cta-card .s { color: var(--quiet); font-size: 14px; margin: 0 0 20px; }
+    .btn {
+      display: block; text-align: center; text-decoration: none;
+      font-weight: 700; font-size: 15.5px; letter-spacing: -.01em;
+      border-radius: 14px; padding: 15px 18px; margin-bottom: 10px;
+      transition: transform .12s ease, opacity .12s ease;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: .92; }
+    .btn.primary { background: var(--cyan); color: #04211d; }
+    .btn.ghost { border: 1px solid var(--line-strong); color: var(--ink); }
+    .fine { color: var(--quiet); font-size: 12.5px; line-height: 1.5; margin: 14px 0 0; }
+
+    /* ── close line ── */
+    .close-line { padding: 30px 0 90px; }
+    .close-line .big {
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(26px, 3.6vw, 44px); letter-spacing: -.03em; line-height: 1.1;
+      color: var(--ink); max-width: 900px; margin: 0;
+    }
+    .close-line .big em { color: var(--cyan); font-style: normal; }
+
+    /* ── footer ── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 34px 0 46px;
+      color: var(--quiet); font-size: 13px; line-height: 1.6;
+    }
+    footer .row { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; align-items: baseline; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--ink); }
+    .disclaimer { max-width: 760px; margin-top: 14px; }
+
+    @media (max-width: 760px) {
+      .principle { grid-template-columns: 1fr; gap: 10px; padding: 36px 0; }
+      .pnum { display: flex; align-items: baseline; gap: 10px; padding-top: 0; }
+      .pnum b { font-size: 20px; }
+      .offer-grid { grid-template-columns: 1fr; }
+      .eqs { gap: 12px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap top">
+    <a class="brand" href="/">STATSKEY <span>· Nutrition, Biometrics, and Metabolic Intelligence</span></a>
+    <div class="unlisted">Unlisted · For Mindscape listeners</div>
+  </div>
+
+  <header class="wrap hero">
+    <p class="eyebrow">You came here from a physics podcast. Good.</p>
+    <h1>You are an open system far from equilibrium.</h1>
+    <p class="lede">
+      Not a thing — a <b>process</b>: a pattern that persists by continuously moving energy and
+      matter through itself. Almost everyone runs that process on vibes. StatsKey is an
+      <b>instrument</b> for it — record what goes in, measure what actually happens, and let the
+      evidence speak.
+    </p>
+
+    <div class="eqs" aria-hidden="true">
+      <div class="eq">dU = δQ − δW<i>the ledger is not optional</i></div>
+      <div class="eq">dS = d<b>ᵢ</b>S + d<b>ₑ</b>S<i>open systems export entropy</i></div>
+      <div class="eq">⟨x⟩<b>ensemble</b> ≠ ⟨x⟩<b>time</b><i>you are not the population mean</i></div>
+      <div class="eq">P(H&#8202;|&#8202;E) ∝ P(E&#8202;|&#8202;H)·P(H)<i>update on your own evidence</i></div>
+    </div>
+  </header>
+
+  <section class="wrap principles">
+    <p class="sect-kicker">The argument, from first principles</p>
+    <h2>Five things physics already told you about your body.</h2>
+
+    <div class="principle">
+      <div class="pnum"><b>01</b>postulate</div>
+      <div>
+        <h3>Bookkeeping is physics.</h3>
+        <p>
+          Energy balance isn't diet culture; it's the first law doing accounting the universe
+          enforces whether or not you watch. StatsKey keeps the ledger visible — consumed, burned,
+          basal, active, surplus — and records a meal in seconds by photo, text, barcode, or label,
+          because an instrument you won't use has no resolving power at all.
+        </p>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="pnum"><b>02</b>stat mech</div>
+      <div>
+        <h3>The macrostate hides the trajectory.</h3>
+        <p>
+          Wildly different microhistories share the same average. The founder's own data made the
+          point: a <b>+1,000 kcal/day surplus</b> — a perfectly healthy-looking macrostate —
+          concealed overnight glucose of <b>39 mg/dL</b>. The daily total was fine. The path
+          through the day was not. Only time-resolved recording can see the path.
+        </p>
+        <div class="mini-stats">
+          <div class="ms red"><div class="v">39</div><div class="l">mg/dL overnight, inside a calorie surplus</div></div>
+          <div class="ms green"><div class="v">92%</div><div class="l">glucose time-in-range after the pattern became visible</div></div>
+          <div class="ms"><div class="v">2,282</div><div class="l">meals recorded by the founder in 8 months — user #1</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="pnum"><b>03</b>ergodicity</div>
+      <div>
+        <h3>You are not the ensemble average.</h3>
+        <p>
+          Population guidance is an ensemble statement — true averaged over many people, silent
+          about any one of them. No theorem promises the ensemble mean describes <b>you</b>. The
+          same meal produces different glucose responses in different bodies, which is why StatsKey's
+          premise is <b>measure the response, not just the intake</b>: n-of-1 instrumentation
+          instead of borrowed averages.
+        </p>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="pnum"><b>04</b>instruments</div>
+      <div>
+        <h3>Joint analysis or nothing.</h3>
+        <p>
+          Every field became a science when measurement replaced introspection — and the strongest
+          constraints come from <b>combining</b> datasets. Cosmology needs the CMB, supernovae, and
+          lensing together; a human needs meals, glucose, training, sleep, and gut signals on
+          <b>one timeline</b>. Today those live in five apps that have never met. StatsKey is the
+          joint fit: one private, connected model of you, with 50+ nutrients per meal and live
+          glucose and workout import.
+        </p>
+      </div>
+    </div>
+
+    <div class="principle">
+      <div class="pnum"><b>05</b>epistemics</div>
+      <div>
+        <h3>State your uncertainty.</h3>
+        <p>
+          StatsKey stores a number <b>and how it was known</b> — label, photo estimate, database,
+          verified entry — and its Intelligence layer answers from your evidence, cites its
+          sources, and says "I don't know" when the data is thin. No streaks, no confetti, no
+          oracle. An instrument that hides its error bars isn't an instrument; it's a horoscope.
+        </p>
+        <div class="pquote">It cites its work — or says it doesn't know.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap instrument">
+    <p class="sect-kicker">The instrument itself</p>
+    <h2>What the joint fit looks like in your pocket.</h2>
+    <p class="intro">
+      Live screens from the shipping app — meal recording with full micronutrient depth,
+      Intelligence reading an actual glucose response, and targets that update as your
+      training changes.
+    </p>
+    <div class="shots">
+      <div class="shot">
+        <img src="nutrition-facts.png" alt="StatsKey showing complete Nutrition Facts for a recorded food, including micronutrients" loading="lazy" />
+        <div class="cap"><b>Full Nutrition Facts, instantly.</b> Recorded in seconds; resolved to the micronutrients.</div>
+      </div>
+      <div class="shot">
+        <img src="intelligence-glucose.png" alt="StatsKey Intelligence analyzing a real glucose response to a meal, flagging a borderline-low pattern before a run" loading="lazy" />
+        <div class="cap"><b>Intelligence, reading your actual response.</b> A real meal-to-glucose analysis — evidence, trend, and a concrete recommendation.</div>
+      </div>
+      <div class="shot">
+        <img src="adaptive-target.png" alt="StatsKey Adaptive Intelligence energy balance targets adjusting to training load" loading="lazy" />
+        <div class="cap"><b>Adaptive Intelligence targets.</b> The ledger updates itself as the process changes.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap offer">
+    <div class="offer-grid">
+      <div>
+        <p class="sect-kicker">The offer</p>
+        <h2>Run your metabolism like you'd run an experiment.</h2>
+        <p style="margin-top:16px">
+          StatsKey is an iOS + Apple Watch app (with a full web app) built by a solo
+          founder-engineer who needed the instrument to exist. The core app is <b>free</b> —
+          recording, nutrients, workouts, biometrics. Pro ($4.99/mo) and Pro+ ($19.99/mo) add
+          more Intelligence on top.
+        </p>
+        <p>
+          It connects Apple Health and Dexcom, records meals faster than you can weigh a
+          skeptical thought, and never asks you to trust a number it can't explain.
+        </p>
+      </div>
+      <div class="cta-card">
+        <p class="t">Take the data.</p>
+        <p class="s">Free to start. Your model stays private and yours.</p>
+        <a class="btn primary" href="https://apps.apple.com/us/app/statskey/id6751132823">Download on the App Store</a>
+        <a class="btn ghost" href="/">Explore StatsKey on the web</a>
+        <p class="fine">
+          StatsKey is a wellness tool, not a medical device. It doesn't diagnose or treat
+          anything — it makes your own evidence legible.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap close-line">
+    <p class="big">
+      The universe enforces the bookkeeping either way.
+      <em>You may as well see the ledger.</em>
+    </p>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="row">
+        <div>© 2026 StatsKey · Dallas, TX</div>
+        <div>
+          <a href="/">statskeybiometrics.com</a> &nbsp;·&nbsp;
+          <a href="/privacy">Privacy</a> &nbsp;·&nbsp;
+          <a href="/terms">Terms</a>
+        </div>
+      </div>
+      <p class="disclaimer">
+        This page is unlisted — a quiet corner for Mindscape listeners. StatsKey provides
+        general wellness insights and is not intended to diagnose, treat, cure, or prevent any
+        disease. Sponsorship of independent media does not imply the host's scientific
+        endorsement of any specific claim.
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
