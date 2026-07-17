@@ -6,6 +6,8 @@ import react from '@vitejs/plugin-react'
 // so the embedded bid viewer iframe and clean URLs behave the same locally.
 const DEV_REWRITES = {
   '/web-terms': '/web-terms.html',
+  '/join': '/join.html',
+  '/join/': '/join.html',
   '/cbm': '/cbm.html',
   '/cbm/': '/cbm/index.html',
   '/ckm': '/ckm.html',
@@ -74,6 +76,7 @@ export default {
         webTerms: resolve(__dirname, 'web-terms.html'),
         support: resolve(__dirname, 'support.html'),
         dietitians: resolve(__dirname, 'for-dietitians.html'),
+        join: resolve(__dirname, 'join.html'),
         nikeRunClub: resolve(__dirname, 'nike-statskey-presentation.html'),
         app: resolve(__dirname, 'app.html'),
       },

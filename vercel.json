@@ -49,6 +49,8 @@
     { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
     { "source": "/energy", "destination": "/energy.html" },
     { "source": "/energy/", "destination": "/energy.html" },
+    { "source": "/join", "destination": "/join.html" },
+    { "source": "/join/", "destination": "/join.html" },
     { "source": "/for-dietitians", "destination": "/for-dietitians.html" },
     { "source": "/for-dietitians/", "destination": "/for-dietitians.html" },
     { "source": "/for-dietitiana", "destination": "/for-dietitians.html" },
