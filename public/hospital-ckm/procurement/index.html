@@ -32,6 +32,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:var(--bg);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
 body{min-height:100vh}
+section[id],header[id]{scroll-margin-top:160px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 code,kbd,pre{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:.92em}
@@ -217,6 +218,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
       <a href="#viewer">5. 3D product viewer</a>
       <a href="#pricing">6. Pricing framework</a>
       <a href="#bom">7. First-article BOM</a>
+      <a href="#audit">Build-readiness audit</a>
       <a href="#chemistry">8. Validated chemistry</a>
       <a href="#validation">9. First-data validation</a>
       <a href="#scale">10. Scale readiness</a>
@@ -257,8 +259,8 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
       </header>
 
       <div class="facts" aria-label="Program headline numbers">
-        <div class="fact"><div class="fact__label">First article order</div><div class="fact__value fact__value--num">$4.2K-$6.8K</div><div class="fact__sub">Duplicate wet path, sensors, controls</div></div>
-        <div class="fact fact--amber"><div class="fact__label">Feasibility package</div><div class="fact__value fact__value--num">$58K-$112K</div><div class="fact__sub">Bench build, validation, report</div></div>
+        <div class="fact"><div class="fact__label">Parts line-item sum</div><div class="fact__value fact__value--num">$3.3K-$7.3K</div><div class="fact__sub">Before shipping, tax, carrier RFQ</div></div>
+        <div class="fact fact--amber"><div class="fact__label">Initial program PO</div><div class="fact__value fact__value--num">$61K-$113K</div><div class="fact__sub">Hardware plus feasibility work</div></div>
         <div class="fact"><div class="fact__label">Pilot planning</div><div class="fact__value fact__value--num">12-18 wks</div><div class="fact__sub">Bench to simulation-ready evidence</div></div>
         <div class="fact fact--mint"><div class="fact__label">Clinical posture</div><div class="fact__value">Confirmatory</div><div class="fact__sub">No dosing or diagnostic claims</div></div>
       </div>
@@ -278,8 +280,8 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
         <h2>Procurement sheet</h2>
         <p class="lead">Use this section as the buyer-facing purchase order or internal approval summary. It keeps the scope research-only and converts the concept into orderable lines, buyer inputs, acceptance artifacts, and approvals.</p>
         <div class="quote-band" aria-label="Procurement summary">
-          <div class="quote-item"><div class="k">Recommended initial PO</div><div class="v">$58K-$112K</div><div class="s">Feasibility package with first article</div></div>
-          <div class="quote-item"><div class="k">Parts stack included</div><div class="v">$4.2K-$6.8K</div><div class="s">Duplicate wet path, controls, bench margin</div></div>
+          <div class="quote-item"><div class="k">Recommended initial PO</div><div class="v">$61K-$113K</div><div class="s">Parts plus feasibility package</div></div>
+          <div class="quote-item"><div class="k">Parts line-item sum</div><div class="v">$3.3K-$7.3K</div><div class="s">Existing inventory reduces remaining spend</div></div>
           <div class="quote-item"><div class="k">Delivery window</div><div class="v">12-18 weeks</div><div class="s">Bench build through validation memo</div></div>
         </div>
         <div class="sheet-grid">
@@ -289,15 +291,15 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
               <table class="tbl">
                 <thead><tr><th style="width:76px">Qty</th><th>Line item</th><th>Acceptance artifact</th><th class="num">Planning range</th></tr></thead>
                 <tbody>
-                  <tr><td>1</td><td>Hospital CKM research first article: reader envelope, cassette, triplicate valinomycin K+ channels, dual reference, blank membrane, temperature, flow, pressure, and bubble diagnostics.</td><td>As-built photos, measured dimensions, wet-path leak test, raw channel verification.</td><td class="num">$4.2K-$6.8K</td></tr>
-                  <tr><td>1</td><td>Bench bring-up and feasibility engineering: fluidic setup, guarded high-impedance electronics, logging software, QC state machine, and output-suppression logic.</td><td>Bring-up log, firmware/software snapshot, issue register, raw-data dictionary.</td><td class="num">$38K-$68K</td></tr>
+                  <tr><td>1</td><td>Hospital CKM research first article: reader envelope, cassette, triplicate valinomycin K+ channels, dual reference, matched blank membrane, temperature, flow, pressure, and bubble diagnostics.</td><td>As-built photos, measured dimensions, wet-path leak test, raw channel verification.</td><td class="num">$3.3K-$7.3K*</td></tr>
+                  <tr><td>1</td><td>Bench bring-up and feasibility engineering: fluidic setup, guarded high-impedance electronics, data-capture software, QC state machine, and output-suppression logic.</td><td>Bring-up record, firmware/software snapshot, issue register, raw-data dictionary.</td><td class="num">$38K-$68K</td></tr>
                   <tr><td>1</td><td>Controlled validation campaign: KCl standards, dialysate/CRRT-like matrices, flow artifacts, bubbles, carryover, drift, fouling, interference, and calibration aging.</td><td>Test report, raw CSV export, gate-by-gate pass/fail table, comparator plan.</td><td class="num">$14K-$28K</td></tr>
                   <tr><td>1</td><td>Procurement binder and pilot-readiness memo: BOM, assembly notes, acceptance gates, risk register, CLSI-style validation map, next-stage recommendation.</td><td>PDF binder and stakeholder review memo.</td><td class="num">$6K-$10K</td></tr>
-                  <tr class="grand"><td colspan="3">Recommended initial PO total</td><td class="num">$58K-$112K</td></tr>
+                  <tr class="grand"><td colspan="3">Recommended initial PO total</td><td class="num">$61K-$113K</td></tr>
                 </tbody>
               </table>
             </div>
-            <p class="caption">Optional simulation / hospital pilot planning can be added later for <code>$35K-$95K</code> after the bench and matrix gates pass.</p>
+            <p class="caption">*Detailed numeric BOM sum is $3,285-$7,255 and excludes shipping, tax, and any integrated multi-lane carrier RFQ. Optional simulation / hospital pilot planning can be added later for <code>$35K-$95K</code> after the bench and matrix gates pass.</p>
           </div>
           <aside class="sheet-panel">
             <h3>Buyer inputs required</h3>
@@ -329,7 +331,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
         <ol>
           <li>Can a closed disposable flow-cell produce stable, redundant potassium signals in controlled electrolyte and dialysate-like matrices?</li>
           <li>Can onboard QC suppress misleading output during bubbles, stale flow, reference drift, temperature change, fouling, or channel disagreement?</li>
-          <li>Can the workflow support a hospital-safe posture: trend surveillance, confirmatory sample trigger, audit log, and no autonomous dosing?</li>
+          <li>Can the workflow support a hospital-safe posture: trend surveillance, confirmatory sample trigger, audit record, and no autonomous dosing?</li>
         </ol>
         <p>The package below turns the public Hospital CKM product thesis into a buyer-facing document: scope, pricing framework, component list, validation gates, schedule, assumptions, and contracting paths.</p>
       </section>
@@ -339,8 +341,8 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
         <ul>
           <li>One (1) Hospital CKM research first article: reusable reader envelope, transparent disposable flow-cell cassette, triplicate K+ channels, dual reference, blank membrane control, temperature, flow, pressure, and bubble diagnostics.</li>
           <li>Duplicate wet-path consumables: second flow-cell body, spare fittings, tubing, KCl standards, waste capture, protein/salt matrix supplies, and enough electrodes/membrane chemistry to repeat assembly and step-response tests.</li>
-          <li>Bench electronics stack: guarded LMP7721 buffer path, ADS124S08 24-bit multi-channel ADC, TMP117 temperature sensing, flow/pump instrumentation, MCU logging, and isolated prototype power path.</li>
-          <li>Research logging software for raw mV, temperature, flow, pressure, pump state, reference delta, blank channel, channel agreement, sample label, calibration state, and withheld-output reason.</li>
+          <li>Bench electronics stack: six same-family guarded electrometer channels, ADS124S08 24-bit multi-channel ADC, TMP117 temperature sensing, digital flow measurement, pressure-bridge acquisition, pump control, ESP32-S3 data capture, and isolated prototype power.</li>
+          <li>Research data-capture software for raw mV, temperature, flow, pressure, pump state, reference delta, blank channel, channel agreement, sample label, calibration state, and withheld-output reason.</li>
           <li>Written bench protocol covering KCl standards, dialysate/CRRT-like matrices, drift, fouling, bubbles, stale flow, carryover, interferences, and controlled failure modes.</li>
           <li>Comparator-first validation plan for later blood gas, i-STAT/POC, central lab, and dialysis/CRRT chemistry comparisons.</li>
           <li>Procurement binder: BOM, assembly drawings, risk register, acceptance gates, and pilot-readiness decision memo.</li>
@@ -385,13 +387,13 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
                                |
       +------------------------v------------------------+
       | Reusable bedside reader                         |
-      | guarded LMP7721 buffers -> ADS124S08 24-bit ADC |
-      | TMP117 temp | flow sensor | MCU | display/logs  |
+      | 6 guarded electrometers -> ADS124S08 24-bit ADC|
+      | TMP117 + flow on digital buses | MCU | display  |
       +------------------------+------------------------+
                                |
         +----------------------v----------------------+
         | Research output                             |
-        | raw mV logs | QC state | K+ trend estimate  |
+        | raw mV data | QC state | K+ trend estimate  |
         | confirm-now trigger | withheld-output reason|
         +---------------------------------------------+</div>
         <div class="three-col" style="margin-top:16px">
@@ -414,7 +416,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
             <span class="k">Inline preview · first article · procurement review</span>
             <span class="muted">touch / drag enabled</span>
           </div>
-          <iframe class="viewer-iframe" src="/hospital-ckm/viewer/" title="Hospital CKM 3D procurement viewer" loading="lazy" allow="fullscreen"></iframe>
+          <iframe class="viewer-iframe" src="/hospital-ckm/viewer/?embed=1&amp;view=assembled" title="Hospital CKM 3D procurement viewer" loading="lazy" allow="fullscreen"></iframe>
           <div class="viewer-hint">On small screens, open the standalone viewer for the full inspection workflow.</div>
         </div>
       </section>
@@ -428,10 +430,10 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
           <table class="tbl">
             <thead><tr><th>Line</th><th class="num">Amount</th></tr></thead>
             <tbody>
-              <tr><td>Electrodes, validated valinomycin/PVC membrane chemistry, KCl standards, references, fittings, tubing, two transparent flow-cell bodies</td><td class="num">$1,725-$3,320</td></tr>
-              <tr><td>Electronics: guarded buffer path, ADC, temperature, flow, pressure, bubble detection, pump/driver, MCU/display/power harness</td><td class="num">$1,725-$2,905</td></tr>
-              <tr><td>Duplicate consumables, matrix controls, cleaning/leak-test supplies, and bench failure margin</td><td class="num">$750-$1,575</td></tr>
-              <tr class="grand"><td>Orderable first-article parts range</td><td class="num">$4,200-$6,800</td></tr>
+              <tr><td>Sensor path: development electrodes, controlled active/blank membrane chemistry, solid contact, and two potassium-safe double-junction references</td><td class="num">$945-$2,570</td></tr>
+              <tr><td>Electronics and instruments: six guarded channels, ADC, temperature, flow, pressure, bubble detection, pump/driver, MCU/display/power harness</td><td class="num">$1,080-$2,465</td></tr>
+              <tr><td>Fluidics: manual routing, two transparent flow-cell bodies, fittings, tubing, standards, waste, and duplicate wet path</td><td class="num">$1,260-$2,220</td></tr>
+              <tr class="grand"><td>Detailed first-article line-item sum</td><td class="num">$3,285-$7,255</td></tr>
             </tbody>
           </table>
         </div>
@@ -445,7 +447,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
               <tr><td>Electronics integration, raw data logger, QC state machine, guarded-layout verification, and output-suppression logic</td><td class="num">$16,000-$30,000</td></tr>
               <tr><td>Bench protocol, standards testing, dialysate/CRRT-like matrix testing, interference/drift testing, and report</td><td class="num">$14,000-$28,000</td></tr>
               <tr><td>Procurement binder, risk register, pilot-readiness memo, and stakeholder review</td><td class="num">$6,000-$10,000</td></tr>
-              <tr class="grand"><td>Indicative feasibility package</td><td class="num">$58,000-$112,000</td></tr>
+              <tr class="grand"><td>Indicative feasibility services</td><td class="num">$58,000-$106,000</td></tr>
             </tbody>
           </table>
         </div>
@@ -456,27 +458,27 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
 
       <section class="card" id="bom">
         <h2><span class="n">7</span>First-article bill of materials</h2>
-        <p class="lead">Procurement lines reflect the product page's locked first article, with scale targets included for buyers evaluating a path beyond feasibility.</p>
+        <p class="lead">This is a planning BOM for a non-clinical first article. The incoming-parts audit, multi-lane carrier selection, and measured fit check must close before it becomes a released build package.</p>
         <div class="tbl-wrap">
           <table class="tbl">
             <thead><tr><th>Item</th><th>Purpose</th><th class="num">Prototype cost</th><th>Scale target</th></tr></thead>
             <tbody>
-              <tr><td>Metrohm DropSens DRP-110 / DRP-110KION development pack</td><td>Commercial screen-printed substrate for K+ membrane experiments and triplicate channels; production migrates to custom lanes.</td><td class="num">$285-$650</td><td>$2-$6 custom printed lane</td></tr>
-              <tr><td>Valinomycin / Potassium Ionophore I membrane chemistry</td><td>Validated K+ ISE chemistry: PVC or silicone membrane, DOS/ETH-class plasticizer, lipophilic salt, and KCl conditioning standards.</td><td class="num">$250-$700</td><td>$0.50-$2 per cassette chemistry</td></tr>
+              <tr><td>Metrohm DropSens development substrates</td><td>Reuse DRP-110/DRP-110KION single-cell substrates for chemistry screening. Select DRP-8X110-U20 + CAC8X or a custom six-lane carrier before integrated cover machining.</td><td class="num">$285-$650</td><td>$2-$6 custom printed lane</td></tr>
+              <tr><td>Valinomycin solid-state membrane component set</td><td>Controlled ionophore, lipophilic salt, plasticizer, binder, and casting solvent for active and matched blank membranes. Cocktail 99373 alone is a liquid carrier, not the complete PVC membrane.</td><td class="num">$250-$700</td><td>$0.50-$2 per cassette chemistry</td></tr>
               <tr><td>Solid-contact layer supplies</td><td>MWCNT or PEDOT:PSS underlayer for lower drift and better miniaturized potentiometric stability.</td><td class="num">$120-$450</td><td>$0.50-$2 per printed lane</td></tr>
-              <tr><td>Bench Ag/AgCl references plus dual-reference reservoirs</td><td>Stable first-article reference quality before printed/reservoir reference translation; dual reference detects drift.</td><td class="num">$250-$650</td><td>$1-$4 reference reservoir</td></tr>
+              <tr><td>Two double-junction Ag/AgCl references</td><td>Potassium-free outer bridge electrolyte, such as 10% KNO3, prevents KCl reference leakage from contaminating the low-volume sample; dual references detect drift.</td><td class="num">$250-$650</td><td>$1-$4 integrated reference reservoir</td></tr>
               <tr><td>Non-ionophore blank membrane controls</td><td>Control channel for membrane-independent drift, bubbles, wetting artifacts, fouling, and reference movement.</td><td class="num">$40-$120</td><td>&lt;$0.50 chemistry share</td></tr>
-              <tr><td>TI LMP7721 guarded buffer path</td><td>3 fA-class high-impedance potentiometric inputs for K1/K2/K3, blank, and references; requires guarded clean PCB layout.</td><td class="num">$150-$350</td><td>$12-$25 electronics share</td></tr>
-              <tr><td>TI ADS124S08 24-bit 12-channel ADC</td><td>Reads triplicate K+, blank, references, temperature, pressure, flow, and diagnostics with channel margin.</td><td class="num">$75-$250</td><td>$5-$12 ADC share</td></tr>
+              <tr><td>Six guarded electrometer channels</td><td>Use the two documented ADA4530-1ARZ parts for bring-up, then standardize K1/K2/K3, blank, Reference A, and Reference B on one qualified family before PCB release.</td><td class="num">$150-$350</td><td>$12-$25 electronics share</td></tr>
+              <tr><td>TI ADS124S08 24-bit 12-input ADC</td><td>Digitizes six buffered electrode/reference potentials plus analog pressure and bubble diagnostics. TMP117 and SLF3S are separate digital buses.</td><td class="num">$75-$250</td><td>$5-$12 ADC share</td></tr>
               <tr><td>TI TMP117 temperature sensor</td><td>Local fluid-bay temperature for Nernst slope compensation, warm-up gating, and drift review.</td><td class="num">$10-$40</td><td>$2-$5</td></tr>
               <tr><td>Sensirion SLF3S-0600F liquid flow sensor</td><td>48 x 15.5 x 8.9 mm, 1/4-28 flat-bottom ports, roughly 28 uL internal volume, microflow validation for sample refresh.</td><td class="num">$115-$205</td><td>$20-$45 integrated/OEM</td></tr>
-              <tr><td>Bartels mp6 micropump plus driver</td><td>30 x 15 x 3.8 mm pump, about 32 uL internal volume, controlled standard/sample loop flow; pressure/backflow must be characterized.</td><td class="num">$160-$320</td><td>$15-$35 OEM or alternate pump</td></tr>
-              <tr><td>TE MEAS 1620 disposable pressure sensors</td><td>-50 to 300 mmHg upstream/downstream pressure checks in a 10.54 x 8.10 x 3.53 mm class package.</td><td class="num">$90-$280</td><td>$2-$8 disposable share</td></tr>
-              <tr><td>Optical bubble window / LED-photodiode pair</td><td>Detects bubbles and incomplete wetting before false K+ movement can be shown.</td><td class="num">$30-$120</td><td>$0.50-$3</td></tr>
+              <tr><td>Bartels mp6-liq plus exact driver</td><td>30 x 15 x 3.8 mm pump, about 32 uL internal volume, up to roughly 6 mL/min water; requires a Bartels high-voltage driver and pressure/backflow characterization.</td><td class="num">$160-$320</td><td>$15-$35 OEM or alternate pump</td></tr>
+              <tr><td>TE MEAS 1620 disposable pressure sensors</td><td>Two -50 to 300 mmHg, 5 uV/V/mmHg bridge sensors with stable excitation and ratiometric/PGA acquisition; exact SKU and housing must be selected.</td><td class="num">$90-$280</td><td>$2-$8 disposable share</td></tr>
+              <tr><td>TT Electronics OPB350L062 bubble sensor</td><td>Non-contact optical fluid/bubble sensing around 1/16 in OD clear tubing; OCB350L062Z adds a calibration interface board.</td><td class="num">$30-$120</td><td>$0.50-$3</td></tr>
               <tr><td>Manual stopcocks now; Lee valve planning later</td><td>Manual routing for first article; automation after chemistry/flow gates pass.</td><td class="num">$60-$220</td><td>$25-$80 manifolded valves</td></tr>
               <tr><td>Two transparent flow-cell bodies, fittings, tubing, standards, waste capture</td><td>Modeled cassette is 120 x 44 x 14 mm with a 3.0 mm main channel; bench loop includes duplicate wet path, KCl standards, dialysate simulants, and waste.</td><td class="num">$1,200-$2,000</td><td>$8-$25 molded cassette before sterile pack</td></tr>
-              <tr><td>Display/MCU/power/enclosure/logging harness</td><td>Prototype reader shell, isolated prototype power, display, local data capture, and export control.</td><td class="num">$450-$900</td><td>$55-$120 reusable reader COGS share</td></tr>
-              <tr class="grand"><td colspan="2">Estimated orderable first-article stack</td><td class="num">$4,200-$6,800</td><td>Disposable target: $18-$45 early</td></tr>
+              <tr><td>Display/MCU/power/enclosure/data-capture harness</td><td>Prototype reader shell, isolated prototype power, display, local data capture, and export control.</td><td class="num">$450-$900</td><td>$55-$120 reusable reader COGS share</td></tr>
+              <tr class="grand"><td colspan="2">Detailed numeric BOM sum</td><td class="num">$3,285-$7,255</td><td>Carrier RFQ, shipping, and tax excluded</td></tr>
             </tbody>
           </table>
         </div>
@@ -485,27 +487,69 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
           <table class="tbl">
             <thead><tr><th>Assembly area</th><th>Locked decision</th><th>Pre-data check</th></tr></thead>
             <tbody>
-              <tr><td>Reader + cassette geometry</td><td>Reader shell remains 170 x 112 x 42 mm; transparent cassette remains 120 x 44 x 14 mm with a 3.0 mm main channel until first fit check.</td><td>Measure printed/machined parts, confirm cassette capture, inspect dead zones, verify no line strain at ports.</td></tr>
-              <tr><td>Sensor bay</td><td>K1/K2/K3, REF A/B, and blank membrane sit in one wetted bay with controlled exposure to the main flow path.</td><td>Condition membranes, record baseline mV, confirm blank silence, test dual-reference agreement before flow.</td></tr>
-              <tr><td>Fluidics</td><td>Use short low-dead-volume tubing, 1/4-28 flat-bottom fittings at the flow sensor, manual routing first, and waste capture for all standards.</td><td>Prime, leak-test, bubble-challenge, confirm flow sensor response, characterize pump backpressure and carryover.</td></tr>
-              <tr><td>Electronics</td><td>Guard every high-impedance input, clean flux aggressively, log raw mV before calculating K+, and keep AD5940-style impedance checks optional.</td><td>Open-input leakage test, ADC settling test, temperature coupling test, and channel-memory check before chemistry data is trusted.</td></tr>
+              <tr><td>Reader + cassette geometry</td><td>170 x 112 x 42 mm reader and 120 x 44 x 14 mm cassette are nominal planning envelopes. The current 0.61 mL channel is a commissioning cell, not a frozen rapid-response geometry.</td><td>Measure printed/machined parts, confirm capture and gasket compression, quantify actual wetted volume, inspect dead zones, verify no line strain.</td></tr>
+              <tr><td>Sensor bay</td><td>K1/K2/K3 and matched blank share one wetted carrier; two potassium-safe double-junction references remain independent.</td><td>Choose carrier/connector, condition membranes, record baseline mV, confirm blank silence, and test reference agreement before machining the final cover.</td></tr>
+              <tr><td>Fluidics</td><td>Use short low-dead-volume tubing compatible with the OPB350L062, 1/4-28 flat-bottom fittings at the flow sensor, manual routing first, and closed waste.</td><td>Prime, leak-test, bubble-challenge, confirm flow response, characterize pump backpressure, carryover, and three-volume refresh time.</td></tr>
+              <tr><td>Electronics</td><td>Guard all six high-impedance nodes, clean flux aggressively, record raw mV before calculating K+, and acquire MEAS 1620 bridges ratiometrically.</td><td>Open-input leakage, ADC settling, pressure excitation, temperature coupling, channel-memory, and pump-noise tests before chemistry is trusted.</td></tr>
               <tr><td>Biofluid boundary</td><td>First build is non-clinical. Direct blood contact is not part of the first PO; CRRT/dialysate-style or membrane-separated paths come first.</td><td>Document disposal, decontamination, and waste handling even for simulated matrices.</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
+      <section class="card" id="audit">
+        <h2>Build-readiness audit</h2>
+        <p class="lead">Use existing parts when they preserve measurement quality. The rows below distinguish documented inventory from the specific closures still required for an integrated Hospital CKM first article.</p>
+        <div class="two-col">
+          <div>
+            <h3>Documented inventory — verify physically in hand</h3>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead><tr><th>Part</th><th>Use</th><th>Decision</th></tr></thead>
+                <tbody>
+                  <tr><td>TMP117 breakout + bare sensor</td><td>Fluid-bay temperature</td><td>Reuse breakout for first data.</td></tr>
+                  <tr><td>ESP32-S3-DevKitC-1-N8R8</td><td>USB capture, control, display</td><td>Reuse; no new MCU board needed.</td></tr>
+                  <tr><td>2x ADA4530-1ARZ</td><td>High-impedance bring-up</td><td>Reuse; order four more only if this family passes the freeze.</td></tr>
+                  <tr><td>PEDOT:PSS PH1000, 100 mL</td><td>Solid-contact trial</td><td>Quarantine until film/conductivity/drift checks pass.</td></tr>
+                  <tr><td>2x 350 mAh LiPo</td><td>Isolated debug power</td><td>Optional bench use; not clinical reader power.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <h3>Blocking closure — buy or verify</h3>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead><tr><th>Gap</th><th>Required closure</th></tr></thead>
+                <tbody>
+                  <tr><td>Integrated sensor bay</td><td>DRP-8X110-U20 + CAC8X or custom six-lane carrier; existing DRP-110 singles remain useful.</td></tr>
+                  <tr><td>Reference contamination</td><td>Two double-junction Ag/AgCl references with potassium-free outer bridge.</td></tr>
+                  <tr><td>Bubble detection</td><td>OPB350L062/OCB350L062Z matched to 1/16 in OD clear tubing.</td></tr>
+                  <tr><td>Pump actuation</td><td>Exact mp6 liquid-pump driver, not the pump alone.</td></tr>
+                  <tr><td>Analog completeness</td><td>Six guarded channels, pressure bridge excitation/acquisition, filters, clean rails, and leakage fixtures.</td></tr>
+                  <tr><td>Independent truth</td><td>Traceable KCl, Class A dilution, matrix-matched standards, pH/conductivity checks, and comparator access.</td></tr>
+                  <tr><td>Chemistry reproducibility</td><td>Separate active/blank membrane components, conditioning protocol, fume hood, PPE, and solvent waste.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="note amber"><strong>Do not reorder from this page alone.</strong> The statement that “most parts are ordered” is not backed by line-level Hospital CKM receipts in the current workbook. Reconcile packing slips against this audit, then buy only unresolved P0 rows.</div>
+        <p class="caption">Audit sources: <a href="https://www.metrohm.com/en/products/d/rp-1/drp-110-u75.html" target="_blank" rel="noreferrer">DRP-110 single-cell specification</a>, <a href="https://www.metrohm.com/en/products/d/rp-8/drp-8x110-u20.html" target="_blank" rel="noreferrer">DRP-8X110 array</a>, <a href="https://pineresearch.com/downloads/documents/DRP10026.pdf/" target="_blank" rel="noreferrer">double-junction reference</a>, <a href="https://www.analog.com/en/products/ada4530-1.html" target="_blank" rel="noreferrer">ADA4530-1</a>, <a href="https://www.ttelectronics.com/products/sensors/optoelectronics/fluid-sensors/opb350l062" target="_blank" rel="noreferrer">OPB350L062</a>, and vendor datasheets linked in the BOM.</p>
+      </section>
+
       <section class="card" id="chemistry">
         <h2><span class="n">8</span>Validated chemistry basis</h2>
-        <p class="lead">The strongest part of the Hospital CKM first article is the chemistry: potassium-selective potentiometry with valinomycin is a mature, clinically used measurement principle. The prototype risk is not whether K+ can be measured this way; it is packaging, drift control, reference stability, calibration, matrix behavior, and safe interpretation.</p>
+        <p class="lead">Potassium-selective potentiometry with valinomycin is a mature, clinically used measurement principle. That does not validate this flow cell. Packaging, activity-versus-concentration behavior, reference contamination, drift, calibration, matrix effects, and safe interpretation still require direct evidence.</p>
         <div class="tbl-wrap">
           <table class="tbl">
             <thead><tr><th>Area</th><th>Procurement decision</th><th>Validation implication</th></tr></thead>
             <tbody>
-              <tr><td>K+ sensor chemistry</td><td>Use valinomycin / Potassium Ionophore I in PVC or silicone-style ion-selective membrane with lipophilic salt and controlled KCl conditioning.</td><td>Expect near-Nernstian response in standards; verify slope, intercept, response time, drift, and lot-to-lot reproducibility before matrix testing.</td></tr>
+              <tr><td>K+ sensor chemistry</td><td>Make active and matched blank solvent-polymer membranes from separately controlled components. Use premixed cocktail 99373 only as an early liquid-carrier route, not as proof of the final PVC stack.</td><td>Verify slope, intercept, response time, drift, adhesion, water-layer behavior, and lot-to-lot reproducibility before matrix testing.</td></tr>
               <tr><td>Clinical precedent</td><td>Keep the claim tied to ion-selective electrode potentiometry, the same broad principle used by electrolyte analyzers and single-use blood cartridges.</td><td>Prototype evidence must still be generated; precedent supports feasibility, not equivalence to an FDA-cleared analyzer.</td></tr>
               <tr><td>Major interferences</td><td>Design tests for ammonium first, then sodium, calcium, magnesium, lithium, pH/bicarbonate, protein, hemolysis, lipemia, icterus, and heparin effects.</td><td>Ammonium is the most important K+ ISE interference to bound; sodium is high concentration but usually lower selectivity risk for valinomycin membranes.</td></tr>
-              <tr><td>Reference system</td><td>Procure bench Ag/AgCl reference quality now, plus dual-reference reservoir planning for the cassette.</td><td>Reference drift is the central accuracy failure mode; dual-reference disagreement suppresses output.</td></tr>
+              <tr><td>Reference system</td><td>Procure two double-junction Ag/AgCl references with potassium-free outer bridge electrolyte, then plan independent integrated reservoirs.</td><td>Reference drift and KCl leakage are central accuracy failure modes; either reference fault suppresses output.</td></tr>
+              <tr><td>Activity and matrix</td><td>Calibrate clean KCl response first, then use standards with the same ionic background as each dialysate/CRRT matrix.</td><td>ISEs respond to ion activity. A clean-water calibration cannot support a concentration claim in a high-sodium/bicarbonate matrix.</td></tr>
               <tr><td>Miniaturization path</td><td>Use commercial SPEs for first data, then move to custom printed lanes with solid-contact MWCNT/PEDOT:PSS underlayers.</td><td>Solid contact improves potential stability, but every custom lane needs water-layer, impedance/drift, and lot-release testing.</td></tr>
               <tr><td>Flow-cell chemistry exposure</td><td>Keep first clinical-adjacent work in dialysate/CRRT effluent or a membrane-separated compartment before direct blood contact.</td><td>This follows the safer extracorporeal literature pattern: protect sensors from proteins/coagulation while proving continuous electrolyte tracking.</td></tr>
             </tbody>
@@ -522,8 +566,9 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
             <thead><tr><th>Gate</th><th>Pass condition</th><th>Unlocks</th></tr></thead>
             <tbody>
               <tr><td>Incoming parts + dimensions</td><td>Record actual reader, cassette, channel, electrode, tubing, pump, sensor, and reservoir dimensions against the modeled unit; leak-test the duplicate wet path before chemistry exposure.</td><td>Wet chemistry assembly</td></tr>
-              <tr><td>KCl standards</td><td>2.0, 3.0, 4.0, 5.5, 7.0, and 9.0 mmol/L steps produce stable log-linear response, expected slope window, and repeatable recovery after low-to-high and high-to-low transitions.</td><td>Dialysate/CRRT matrix testing</td></tr>
+              <tr><td>KCl standards</td><td>2.0, 3.0, 4.0, 5.5, 7.0, and 9.0 mmol/L steps produce stable log-linear response and repeatable recovery after at least three measured cell volumes.</td><td>Matrix-matched dialysate/CRRT testing</td></tr>
               <tr><td>Triplicate agreement</td><td>K1/K2/K3 agree within preset mV/K+ window while the blank channel stays quiet and dual-reference delta remains below drift threshold.</td><td>Confidence score and majority-vote QC</td></tr>
+              <tr><td>Hydraulic response</td><td>Measured flow and wetted volume predict the observed step delay; the current 0.61 mL cell requires about 55 seconds for three cell volumes even at 2 mL/min, before tubing volume.</td><td>Honest refresh gate or lower-volume cassette revision</td></tr>
               <tr><td>Flow artifact rejection</td><td>Bubble, stale-flow, pressure, carryover, and incomplete-wetting challenges suppress output instead of producing false potassium movement.</td><td>Enclosed reader and valve automation</td></tr>
               <tr><td>Dialysate matrix</td><td>Performance holds in CRRT/dialysate-like sodium, bicarbonate, calcium, magnesium, urea, temperature, and flow conditions over a multi-hour run.</td><td>Artificial plasma and drawn-line micro-sample planning</td></tr>
               <tr><td>Interference panel</td><td>Quantify bias from ammonium, sodium, calcium, magnesium, lithium, pH/bicarbonate shifts, albumin/protein, hemolysis, lipemia, icterus, and heparinized matrices.</td><td>Matrix-specific correction or exclusion rules</td></tr>
@@ -538,7 +583,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
 
       <section class="card" id="scale">
         <h2><span class="n">10</span>How far from usable at scale</h2>
-        <p class="lead">The research read is optimistic for a bench first article and cautious for hospital scale. The chemistry is validated enough that a well-assembled prototype should work in principle in standards and dialysate-like flows, with expected tuning around references, bubbles, flow, conditioning, and calibration. It is not yet close to autonomous or patient-care use.</p>
+        <p class="lead">The measurement principle is credible enough to justify a bench first article, but the integrated architecture is not yet released or clinically validated. It must close the sensor carrier, references, hydraulic response, electronics, calibration, and failure modes before any scale claim.</p>
         <div class="tbl-wrap">
           <table class="tbl">
             <thead><tr><th>Stage</th><th>Evidence needed</th><th>Realistic readiness</th></tr></thead>
@@ -546,12 +591,12 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
               <tr><td>Bench first article</td><td>Ordered parts, assembled cassette, raw KCl response, leak-free wet path, basic QC suppression.</td><td>Near-term: 12-18 weeks after PO if long-lead parts arrive and no redesign blocker appears.</td></tr>
               <tr><td>Dialysate / CRRT simulation</td><td>Multi-hour matrix runs, drift and recalibration behavior, pressure/bubble handling, paired bench comparator samples.</td><td>Feasible next: likely 3-6 months after first article bring-up.</td></tr>
               <tr><td>Ex vivo comparator study</td><td>Locked protocol, residual or simulated samples, blood gas/i-STAT/central lab comparison, documented exclusions.</td><td>Research pilot: commonly 6-12+ months depending on partner access and IRB path.</td></tr>
-              <tr><td>Hospital usability prototype</td><td>Design controls, electrical safety plan, disposable boundary, cleaning, biohazard workflow, cybersecurity, human factors.</td><td>Substantial device-development stage: likely 12-24+ months after feasibility success.</td></tr>
-              <tr><td>Scaled clinical product</td><td>Manufacturing process, sterilization/biocompatibility, lot release, quality system, regulatory submission, clinical performance evidence.</td><td>Medical-device path: likely 24-36+ months and partner-dependent.</td></tr>
+              <tr><td>Hospital usability prototype</td><td>ISO 14971 risk file, IEC 60601-1/-1-2 safety plan, IEC 62304 software lifecycle, IEC 62366-1 human factors, disposable boundary, cleaning, biohazard workflow, and cybersecurity.</td><td>Substantial device-development stage: likely 12-24+ months after feasibility success.</td></tr>
+              <tr><td>Scaled clinical product</td><td>ISO 13485 quality system, ISO 10993 biological evaluation, manufacturing/sterilization process, lot release, regulatory submission, and clinical performance evidence.</td><td>Medical-device path: likely 24-36+ months and partner-dependent.</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="note mint">Best current claim: the Hospital CKM first article is a strong, orderable, chemistry-grounded feasibility build. It should be excellent for generating the first controlled evidence if assembled carefully, but scale readiness depends on the first raw data and failure-mode closure.</div>
+        <div class="note mint">Best current claim: Hospital CKM is a chemistry-grounded, buildable feasibility architecture with a now-explicit closure list. Its value is the controlled evidence it can generate—not a claim that the current model is production-ready.</div>
       </section>
 
       <section class="card" id="schedule">
@@ -560,10 +605,10 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
           <table class="tbl">
             <thead><tr><th style="width:120px">Week</th><th>Milestone</th></tr></thead>
             <tbody>
-              <tr><td><code>0</code></td><td>Purchase order, kickoff, final scope, and buyer review of research-only boundaries.</td></tr>
-              <tr><td><code>0-2</code></td><td>Long-lead procurement: electrodes, membrane chemistry, references, flow sensor, pressure sensors, pump, ADC/buffer components, fittings, standards.</td></tr>
+              <tr><td><code>0</code></td><td>Reconcile placed orders and packing slips, freeze research-only scope, and close the P0 build-readiness audit.</td></tr>
+              <tr><td><code>0-2</code></td><td>Buy only missing P0 items: integrated carrier/connector, potassium-safe references, pump driver, bubble sensor, six-channel completion, exact fittings, and validation supplies.</td></tr>
               <tr><td><code>2-5</code></td><td>Flow-cell body fabrication, measured reader/cassette setup, wet-path assembly, electronics bench bring-up.</td></tr>
-              <tr><td><code>5-8</code></td><td>KCl standards testing, raw mV logging, temperature/flow/pressure characterization, first QC thresholds.</td></tr>
+              <tr><td><code>5-8</code></td><td>KCl standards testing, raw mV capture, temperature/flow/pressure characterization, first QC thresholds.</td></tr>
               <tr><td><code>8-12</code></td><td>Dialysate/CRRT-like matrix testing, drift/fouling/bubble/stale-flow/carryover/interference challenge tests.</td></tr>
               <tr><td><code>12-15</code></td><td>Data review, failure-mode closure, procurement binder, pilot-readiness memo.</td></tr>
               <tr><td><code>15-18</code></td><td>Optional hospital simulation planning and comparator-study protocol drafting.</td></tr>
@@ -576,7 +621,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
         <h2><span class="n">12</span>Support model</h2>
         <ul>
           <li>Weekly engineering review during active first-article build and bench test window.</li>
-          <li>Shared issue log covering mechanical, fluidic, electronics, chemistry, software, and workflow risks.</li>
+          <li>Shared issue register covering mechanical, fluidic, electronics, chemistry, software, and workflow risks.</li>
           <li>Final deliverables: test report, raw data export, BOM, assembly notes, measured dimensions, risk register, and next-stage recommendation.</li>
           <li>Optional post-delivery support for hospital simulation, comparator-study design, institutional review, biocompatibility planning, and cybersecurity documentation.</li>
         </ul>
@@ -588,7 +633,7 @@ table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var
           <li>All work is research-stage and non-clinical unless a separate clinical protocol is approved.</li>
           <li>This procurement is potassium-first. Sodium, calcium, chloride, bicarbonate/CO2, creatinine, BUN/urea, lactate, glucose, pH, or cystatin C require separate chemistry selection, cross-sensitivity analysis, and validation gates before being sold as Hospital CKM outputs.</li>
           <li>No diagnosis, treatment, autonomous dosing, or replacement of blood gas/central lab potassium is included.</li>
-          <li>Sterile packaging, biocompatibility, hemocompatibility, IEC 60601 testing, FDA submission, and production quality system work are excluded from the first-article package.</li>
+          <li>Sterile packaging, biocompatibility, hemocompatibility, IEC 60601 testing, ISO 14971 risk management, IEC 62304 software lifecycle, human factors, FDA submission, and production quality-system work are excluded from the first-article package but required for the clinical path.</li>
           <li>Hospital provides comparator access, clinical workflow reviewers, institutional approvals, and de-identified data access only under separate agreement.</li>
           <li>Prices exclude tax, institutional overhead, IRB fees, shipping expedites, hospital integration fees, and customer-requested scope changes.</li>
         </ul>
@@ -638,13 +683,13 @@ document.getElementById("printBtn").addEventListener("click", () => window.print
 const poSummary = `Hospital CKM Procurement Sheet
 
 Document type: Buyer-ready research prototype procurement sheet
-Recommended initial PO: $58K-$112K
-Included first-article parts stack: $4.2K-$6.8K
+Recommended initial PO: $61K-$113K
+Detailed first-article line-item sum: $3.3K-$7.3K before shipping, tax, and integrated carrier RFQ
 Estimated delivery window: 12-18 weeks
 
 Scope:
 - One Hospital CKM research first article with reusable reader envelope, disposable flow-cell cassette, triplicate valinomycin K+ channels, dual reference, blank membrane, temperature, flow, pressure, and bubble diagnostics.
-- Bench bring-up and feasibility engineering for fluidics, guarded high-impedance electronics, raw logging software, QC state machine, and fail-closed output suppression.
+- Bench bring-up and feasibility engineering for fluidics, guarded high-impedance electronics, raw data capture, QC state machine, and fail-closed output suppression.
 - Controlled non-clinical testing in KCl standards, selected dialysate/CRRT-like matrices, flow artifacts, drift, carryover, and interference panels.
 - Procurement binder with BOM, measured dimensions, assembly notes, acceptance gates, risk register, CLSI-style validation map, comparator plan, and pilot-readiness memo.
 

@@ -3,30 +3,41 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Interactive Hospital CKM 3D BOM viewer with orderable components, modeled dimensions, and validation risks.">
+<meta name="description" content="Interactive Hospital CKM 3D build tour with lifelike components, plain-language explanations, sourced dimensions, and open validation risks.">
 <meta name="theme-color" content="#0d1117">
 <link rel="canonical" href="https://statskeybiometrics.com/hospital-ckm/viewer/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-<title>Hospital CKM 3D BOM Viewer</title>
+<title>Hospital CKM | Interactive 3D Build Tour</title>
 <style>
-:root{--bg:#0d1117;--panel:rgba(10,14,20,.94);--line:#243041;--ink:#eef6ff;--soft:#c5d3e1;--muted:#91a5b8;--aqua:#8fd3ff;--mint:#70f0cb;--amber:#ffbd68;--danger:#ff7a85}
+:root{--bg:#071018;--panel:rgba(8,15,24,.84);--panel-strong:rgba(9,17,27,.94);--line:rgba(143,211,255,.18);--line-strong:rgba(112,240,203,.46);--ink:#f4f9ff;--soft:#c6d4e2;--muted:#8da3b8;--aqua:#8fd3ff;--mint:#70f0cb;--amber:#ffbd68;--danger:#ff7a85;--shadow:0 24px 70px rgba(0,0,0,.38)}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Barlow,ui-sans-serif,system-ui,sans-serif}
-body{background:radial-gradient(circle at 18% 12%,rgba(44,158,255,.16),transparent 30%),radial-gradient(circle at 88% 18%,rgba(112,240,203,.10),transparent 28%),linear-gradient(145deg,#03060b 0%,#07101a 48%,#04070d 100%)}
-#canvas{display:block;width:100vw;height:100vh;touch-action:none}
+body{background:radial-gradient(circle at 24% 15%,rgba(44,158,255,.18),transparent 31rem),radial-gradient(circle at 82% 23%,rgba(112,240,203,.12),transparent 29rem),radial-gradient(circle at 50% 100%,rgba(34,83,125,.18),transparent 36rem),linear-gradient(145deg,#02060a 0%,#07111b 46%,#02060b 100%)}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(143,211,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(143,211,255,.02) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(circle at 50% 50%,#000,transparent 76%)}
+body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;box-shadow:inset 0 0 120px rgba(0,0,0,.36);background:linear-gradient(180deg,rgba(0,0,0,.04),transparent 20%,transparent 76%,rgba(0,0,0,.14))}
+#canvas{position:relative;z-index:1;display:block;width:100vw;height:100vh;touch-action:none;cursor:grab}#canvas:active{cursor:grabbing}
 .fallback-render{position:fixed;inset:0;z-index:1;display:grid;place-items:center;padding:28px;background:radial-gradient(circle at 50% 38%,rgba(112,240,203,.12),transparent 26rem),linear-gradient(145deg,#03060b 0%,#07101a 48%,#04070d 100%)}
 .fallback-render.hidden{display:none}.fallback-card{width:min(920px,calc(100vw - 48px));border:1px solid var(--line);border-radius:24px;background:rgba(7,12,19,.88);padding:20px}.fallback-card svg{width:100%;height:auto;display:block}.fallback-card p{margin:12px 0 0;color:var(--soft);font-size:13px;line-height:1.55}.fallback-card b{color:var(--ink)}
-.panel{position:fixed;z-index:3;background:linear-gradient(180deg,rgba(13,22,34,.92),rgba(7,12,19,.84));border:1px solid var(--line);backdrop-filter:blur(14px)}
+.panel{position:fixed;z-index:3;background:linear-gradient(155deg,rgba(15,27,41,.91),rgba(5,11,18,.78));border:1px solid var(--line);backdrop-filter:blur(22px) saturate(145%);-webkit-backdrop-filter:blur(22px) saturate(145%);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.055)}
 .brand{left:18px;top:18px;width:min(318px,calc(100vw - 36px));padding:12px 14px;border-radius:18px}
-.back{display:inline-flex;gap:7px;margin-bottom:10px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;text-decoration:none}
+.back{display:inline-flex;gap:7px;margin-bottom:10px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;transition:.2s ease}.back:hover{color:var(--ink);border-color:var(--line-strong);background:rgba(112,240,203,.07)}
 .eyebrow,.panel-title,.button,.chip,.type,.source-link{letter-spacing:.13em;text-transform:uppercase}.eyebrow{color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700}.brand h1{margin:4px 0 0;font-family:Rajdhani,sans-serif;font-size:32px;line-height:.92}.brand p{margin:9px 0 0;color:var(--soft);font-size:11px;line-height:1.45}
 .brand-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chip{display:inline-flex;gap:7px;align-items:center;min-height:28px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.035);font-size:10px;font-weight:700}.chip:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--aqua)}.chip.safe:before{background:var(--mint)}.chip.warn:before{background:var(--amber)}
 .toolbar{right:18px;top:18px;width:min(300px,calc(100vw - 36px));padding:14px;border-radius:18px}.panel-title{margin:0 0 10px;color:var(--aqua);font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700}.views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.button{appearance:none;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.055);color:var(--ink);padding:9px 10px;font:700 11px Rajdhani,sans-serif;cursor:pointer}.button.active{background:rgba(112,240,203,.14);border-color:rgba(112,240,203,.55);color:#f8fffd}
-.parts-panel{left:18px;bottom:18px;width:min(390px,calc(100vw - 36px));max-height:34vh;overflow:auto;padding:14px;border-radius:18px}.part-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.part-button{appearance:none;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.045);color:var(--soft);padding:8px 9px;text-align:left;font:700 11px Rajdhani,sans-serif;letter-spacing:.06em;cursor:pointer}.part-button.active{border-color:rgba(112,240,203,.65);background:rgba(112,240,203,.12);color:#f8fffd}.part-button span{display:block;margin-top:2px;color:var(--muted);font:600 10px Barlow,sans-serif;letter-spacing:0;text-transform:none}
-.inspector{right:18px;bottom:18px;width:min(455px,calc(100vw - 36px));max-height:48vh;overflow:auto;padding:16px;border-radius:18px}.type{color:var(--amber);font-size:10px;font-weight:700}.title{margin-top:4px;font-family:Rajdhani,sans-serif;font-size:27px;font-weight:700;line-height:1}.inspector p{margin:8px 0 0;color:var(--soft);font-size:12px;line-height:1.5}.inspector b{color:var(--ink)}.source-link{display:inline-flex;margin-top:12px;color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700}.hint{position:fixed;left:18px;bottom:calc(34vh + 38px);z-index:2;color:var(--muted);font-size:11px;background:rgba(10,14,20,.72);border:1px solid var(--line);border-radius:999px;padding:9px 12px}
-.legend{position:fixed;left:50%;bottom:18px;z-index:2;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:min(620px,calc(100vw - 36px));padding:9px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(10,14,20,.72);backdrop-filter:blur(12px);color:var(--muted);font-size:11px}.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.legend i{width:9px;height:9px;border-radius:999px;display:inline-block}.legend .sample i{background:#8fd3ff}.legend .cal i{background:#ffbd68}.legend .qc i{background:#70f0cb}.legend .waste i{background:#dcecf2}
-@media(max-width:760px){.toolbar{top:auto;bottom:18px;left:18px;right:auto}.inspector,.parts-panel{display:none}.hint{display:none}.brand{max-height:44vh;overflow:auto}}
+.button{transition:transform .18s ease,border-color .18s ease,background .18s ease}.button:hover{transform:translateY(-1px);border-color:rgba(143,211,255,.48);background:rgba(143,211,255,.09)}.button.active{background:linear-gradient(145deg,rgba(112,240,203,.19),rgba(143,211,255,.08));border-color:rgba(112,240,203,.62);box-shadow:inset 0 0 18px rgba(112,240,203,.07)}
+.viewer-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)}.viewer-controls .button{color:var(--muted)}.viewer-controls .button.active{color:var(--mint)}
+.parts-panel{left:18px;bottom:18px;width:min(390px,calc(100vw - 36px));max-height:34vh;overflow:auto;padding:14px;border-radius:18px;scrollbar-color:rgba(143,211,255,.28) transparent}.part-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.part-button{appearance:none;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.038);color:var(--soft);padding:8px 9px;text-align:left;font:700 11px Rajdhani,sans-serif;letter-spacing:.06em;cursor:pointer;transition:.18s ease}.part-button:hover{border-color:rgba(143,211,255,.38);background:rgba(143,211,255,.07);transform:translateY(-1px)}.part-button.active{border-color:rgba(112,240,203,.65);background:linear-gradient(145deg,rgba(112,240,203,.16),rgba(143,211,255,.06));color:#f8fffd;box-shadow:inset 3px 0 0 var(--mint)}.part-button span{display:block;margin-top:2px;color:var(--muted);font:600 10px Barlow,sans-serif;letter-spacing:0;text-transform:none}
+.inspector{right:18px;bottom:18px;width:min(455px,calc(100vw - 36px));max-height:50vh;overflow:auto;padding:17px 18px;border-radius:18px;scrollbar-color:rgba(143,211,255,.28) transparent}.type{color:var(--amber);font-size:10px;font-weight:700}.title{margin-top:4px;font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;line-height:1}.inspector-copy{margin:11px 0 0;color:var(--soft);font-size:14px;line-height:1.52}.inspector-label{display:block;margin-bottom:3px;color:var(--mint);font:700 10px Rajdhani,sans-serif;letter-spacing:.13em;text-transform:uppercase}.inspector details{margin-top:13px;border-top:1px solid rgba(255,255,255,.08);padding-top:11px}.inspector summary{cursor:pointer;color:var(--aqua);font:700 11px Rajdhani,sans-serif;letter-spacing:.13em;text-transform:uppercase}.inspector details p{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.48}.inspector b{color:var(--ink)}.source-link{display:inline-flex;margin-top:12px;color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;text-decoration:none}.source-link:hover{text-decoration:underline}.hint{position:fixed;left:18px;bottom:calc(34vh + 38px);z-index:2;color:var(--muted);font-size:11px;background:rgba(10,14,20,.72);border:1px solid var(--line);border-radius:999px;padding:9px 12px;backdrop-filter:blur(12px)}
+.legend{position:fixed;left:50%;bottom:18px;z-index:2;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:min(720px,calc(100vw - 36px));padding:9px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(10,14,20,.72);backdrop-filter:blur(12px);color:var(--muted);font-size:11px}.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.legend i{width:9px;height:9px;border-radius:999px;display:inline-block}.legend .sample i{background:#8fd3ff}.legend .cal i{background:#ffbd68}.legend .qc i{background:#70f0cb}.legend .waste i{background:#dcecf2}.legend .live i{background:#fff;box-shadow:0 0 10px #8fd3ff}
+body.capture-mode .panel,body.capture-mode .hint,body.capture-mode .legend{display:none!important}
+body.capture-mode canvas{background:radial-gradient(circle at 52% 45%,rgba(143,211,255,.10),transparent 34rem),linear-gradient(145deg,#03060b 0%,#07101a 54%,#04070d 100%)}
+body.embed-mode .panel,body.embed-mode .hint,body.embed-mode .legend{display:none!important}
+body.embed-mode::after{box-shadow:inset 0 0 80px rgba(0,0,0,.22)}
+body.cinematic .brand,body.cinematic .parts-panel,body.cinematic .inspector,body.cinematic .hint,body.cinematic .legend{opacity:0;pointer-events:none;transform:translateY(8px)}body.cinematic .toolbar{background:rgba(5,11,18,.62)}
+.brand,.parts-panel,.inspector,.hint,.legend{transition:opacity .24s ease,transform .24s ease}
+@media(max-width:980px){.brand{width:min(290px,calc(100vw - 36px))}.parts-panel{width:min(330px,calc(100vw - 36px))}.inspector{width:min(390px,calc(100vw - 36px))}.legend{display:none}}
+@media(max-width:760px){.brand{left:12px;top:12px;width:calc(100vw - 24px);max-height:28vh;overflow:auto}.toolbar{top:auto;left:12px;right:12px;bottom:12px;width:auto;padding:10px}.views{grid-template-columns:repeat(3,minmax(0,1fr))}.viewer-controls{grid-template-columns:repeat(3,minmax(0,1fr))}.parts-panel{display:none}.inspector{display:block;left:12px;right:12px;bottom:220px;width:auto;max-height:24vh;padding:13px 14px}.inspector .title{font-size:22px}.inspector-copy{font-size:12px}.inspector details{display:none}.hint,.legend{display:none}}
 </style>
 </head>
 <body>
@@ -66,45 +77,61 @@ body{background:radial-gradient(circle at 18% 12%,rgba(44,158,255,.16),transpare
 <canvas id="canvas"></canvas>
 <section class="panel brand">
   <a class="back" href="/hospital-ckm/">Back to Hospital CKM</a>
-  <div class="eyebrow">3D BOM viewer</div>
+  <div class="eyebrow">Interactive build tour</div>
   <h1>Hospital CKM</h1>
-  <p>One modeled unit equals one millimeter. Click any part for source, exact modeled dimensions, function, and validation risk.</p>
-  <div class="brand-row"><span class="chip safe">Orderable parts</span><span class="chip warn">Custom cassette</span><span class="chip">1 mm scale</span></div>
+  <p>Drag the device to inspect it, then pick any part. The first explanation is plain English; exact specifications and sourcing stay one tap deeper.</p>
+  <div class="brand-row"><span class="chip safe">Bench prototype</span><span class="chip warn">Open risks shown</span><span class="chip">1 mm model units</span></div>
 </section>
-<section class="panel toolbar"><h2 class="panel-title">Views</h2><div class="views" id="views"></div></section>
+<section class="panel toolbar">
+  <h2 class="panel-title">Choose a view</h2>
+  <div class="views" id="views"></div>
+  <div class="viewer-controls">
+    <button class="button active" id="flowBtn" type="button">Flow on</button>
+    <button class="button" id="rotateBtn" type="button">Auto rotate</button>
+    <button class="button" id="cinemaBtn" type="button">Cinema</button>
+  </div>
+</section>
 <section class="panel parts-panel"><h2 class="panel-title">Parts</h2><div class="part-list" id="partList"></div></section>
-<section class="panel inspector" id="inspector"></section>
-<div class="hint">Drag to rotate · Scroll to zoom · Click a part</div>
-<div class="legend" aria-label="Render legend"><span class="sample"><i></i>sample path</span><span class="cal"><i></i>KCl calibration</span><span class="qc"><i></i>sensor / QC bay</span><span class="waste"><i></i>waste capture</span></div>
+<section class="panel inspector" id="inspector" aria-live="polite"></section>
+<div class="hint">Drag to rotate · Scroll to zoom · Click a part for the story</div>
+<div class="legend" aria-label="Render legend"><span class="live"><i></i>moving dots show flow</span><span class="sample"><i></i>sample path</span><span class="cal"><i></i>KCl calibration</span><span class="qc"><i></i>sensor / QC bay</span><span class="waste"><i></i>waste capture</span></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+
+const query = new URLSearchParams(location.search);
+if (query.get("capture") === "1") document.body.classList.add("capture-mode");
+if (query.get("embed") === "1") document.body.classList.add("embed-mode");
+const isMobile=matchMedia("(max-width: 760px)").matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 const parts = [
   {id:"cassette",name:"Disposable flow-cell cassette",type:"custom disposable",exact:"Custom CNC/SLA prototype; future injection-molded COC/COP or medical PC",dims:"120 x 44 x 14 mm modeled cassette body; 3.0 mm main channel; 0.7 mL active cell volume",detail:"Closed single-patient cartridge carrying the sample channel, electrode bay, pressure diaphragms, calibration loop, and optical bubble window.",risk:"Must prove no leaks, no stagnant blood pockets, no unsafe pressure drop, sterilization compatibility, and no reusable wet path.",source:"Custom fabrication / Protolabs / local CNC",href:"https://www.protolabs.com/services/cnc-machining/"},
   {id:"main-channel",name:"Main sample channel",type:"fluid path",exact:"Modeled channel inside disposable cassette",dims:"86 mm long x 3.0 mm ID equivalent; 0.61 mL main-channel volume",detail:"Primary path for dialysate/effluent or drawn-line micro-sample over the K+ sensing zone.",risk:"Geometry must prevent bubbles, clots, and dead zones from being mistaken for potassium movement.",source:"Custom cassette geometry",href:"/hospital-ckm/"},
-  {id:"sensor-strip",name:"Printed electrode strip",type:"chemistry substrate",exact:"Metrohm DropSens DRP-110-U75 carbon screen-printed electrode family",dims:"33.8 x 10.2 x 0.5 mm commercial substrate; 4 mm carbon working electrode",detail:"Development substrate for K+ ISE membrane, reference/blank experiments, and early urine/dialysate/blood-simulant validation.",risk:"Commercial strip is a bench substrate; production cassette needs custom electrode geometry and lot release.",source:"Metrohm DropSens DRP-110",href:"https://metrohm-dropsens.com/products/electrodes/screen-printed-electrodes/screen-printed-carbon-electrode-110/"},
+  {id:"sensor-strip",name:"Multi-lane electrode carrier",type:"chemistry substrate",exact:"Integration target: Metrohm DropSens DRP-8X110-U20 + CAC8X, or custom six-lane carrier; existing DRP-110-U75 strips remain single-cell chemistry tools",dims:"78 x 33 x 1 mm DRP-8X110 class envelope; 2.56 mm array WEs. A DRP-110-U75 is 34 x 10 x 0.5 mm with one 4 mm WE.",detail:"The modeled carrier provides one wetted geometry for K1/K2/K3, a matched blank, and reference checks. It is not a literal DRP-110 strip.",risk:"Freeze the actual carrier and connector before machining the cassette cover; a single DRP-110 cannot provide the six sites in the old render.",source:"Metrohm DropSens DRP-8X110",href:"https://www.metrohm.com/en/products/d/rp-8/drp-8x110-u20.html"},
+  {id:"solid-contact",name:"Solid-contact transducer layer",type:"chemistry substrate",exact:"MWCNT or PEDOT:PSS solid-contact layer under K+ membranes",dims:"Modeled as 3.4 mm disks below each 4.0 mm K+ membrane",detail:"Ion-to-electron transducer layer that lowers drift before the valinomycin membrane is cast.",risk:"Needs water-layer, impedance, and drift checks before trusting long-run potassium data.",source:"Sigma / Ossila / Heraeus class materials",href:"/hospital-ckm/"},
   {id:"k1",name:"K1 potassium ISE",type:"chemistry",exact:"Valinomycin K+ membrane using Sigma V0627 / Selectophore cocktail 99373 class chemistry",dims:"4.0 mm modeled membrane disk on printed electrode pad",detail:"Primary potassium-selective channel producing open-circuit potential versus reference.",risk:"Requires selectivity testing against Na+, NH4+, proteins, pH, temperature, and dialysate/blood matrices.",source:"MilliporeSigma valinomycin",href:"https://www.sigmaaldrich.com/US/en/product/sigma/v0627"},
   {id:"k2",name:"K2 potassium ISE",type:"chemistry",exact:"Duplicate valinomycin K+ ISE; separate membrane lot or lane preferred",dims:"4.0 mm modeled membrane disk",detail:"Redundant K+ channel for agreement and drift rejection.",risk:"Duplicate only helps if process independence exposes failures rather than repeating them.",source:"MilliporeSigma potassium ionophore cocktail",href:"https://www.sigmaaldrich.com/US/en/product/sial/99373"},
   {id:"k3",name:"K3 potassium ISE",type:"chemistry",exact:"Third valinomycin K+ ISE for majority-vote QC",dims:"4.0 mm modeled membrane disk",detail:"Tie-breaker channel for early validation and high-risk clinical contexts.",risk:"Adds cost and fluidic footprint; must reduce false output, not just add complexity.",source:"Selectophore membrane reagents",href:"https://www.sigmaaldrich.com/US/en/products/chemistry-and-biochemicals/analytical-chemistry/ionophores"},
-  {id:"ref-a",name:"Reference A",type:"reference",exact:"Ag/AgCl reference with chloride reservoir; Creative Materials 113-09 / 126-49 ink family for prototype printing",dims:"5.2 mm modeled pad plus 18 x 4 x 2 mm reservoir block",detail:"Primary potentiometric reference path.",risk:"Reference drift is the central accuracy failure mode; must be independently monitored.",source:"Creative Materials Ag/AgCl inks",href:"https://www.creativematerials.com/products/ag-agcl-inks/"},
-  {id:"ref-b",name:"Reference B",type:"reference",exact:"Independent Ag/AgCl reference sentinel",dims:"5.2 mm modeled pad plus separate 18 x 4 x 2 mm reservoir block",detail:"Detects reference drift before clinical interpretation is shown.",risk:"Needs enough independence to expose reference failure without excessive sample volume.",source:"Creative Materials Ag/AgCl inks",href:"https://www.creativematerials.com/products/ag-agcl-inks/"},
+  {id:"ref-a",name:"Reference A",type:"reference",exact:"Double-junction Ag/AgCl reference; Pine RREF0024 class with 10% KNO3 outer bridge or equivalent",dims:"External bench reference; rendered reservoir is a future integration envelope, not the commercial electrode body",detail:"Primary potentiometric reference path with a potassium-free outer bridge.",risk:"A single-junction KCl reference can leak K+ into the low-volume cell; contamination and drift must be independently monitored.",source:"Pine double-junction reference",href:"https://pineresearch.com/downloads/documents/DRP10026.pdf/"},
+  {id:"ref-b",name:"Reference B",type:"reference",exact:"Second independent double-junction Ag/AgCl reference with potassium-free outer bridge",dims:"External bench reference; separate rendered reservoir marks the future sentinel path",detail:"Independent sentinel used to suppress output when reference delta moves.",risk:"It must not share a junction, fill reservoir, or electrical failure path with Reference A.",source:"Pine double-junction reference",href:"https://pineresearch.com/downloads/documents/DRP10026.pdf/"},
   {id:"blank",name:"Blank / non-ionophore control",type:"QC chemistry",exact:"Non-ionophore polymer membrane on printed electrode",dims:"4.0 mm modeled control disk",detail:"Catches membrane-independent drift, protein fouling, bubble wetting artifacts, and reference movement.",risk:"Must be hidden from clinical interpretation and treated only as QC.",source:"Custom membrane control",href:"/hospital-ckm/"},
-  {id:"flow-sensor",name:"Liquid flow sensor",type:"orderable sensor",exact:"Sensirion SLF3S-0600F liquid flow sensor",dims:"48.0 x 15.5 x 8.9 mm; 1/4-28 flat-bottom ports; up to +/-2 mL/min",detail:"Measures micro-sample or dialysate flow through the cassette for valid sample refresh and excretion/kinetics calculations.",risk:"Not a sterile disposable by itself; production design must isolate reusable sensor or use disposable fluidic boundary.",source:"Sensirion SLF3S-0600F",href:"https://sensirion.com/products/catalog/SLF3S-0600F"},
-  {id:"pump",name:"Micro-pump",type:"orderable actuator",exact:"Bartels mp6 piezoelectric diaphragm micropump",dims:"30.0 x 15.0 x 3.8 mm without connectors; 0-8 mL/min liquid; ~30 uL internal volume",detail:"Pulls calibration standard or micro-sample through the measurement loop in the bench and drawn-line prototype.",risk:"Pump must not hemolyze samples or contaminate clinical fluid path; may remain on reusable side only if isolated.",source:"Bartels mp6",href:"https://bartels-mikrotechnik.de/support-center/mp6-micropumps-series-datasheet/"},
+  {id:"flow-sensor",name:"Liquid flow sensor",type:"orderable sensor",exact:"Sensirion SLF3S-0600F liquid flow sensor",dims:"48.0 x 15.5 x 8.9 mm; 1/4-28 flat-bottom ports; +/-2 mL/min full scale; ~28 uL internal volume",detail:"Digital I2C measurement of sample refresh through the non-clinical bench loop.",risk:"It is a wetted research sensor, not a sterile disposable. A clinical design must place it inside the disposable boundary or replace it with non-contact sensing.",source:"Sensirion SLF3S-0600F",href:"https://sensirion.com/products/catalog/SLF3S-0600F"},
+  {id:"pump",name:"Micro-pump",type:"orderable actuator",exact:"Bartels mp6-liq plus mp-Lowdriver / mp-Highdriver class controller",dims:"30.0 x 15.0 x 3.8 mm without connectors; up to ~6 mL/min water; 32 uL internal volume",detail:"Moves standards and simulated sample through the non-clinical bench loop.",risk:"The piezo pump needs a Bartels high-voltage driver and characterized pressure/flow behavior. It is not approved here for direct blood contact.",source:"Bartels mp6 series",href:"https://bartels-mikrotechnik.de/wp-content/uploads/2025/06/Datasheet-mp6-series.pdf"},
   {id:"valve-bank",name:"Microfluidic valve bank",type:"orderable actuator",exact:"Lee Company LHD 2-way / 3-way solenoid valve family",dims:"7 mm valve class; 2.5-4.5 g; 26-94 uL internal volume depending configuration",detail:"Switches sample, waste, and onboard calibration standard paths.",risk:"Dead volume, leakage, hold power, and cleanability determine whether it belongs in reusable or disposable path.",source:"Lee LHD valves",href:"https://www.theleeco.com/product/lhd-series-3-way-control-solenoid-valve/"},
-  {id:"pressure-a",name:"Pressure sensor A",type:"orderable sensor",exact:"TE Connectivity MEAS 1620 AAMI-compliant disposable pressure sensor family",dims:"10.54 x 8.10 x 3.53 mm; -50 to 300 mmHg",detail:"Upstream pressure diagnostic for occlusion, clot, bubble, and unsafe line pressure.",risk:"Clinical path requires disposable sterile pressure interface or approved pressure transducer integration.",source:"TE MEAS 1620",href:"https://www.te.com/en/product-CAT-BLPS0030.html"},
-  {id:"pressure-b",name:"Pressure sensor B",type:"orderable sensor",exact:"TE Connectivity MEAS 1620 AAMI-compliant disposable pressure sensor family",dims:"10.54 x 8.10 x 3.53 mm; -50 to 300 mmHg",detail:"Downstream pressure diagnostic and delta-pressure validation.",risk:"False pressure readings can suppress valid data or miss occlusion.",source:"TE MEAS 1620",href:"https://www.te.com/en/product-CAT-BLPS0030.html"},
+  {id:"pressure-a",name:"Pressure sensor A",type:"orderable sensor",exact:"TE Connectivity MEAS 1620 AAMI-compliant disposable bridge sensor family",dims:"10.54 x 8.10 x 3.53 mm; -50 to 300 mmHg; 5 uV/V/mmHg nominal sensitivity",detail:"Upstream pressure diagnostic acquired ratiometrically through stable bridge excitation and the ADC PGA.",risk:"This is not a plug-and-play digital sensor; the exact SKU, housing, excitation, calibration, and disposable interface must be frozen.",source:"TE MEAS 1620",href:"https://www.te.com/en/product-CAT-BLPS0030.html"},
+  {id:"pressure-b",name:"Pressure sensor B",type:"orderable sensor",exact:"Second TE Connectivity MEAS 1620 disposable bridge sensor",dims:"10.54 x 8.10 x 3.53 mm; -50 to 300 mmHg; 5 uV/V/mmHg nominal sensitivity",detail:"Downstream pressure and differential-pressure diagnostic using the same ratiometric acquisition path.",risk:"False pressure readings can suppress valid data or miss occlusion; calibrate both channels independently.",source:"TE MEAS 1620",href:"https://www.te.com/en/product-CAT-BLPS0030.html"},
+  {id:"bubble-optics",name:"Optical bubble detector",type:"orderable sensor",exact:"TT Electronics OPB350L062 for 1/16 in OD clear tubing; OCB350L062Z if using the calibration board",dims:"Commercial slotted sensor sized for 1.6 mm OD tubing; render shows the optical path, not exact package artwork",detail:"Non-contact liquid/bubble detection before the cell, with opaque housing for ambient-light rejection.",risk:"Calibrate thresholds for clear fluid, dyed fluid, foam, tube presence, and bubble size; never infer bubble state from an uncalibrated generic photodiode pair.",source:"TT Electronics OPB350L062",href:"https://www.ttelectronics.com/products/sensors/optoelectronics/fluid-sensors/opb350l062"},
   {id:"fittings",name:"1/4-28 fluidic fittings",type:"orderable fluidics",exact:"IDEX Health & Science 1/4-28 flat-bottom PEEK fittings / nuts family",dims:"Modeled as 8 mm OD x 10 mm long port bodies; real SKU dimensions vary",detail:"Connects sample, standard, waste, and dialysate tubing to the prototype cassette.",risk:"Dimensions must be locked to selected SKU before machining the cassette.",source:"IDEX 1/4-28 fittings",href:"https://idex-hs.com/store/product-detail/flangeless_fitting_natural_peek_1_4_28_flat_bottom_for_1_8_od"},
   {id:"stopcock",name:"Clinical stopcock / manifold",type:"orderable fluidics",exact:"Qosina 3-way stopcock family, e.g. 99762 / 99520-3",dims:"Modeled envelope 38 x 24 x 12 mm; final dimensions per selected SKU",detail:"Bench and simulation manifold for sample/waste/standard routing.",risk:"Clinical use needs selected part drawings, pressure rating, biocompatibility, and sterile packaging.",source:"Qosina stopcocks",href:"https://www.qosina.com/categories/stopcocks-manifolds/stopcocks"},
   {id:"reader-shell",name:"Bedside reader shell",type:"custom reusable",exact:"Custom sealed reader enclosure, prototype SLA/CNC, future molded PC/ABS",dims:"170 x 112 x 42 mm modeled shell with bedrail flange",detail:"Reusable housing for display, electronics, pump/valve control, isolated pressure couplers, and network/power ports.",risk:"Must survive cleaning, drops, cable strain, fluid ingress, and hospital electrical safety review.",source:"Custom fabrication",href:"https://www.protolabs.com/services/3d-printing/"},
   {id:"display",name:"Touch display",type:"orderable display",exact:"Adafruit 2.8 inch TFT LCD touchscreen breakout, product 1770 / ILI9341 family",dims:"Modeled PCB 70 x 50 x 6 mm; 2.8 inch 240 x 320 display",detail:"Prototype bedside status display for trend, QC, comparator age, and confirm-test prompts.",risk:"Production version needs medical UI, cleaning, brightness, and alarm/human-factors validation.",source:"Adafruit product 1770",href:"https://www.adafruit.com/product/1770"},
   {id:"afe",name:"Electrometer front end",type:"orderable electronics",exact:"Analog Devices AD5940 kept as optional impedance/health-check AFE, not the primary K+ voltage path",dims:"LFCSP 7 x 7 mm modeled package; optional on proof PCB",detail:"Useful for electrode impedance and membrane-health experiments while the K+ value is read through high-Z buffers into the precision ADC.",risk:"Do not rely on this alone for high-impedance potentiometric K+ measurement; isolate it from the measurement node during OCP reads.",source:"Analog Devices AD5940",href:"https://www.analog.com/en/products/ad5940.html"},
-  {id:"buffer",name:"Electrometer buffer array",type:"orderable electronics",exact:"Texas Instruments LMP7721 3 fA input-bias op amps, one guarded buffer per ISE/reference/QC node",dims:"8-pin SOIC body 4.9 x 3.9 mm each; modeled as four guarded buffer packages",detail:"High-impedance isolation for K1/K2/K3, blank, reference sentinel, and open-circuit potentiometric nodes before ADC multiplexing.",risk:"Requires guarded PCB layout, low-leakage standoffs, clean flux process, driven shields, and leakage testing before trusting drift data.",source:"TI LMP7721",href:"https://www.ti.com/product/LMP7721"},
+  {id:"buffer",name:"Electrometer buffer array",type:"orderable electronics",exact:"Six Analog Devices ADA4530-1 electrometer amplifiers; two ADA4530-1ARZ parts are documented as received",dims:"8-lead SOIC, approximately 4.9 x 3.9 mm each; modeled as six guarded packages",detail:"One same-family high-impedance channel for K1/K2/K3, matched blank, Reference A, and Reference B before ADC multiplexing.",risk:"Requires driven guards, low-leakage standoffs, clean flux process, shielding, and open-input leakage testing. Do not mix amplifier families on the integrated board without comparative evidence.",source:"ADI ADA4530-1",href:"https://www.analog.com/en/products/ada4530-1.html"},
   {id:"adc",name:"Multi-channel precision ADC",type:"orderable electronics",exact:"Texas Instruments ADS124S08 24-bit, 12-channel delta-sigma ADC",dims:"VQFN-32 RHB package 5.0 x 5.0 mm; 0.9 mm class height; modeled 5 x 5 mm",detail:"Replaces the smaller ADS1220 role so one precision ADC can digitize K1/K2/K3, blank, reference, temperature, and diagnostics with margin.",risk:"Multiplexing must be validated for settling time, leakage, channel memory, common-mode range, and fail-closed handling of impossible channel agreement.",source:"TI ADS124S08",href:"https://www.ti.com/product/ADS124S08"},
   {id:"temperature",name:"Temperature sensor",type:"orderable electronics",exact:"Texas Instruments TMP117 high-accuracy digital temperature sensor",dims:"6-pin WSON 2.0 x 2.0 mm package; modeled near cassette thermal bay",detail:"Provides local temperature compensation for Nernst slope, fluid bay drift analysis, and warm-up/thermal-stability gating.",risk:"Sensor must measure the fluid/electrode thermal state, not just board temperature; production needs verified thermal coupling.",source:"TI TMP117",href:"https://www.ti.com/product/TMP117"},
-  {id:"mcu",name:"MCU / network module",type:"orderable electronics",exact:"ESP32-S3 module or Nordic nRF52840 gateway module for prototype",dims:"Modeled module 18 x 25 x 3 mm",detail:"Runs state machine, logs data, handles local network export, display, and alarms.",risk:"Hospital production needs cybersecurity, isolation, update policy, and EMR integration.",source:"Espressif ESP32-S3",href:"https://www.espressif.com/en/products/socs/esp32-s3"},
+  {id:"mcu",name:"MCU / network module",type:"orderable electronics",exact:"ESP32-S3-DevKitC-1-N8R8 documented as received; compact module later",dims:"Modeled module 18 x 25 x 3 mm",detail:"Runs the state machine, records data, controls the bench display, and exports research data over USB.",risk:"Hospital production needs cybersecurity, isolation, update policy, and EMR integration.",source:"Espressif ESP32-S3",href:"https://www.espressif.com/en/products/socs/esp32-s3"},
   {id:"psu",name:"Power module",type:"orderable electronics",exact:"Medical-grade external 5 V supply plus internal isolated DC/DC prototype module",dims:"Modeled 28 x 16 x 9 mm internal module",detail:"Powers sensors, valves, display, and analog front end with isolated rails.",risk:"Production system must meet IEC 60601 electrical safety and leakage-current requirements.",source:"CUI / medical power modules",href:"https://www.cui.com/catalog/power/dc-dc-converters"},
   {id:"standard",name:"KCl calibration reservoirs",type:"orderable consumable",exact:"NIST-traceable KCl standards, Thermo Orion 921906 class plus custom cartridge reservoirs",dims:"Two modeled reservoirs, 18 x 10 x 24 mm each; 0.8 mL each",detail:"Onboard low/high K+ checks for one-point/two-point validation and drift recovery.",risk:"Reservoir leaching, evaporation, shelf life, and accidental mixing must be validated.",source:"Thermo Orion potassium standard",href:"https://www.thermofisher.com/order/catalog/product/921906"},
   {id:"waste",name:"Waste / return capture",type:"disposable fluidics",exact:"Custom waste return or waste-capture path; bag/tube set selected by clinical mode",dims:"Modeled 40 x 26 x 36 mm waste cartridge plus 2 mm ID tube",detail:"Captures calibration and drawn-line waste, or routes safe return path in non-blood modes.",risk:"Blood mode likely requires waste capture; return path requires far higher safety validation.",source:"Custom disposable set",href:"/hospital-ckm/"},
@@ -122,27 +149,163 @@ const views = {
 let activeView="assembled"; let activePart="cassette";
 const objectById = new Map();
 const canvas=document.getElementById("canvas");
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0d1117);
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x061019,.00155);
 const camera=new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 1000);
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
-const controls=new OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
-scene.add(new THREE.AmbientLight(0xffffff,.54)); const key=new THREE.DirectionalLight(0xffffff,1.05); key.position.set(80,120,82); scene.add(key); const fill=new THREE.DirectionalLight(0x8fd3ff,.34); fill.position.set(-90,42,-88); scene.add(fill); const rim=new THREE.DirectionalLight(0x70f0cb,.22); rim.position.set(20,58,-120); scene.add(rim);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.35:2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.34;
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const controls=new OrbitControls(camera, renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=.055;
+controls.minDistance=74;
+controls.maxDistance=520;
+controls.autoRotate=false;
+controls.autoRotateSpeed=.42;
+scene.add(new THREE.HemisphereLight(0xc9ecff,0x102538,1.35));
+scene.add(new THREE.AmbientLight(0xffffff,.48));
+const key=new THREE.DirectionalLight(0xffffff,3.15);
+key.position.set(110,165,105);
+key.castShadow=true;
+key.shadow.mapSize.set(isMobile?1024:2048,isMobile?1024:2048);
+key.shadow.camera.left=-220;key.shadow.camera.right=220;key.shadow.camera.top=220;key.shadow.camera.bottom=-220;
+key.shadow.bias=-.00025;
+scene.add(key);
+const fill=new THREE.DirectionalLight(0x8fcfff,1.55);fill.position.set(-120,54,-90);scene.add(fill);
+const rim=new THREE.DirectionalLight(0x70f0cb,1.65);rim.position.set(48,92,-150);scene.add(rim);
+const warm=new THREE.PointLight(0xffbd68,64,420,2);warm.position.set(-115,18,100);scene.add(warm);
 const root=new THREE.Group(); root.scale.setScalar(.84); scene.add(root);
-function mat(hex, opacity=1, metal=.06){return new THREE.MeshStandardMaterial({color:new THREE.Color(hex),roughness:.5,metalness:metal,transparent:opacity<1,opacity,depthWrite:opacity>=.62,side:THREE.DoubleSide});}
-function remember(id,obj){obj.userData.partId=id; if(!objectById.has(id)) objectById.set(id,[]); objectById.get(id).push(obj); return obj;}
-function box(id,size,pos,hex,opacity=1,metal=.06){const m=remember(id,new THREE.Mesh(new THREE.BoxGeometry(...size),mat(hex,opacity,metal))); m.position.set(...pos); root.add(m); return m;}
-function cyl(id,r,h,pos,hex,opacity=1,metal=.06,axis="y"){const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,80),mat(hex,opacity,metal))); if(axis==="x")m.rotation.z=Math.PI/2; if(axis==="z")m.rotation.x=Math.PI/2; m.position.set(...pos); root.add(m); return m;}
-function sphere(id,r,pos,hex,opacity=1,metal=.06){const m=remember(id,new THREE.Mesh(new THREE.SphereGeometry(r,32,16),mat(hex,opacity,metal))); m.position.set(...pos); root.add(m); return m;}
-function tube(id,start,end,r,hex,opacity=.9){const mid=new THREE.Vector3((start[0]+end[0])/2,(start[1]+end[1])/2,(start[2]+end[2])/2); const dir=new THREE.Vector3(end[0]-start[0],end[1]-start[1],end[2]-start[2]); const len=dir.length(); const geom=new THREE.CylinderGeometry(r,r,len,48); const mesh=remember(id,new THREE.Mesh(geom,mat(hex,opacity,.04))); mesh.position.copy(mid); mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); root.add(mesh); return mesh;}
-function route(id,points,r,hex,opacity=.9){for(let i=0;i<points.length-1;i++)tube(id,points[i],points[i+1],r,hex,opacity); points.slice(1,-1).forEach(p=>sphere(id,r*1.08,p,hex,opacity));}
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(760,760),new THREE.MeshStandardMaterial({color:0x050b11,roughness:.92,metalness:.03,transparent:true,opacity:.72}));
+floor.rotation.x=-Math.PI/2;floor.position.y=-47;floor.receiveShadow=true;scene.add(floor);
+const grid=new THREE.GridHelper(660,28,0x24556c,0x153040);
+grid.position.y=-46.7;grid.material.transparent=true;grid.material.opacity=.12;scene.add(grid);
+const stageGlow=new THREE.Mesh(new THREE.CircleGeometry(168,96),new THREE.MeshBasicMaterial({color:0x2c9eff,transparent:true,opacity:.045,depthWrite:false}));
+stageGlow.rotation.x=-Math.PI/2;stageGlow.position.y=-46.5;scene.add(stageGlow);
+let flowTracers=[];
+let flowEnabled=!matchMedia("(prefers-reduced-motion: reduce)").matches;
+let flowClock=0;
+function mat(id,hex,opacity=1,metal=.06){
+  const color=new THREE.Color(hex);
+  const glass=["cassette","standard","waste"].includes(id)&&opacity<.7;
+  const litScreen=id==="display"&&["#0b3a42","#70f0cb","#ffbd68","#8fd3ff"].includes(hex);
+  return new THREE.MeshPhysicalMaterial({
+    color,
+    roughness:glass?.12:(metal>.12?.25:.44),
+    metalness:metal,
+    transparent:glass||opacity<.995,
+    opacity:glass?Math.max(.24,opacity):opacity,
+    transmission:glass?.42:0,
+    ior:1.46,
+    thickness:glass?2.2:0,
+    clearcoat:glass?.9:.24,
+    clearcoatRoughness:glass?.1:.36,
+    emissive:litScreen?color:new THREE.Color(0x000000),
+    emissiveIntensity:litScreen?.42:0,
+    depthWrite:!glass&&opacity>=.62,
+    side:THREE.DoubleSide
+  });
+}
+function remember(id,obj){
+  obj.userData.partId=id;
+  if(obj.isMesh){
+    const ghost=obj.material?.transparent&&obj.material?.opacity<.5;
+    obj.castShadow=!ghost;
+    obj.receiveShadow=true;
+    if(obj.material&&"emissive" in obj.material){
+      obj.userData.baseEmissive=obj.material.emissive.clone();
+      obj.userData.baseEmissiveIntensity=obj.material.emissiveIntensity||0;
+    }
+  }
+  if(!objectById.has(id))objectById.set(id,[]);
+  objectById.get(id).push(obj);
+  return obj;
+}
+function box(id,size,pos,hex,opacity=1,metal=.06){
+  const smallest=Math.min(...size);
+  const radius=Math.min(1.35,Math.max(.06,smallest*.16));
+  const m=remember(id,new THREE.Mesh(new RoundedBoxGeometry(size[0],size[1],size[2],3,radius),mat(id,hex,opacity,metal)));
+  m.position.set(...pos);root.add(m);return m;
+}
+function cyl(id,r,h,pos,hex,opacity=1,metal=.06,axis="y"){
+  const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,64),mat(id,hex,opacity,metal)));
+  if(axis==="x")m.rotation.z=Math.PI/2;if(axis==="z")m.rotation.x=Math.PI/2;
+  m.position.set(...pos);root.add(m);return m;
+}
+function sphere(id,r,pos,hex,opacity=1,metal=.06){
+  const m=remember(id,new THREE.Mesh(new THREE.SphereGeometry(r,32,18),mat(id,hex,opacity,metal)));
+  m.position.set(...pos);root.add(m);return m;
+}
+function addFlowTracers(id,curve,hex,count=4,speed=.1,size=.52){
+  const geometry=new THREE.SphereGeometry(1,18,12);
+  const color=new THREE.Color(hex);
+  const material=new THREE.MeshPhysicalMaterial({
+    color,
+    emissive:color,
+    emissiveIntensity:2.8,
+    roughness:.08,
+    metalness:0,
+    transparent:true,
+    opacity:.96,
+    depthWrite:false,
+    blending:THREE.AdditiveBlending
+  });
+  for(let i=0;i<count;i++){
+    const tracer=remember(id,new THREE.Mesh(geometry,material));
+    tracer.castShadow=false;
+    tracer.userData.flowCurve=curve;
+    tracer.userData.flowOffset=i/count;
+    tracer.userData.flowSpeed=speed;
+    tracer.userData.flowSize=size;
+    tracer.visible=flowEnabled;
+    root.add(tracer);
+    flowTracers.push(tracer);
+  }
+}
+function tube(id,start,end,r,hex,opacity=.9){
+  const mid=new THREE.Vector3((start[0]+end[0])/2,(start[1]+end[1])/2,(start[2]+end[2])/2);
+  const dir=new THREE.Vector3(end[0]-start[0],end[1]-start[1],end[2]-start[2]);
+  const len=dir.length();
+  const geom=new THREE.CylinderGeometry(r,r,len,32);
+  const mesh=remember(id,new THREE.Mesh(geom,mat(id,hex,opacity,.04)));
+  mesh.position.copy(mid);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());root.add(mesh);return mesh;
+}
+function route(id,points,r,hex,opacity=.9){
+  const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)),false,"centripetal",.35);
+  const segments=Math.max(isMobile?18:28,(points.length-1)*(isMobile?10:18));
+  if(r>=.8){
+    const shell=remember(id,new THREE.Mesh(new THREE.TubeGeometry(curve,segments,r,isMobile?8:14,false),mat(id,"#dce8ed",.25,.02)));
+    root.add(shell);
+    const fluid=remember(id,new THREE.Mesh(new THREE.TubeGeometry(curve,segments,r*.58,isMobile?7:12,false),mat(id,hex,opacity,.01)));
+    root.add(fluid);
+    const animated={
+      "fittings":["#c9f2ff",.085],
+      "flow-sensor":["#8fd3ff",.09],
+      "standard":["#ffbd68",.065],
+      "pump":["#70f0cb",.095],
+      "valve-bank":["#70f0cb",.08],
+      "waste":["#eef6ff",.075],
+      "stopcock":["#c9f2ff",.07]
+    }[id];
+    if(animated)addFlowTracers(id,curve,animated[0],isMobile?3:5,animated[1],Math.max(.38,r*.38));
+    return fluid;
+  }
+  const wire=remember(id,new THREE.Mesh(new THREE.TubeGeometry(curve,segments,r,isMobile?6:10,false),mat(id,hex,opacity,.04)));
+  root.add(wire);return wire;
+}
 function screw(id,pos){cyl(id,1.5,.8,pos,"#d7dde3",.96,.18); cyl(id,.72,1,pos,"#253241",.96,.08);}
 function standoff(id,x,z,floorY,boardBottomY){const h=boardBottomY-floorY; cyl(id,1.7,h,[x,floorY+h/2,z],"#c7d3db",.94,.14); cyl(id,2.8,1.2,[x,floorY+.6,z],"#2a3641",.95,.08); screw(id,[x,boardBottomY+.9,z]);}
-function pcbTrace(id,points,color="#ffbd68"){route(id,points,.26,color,.82);}
+function pcbTrace(id,points,color="#ffbd68"){for(let i=0;i<points.length-1;i++)tube(id,points[i],points[i+1],.26,color,.82);}
 function labelSprite(id,text,pos,color="#8fd3ff",width=34){
   const c=document.createElement("canvas"); c.width=512; c.height=128; const ctx=c.getContext("2d");
   ctx.fillStyle="rgba(5,11,14,.78)"; ctx.strokeStyle=color; ctx.lineWidth=4; ctx.beginPath(); ctx.roundRect(10,18,492,92,22); ctx.fill(); ctx.stroke();
   ctx.fillStyle="#eef6ff"; ctx.font="700 42px Rajdhani, Arial, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(text,256,66);
-  const tex=new THREE.CanvasTexture(c); const spr=remember(id,new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,opacity:.9})));
+  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  const spr=remember(id,new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,opacity:.9})));
   spr.position.set(...pos); spr.scale.set(width,6,1); root.add(spr); return spr;
 }
 function clampSaddle(id,pos){
@@ -156,29 +319,43 @@ function clampSaddle(id,pos){
   cyl(id,2.4,8,[x-88,y-18,z],"#ffbd68",.98,.16,"x");
   cyl(id,2.4,8,[x-28,y-18,z],"#ffbd68",.98,.16,"x");
 }
+const viewPartIds={
+  assembled:null,
+  exploded:null,
+  fluidics:["cassette","main-channel","flow-sensor","pump","valve-bank","pressure-a","pressure-b","bubble-optics","fittings","stopcock","standard","waste"],
+  chemistry:["cassette","main-channel","sensor-strip","solid-contact","k1","k2","k3","ref-a","ref-b","blank","standard"],
+  reader:["reader-shell","display","afe","buffer","adc","temperature","mcu","psu","mount","pump","valve-bank"],
+  validation:["cassette","main-channel","sensor-strip","solid-contact","k1","k2","k3","ref-a","ref-b","blank","flow-sensor","pump","valve-bank","pressure-a","pressure-b","bubble-optics","standard","waste"]
+};
 function setVisibilityForView(){
-  const include={
-    assembled:null,
-    exploded:null,
-    fluidics:["cassette","main-channel","flow-sensor","pump","valve-bank","pressure-a","pressure-b","fittings","stopcock","standard","waste"],
-    chemistry:["cassette","main-channel","sensor-strip","k1","k2","k3","ref-a","ref-b","blank","standard"],
-    reader:["reader-shell","display","afe","buffer","adc","temperature","mcu","psu","mount","pump","valve-bank"],
-    validation:["cassette","main-channel","sensor-strip","k1","k2","k3","ref-a","ref-b","blank","flow-sensor","pump","valve-bank","pressure-a","pressure-b","standard","waste"]
-  }[activeView];
-  if(!include)return;
-  for(const [id,objs] of objectById) objs.forEach(o=>o.visible=include.includes(id));
+  const include=viewPartIds[activeView];
+  for(const [id,objs] of objectById){
+    const partAllowed=!include||include.includes(id);
+    objs.forEach(obj=>{obj.visible=partAllowed&&(!obj.userData.flowCurve||flowEnabled);});
+  }
+}
+function clearRoot(){
+  root.traverse(obj=>{
+    if(obj.geometry)obj.geometry.dispose();
+    const materials=Array.isArray(obj.material)?obj.material:[obj.material];
+    materials.filter(Boolean).forEach(material=>{
+      if(material.map)material.map.dispose();
+      material.dispose();
+    });
+  });
+  root.clear();
 }
 function build(){
-  root.clear(); objectById.clear();
+  clearRoot();objectById.clear();flowTracers=[];
   const exploded=activeView==="exploded";
   const lift = exploded ? 38 : 0;
   const cassetteY = 0;
   const top = cassetteY + 7;
   const channelY = cassetteY + 1.1;
-  const stripY = top + 1.3 + lift * 0.38;
+  const stripY = channelY + 4.55 + lift * 0.38;
+  const sensorZ = 0;
   const shellY = 36 + lift;
   const boardY = shellY + 1.5;
-  const rearZ = -18;
   const frontZ = 18;
   const railY = 12 + lift * 0.55;
   const portY = cassetteY + 1.1;
@@ -203,6 +380,8 @@ function build(){
   box("reader-shell",[136,5,4],[20,chassisFloorY+3,-43],"#253241",.72,.08);
   box("reader-shell",[4,5,84],[-50,chassisFloorY+3,0],"#253241",.72,.08);
   box("reader-shell",[4,5,84],[90,chassisFloorY+3,0],"#253241",.72,.08);
+  [[-42,-38],[-42,38],[82,-38],[82,38]].forEach(([x,z])=>cyl("reader-shell",3.2,2,[x,chassisFloorY-1.2,z],"#111820",.98,.04));
+  [-18,-6,6,18].forEach(z=>box("reader-shell",[52,1.2,2.4],[58,shellY+22.8,z],"#31404c",.82,.14));
   labelSprite("reader-shell","reusable reader",[0,shellY+50,5],"#8fd3ff",38);
 
   // Disposable cassette is a layered machined part: lower plate, gasket, clear cover, screws, ports, and capture rails.
@@ -210,6 +389,10 @@ function build(){
   box("cassette",[120,8,44],[0,cassetteY,0],"#bfeaf4",.20,.04);
   box("cassette",[116,1.2,40],[0,top+1.0,0],"#e8fbff",.30,.04);
   box("cassette",[108,.9,34],[0,top+1.8,0],"#70f0cb",.10,.02);
+  box("cassette",[112,.5,2.2],[0,top+.45,19],"#17282f",.86,.04);
+  box("cassette",[112,.5,2.2],[0,top+.45,-19],"#17282f",.86,.04);
+  box("cassette",[2.2,.5,36],[-55,top+.45,0],"#17282f",.86,.04);
+  box("cassette",[2.2,.5,36],[55,top+.45,0],"#17282f",.86,.04);
   [[-54,top+2,18],[54,top+2,18],[-54,top+2,-18],[54,top+2,-18],[-8,top+2,18],[28,top+2,-18]].forEach(p=>screw("cassette",p));
   box("cassette",[130,3,4],[0,cassetteY+7.5,27],"#d7dde3",.45,.08);
   box("cassette",[130,3,4],[0,cassetteY+7.5,-27],"#d7dde3",.45,.08);
@@ -220,6 +403,7 @@ function build(){
   tube("main-channel",[-36,channelY,-9],[-12,channelY,-9],1.1,"#4ea3ff",.42);
   tube("main-channel",[12,channelY,9],[36,channelY,9],1.1,"#4ea3ff",.42);
   [-28,-14,0,14,28].forEach((x,i)=>sphere("main-channel",1.15,[x,channelY,0],i%2?"#8fd3ff":"#4ea3ff",.9));
+  addFlowTracers("main-channel",new THREE.LineCurve3(new THREE.Vector3(-44,channelY,0),new THREE.Vector3(44,channelY,0)),"#d8f7ff",isMobile?6:10,.13,.58);
   labelSprite("main-channel","sample flow",[0,12,13],"#8fd3ff",31);
 
   // End-face and top-face fluidic connectors. These make the tubing and sample direction legible.
@@ -231,20 +415,22 @@ function build(){
   cyl("fittings",3.0,9,[48,portY,-25],"#d7dde3",.98,.12,"z");
   labelSprite("fittings","1/4-28 ports",[-86,11,7],"#dcecf2",27);
 
-  // Chemistry strip is clamped under a transparent wet window; the disks line up with the flowing stream.
-  box("sensor-strip",[38,.55,13],[-2,stripY,rearZ],"#f7f8fb",.98,.05);
-  box("sensor-strip",[42,.7,16],[-2,stripY+1.0,rearZ],"#dbefff",.18,.04);
-  [-20,-12,-4,6,16,25].forEach((x,i)=>box("sensor-strip",[2.4,.4,13],[x,stripY+.35,rearZ],"#2d3742",.72,.06));
-  cyl("k1",2.15,.55,[-20,stripY+1.0,rearZ],"#36d399",1,.08);
-  cyl("k2",2.15,.55,[-12,stripY+1.0,rearZ],"#2fbf78",1,.08);
-  cyl("k3",2.15,.55,[-4,stripY+1.0,rearZ],"#70f0cb",1,.08);
-  cyl("ref-a",2.15,.55,[6,stripY+1.0,rearZ],"#d9eeff",1,.08);
-  cyl("ref-b",2.15,.55,[16,stripY+1.0,rearZ],"#8fd3ff",1,.08);
-  cyl("blank",2.15,.55,[25,stripY+1.0,rearZ],"#8995a1",1,.08);
-  box("ref-a",[18,2.2,3.4],[6,stripY+3.2,rearZ-8],"#d9eeff",.78,.04);
-  box("ref-b",[18,2.2,3.4],[16,stripY+5.8,rearZ-8],"#8fd3ff",.78,.04);
-  tube("sensor-strip",[-24,stripY+1.6,rearZ+7],[29,stripY+1.6,rearZ+7],.45,"#70f0cb",.7);
-  labelSprite("sensor-strip","K1 K2 K3 REF BLK",[-1,20,-24],"#70f0cb",39);
+  // A 78 x 33 mm multi-lane integration carrier fits the nominal cassette. Existing DRP-110 strips remain chemistry tools.
+  box("sensor-strip",[78,1,33],[0,stripY,sensorZ],"#f7f8fb",.98,.05);
+  box("sensor-strip",[82,.7,36],[0,stripY+1.0,sensorZ],"#dbefff",.18,.04);
+  const sensorXs=[-30,-18,-6,6,18,30];
+  sensorXs.forEach(x=>box("sensor-strip",[2.4,.4,29],[x,stripY+.35,sensorZ],"#2d3742",.72,.06));
+  [-30,-18,-6].forEach(x=>cyl("solid-contact",1.7,.32,[x,stripY-.72,sensorZ],"#171f26",1,.04));
+  cyl("k1",1.45,.55,[-30,stripY-1.05,sensorZ],"#36d399",1,.08);
+  cyl("k2",1.45,.55,[-18,stripY-1.05,sensorZ],"#2fbf78",1,.08);
+  cyl("k3",1.45,.55,[-6,stripY-1.05,sensorZ],"#70f0cb",1,.08);
+  cyl("ref-a",1.45,.55,[6,stripY-1.05,sensorZ],"#d9eeff",1,.08);
+  cyl("ref-b",1.45,.55,[18,stripY-1.05,sensorZ],"#8fd3ff",1,.08);
+  cyl("blank",1.45,.55,[30,stripY-1.05,sensorZ],"#8995a1",1,.08);
+  box("ref-a",[18,2.2,3.4],[6,stripY+3.2,sensorZ-13],"#d9eeff",.78,.04);
+  box("ref-b",[18,2.2,3.4],[18,stripY+5.8,sensorZ-13],"#8fd3ff",.78,.04);
+  tube("sensor-strip",[-36,stripY+1.6,sensorZ+15],[36,stripY+1.6,sensorZ+15],.45,"#70f0cb",.7);
+  labelSprite("sensor-strip","K1 K2 K3 REF A REF B BLK",[0,19,-20],"#70f0cb",46);
 
   // Pressure, temperature, and bubble diagnostics are physically attached to the cassette around the wet bay.
   box("pressure-a",[10.54,3.53,8.1],[-41,top+2.4,frontZ],"#f4f1e8",.98,.06);
@@ -252,14 +438,19 @@ function build(){
   box("temperature",[3,1.2,3],[-2,top+2.8,frontZ+9],"#70f0cb",1,.08);
   box("pressure-a",[9,.8,18],[-41,top+4.7,frontZ],"#ff7a85",.42,.04);
   box("pressure-b",[9,.8,18],[41,top+4.7,frontZ],"#ff7a85",.42,.04);
+  box("bubble-optics",[20,8,14],[0,top+3.6,frontZ+18],"#0b151d",.92,.08);
   box("cassette",[16,3.4,8],[0,top+2.7,frontZ+18],"#0b2f3a",.52,.04);
   sphere("cassette",1.2,[-3,top+5.2,frontZ+18],"#8fd3ff",.82);
   sphere("cassette",.9,[2,top+5.0,frontZ+18],"#dcecf2",.68);
+  box("bubble-optics",[3,2,2],[-8,top+5.0,frontZ+18],"#ffbd68",.95,.08);
+  box("bubble-optics",[3,2,2],[8,top+5.0,frontZ+18],"#8fd3ff",.95,.08);
+  tube("bubble-optics",[-8,top+5.0,frontZ+18],[8,top+5.0,frontZ+18],.22,"#dcecf2",.48);
   labelSprite("pressure-a","pressure + bubble",[0,20,35],"#ff7a85",39);
 
   // Reader internals: visible boards, cables, pump, valve bank, flow sensor, analog front end, ADC, MCU, and power.
   box("display",[74,4,50],[-41,shellY+23,6],"#17232c",.98,.08);
   box("display",[60,4.4,36],[-41,shellY+25,6],"#0b3a42",.98,.08);
+  box("display",[56,1.1,32],[-41,shellY+27.5,6],"#061a20",.88,.02);
   box("display",[48,4.8,5],[-41,shellY+27,13],"#70f0cb",.82,.04);
   box("display",[38,4.8,3],[-41,shellY+27,5],"#ffbd68",.72,.04);
   box("display",[32,4.8,3],[-41,shellY+27,-2],"#8fd3ff",.72,.04);
@@ -278,11 +469,13 @@ function build(){
   box("pump",[30,4.2,15],[-54,pumpY,13],"#26313a",.98,.08);
   cyl("pump",4,4,[-64,pumpY,13],"#111820",.98,.08,"x");
   cyl("pump",4,4,[-44,pumpY,13],"#111820",.98,.08,"x");
+  box("pump",[22,5,12],[-54,pumpY+4.2,13],"#39434c",.96,.16);
+  box("pump",[18,3,10],[-54,pumpY+8.2,13],"#12212b",.98,.08);
   box("valve-bank",[38,10,20],[-12,valveY,15],"#1b242b",.98,.08);
   [-24,-12,0].forEach(x=>cyl("valve-bank",3.2,9,[x,valveY+6,15],"#2a3641",.98,.08));
   box("afe",[9,2,9],[20,boardTopY+1,-28],"#18212a",1,.1);
   labelSprite("afe","health AFE",[20,boardY+18,-38],"#ffbd68",24);
-  [[32,-33],[41,-33],[50,-33],[32,-23],[41,-23]].forEach(([x,z])=>box("buffer",[4.9,1.6,3.9],[x,boardTopY+.8,z],"#18212a",1,.1));
+  [[32,-33],[41,-33],[50,-33],[32,-23],[41,-23],[50,-23]].forEach(([x,z])=>box("buffer",[4.9,1.6,3.9],[x,boardTopY+.8,z],"#18212a",1,.1));
   box("adc",[6,1.4,6],[58,boardTopY+.7,-28],"#18212a",1,.1);
   box("mcu",[26,3,20],[30,boardTopY+1.5,25],"#234d85",1,.08);
   box("psu",[30,9,17],[68,boardTopY+4.5,22],"#30343a",1,.08);
@@ -298,7 +491,7 @@ function build(){
   pcbTrace("buffer",[[32,boardTopY+1.8,-28],[32,boardTopY+1.8,-40],[58,boardTopY+1.8,-40],[58,boardTopY+1.8,-28]],"#ffbd68");
   pcbTrace("mcu",[[58,boardTopY+1.8,-28],[72,boardTopY+1.8,-28],[72,boardTopY+1.8,39],[30,boardTopY+1.8,39],[30,boardTopY+1.8,25]],"#8fd3ff");
   pcbTrace("psu",[[68,boardTopY+5,22],[82,boardTopY+5,22],[82,boardTopY+1.8,36],[68,boardTopY+1.8,36],[50,boardTopY+1.8,39],[30,boardTopY+1.8,39]],"#dcecf2");
-  route("buffer",[[-2,stripY+2.2,rearZ-16],[-2,stripY+6,-34],[42,stripY+6,-34],[42,boardTopY+1.6,-40]],.42,"#70f0cb",.72);
+  route("buffer",[[0,stripY+2.2,sensorZ-16],[0,stripY+6,-34],[42,stripY+6,-34],[42,boardTopY+1.6,-40]],.42,"#70f0cb",.72);
   route("pressure-a",[[-41,top+5.5,frontZ],[-41,top+10,35],[-70,top+10,35],[-80,boardTopY+2.5,-42]],.34,"#ff7a85",.62);
   route("pressure-b",[[41,top+5.5,frontZ],[41,top+10,35],[-70,top+10,35],[-80,boardTopY+2.5,-42]],.34,"#ff7a85",.62);
 
@@ -340,22 +533,150 @@ function build(){
   }
   setVisibilityForView();
 }
-function setView(id){activeView=id; build(); const v=views[id]; camera.position.set(...v.camera); controls.target.set(...v.target); controls.update(); renderUI();}
+const cameraGoal=new THREE.Vector3();
+const targetGoal=new THREE.Vector3();
+let viewInitialized=false;
+let transitioning=false;
+controls.addEventListener("start",()=>{transitioning=false;});
+function framedView(view){
+  root.updateMatrixWorld(true);
+  const bounds=new THREE.Box3();
+  root.traverse(obj=>{
+    if(!obj.isMesh||!obj.visible)return;
+    const local=new THREE.Box3().setFromObject(obj);
+    if(!local.isEmpty())bounds.union(local);
+  });
+  const sphere=new THREE.Sphere();
+  bounds.getBoundingSphere(sphere);
+  const intendedTarget=new THREE.Vector3(...view.target);
+  const direction=new THREE.Vector3(...view.camera).sub(intendedTarget).normalize();
+  const vertical=THREE.MathUtils.degToRad(camera.fov);
+  const horizontal=2*Math.atan(Math.tan(vertical/2)*camera.aspect);
+  const limiting=Math.min(vertical,horizontal);
+  const distance=(sphere.radius/Math.sin(limiting/2))*1.12;
+  return {camera:sphere.center.clone().add(direction.multiplyScalar(distance)),target:sphere.center.clone()};
+}
+function setView(id){
+  activeView=id;
+  build();
+  const v=views[id];
+  const framed=framedView(v);
+  cameraGoal.copy(framed.camera);
+  targetGoal.copy(framed.target);
+  if(!viewInitialized){
+    camera.position.copy(cameraGoal);
+    controls.target.copy(targetGoal);
+    viewInitialized=true;
+  }else{
+    transitioning=true;
+  }
+  controls.update();
+  renderUI();
+}
 function selectPart(id){activePart=id; renderUI();}
 function renderUI(){
   document.getElementById("views").innerHTML=Object.entries(views).map(([id,v])=>`<button class="button ${id===activeView?"active":""}" data-view="${id}">${v.label}</button>`).join("");
   document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
-  document.getElementById("partList").innerHTML=parts.map(p=>`<button class="part-button ${p.id===activePart?"active":""}" data-part="${p.id}">${p.name}<span>${p.exact}</span></button>`).join("");
+  document.getElementById("partList").innerHTML=parts.map(p=>`<button class="part-button ${p.id===activePart?"active":""}" data-part="${p.id}">${p.name}<span>${p.type}</span></button>`).join("");
   document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>selectPart(b.dataset.part));
   const p=partById.get(activePart)||parts[0];
-  document.getElementById("inspector").innerHTML=`<div class="type">${p.type}</div><div class="title">${p.name}</div><p><b>Exact part / family:</b> ${p.exact}</p><p><b>Modeled dimensions:</b> ${p.dims}</p><p><b>Function:</b> ${p.detail}</p><p><b>Validation risk:</b> ${p.risk}</p><p><b>Source:</b> ${p.source}</p><a class="source-link" href="${p.href}" target="_blank" rel="noopener">Open source / order page</a>`;
-  for(const [id,objs] of objectById){objs.forEach(obj=>{if(obj.material && "emissive" in obj.material){obj.material.emissive=new THREE.Color(id===activePart?0x254b60:0x000000);obj.material.emissiveIntensity = id === activePart ? 0.55 : 0;}})}
+  document.getElementById("inspector").innerHTML=`<div class="type">${p.type}</div><div class="title">${p.name}</div><p class="inspector-copy"><span class="inspector-label">What it does</span>${p.detail}</p><p class="inspector-copy"><span class="inspector-label">What still has to be proven</span>${p.risk}</p><details><summary>Engineering details</summary><p><b>Part / family:</b> ${p.exact}</p><p><b>Size in this model:</b> ${p.dims}</p><p><b>Source:</b> ${p.source}</p><a class="source-link" href="${p.href}" target="_blank" rel="noopener">Open source / order page</a></details>`;
+  for(const [id,objs] of objectById){
+    objs.forEach(obj=>{
+      if(!obj.material||!("emissive" in obj.material))return;
+      const base=obj.userData.baseEmissive||new THREE.Color(0x000000);
+      if(id===activePart){
+        obj.material.emissive.copy(base).lerp(new THREE.Color(0x2f8f9f),.72);
+        obj.material.emissiveIntensity=Math.max(obj.userData.baseEmissiveIntensity||0,.72);
+      }else{
+        obj.material.emissive.copy(base);
+        obj.material.emissiveIntensity=obj.userData.baseEmissiveIntensity||0;
+      }
+    });
+  }
 }
 const raycaster=new THREE.Raycaster(); const mouse=new THREE.Vector2();
 canvas.addEventListener("click",e=>{mouse.x=e.clientX/innerWidth*2-1; mouse.y=-(e.clientY/innerHeight)*2+1; raycaster.setFromCamera(mouse,camera); const hit=raycaster.intersectObjects(root.children,true).find(h=>h.object.userData.partId); if(hit) selectPart(hit.object.userData.partId);});
 addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight);});
-function animate(){requestAnimationFrame(animate); controls.update(); renderer.render(scene,camera);}
-setView("assembled"); animate();
+const flowBtn=document.getElementById("flowBtn");
+const rotateBtn=document.getElementById("rotateBtn");
+const cinemaBtn=document.getElementById("cinemaBtn");
+function syncFlowButton(){
+  flowBtn.classList.toggle("active",flowEnabled);
+  flowBtn.textContent=flowEnabled?"Flow on":"Flow off";
+  setVisibilityForView();
+}
+flowBtn.addEventListener("click",()=>{
+  flowEnabled=!flowEnabled;
+  syncFlowButton();
+});
+rotateBtn.addEventListener("click",()=>{
+  controls.autoRotate=!controls.autoRotate;
+  rotateBtn.classList.toggle("active",controls.autoRotate);
+  rotateBtn.textContent=controls.autoRotate?"Pause rotation":"Auto rotate";
+});
+cinemaBtn.addEventListener("click",()=>{
+  const active=document.body.classList.toggle("cinematic");
+  cinemaBtn.classList.toggle("active",active);
+  cinemaBtn.textContent=active?"Exit cinema":"Cinema";
+});
+if(document.body.classList.contains("embed-mode")&&!isMobile)controls.autoRotate=true;
+syncFlowButton();
+let lastFrame=performance.now();
+let lastRafWall=lastFrame;
+let lastFallbackFrame=lastFrame;
+const flowForward=new THREE.Vector3(1,0,0);
+function stepScene(delta){
+  if(transitioning){
+    camera.position.lerp(cameraGoal,.085);
+    controls.target.lerp(targetGoal,.1);
+    if(camera.position.distanceTo(cameraGoal)<.25&&controls.target.distanceTo(targetGoal)<.15){
+      camera.position.copy(cameraGoal);controls.target.copy(targetGoal);transitioning=false;
+    }
+  }
+  if(flowEnabled){
+    flowClock=(flowClock+delta)%10000;
+    flowTracers.forEach((tracer,i)=>{
+      const curve=tracer.userData.flowCurve;
+      const u=(flowClock*tracer.userData.flowSpeed+tracer.userData.flowOffset)%1;
+      const point=curve.getPointAt(u);
+      const tangent=curve.getTangentAt(u).normalize();
+      tracer.position.copy(point);
+      tracer.quaternion.setFromUnitVectors(flowForward,tangent);
+      const size=tracer.userData.flowSize;
+      const pulse=.88+Math.sin(flowClock*8+i)*.12;
+      tracer.scale.set(size*2.35*pulse,size*.72*pulse,size*.72*pulse);
+    });
+  }
+  controls.update();
+  renderer.render(scene,camera);
+}
+function animate(){
+  requestAnimationFrame(animate);
+  const wall=performance.now();
+  const delta=Math.min(Math.max((wall-lastFrame)/1000,0),.05);
+  lastFrame=wall;
+  lastRafWall=wall;
+  stepScene(delta);
+}
+setInterval(()=>{
+  const wall=performance.now();
+  if(document.hidden||wall-lastRafWall<220)return;
+  const delta=Math.min(Math.max((wall-lastFallbackFrame)/1000,0),.05);
+  lastFallbackFrame=wall;
+  stepScene(delta);
+},50);
+function resetAnimationClocks(){
+  lastFrame=lastRafWall=lastFallbackFrame=performance.now();
+}
+document.addEventListener("visibilitychange",resetAnimationClocks);
+addEventListener("pageshow",resetAnimationClocks);
+canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();});
+canvas.addEventListener("webglcontextrestored",()=>{setView(activeView);syncFlowButton();});
+const initialView = views[query.get("view")] ? query.get("view") : "assembled";
+setView(initialView);
+if (partById.has(query.get("part"))) selectPart(query.get("part"));
+animate();
 requestAnimationFrame(()=>document.getElementById("fallbackRender")?.classList.add("hidden"));
 </script>
 </body>

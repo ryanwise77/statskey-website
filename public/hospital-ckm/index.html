@@ -56,6 +56,7 @@
       background-size: 72px 72px;
       mask-image: linear-gradient(180deg, rgba(0,0,0,.9), transparent 78%);
     }
+    section[id] { scroll-margin-top: 76px; }
     a { color: inherit; text-decoration: none; }
     .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
     .nav {
@@ -158,6 +159,9 @@
     .stack-row span { color: var(--soft); font-size: 14px; line-height: 1.65; }
     .viewer-frame { height: min(800px, 84vh); min-height: 600px; border: 1px solid var(--line); border-radius: 34px; overflow: hidden; background: #05090a; }
     .viewer-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .viewer-mobile-cover { display: none; min-height: 260px; padding: 28px; place-items: center; text-align: center; background: radial-gradient(circle at 50% 30%, rgba(48,213,200,.16), transparent 18rem), linear-gradient(145deg,#071419,#03070b); }
+    .viewer-mobile-cover b { display: block; font-family: var(--display); font-size: 28px; letter-spacing: -.04em; }
+    .viewer-mobile-cover span { display: block; max-width: 34ch; margin-top: 8px; color: var(--soft); font-size: 14px; line-height: 1.55; }
     .source-link { display: inline-flex; margin-top: 16px; margin-right: 16px; color: var(--cyan); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
     .roadmap { display: grid; gap: 12px; counter-reset: step; }
     .roadmap-step { position: relative; padding: 22px 22px 22px 64px; border: 1px solid var(--line); border-radius: 24px; background: rgba(255,255,255,.046); }
@@ -175,6 +179,11 @@
       h1 { font-size: clamp(3rem, 13vw, 5rem); }
       .hero-panel iframe { height: 760px; }
     }
+    @media (max-width: 760px) {
+      .viewer-frame--secondary { height: auto; min-height: 260px; }
+      .viewer-frame--secondary iframe { display: none; }
+      .viewer-mobile-cover { display: grid; }
+    }
   </style>
 </head>
 <body>
@@ -182,7 +191,7 @@
     <div class="shell nav__inner">
       <a class="brand" href="/" aria-label="StatsKey home"><span class="brand__mark"></span><span>Hospital CKM</span></a>
       <div class="nav__links">
-        <a href="#why">Why</a><a href="#architecture">Architecture</a><a href="#proof">Proof kit</a><a href="#viewer">Viewer</a><a href="#assembly">Assembly</a><a href="#economics">BOM</a><a href="#shipping">Shipping plan</a><a href="/ckm/">Wearable CKM</a>
+        <a href="#why">Why</a><a href="#architecture">Architecture</a><a href="#proof">Proof kit</a><a href="#readiness">Readiness</a><a href="#viewer">Viewer</a><a href="#assembly">Assembly</a><a href="#economics">BOM</a><a href="#shipping">Shipping plan</a><a href="/ckm/">Wearable CKM</a>
       </div>
     </div>
   </nav>
@@ -191,7 +200,7 @@
       <div class="shell hero-grid">
         <div>
           <div class="eyebrow">Hospital continuous potassium monitoring</div>
-          <h1>Hospital CKM is the potassium product for treatment-grade urgency.</h1>
+          <h1>Hospital CKM is a research program built around treatment-grade urgency.</h1>
           <p class="lede">Wearable CKM is the outpatient trend monitor. Hospital CKM is a separate bedside system: a closed inline flow-cell or drawn-line micro-sample path built for ICU, dialysis, CRRT, DKA, insulin, and post-cardiac-surgery workflows where potassium moves faster than scheduled labs.</p>
           <div class="actions">
             <a class="button button--primary" href="/hospital-ckm/viewer/">Open hospital viewer</a>
@@ -205,7 +214,7 @@
           </div>
         </div>
         <aside class="hero-panel" aria-label="Interactive Hospital CKM 3D preview">
-          <iframe src="/hospital-ckm/viewer/" title="Interactive Hospital CKM 3D assembly preview" loading="eager" allow="fullscreen"></iframe>
+          <iframe src="/hospital-ckm/viewer/?embed=1&amp;view=assembled" title="Interactive Hospital CKM 3D assembly preview" loading="eager" allow="fullscreen"></iframe>
           <div class="hero-panel__chrome">
             <span>Interactive 3D preview: drag to inspect the assembled bedside reader, cassette, tubing, calibration loop, and waste path.</span>
             <a class="button" href="/hospital-ckm/viewer/">Fullscreen</a>
@@ -243,11 +252,11 @@
       <div class="shell">
         <div class="section-head">
           <div><div class="eyebrow">Product architecture</div><h2>A closed disposable flow-cell with hospital-grade calibration controls.</h2></div>
-          <p>The hospital version should not inherit wearable constraints. It gets a bigger cartridge, larger reference reservoir, calibration standard, temperature control, stronger diagnostics, and a bedrail reader with EHR-ready logs.</p>
+          <p>The hospital version should not inherit wearable constraints. The bench system gets a larger cartridge, external calibration standards, measured fluid temperature, stronger diagnostics, and a bedrail reader. Battery backup, EHR export, active heating, and patient-circuit integration remain later engineering work.</p>
         </div>
         <div class="card-grid">
           <article class="card"><div class="card-number">01 / DISPOSABLE</div><h3>Inline K+ flow-cell</h3><p>Single-patient closed cassette with K1/K2/K3 valinomycin ISEs, blank control, dual references, temperature, pressure, bubble detection, and standard/calibration loop.</p></article>
-          <article class="card"><div class="card-number">02 / REUSABLE</div><h3>Bedside reader</h3><p>Guarded electrometer front end, 24-bit ADC, fluidic valve/pump control, optical/bubble checks, heating block, local display, battery backup, and network export.</p></article>
+          <article class="card"><div class="card-number">02 / REUSABLE</div><h3>Bedside reader</h3><p>Six guarded electrometer channels, 24-bit ADC, fluidic pump control, optical bubble checks, bridge-pressure acquisition, local display, isolated bench power, and raw data export.</p></article>
           <article class="card"><div class="card-number">03 / OUTPUT</div><h3>Protocol trigger</h3><p>Reports validated K+ trend, drift/QC state, rate of change, and confirmatory-test trigger. It never acts as autonomous potassium dosing.</p></article>
         </div>
       </div>
@@ -278,27 +287,67 @@
     <section id="proof" class="section">
       <div class="shell">
         <div class="section-head">
-          <div><div class="eyebrow">Production-locked proof kit</div><h2>One orderable first article, built from validated potassium sensing technology.</h2></div>
-          <p>Potassium ISE chemistry is already used in clinical electrolyte and blood-gas analyzers. The Hospital CKM first article applies that validated measurement principle to a controlled dialysate/effluent-style flow cell with redundant channels, onboard QC, temperature compensation, and locked acceptance gates.</p>
+          <div><div class="eyebrow">Design-audited bench architecture</div><h2>One first article, with the remaining decisions made explicit.</h2></div>
+          <p>Potassium ISE chemistry is already used in clinical electrolyte and blood-gas analyzers. That precedent supports feasibility, not this device's accuracy. Hospital CKM still has to prove its exact sensor carrier, reference system, hydraulic refresh, guarded electronics, calibration, and fail-closed behavior.</p>
         </div>
         <article class="wide wide--mint">
           <div class="truth-table">
-            <div class="truth-cell"><b>$2.8K-$4.2K</b><span>Locked first-article order with duplicate wet-path parts, spare fittings, bench references, and enough consumables to confirm reproducibility without redesigning.</span></div>
-            <div class="truth-cell"><b>5-30 sec</b><span>Raw voltage sampling interval; report K+ after smoothing, temperature correction, QC, and agreement gates.</span></div>
+            <div class="truth-cell"><b>$3.3K-$7.3K</b><span>Arithmetic sum of the detailed planning BOM before shipping, tax, and the integrated sensor-carrier RFQ. Existing inventory should reduce remaining spend.</span></div>
+            <div class="truth-cell"><b>≥60 sec</b><span>Minimum three-volume refresh for the current 0.61 mL cell at the flow sensor's 2 mL/min full-scale rate; tubing adds more delay.</span></div>
             <div class="truth-cell"><b>2-9 mmol/L</b><span>Bench validation span covering hypokalemia, normal range, hyperkalemia, dialysis/CRRT transitions, and failure states.</span></div>
-            <div class="truth-cell"><b>±0.2 mmol/L</b><span>First-article acceptance target in clean electrolyte/dialysate matrices before moving to artificial plasma, micro-sample blood, or hospital comparator work.</span></div>
+            <div class="truth-cell"><b>Comparator first</b><span>Research error targets do not become claims until matrix-matched standards and an independent analyzer establish bias.</span></div>
           </div>
           <div class="stack-list">
-            <div class="stack-row"><b>Locked build</b><span>Order and assemble one transparent PMMA/COC/COP flow-cell architecture with two identical wet-path sets, DropSens carbon electrodes coated with K+ ionophore membrane, bench Ag/AgCl references, LMP7721 guarded buffers, ADS124S08 multi-channel ADC, TMP117 temperature, Sensirion flow, pressure diagnostics, and KCl standards.</span></div>
-            <div class="stack-row"><b>Pass condition</b><span>Across repeated 3.0, 4.0, 5.5, 7.0, and 9.0 mmol/L steps, K1/K2/K3 must agree, the blank and dual references must stay within drift limits, step response must stabilize quickly, and the state machine must suppress output during bubbles, stale calibration, or reference movement.</span></div>
-            <div class="stack-row"><b>Risk control</b><span>The extra spend is part of the first-article order. It buys duplicate consumables, duplicate flow-cell bodies, and spare fittings up front so the first article can be assembled, repeated, and stress-tested from one locked design without being blocked by a trivial consumable failure.</span></div>
-            <div class="stack-row"><b>Why ADS124S08</b><span>I replaced the earlier single ADS1220 role with TI ADS124S08 because one 24-bit, 12-channel ADC can read triplicate K+, blank, references, temperature, and diagnostics. Verified package: VQFN-32 RHB, 5.0 x 5.0 mm, now reflected in the viewer.</span></div>
+            <div class="stack-row"><b>Bench freeze</b><span>Keep ordered DRP-110-class single-cell electrodes for coating and channel screening. Before machining the integrated cover, choose a measured multi-lane carrier: Metrohm DRP-8X110-U20 with CAC8X interface or a custom six-lane substrate. A DRP-110 has one 4 mm working electrode; it is not the six-pad carrier shown in the old render.</span></div>
+            <div class="stack-row"><b>Reference freeze</b><span>Use two independent double-junction Ag/AgCl references with a potassium-free outer bridge such as 10% KNO3. A single-junction KCl reference can leak the analyte into this low-volume cell and create false potassium drift.</span></div>
+            <div class="stack-row"><b>Electronics freeze</b><span>Use the two documented ADA4530-1ARZ parts for early channel bring-up, then standardize all six high-impedance nodes on one amplifier family before the guarded PCB is fabricated. ADS124S08 digitizes the buffered potentials and analog diagnostics; TMP117 and SLF3S flow are separate digital sensors.</span></div>
+            <div class="stack-row"><b>Pass condition</b><span>Across repeated 2.0, 3.0, 4.0, 5.5, 7.0, and 9.0 mmol/L steps, K1/K2/K3 agree, the matched blank remains quiet, dual references remain stable, at least three measured cell volumes have passed, and bubbles, stale flow, pressure faults, or reference movement suppress output.</span></div>
           </div>
           <a class="source-link" href="https://www.ti.com/product/ADS124S08" target="_blank" rel="noopener">TI ADS124S08</a>
-          <a class="source-link" href="https://www.ti.com/product/LMP7721" target="_blank" rel="noopener">TI LMP7721</a>
+          <a class="source-link" href="https://www.analog.com/en/products/ada4530-1.html" target="_blank" rel="noopener">ADI ADA4530-1</a>
           <a class="source-link" href="https://www.ti.com/product/TMP117" target="_blank" rel="noopener">TI TMP117</a>
+          <a class="source-link" href="https://www.metrohm.com/en/products/d/rp-8/drp-8x110-u20.html" target="_blank" rel="noopener">Metrohm 8X array</a>
+          <a class="source-link" href="https://pineresearch.com/downloads/documents/DRP10026.pdf/" target="_blank" rel="noopener">Double-junction reference</a>
           <a class="source-link" href="https://www.sigmaaldrich.com/US/en/product/sial/99373" target="_blank" rel="noopener">K+ ionophore cocktail</a>
           <a class="source-link" href="https://jsss.copernicus.org/articles/7/559/2018/" target="_blank" rel="noopener">In-line dialysis electrolyte monitoring</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="readiness" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Build-readiness audit</div><h2>Reuse what is already here. Buy only the gaps that block valid data.</h2></div>
+          <p>The master inventory documents several reusable parts, but it does not prove every Hospital CKM item is physically in hand. Reconcile each packing slip before placing duplicate orders.</p>
+        </div>
+        <div class="two-grid">
+          <article class="wide">
+            <h3>Documented inventory to verify and reuse</h3>
+            <div class="stack-list">
+              <div class="stack-row"><b>TMP117</b><span>Adafruit breakout plus a bare sensor are documented as received. Use the breakout for first data and thermally couple it to the fluid bay.</span></div>
+              <div class="stack-row"><b>ESP32-S3</b><span>One ESP32-S3-DevKitC-1-N8R8 is documented as received. It is sufficient for USB data capture, pump control, and the bench display.</span></div>
+              <div class="stack-row"><b>ADA4530-1</b><span>Two ADA4530-1ARZ electrometer amplifiers are documented as received. Use them for leakage/noise bring-up; an integrated six-node build needs four more if this family wins the freeze.</span></div>
+              <div class="stack-row"><b>PEDOT:PSS</b><span>Ossila PH1000 is documented as received but was left unrefrigerated. Use it only after film, conductivity, adhesion, and drift checks; replace it if those fail.</span></div>
+              <div class="stack-row"><b>350 mAh LiPo</b><span>Two cells are documented as received. They can isolate a debug run from mains noise, but they are not a medical-grade reader power system.</span></div>
+            </div>
+          </article>
+          <article class="wide">
+            <h3>Do not start integrated assembly without these closures</h3>
+            <div class="stack-list">
+              <div class="stack-row"><b>Sensor carrier</b><span>Measure and choose DRP-8X110-U20 + CAC8X or a custom six-lane carrier. Existing DRP-110 strips remain useful for chemistry screening.</span></div>
+              <div class="stack-row"><b>References</b><span>Two double-junction Ag/AgCl references with potassium-free outer bridge electrolyte; no exposed KCl-leaking junction in the measurement cell.</span></div>
+              <div class="stack-row"><b>Fluid controls</b><span>Exact mp6 liquid pump driver, TT Electronics OPB350L062/OCB350L062Z for 1/16 in OD clear tubing, selected fittings, gasket, and closed waste.</span></div>
+              <div class="stack-row"><b>Analog completeness</b><span>Six guarded electrometer channels, bridge excitation/ratiometric acquisition for both MEAS 1620 sensors, ADC input filters, clean analog rails, and leakage-test fixtures.</span></div>
+              <div class="stack-row"><b>Independent truth</b><span>Traceable KCl stock, Class A dilution tools, matrix-matched standards, pH/conductivity checks, and an independent potassium ISE meter or analyzer access.</span></div>
+              <div class="stack-row"><b>Chemistry safety</b><span>Fume-hood access, solvent-compatible PPE and waste, controlled conditioning/storage, and an active/blank membrane recipe made from separate components.</span></div>
+            </div>
+          </article>
+        </div>
+        <article class="wide wide--mint" style="margin-top:14px">
+          <div class="stack-list">
+            <div class="stack-row"><b>Hydraulic truth</b><span>The modeled 0.61 mL channel is acceptable for commissioning, not a fast micro-sample product. At 2 mL/min, three cell volumes alone require about 55 seconds; pump, sensor, and tubing push the valid-output gate beyond one minute. A later cassette should target ≤100 µL active volume if sub-30-second hydraulic refresh is required.</span></div>
+            <div class="stack-row"><b>Cost truth</b><span>The detailed BOM rows add to $3,285-$7,255, not the older $2.8K-$4.2K headline. Keep a $5K-$10K authorization ceiling only if the integrated carrier, references, driver, controls, shipping, and duplicate wet path are not already covered by placed orders.</span></div>
+          </div>
         </article>
       </div>
     </section>
@@ -310,7 +359,10 @@
           <p>The 3D preview in the hero and this full viewer show the same first-article assembly: bedrail reader, disposable flow-cell, triplicate K-channel stack, reference/blank controls, KCl standards, pump/flow path, and waste capture.</p>
         </div>
         <div class="actions" style="margin-top:0;margin-bottom:18px"><a class="button button--primary" href="/hospital-ckm/viewer/">Open full-screen viewer</a></div>
-        <div class="viewer-frame"><iframe src="/hospital-ckm/viewer/" title="Hospital CKM viewer" loading="lazy"></iframe></div>
+        <div class="viewer-frame viewer-frame--secondary">
+          <iframe id="secondaryHospitalViewer" data-src="/hospital-ckm/viewer/?embed=1&amp;view=assembled" title="Hospital CKM viewer" loading="lazy"></iframe>
+          <a class="viewer-mobile-cover" href="/hospital-ckm/viewer/"><div><b>Open the full interactive build tour</b><span>One full-screen WebGL scene runs more smoothly on mobile and keeps the animated fluid path visible.</span></div></a>
+        </div>
       </div>
     </section>
 
@@ -321,9 +373,9 @@
           <p>Use this checklist to validate that the ordered parts and fabricated flow-cell match the prototype before testing. Anything that fails here should block chemistry claims until the physical stack is corrected.</p>
         </div>
         <div class="grid">
-          <article class="evidence-card"><div class="card-number">01 / CASSETTE</div><h3>Wet path body</h3><p>Transparent PMMA/COC/COP body, 120 x 44 x 14 mm modeled envelope, 86 mm long x 3.0 mm ID-equivalent channel, 0.61 mL main-channel volume, four 1/4-28-style ports for sample, standard, waste, and flush.</p></article>
-          <article class="evidence-card"><div class="card-number">02 / CHEMISTRY</div><h3>Electrode bay</h3><p>DropSens DRP-110-U75 strip or equivalent fixture, 33.8 x 10.2 x 0.5 mm substrate, 4 mm working electrode pads coated as K1/K2/K3, blank membrane, and reference interface.</p></article>
-          <article class="evidence-card"><div class="card-number">03 / READER</div><h3>Electronics envelope</h3><p>Reusable reader envelope 170 x 112 x 42 mm with LMP7721 guarded buffer array, ADS124S08 5 x 5 mm ADC package, TMP117 local temperature sensor, flow sensor, pump/driver, MCU logging, and isolated power path.</p></article>
+          <article class="evidence-card"><div class="card-number">01 / CASSETTE</div><h3>Wet path body</h3><p>Transparent PMMA/COC/COP body, 120 x 44 x 14 mm nominal envelope, 86 mm long x 3.0 mm ID-equivalent channel, 0.61 mL main-channel volume, and ports for sample, standard, waste, and flush. This is a commissioning geometry pending measured fit and dead-volume review.</p></article>
+          <article class="evidence-card"><div class="card-number">02 / CHEMISTRY</div><h3>Electrode bay</h3><p>A measured multi-lane carrier must provide K1/K2/K3 and a matched blank in one wetted bay. Existing DRP-110-U75 substrates each provide one 4 mm working electrode; the integrated option is DRP-8X110-U20/CAC8X or a custom six-lane substrate.</p></article>
+          <article class="evidence-card"><div class="card-number">03 / READER</div><h3>Electronics envelope</h3><p>Reusable reader envelope 170 x 112 x 42 mm with six same-family guarded electrometer channels, ADS124S08 5 x 5 mm ADC, TMP117 local temperature, digital flow sensor, pump/driver, ESP32-S3 data capture, and isolated bench power.</p></article>
         </div>
         <article class="wide" style="margin-top:14px">
           <h3>Mechanical and electrical checks before wet testing</h3>
@@ -331,11 +383,11 @@
             <thead><tr><th>Check</th><th>Acceptance condition</th><th>Why it matters</th></tr></thead>
             <tbody>
               <tr><td>Channel alignment</td><td>Fluid path crosses K1/K2/K3, reference, and blank sensing zone without dead pockets or sharp trapped-bubble corners.</td><td>Prevents stagnant fluid and bubbles from looking like K+ movement.</td></tr>
-              <tr><td>Electrode seating</td><td>DRP-110 strip is fixed, sealed, and repeatably positioned over the channel; membrane disks remain wetted under flow.</td><td>Turns the render into a repeatable physical measurement geometry.</td></tr>
-              <tr><td>Reference isolation</td><td>Bench Ag/AgCl reference and reference sentinel have stable chloride contact and do not share a failure path.</td><td>Reference drift is the fastest way to create false accuracy.</td></tr>
-              <tr><td>Guarded analog path</td><td>LMP7721 inputs are guarded, clean, high impedance, and routed away from pump/valve/display noise before ADS124S08 digitization.</td><td>Potentiometric K+ signals are high impedance and can be ruined by leakage.</td></tr>
-              <tr><td>Flow instrumentation</td><td>SLF3S-0600F, pump, manual stopcocks, KCl standards, and waste capture route around the cassette without kinks or unmeasured bypass paths.</td><td>Validates that every K+ estimate corresponds to fresh known fluid.</td></tr>
-              <tr><td>Logging readiness</td><td>Before first wet run, log raw K1/K2/K3 mV, blank, reference delta, temperature, flow, pump state, sample label, and withheld-output reason.</td><td>Makes the first article auditable and reproducible from run one.</td></tr>
+              <tr><td>Electrode seating</td><td>The selected multi-lane carrier is fixed, sealed, and repeatably positioned over the channel; K1/K2/K3 and matched blank remain wetted together.</td><td>Prevents a single-cell development strip from being mistaken for the integrated sensor bay.</td></tr>
+              <tr><td>Reference isolation</td><td>Two independent double-junction Ag/AgCl references use potassium-free outer bridge electrolyte and do not share a failure path.</td><td>Prevents reference drift and KCl leakage from becoming false potassium movement.</td></tr>
+              <tr><td>Guarded analog path</td><td>All six high-impedance nodes use one qualified amplifier family, driven guards, clean flux process, short shielded leads, and routing away from pump/display noise before ADS124S08 digitization.</td><td>Potentiometric K+ signals are high impedance and can be ruined by leakage.</td></tr>
+              <tr><td>Flow instrumentation</td><td>SLF3S-0600F, mp6 liquid pump plus its high-voltage driver, OPB350 bubble sensor, manual stopcocks, standards, and waste route without kinks or bypass paths.</td><td>Validates that every K+ estimate corresponds to fresh, bubble-free known fluid.</td></tr>
+              <tr><td>Capture readiness</td><td>Before first wet run, record raw K1/K2/K3 mV, blank, reference delta, temperature, flow, pump state, sample label, and withheld-output reason.</td><td>Makes the first article auditable and reproducible from run one.</td></tr>
             </tbody>
           </table>
         </article>
@@ -382,7 +434,7 @@
             <div class="stack-row"><b>Analytical</b><span>K+ slope, bias, precision, drift, hysteresis, temperature response, protein/fouling response, matrix effect, and calibration recovery across 2.0-9.0 mmol/L.</span></div>
             <div class="stack-row"><b>Comparator</b><span>Dense paired samples against blood gas, i-STAT/POC, central lab, and dialysis/CRRT machine chemistry where applicable.</span></div>
             <div class="stack-row"><b>Fluidic</b><span>No leaks, no unsafe pressure drop, bubble/clot detection, no hemolysis above accepted thresholds, and no blood-contacting reusable part.</span></div>
-            <div class="stack-row"><b>Software</b><span>Fail-closed state machine, audit log, calibration age, comparator age, alarm thresholds, and no autonomous dosing recommendation.</span></div>
+            <div class="stack-row"><b>Software</b><span>Fail-closed state machine, audit record, calibration age, comparator age, alarm thresholds, and no autonomous dosing recommendation.</span></div>
             <div class="stack-row"><b>Human factors</b><span>Nurse installation, sterile boundary, line-change workflow, alarm comprehension, and clinician response must pass simulation before patient feasibility.</span></div>
           </div>
         </article>
@@ -391,11 +443,11 @@
           <table class="bom-table" aria-label="Hospital CKM first article acceptance gates">
             <thead><tr><th>Gate</th><th>Pass condition</th><th>Unlocks</th></tr></thead>
             <tbody>
-              <tr><td>KCl standards</td><td>3.0, 4.0, 5.5, 7.0, and 9.0 mmol/L steps track within the first-article error target and stabilize quickly.</td><td>Dialysate/CRRT matrix testing</td></tr>
+              <tr><td>KCl standards</td><td>2.0, 3.0, 4.0, 5.5, 7.0, and 9.0 mmol/L steps produce a stable log-linear response after at least three measured cell volumes.</td><td>Matrix-matched dialysate/CRRT testing</td></tr>
               <tr><td>Triplicate agreement</td><td>K1/K2/K3 agree within the preset mV/K+ window while the blank channel stays quiet.</td><td>Confidence score and majority-vote QC</td></tr>
-              <tr><td>Reference stability</td><td>Dual-reference delta stays inside drift limits across the run window and during calibration checks.</td><td>Longer duration runs and calibration aging</td></tr>
+              <tr><td>Reference stability</td><td>Dual-reference delta stays inside drift limits and no upward K+ creep appears from bridge-electrolyte contamination.</td><td>Longer duration runs and calibration aging</td></tr>
               <tr><td>Flow artifact rejection</td><td>Bubble, stale-flow, and pressure anomalies suppress output instead of creating false potassium movement.</td><td>Enclosed reader and valve automation work</td></tr>
-              <tr><td>Dialysate matrix</td><td>Performance holds in CRRT/dialysate-like sodium, bicarbonate, temperature, and flow conditions.</td><td>Artificial plasma and drawn-line blood micro-sample planning</td></tr>
+              <tr><td>Dialysate matrix</td><td>Performance holds with matrix-matched calibration in CRRT/dialysate-like sodium, bicarbonate, calcium, magnesium, urea, temperature, and flow conditions.</td><td>Artificial plasma and drawn-line blood micro-sample planning</td></tr>
             </tbody>
           </table>
         </article>
@@ -406,7 +458,7 @@
       <div class="shell">
         <div class="section-head">
           <div><div class="eyebrow">Expected data</div><h2>The first useful dataset is raw mV truth, not a polished medical number.</h2></div>
-          <p>Production readiness starts by logging everything needed to explain every potassium estimate, every suppressed estimate, and every calibration correction.</p>
+          <p>Production readiness starts by capturing everything needed to explain every potassium estimate, every suppressed estimate, and every calibration correction.</p>
         </div>
         <div class="grid">
           <article class="evidence-card"><div class="card-number">RAW SIGNAL</div><h3>Electrode voltages</h3><p>K1/K2/K3 open-circuit potential versus reference, blank membrane potential, reference A/B delta, ADC noise, settling time, and channel-to-channel agreement.</p></article>
@@ -415,7 +467,7 @@
         </div>
         <article class="wide" style="margin-top:14px">
           <div class="stack-list">
-            <div class="stack-row"><b>Bench expectation</b><span>Valinomycin ISE literature supports Nernstian or near-Nernstian slopes around 55-62 mV/decade, second-scale response in clean solutions, and low drift in controlled setups. The first article should prove repeatable step tracking with production-style QC logs.</span></div>
+            <div class="stack-row"><b>Bench expectation</b><span>Valinomycin ISE literature supports Nernstian or near-Nernstian slopes around 55-62 mV/decade, second-scale response in clean solutions, and low drift in controlled setups. The first article should prove repeatable step tracking with production-style QC records.</span></div>
             <div class="stack-row"><b>Hospital bar</b><span>Existing point-of-care electrolyte analyzers already validate the core potassium ISE principle. Hospital CKM must validate continuous flow-cell behavior against blood gas/i-STAT/central lab and must report "confirm now" rather than act as a dosing device.</span></div>
           </div>
           <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8993652/" target="_blank" rel="noopener">POC electrolyte performance</a>
@@ -432,32 +484,36 @@
           <p>This is not a consumer subscription. It is a per-patient disposable plus bedside reader platform for units already paying for blood gas cartridges, dialysis consumables, ICU telemetry, and adverse-event prevention.</p>
         </div>
         <div class="truth-table">
-          <div class="truth-cell"><b>Reader</b><span>Reusable bedside module: analog front end, pump/valves, display, network export, battery backup.</span></div>
-          <div class="truth-cell"><b>Cassette</b><span>Single-patient disposable flow-cell with electrodes, references, fluid path, calibration reservoir, sterile packaging.</span></div>
+          <div class="truth-cell"><b>Reader</b><span>Reusable bench module: guarded analog front end, pump control, display, and raw data export. Network integration and battery backup are later requirements.</span></div>
+          <div class="truth-cell"><b>Cassette</b><span>Non-clinical flow-cell first; single-patient sterile packaging is a later design-control and manufacturing program.</span></div>
           <div class="truth-cell"><b>Use cases</b><span>DKA, CRRT, dialysis transition, post-cardiac surgery, transplant induction, refeeding, high-risk arrhythmia beds.</span></div>
           <div class="truth-cell"><b>Value</b><span>Earlier confirmation, fewer hours out of range, fewer unnecessary samples, better protocol adherence.</span></div>
         </div>
         <table class="bom-table" aria-label="Hospital CKM prototype buy list and cost estimate">
-          <thead><tr><th>Buy now item</th><th>Why this part</th><th>Locked order cost</th><th>Scale target</th></tr></thead>
+          <thead><tr><th>Build item</th><th>Why this part</th><th>Planning cost</th><th>Scale target</th></tr></thead>
           <tbody>
-            <tr><td>Metrohm DropSens DRP-110-U75 pack</td><td>Fastest replicable carbon SPE substrate for K+ membrane experiments; 33.8 x 10.2 x 0.5 mm, 4 mm working electrode. One 75-pack is enough for coating practice, triplicate channels, and repeats.</td><td>$285</td><td>$2-$6 custom printed lane</td></tr>
-            <tr><td>Sigma/Supelco K+ ionophore cocktail / valinomycin membrane reagents</td><td>Known potassium-selective chemistry for biological and aqueous ISE work. Buy enough to coat multiple membranes from the same chemistry lot.</td><td>$150-$500<small>Vendor quote/login pricing varies.</small></td><td>$0.50-$2 per cassette chemistry</td></tr>
-            <tr><td>Bench Ag/AgCl reference electrodes plus Ag/AgCl ink planning</td><td>Use bench references to lock first-article measurement quality, then translate to printed/reservoir references after drift behavior is known.</td><td>$150-$450</td><td>$1-$4 printed/reference reservoir</td></tr>
-            <tr><td>TI LMP7721 buffer array + guarded PCB/EVM path</td><td>3 fA input-bias electrometer buffers protect high-impedance ISE nodes. Buy enough channels for K1/K2/K3, blank, and references.</td><td>$150-$350<small>Guarded layout and cleaning process matter more than chip price.</small></td><td>$12-$25 electronics</td></tr>
-            <tr><td>TI ADS124S08 24-bit 12-channel ADC</td><td>Replaces ADS1220 role; reads triplicate K+, blank, references, temperature, and diagnostics from one precision ADC.</td><td>$75-$250<small>Prefer EVM/dev path for first article, then custom PCB.</small></td><td>$5.28+ at 1k IC volume</td></tr>
+            <tr><td>Metrohm DropSens development substrates</td><td>Reuse DRP-110-U75 single-cell strips for coating and response screening. Select DRP-8X110-U20 + CAC8X or a custom six-lane carrier before integrated cassette machining.</td><td>$285-$650<small>Integrated carrier/connector may require a separate RFQ.</small></td><td>$2-$6 custom printed lane</td></tr>
+            <tr><td>Valinomycin membrane component set</td><td>Cocktail 99373 is a liquid ionophore carrier, not by itself the controlled PVC solid-state membrane. Make active and matched blank formulations from separately controlled ionophore, lipophilic salt, plasticizer, binder, and casting solvent.</td><td>$250-$700</td><td>$0.50-$2 per cassette chemistry</td></tr>
+            <tr><td>Solid-contact layer supplies</td><td>Use the documented PEDOT:PSS only if its incoming film, conductivity, adhesion, and drift checks pass; otherwise replace it or qualify an MWCNT route.</td><td>$120-$450</td><td>$0.50-$2 per lane</td></tr>
+            <tr><td>Two double-junction Ag/AgCl references</td><td>Use a potassium-free outer bridge such as 10% KNO3 to stop KCl reference electrolyte from contaminating the low-volume potassium sample.</td><td>$250-$650</td><td>$1-$4 integrated reference reservoir</td></tr>
+            <tr><td>Matched non-ionophore blank controls</td><td>Use the same binder, plasticizer, salt, thickness, cure, and conditioning as the active membrane, omitting only valinomycin.</td><td>$40-$120</td><td>&lt;$0.50 chemistry share</td></tr>
+            <tr><td>Six guarded electrometer channels</td><td>Reuse the two documented ADA4530-1ARZ parts for bring-up, then standardize all six K1/K2/K3/blank/reference nodes on the qualified family with driven guards.</td><td>$150-$350<small>Guarded layout, cleanliness, and shielding matter more than chip price.</small></td><td>$12-$25 electronics share</td></tr>
+            <tr><td>TI ADS124S08 24-bit 12-input ADC</td><td>Digitizes six buffered electrode/reference potentials plus analog pressure and bubble diagnostics. TMP117 and SLF3S remain digital buses, not ADC channels.</td><td>$75-$250<small>Prefer EVM/dev path for first article, then custom PCB.</small></td><td>$5-$12 ADC share</td></tr>
             <tr><td>TI TMP117 temperature sensor</td><td>High-accuracy local temperature for Nernst compensation and QC gating; 2 x 2 mm package.</td><td>$10-$40</td><td>$2-$5</td></tr>
             <tr><td>Sensirion SLF3S-0600F liquid flow sensor</td><td>Orderable microflow validation for sample refresh and valid trend windows; 48 x 15.5 x 8.9 mm.</td><td>$115-$205</td><td>$20-$45 integrated/OEM</td></tr>
-            <tr><td>Bartels mp6 micropump plus driver</td><td>Compact controlled flow for calibration/sample loop; 30 x 15 x 3.8 mm, 0-8 mL/min liquid.</td><td>$120-$250</td><td>$15-$35 OEM or alternate pump</td></tr>
-            <tr><td>Manual 3-way stopcocks now; Lee LHD valve bank later</td><td>Manual routing reduces first-article complexity. Add automated Lee valves after the chemistry and flow loop pass locked acceptance.</td><td>$30-$120 now<small>Hold $150-$400 Lee valves until automation gate.</small></td><td>$25-$80 manifolded valves</td></tr>
-            <tr><td>Two transparent flow-cell bodies, fittings, tubing, KCl standards, waste capture</td><td>Physical bench loop: 1/4-28 fittings, PMMA/COC/COP flow body, KCl reservoirs, waste path. Two bodies avoid a redesign if one is damaged or contaminated.</td><td>$700-$1,200</td><td>$8-$25 molded cassette before sterile pack</td></tr>
-            <tr><td>Display/MCU/power/enclosure/logging harness</td><td>Prototype reader shell and logging/display control; production will be medically isolated and sealed.</td><td>$300-$600</td><td>$55-$120 reusable reader COGS share</td></tr>
+            <tr><td>Bartels mp6-liq micropump plus exact driver</td><td>Compact controlled flow for the non-clinical standard/sample loop; 30 x 15 x 3.8 mm, 32 µL internal volume, up to roughly 6 mL/min water. The pump requires a high-voltage Bartels driver.</td><td>$160-$320</td><td>$15-$35 OEM or alternate pump</td></tr>
+            <tr><td>TE MEAS 1620 pressure sensors</td><td>Two -50 to 300 mmHg bridge sensors require stable excitation and ratiometric/PGA acquisition; they are not plug-and-play digital sensors.</td><td>$90-$280</td><td>$2-$8 disposable share</td></tr>
+            <tr><td>TT Electronics OPB350L062 bubble sensor</td><td>Non-contact optical fluid/bubble detection around 1/16 in OD clear tubing; use OCB350L062Z if the calibrated interface board is preferred.</td><td>$30-$120</td><td>$0.50-$3 optical share</td></tr>
+            <tr><td>Manual 3-way stopcocks now; Lee LHD valve bank later</td><td>Manual routing reduces first-article complexity. Add automated Lee valves only after chemistry and flow gates pass.</td><td>$60-$220<small>Hold automated valves until the gate.</small></td><td>$25-$80 manifolded valves</td></tr>
+            <tr><td>Two transparent flow-cell bodies, fittings, tubing, KCl standards, waste capture</td><td>Physical bench loop: 1/4-28 fittings, PMMA/COC/COP flow body, KCl reservoirs, waste path, and a duplicate wet path.</td><td>$1,200-$2,000</td><td>$8-$25 molded cassette before sterile pack</td></tr>
+            <tr><td>Display/MCU/power/enclosure/data-capture harness</td><td>Reuse the documented ESP32-S3 and TMP117 breakout where practical; production will require medical isolation and a sealed enclosure.</td><td>$450-$900</td><td>$55-$120 reusable reader COGS share</td></tr>
           </tbody>
         </table>
         <article class="wide" style="margin-top:14px">
           <div class="stack-list">
-            <div class="stack-row"><b>Order now total</b><span>Production-minded first article: approximately $2,800-$4,200 for the orderable stack plus duplicate wet-path consumables. The lean minimum remains around $1,800-$2,800, but the locked order is better because it gives assembly and repeat-test margin from day one.</span></div>
+            <div class="stack-row"><b>Line-item arithmetic</b><span>The detailed numeric rows sum to $3,285-$7,255 before shipping, tax, and any integrated sensor-carrier RFQ. A $5K-$10K ceiling is prudent only when placed orders and documented inventory do not already cover those gaps.</span></div>
             <div class="stack-row"><b>At scale</b><span>Disposable cassette target COGS: roughly $18-$45 before sterile packaging and QA at low production maturity, with a long-term target around $12-$25. Reusable reader target COGS: roughly $180-$350 early, $90-$180 mature, excluding clinical service and support.</span></div>
-            <div class="stack-row"><b>Order first</b><span>Electrodes, K+ membrane chemistry, KCl standards, bench references, LMP7721/ADS124S08/TMP117 dev hardware, Sensirion flow sensor, mp6 pump/driver, manual routing parts, fittings/tubing, waste capture, and two transparent flow-cell bodies. Defer custom sterile blood-path parts and automated valve banks until the locked first article passes.</span></div>
+            <div class="stack-row"><b>Reconcile before buying</b><span>Verify every placed order and packing slip first. The documented TMP117, ESP32-S3, two ADA4530-1 parts, LiPo cells, and conditional PEDOT:PSS are reusable; do not duplicate them. Prioritize only the carrier, potassium-safe references, missing pump driver, bubble sensor, six-channel completion, exact fittings, and independent validation supplies.</span></div>
           </div>
         </article>
       </div>
@@ -474,7 +530,7 @@
           <div class="roadmap-step"><b>CRRT/dialysate feasibility</b><span>Prove continuous K+ tracking in dialysate/effluent-like matrices before blood-contacting designs. Show response to prescription-like potassium changes.</span></div>
           <div class="roadmap-step"><b>Micro-sample blood loop</b><span>Move to drawn-line sample loops with waste capture. Compare against blood gas/i-STAT/central lab and quantify hemolysis, clotting, drift, and calibration recovery.</span></div>
           <div class="roadmap-step"><b>Simulation pilot</b><span>Run ICU nurse and physician simulations: setup, alarm interpretation, comparator prompts, protocol response, and EHR-style event review.</span></div>
-          <div class="roadmap-step"><b>Observational hospital study</b><span>No care-driving claims. Collect paired comparator data, alarm logs, setup time, false alarms, and clinician response to trend information.</span></div>
+          <div class="roadmap-step"><b>Observational hospital study</b><span>No care-driving claims. Collect paired comparator data, alarm records, setup time, false alarms, and clinician response to trend information.</span></div>
         </div>
       </div>
     </section>
@@ -485,7 +541,7 @@
           <div class="eyebrow">Boundaries</div>
           <h2>What Hospital CKM does and does not claim.</h2>
           <div class="two-grid" style="margin-top:24px">
-            <div class="card"><div class="card-number">DOES CLAIM</div><h3>Research architecture</h3><p>A physically plausible hospital potassium trend monitor architecture with direct fluid access, redundant K+ sensing, onboard calibration, comparator-first validation, and fail-closed workflow.</p></div>
+            <div class="card"><div class="card-number">DOES CLAIM</div><h3>Research architecture</h3><p>A physically plausible hospital potassium trend-monitor architecture with direct access to non-clinical test fluid, redundant K+ sensing, external calibration first, comparator-first validation, and fail-closed workflow.</p></div>
             <div class="card"><div class="card-number">DOES NOT CLAIM</div><h3>Clinical readiness</h3><p>No diagnosis, no autonomous dosing, no replacement of blood gas/lab potassium, no sterile patient use, no mortality reduction claim until analytical and clinical studies prove it.</p></div>
           </div>
         </article>
@@ -498,5 +554,20 @@
       <nav><a href="/">Home</a><a href="/ckm/">Wearable CKM</a><a href="/urine-aki/">Urine AKI</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
     </div>
   </footer>
+  <script>
+    (() => {
+      const iframe = document.getElementById("secondaryHospitalViewer");
+      const desktop = window.matchMedia("(min-width: 761px)");
+      const syncSecondaryViewer = () => {
+        if (desktop.matches && !iframe.getAttribute("src")) {
+          iframe.setAttribute("src", iframe.dataset.src);
+        } else if (!desktop.matches && iframe.getAttribute("src")) {
+          iframe.removeAttribute("src");
+        }
+      };
+      syncSecondaryViewer();
+      desktop.addEventListener?.("change", syncSecondaryViewer);
+    })();
+  </script>
 </body>
 </html>
