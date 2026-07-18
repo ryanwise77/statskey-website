@@ -152,18 +152,6 @@
     .ms.red .v { color: var(--red); }
     .ms.green .v { color: var(--green); }
 
-    /* ── quantum mechanic interlude ── */
-    .qm {
-      margin-top: 84px;
-      padding: 52px clamp(24px, 4vw, 56px);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      background: rgba(64, 217, 200, .035);
-    }
-    .qm p { color: var(--muted); font-size: 17.5px; line-height: 1.6; max-width: 780px; margin: 14px 0 0; }
-    .qm p b { color: var(--ink); font-weight: 600; }
-    .qm .pquote { margin-top: 22px; }
-
     /* ── instrument (screenshots) ── */
     .instrument { padding: 88px 0 20px; }
     .instrument .intro { color: var(--muted); font-size: 18px; max-width: 760px; margin: 14px 0 0; }
@@ -277,7 +265,7 @@
 
   <section class="wrap principles">
     <p class="sect-kicker">The argument, from first principles</p>
-    <h2>Six things physics already told you about your body.</h2>
+    <h2>Seven things physics already told you about your body.</h2>
 
     <div class="principle">
       <div class="pnum"><b>01</b>second law</div>
@@ -374,47 +362,45 @@
         <div class="pquote">It cites its work — or says it doesn't know.</div>
       </div>
     </div>
-  </section>
 
-  <section class="wrap qm">
-    <p class="sect-kicker">A job title, proposed</p>
-    <h2>The disciplined user is a quantum mechanic.</h2>
-    <p>
-      Not in the woo sense — your metabolism is warm, wet, and thoroughly decoherent, and this
-      page won't pretend otherwise. In the literal sense of the two words. Quantum mechanics is
-      the physics in which <b>measurement is the fundamental act</b>: what you choose to measure
-      determines what can be known at all. And a mechanic is someone who keeps a machine running
-      with instruments and a schedule, instead of waiting for the check-engine light.
-    </p>
-    <p>
-      Put them together and you have the discipline: <b>choose your observables</b> — meals,
-      glucose, splits, sleep, the gut — and run the measurements every day. Each record updates
-      the best available description of the system; the question you don't measure stays
-      unanswerable. Discipline, on this view, isn't willpower. <b>It's a high sampling rate.</b>
-    </p>
-    <div class="pquote">Pick your observables. Keep the sampling rate honest. Service the only machine you were issued.</div>
+    <div class="principle">
+      <div class="pnum"><b>07</b>observables</div>
+      <div>
+        <h3>The disciplined user is a quantum mechanic.</h3>
+        <p>
+          The deepest lesson measurement theory ever taught: <b>the observables you choose
+          determine what can be known at all</b>, and the question you never measure has no
+          answer you can use. That principle survives the trip to everyday scale intact. So the
+          discipline is choosing your observables — meals, glucose, splits, sleep, the gut —
+          and running the measurements every day, the way a mechanic services a machine on a
+          schedule rather than waiting for the check-engine light. Each record updates the best
+          available description of the system. Discipline isn't willpower.
+          <b>It's a high sampling rate.</b>
+        </p>
+        <div class="pquote">Pick your observables. Keep the sampling rate honest. Service the only machine you were issued.</div>
+      </div>
+    </div>
   </section>
 
   <section class="wrap instrument">
     <p class="sect-kicker">The instrument itself</p>
     <h2>What the joint fit looks like in your pocket.</h2>
     <p class="intro">
-      Live screens from the shipping app — meal recording with full micronutrient depth,
-      Intelligence reading an actual glucose response, and targets that update as your
-      training changes.
+      Live screens from the shipping app — the day's intake recorded in seconds, your glucose
+      in real time, and every nutrient measured against its reference intake.
     </p>
     <div class="shots">
       <div class="shot">
-        <img src="/mindscape/nutrition-facts.png" alt="StatsKey showing complete Nutrition Facts for a recorded food, including micronutrients" loading="lazy" />
-        <div class="cap"><b>Full Nutrition Facts, instantly.</b> Recorded in seconds; resolved to the micronutrients.</div>
+        <img src="/mindscape/record-today.png" alt="StatsKey Record screen with the day's calories, protein, carbs, fat, fiber, water, and meals recorded" loading="lazy" />
+        <div class="cap"><b>The day, recorded.</b> Meals by photo, text, barcode, or label — seconds each, streak intact.</div>
       </div>
       <div class="shot">
-        <img src="/mindscape/intelligence-glucose.png" alt="StatsKey Intelligence analyzing a real glucose response to a meal, flagging a borderline-low pattern before a run" loading="lazy" />
-        <div class="cap"><b>Intelligence, reading your actual response.</b> A real meal-to-glucose analysis — evidence, trend, and a concrete recommendation.</div>
+        <img src="/mindscape/metabolic-day.png" alt="StatsKey Metabolic Day dial showing live glucose at 123 mg/dL with 96% time in range from a connected Dexcom" loading="lazy" />
+        <div class="cap"><b>Your metabolism, in real time.</b> Live glucose from a connected Dexcom, scored as time-in-range.</div>
       </div>
       <div class="shot">
-        <img src="/mindscape/adaptive-target.png" alt="StatsKey Adaptive Intelligence energy balance targets adjusting to training load" loading="lazy" />
-        <div class="cap"><b>Adaptive Intelligence targets.</b> The ledger updates itself as the process changes.</div>
+        <img src="/mindscape/nutrients-all.png" alt="StatsKey Insights grid measuring 64 nutrients against reference daily intakes" loading="lazy" />
+        <div class="cap"><b>64 nutrients, all measured.</b> Everything scored against reference intake — deficits surface instead of hiding.</div>
       </div>
     </div>
   </section>
