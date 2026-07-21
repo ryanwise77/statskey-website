@@ -391,6 +391,17 @@ function encodeWellnessData(data: WellnessData): Record<string, unknown> {
           // iOS-only private photo attachment survives web edits.
           photoStoragePath: data.entry.photoStoragePath ?? null,
           photoCreatedAt: data.entry.photoCreatedAt ?? null,
+          // Full Gut Check surface — mirrors BowelMovementEntry's Codable keys.
+          segments: (data.entry.segments ?? []).map((s) => ({
+            id: s.id,
+            bristolType: s.bristolType,
+            portion: s.portion,
+          })),
+          passageSymptoms: data.entry.passageSymptoms ?? [],
+          control: data.entry.control ?? null,
+          cleanup: data.entry.cleanup ?? [],
+          redFlags: data.entry.redFlags ?? [],
+          giBurdenScore: data.entry.giBurdenScore ?? null,
         },
       }
     case 'sleep':

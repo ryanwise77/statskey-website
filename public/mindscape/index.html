@@ -6,9 +6,16 @@
   <title>StatsKey | For Mindscape Listeners</title>
   <meta name="description" content="Your body is a non-equilibrium steady state. StatsKey is an instrument for entropy management in alignment with your goals." />
   <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#07090f" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <script>
+    window.va = window.va || function () {
+      (window.vaq = window.vaq || []).push(arguments);
+    };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -62,20 +69,33 @@
     }
 
     /* ── hero ── */
-    .hero { padding: 44px 0 40px; }
+    .hero { padding: 36px 0 40px; }
     .hero-grid {
       display: grid; grid-template-columns: minmax(0, 1fr) auto;
-      gap: clamp(28px, 4.5vw, 68px); align-items: center;
+      gap: clamp(28px, 4.5vw, 68px); align-items: start;
     }
+    .hero-phone { padding-top: 10px; }
     .hero-phone video {
       width: clamp(220px, 21vw, 296px); height: auto; display: block;
       border-radius: 32px; border: 1px solid var(--line-strong);
       background: var(--panel);
     }
-    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
     .cta-row .btn { display: inline-block; margin-bottom: 0; }
-    .code-note { color: var(--quiet); font-size: 13.5px; line-height: 1.55; margin: 14px 0 0; max-width: 560px; }
+    .cta-row .btn.primary { min-width: min(100%, 290px); }
+    .offer-terms {
+      color: var(--muted); font-size: 13.5px; line-height: 1.5;
+      margin: 12px 0 0; max-width: 620px;
+    }
+    .offer-terms b { color: var(--ink); font-weight: 600; }
+    .code-note { color: var(--quiet); font-size: 13.5px; line-height: 1.55; margin: 14px 0 0; max-width: 620px; }
     .code-note b { color: var(--cyan); font-weight: 700; font-family: var(--mono); letter-spacing: .06em; }
+    .hero-proof {
+      color: var(--quiet); font-size: 15px; line-height: 1.58;
+      max-width: 690px; margin: 18px 0 0; padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .hero-proof b { color: var(--muted); font-weight: 600; }
     @media (max-width: 860px) {
       .hero-grid { grid-template-columns: 1fr; }
       .hero-phone { justify-self: center; }
@@ -193,6 +213,28 @@
     .btn.ghost { border: 1px solid var(--line-strong); color: var(--ink); }
     .fine { color: var(--quiet); font-size: 12.5px; line-height: 1.5; margin: 14px 0 0; }
 
+    /* ── cross-device claim path ── */
+    dialog {
+      width: min(420px, calc(100% - 32px)); padding: 0; border: 1px solid var(--line-strong);
+      border-radius: 24px; color: var(--ink); background: var(--panel);
+      box-shadow: 0 28px 90px rgba(0, 0, 0, .65);
+    }
+    dialog::backdrop { background: rgba(2, 5, 10, .8); backdrop-filter: blur(5px); }
+    .claim-dialog { padding: 28px; text-align: center; position: relative; }
+    .claim-dialog h2 { font-size: 26px; margin: 0 28px 8px; }
+    .claim-dialog p { color: var(--muted); font-size: 14.5px; line-height: 1.55; margin: 0 0 18px; }
+    .claim-dialog img {
+      display: block; width: 210px; height: 210px; margin: 0 auto 18px;
+      padding: 10px; border-radius: 18px; background: #fff;
+    }
+    .dialog-close {
+      position: absolute; top: 14px; right: 14px; width: 34px; height: 34px;
+      border: 1px solid var(--line); border-radius: 999px; background: transparent;
+      color: var(--muted); font-size: 21px; line-height: 1; cursor: pointer;
+    }
+    .dialog-close:hover { color: var(--ink); border-color: var(--line-strong); }
+    .mobile-sticky { display: none; }
+
     /* ── close line ── */
     .close-line { padding: 30px 0 90px; }
     .close-line .big {
@@ -214,11 +256,37 @@
     .disclaimer { max-width: 760px; margin-top: 14px; }
 
     @media (max-width: 760px) {
+      body { padding-bottom: 76px; }
+      .wrap { width: min(var(--max), calc(100% - 32px)); }
+      .top { padding-top: 16px; gap: 16px; align-items: center; }
+      .brand { font-size: 14px; white-space: nowrap; }
+      .brand span { display: none; }
+      .unlisted {
+        padding: 6px 9px; font-size: 9px; line-height: 1.25;
+        letter-spacing: .09em; text-align: center;
+      }
+      .hero { padding-top: 24px; }
+      .eyebrow { margin-bottom: 12px; font-size: 11.5px; letter-spacing: .15em; }
+      h1 { font-size: clamp(37px, 10.8vw, 48px); line-height: .98; }
+      .hero .lede { margin-top: 16px; font-size: 17px; line-height: 1.42; }
+      .cta-row { margin-top: 20px; }
+      .cta-row .btn { width: 100%; }
+      .offer-terms { font-size: 12.5px; }
+      .hero-proof { font-size: 14px; margin-top: 15px; padding-top: 15px; }
+      .hero-phone { padding-top: 0; }
       .principle { grid-template-columns: 1fr; gap: 10px; padding: 36px 0; }
       .pnum { display: flex; align-items: baseline; gap: 10px; padding-top: 0; }
       .pnum b { font-size: 20px; }
       .offer-grid { grid-template-columns: 1fr; }
       .eqs { gap: 12px 28px; }
+      .mobile-sticky {
+        display: block; position: fixed; z-index: 20;
+        left: 12px; right: 12px; bottom: max(10px, env(safe-area-inset-bottom));
+        padding: 8px; border: 1px solid var(--line-strong); border-radius: 18px;
+        background: rgba(7, 9, 15, .92); backdrop-filter: blur(16px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+      }
+      .mobile-sticky .btn { margin: 0; padding: 13px 16px; }
     }
   </style>
 </head>
@@ -233,7 +301,7 @@
     <div class="hero-grid">
       <div class="hero-copy">
         <p class="eyebrow">You came here from a physics podcast. Good.</p>
-        <h1>Your body is an entropy management problem. <em>StatsKey is the instrument.</em></h1>
+        <h1>Know <em>thyself.</em></h1>
         <p class="lede">
           You are a <b>non-equilibrium steady state</b>: a pattern held together by the free energy
           flowing through it. Let the flow stop and you settle to equilibrium — which, for an open
@@ -242,18 +310,24 @@
           mile by mile, night by night.
         </p>
         <div class="cta-row">
-          <a class="btn primary" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Claim 1 month of Pro free</a>
-          <a class="btn ghost" href="https://apps.apple.com/us/app/statskey/id6751132823">Download on the App Store</a>
-          <a class="btn ghost" href="/">Use the web app</a>
+          <a class="btn primary" data-claim data-surface="hero" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Get StatsKey + 1 month Pro free</a>
         </div>
+        <p class="offer-terms">
+          <b>New and returning subscribers.</b> One month free, then $4.99/month unless canceled.
+          The core app remains free either way.
+        </p>
         <p class="code-note">
-          Code <b>MINDSCAPE</b> — one month of StatsKey Pro, free. The button applies it in one
-          tap and installs the app if you don't have it yet. Prefer to do it manually? In the
-          app: Settings → Redeem an offer code. The core app is free either way.
+          Code <b>MINDSCAPE</b>. The button applies it and installs the app if needed.
+          You can also enter it in StatsKey under Settings → Redeem an offer code.
+        </p>
+        <p class="hero-proof">
+          StatsKey is the instrument: record a meal in seconds and it builds one connected model —
+          food down to the micronutrient, training, sleep — then tells you what your own evidence
+          supports.
         </p>
       </div>
       <div class="hero-phone">
-        <video src="/mindscape/preview.mp4" poster="/mindscape/preview-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="StatsKey app preview: recording a meal, full nutrition facts, workout tracking, and Intelligence"></video>
+        <video id="mindscape-preview" src="/mindscape/preview.mp4" poster="/mindscape/preview-poster.jpg" muted loop playsinline preload="none" aria-label="StatsKey app preview: recording a meal, full nutrition facts, workout tracking, and Intelligence"></video>
       </div>
     </div>
 
@@ -390,9 +464,8 @@
     <p class="sect-kicker">The instrument itself</p>
     <h2>What the joint fit looks like in your pocket.</h2>
     <p class="intro">
-      Live screens from the shipping app — the day's intake recorded in seconds, every nutrient
-      measured against its reference intake, and a glucose view standing by for the day you
-      get curious about a sensor.
+      Live screens from the shipping app — the day's intake recorded in seconds, and every
+      nutrient measured against its reference intake.
     </p>
     <div class="shots">
       <div class="shot">
@@ -403,10 +476,6 @@
         <img src="/mindscape/nutrients-all.png" alt="StatsKey Insights grid measuring 64 nutrients against reference daily intakes" loading="lazy" />
         <div class="cap"><b>64 nutrients, all measured.</b> Everything scored against reference intake — deficits surface instead of hiding.</div>
       </div>
-      <div class="shot">
-        <img src="/mindscape/metabolic-day.png" alt="StatsKey Metabolic Day dial showing live glucose at 123 mg/dL with 96% time in range from a connected Dexcom" loading="lazy" />
-        <div class="cap"><b>No monitor required.</b> But glucose sensors are over-the-counter now — and two weeks of one inside StatsKey reads out <b>your</b> meal responses, not the population's.</div>
-      </div>
     </div>
   </section>
 
@@ -414,12 +483,12 @@
     <div class="offer-grid">
       <div>
         <p class="sect-kicker">The offer</p>
-        <h2>Run your metabolism like an observatory, not an experiment.</h2>
+        <h2>Know your own numbers, not the population's.</h2>
         <p style="margin-top:16px">
-          You get exactly one run of this system — no control group, no rerun. Cosmology works
-          under the same constraint and does rigorous science anyway: <b>observe relentlessly,
-          fit jointly, update honestly</b>. That's the posture here — not perturbing your body
-          to see what happens, but watching it well enough to steer it.
+          No theorem says the average of a thousand people describes <b>you</b>. The same meal
+          lands differently in different bodies — so StatsKey measures your response instead of
+          borrowing a mean. Change one thing, see what it did, update. <b>Your evidence, not
+          vibes.</b>
         </p>
         <p>
           StatsKey is an iOS + Apple Watch app (with a full web app) built by a solo
@@ -436,13 +505,11 @@
       </div>
       <div class="cta-card">
         <p class="t">Take the data.</p>
-        <p class="s">Code MINDSCAPE · one month of Pro free · core app free either way.</p>
-        <a class="btn primary" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Claim 1 month of Pro free</a>
-        <a class="btn ghost" href="https://apps.apple.com/us/app/statskey/id6751132823">Download on the App Store</a>
-        <a class="btn ghost" href="/">Explore StatsKey on the web</a>
+        <p class="s">Code MINDSCAPE · one month free, then $4.99/month unless canceled.</p>
+        <a class="btn primary" data-claim data-surface="offer" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Get StatsKey + 1 month Pro free</a>
         <p class="fine">
           StatsKey is a wellness tool, not a medical device. It doesn't diagnose or treat
-          anything — it makes your own evidence legible.
+          anything — it makes your own evidence legible. Subscription auto-renews unless canceled.
         </p>
       </div>
     </div>
@@ -473,6 +540,62 @@
       </p>
     </div>
   </footer>
+
+  <div class="mobile-sticky" aria-label="Mindscape listener offer">
+    <a class="btn primary" data-claim data-surface="sticky" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Get StatsKey + 1 month free</a>
+  </div>
+
+  <dialog id="claim-dialog" aria-labelledby="claim-dialog-title">
+    <div class="claim-dialog">
+      <button class="dialog-close" type="button" aria-label="Close">&times;</button>
+      <h2 id="claim-dialog-title">Claim it on your iPhone.</h2>
+      <p>Scan this code with your iPhone camera. Apple applies <b>MINDSCAPE</b> and installs StatsKey if needed.</p>
+      <img src="/mindscape/claim-qr.png" alt="QR code to claim one free month of StatsKey Pro" width="210" height="210" />
+      <a class="btn primary" data-direct-claim data-surface="dialog" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Open the App Store on this device</a>
+      <p class="fine">One month free, then $4.99/month unless canceled. Core app free either way.</p>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      const dialog = document.getElementById("claim-dialog");
+      const preview = document.getElementById("mindscape-preview");
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const device = isIOS ? "ios" : /Macintosh|Mac OS X/i.test(navigator.userAgent) ? "mac" : "other";
+      const track = (name, properties = {}) => window.va("event", name, { device, ...properties });
+
+      track("mindscape_landing_view");
+
+      document.querySelectorAll("[data-claim]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          track("mindscape_claim_click", { surface: link.dataset.surface || "unknown" });
+          if (!isIOS && dialog?.showModal) {
+            event.preventDefault();
+            dialog.showModal();
+            track("mindscape_qr_shown", { surface: link.dataset.surface || "unknown" });
+          }
+        });
+      });
+
+      document.querySelector("[data-direct-claim]")?.addEventListener("click", (event) => {
+        track("mindscape_claim_click", { surface: event.currentTarget.dataset.surface || "dialog" });
+      });
+
+      document.querySelector(".dialog-close")?.addEventListener("click", () => dialog?.close());
+      dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+
+      if (preview) {
+        const observer = new IntersectionObserver((entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          preview.play().catch(() => {});
+          observer.disconnect();
+        }, { rootMargin: "180px" });
+        observer.observe(preview);
+      }
+    })();
+  </script>
 
 </body>
 </html>

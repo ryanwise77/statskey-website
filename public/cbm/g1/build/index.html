@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="The CBM G1 build book: sourced BOM, custom-part manufacturing specifications, material sources, assembly sequence, and validation gates.">
+  <meta name="theme-color" content="#080b0e">
+  <link rel="canonical" href="https://statskeybiometrics.com/cbm/procurement/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2218%22 fill=%22%23050a0d%22/%3E%3Ccircle cx=%2224%22 cy=%2234%22 r=%2211%22 fill=%22%2371f5c6%22/%3E%3Ccircle cx=%2243%22 cy=%2220%22 r=%226%22 fill=%22%237edcff%22/%3E%3C/svg%3E">
+  <title>CBM G1 · Source & Build Book</title>
+  <style>
+    :root{--bg:#080b0e;--panel:#0d1318;--panel2:#111a20;--ink:#f3f7f9;--soft:#bdc8cd;--muted:#738087;--line:rgba(210,235,238,.13);--mint:#71f5c6;--cyan:#7edcff;--orange:#ff8d55;--rose:#ff537d;--violet:#9d88ff;--mono:"DM Mono",monospace;--body:"Manrope",sans-serif;--display:"Space Grotesk",sans-serif}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg)}
+    body{margin:0;background:linear-gradient(180deg,#080b0e,#050709 70%);color:var(--ink);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased}
+    body:before{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(#000,transparent 85%)}
+    a{color:inherit;text-decoration:none}
+    .top{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--line);background:rgba(8,11,14,.82);backdrop-filter:blur(22px)}
+    .top__inner{width:min(1440px,calc(100% - 30px));height:64px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;font:500 10px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase}
+    .brand__mark{width:22px;height:22px;border:1px solid rgba(113,245,198,.45);border-radius:50%;position:relative}.brand__mark:before{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:var(--mint);left:4px;top:8px}
+    .top__actions{display:flex;align-items:center;gap:8px}
+    .top__link{padding:9px 11px;border:1px solid var(--line);border-radius:10px;color:var(--soft);font:500 8px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+    .top__link--accent{color:var(--mint);border-color:rgba(113,245,198,.32)}
+    .layout{width:min(1440px,calc(100% - 30px));margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;padding:28px 0 90px}
+    .toc{position:sticky;top:92px;align-self:start;max-height:calc(100vh - 120px);overflow:auto;padding-right:10px}
+    .toc__label{margin:0 0 10px;color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+    .toc a{display:block;padding:8px 10px;border-left:1px solid var(--line);color:#87959b;font-size:11px;line-height:1.25;transition:.2s}
+    .toc a:hover,.toc a.active{border-left-color:var(--mint);color:var(--ink);background:linear-gradient(90deg,rgba(113,245,198,.06),transparent)}
+    .content{min-width:0}
+    .hero{position:relative;min-height:610px;padding:clamp(30px,5vw,62px);border:1px solid var(--line);border-radius:30px;overflow:hidden;background:
+      radial-gradient(circle at 78% 28%,rgba(126,220,255,.15),transparent 35%),
+      radial-gradient(circle at 14% 82%,rgba(113,245,198,.08),transparent 35%),
+      linear-gradient(145deg,#101b22,#080c10 68%);display:flex;flex-direction:column;justify-content:flex-end}
+    .hero:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(circle at 72% 30%,#000,transparent 65%)}
+    .hero__orbit{position:absolute;right:-4%;top:-24%;width:min(700px,62vw);aspect-ratio:1;border:1px solid rgba(126,220,255,.13);border-radius:50%;box-shadow:0 0 0 60px rgba(126,220,255,.025),0 0 0 132px rgba(126,220,255,.015)}
+    .hero__eyebrow,.eyebrow{position:relative;z-index:2;color:var(--mint);font:500 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase}
+    h1,h2,h3{font-family:var(--display);letter-spacing:-.05em}
+    h1{position:relative;z-index:2;max-width:920px;margin:17px 0 0;font-size:clamp(3rem,6vw,6.7rem);line-height:.89;font-weight:600}
+    .hero__lede{position:relative;z-index:2;max-width:760px;margin:24px 0 0;color:var(--soft);font-size:15px;line-height:1.7}
+    .downloads{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:27px}
+    .download{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 13px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.03);color:var(--soft);font:500 8px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+    .download--primary{border-color:transparent;background:var(--mint);color:#04100d}
+    .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 28px}
+    .fact{padding:16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}
+    .fact__label{color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+    .fact strong{display:block;margin-top:10px;font:600 24px/.95 var(--display);letter-spacing:-.045em}
+    .fact span{display:block;margin-top:7px;color:var(--muted);font-size:10px}
+    .section{scroll-margin-top:90px;margin-top:22px;padding:clamp(24px,4vw,42px);border:1px solid var(--line);border-radius:24px;background:linear-gradient(150deg,rgba(16,24,30,.92),rgba(8,12,15,.82))}
+    .section__head{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.4fr);gap:30px;align-items:end;margin-bottom:28px}
+    h2{margin:12px 0 0;font-size:clamp(2rem,4.2vw,4.4rem);line-height:.94;font-weight:600}
+    .section__head p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+    .gate-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+    .gate{padding:17px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025)}
+    .gate__id{color:var(--cyan);font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .gate h3{margin:18px 0 0;font-size:21px;line-height:1}
+    .gate p{margin:10px 0 0;color:var(--muted);font-size:10px;line-height:1.55}
+    .custom{scroll-margin-top:90px;margin-top:12px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#0a0f13}
+    .custom__head{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(113,245,198,.05),transparent)}
+    .custom__id{color:var(--accent,var(--mint));font:500 10px/1 var(--mono);letter-spacing:.1em}
+    .custom h3{margin:0;font-size:25px;line-height:1}
+    .status{padding:6px 8px;border:1px solid currentColor;border-radius:999px;color:var(--accent,var(--mint));font:500 7px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
+    .custom__body{display:grid;grid-template-columns:minmax(0,.85fr) minmax(300px,1.15fr);gap:0}
+    .custom__spec,.custom__process{padding:20px}
+    .custom__spec{border-right:1px solid var(--line)}
+    .mini-label{color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+    .spec-list{display:grid;gap:8px;margin-top:13px}
+    .spec-list div{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:10px}
+    .spec-list b{color:var(--soft);font-weight:600}.spec-list span{color:var(--muted)}
+    .process{counter-reset:step;display:grid;gap:8px;margin:13px 0 0;padding:0;list-style:none}
+    .process li{counter-increment:step;display:grid;grid-template-columns:29px 1fr;gap:10px;color:var(--soft);font-size:10.5px;line-height:1.55}
+    .process li:before{content:counter(step,decimal-leading-zero);display:grid;place-items:center;width:27px;height:27px;border:1px solid var(--line);border-radius:8px;color:var(--accent,var(--mint));font:500 8px/1 var(--mono)}
+    .acceptance{margin-top:16px;padding:12px 13px;border-left:2px solid var(--accent,var(--mint));background:linear-gradient(90deg,color-mix(in srgb,var(--accent,var(--mint)) 7%,transparent),transparent);color:var(--muted);font-size:10px;line-height:1.55}
+    .acceptance b{color:var(--soft)}
+    .chem-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .chem{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02)}
+    .chem__tag{color:var(--accent,var(--orange));font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .chem h3{margin:18px 0 0;font-size:23px;line-height:1}
+    .chem ol{margin:13px 0 0;padding-left:18px;color:var(--muted);font-size:10px;line-height:1.6}
+    .chem li{margin:5px 0}
+    .warning{margin-top:14px;padding:13px;border:1px solid rgba(255,83,125,.22);border-radius:13px;background:rgba(255,83,125,.045);color:#bd9aa3;font-size:10px;line-height:1.6}
+    .warning b{color:#ff91aa}
+    .bom-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+    .search{flex:1;min-width:220px;height:42px;padding:0 13px;border:1px solid var(--line);border-radius:11px;background:#080c0f;color:var(--ink);font:500 11px var(--body);outline:0}
+    .search:focus{border-color:rgba(113,245,198,.45)}
+    .filter{height:42px;padding:0 11px;border:1px solid var(--line);border-radius:11px;background:#080c0f;color:var(--soft);font:500 8px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+    table{width:100%;border-collapse:collapse;font-size:10px}
+    th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{position:sticky;top:0;background:#111a20;color:var(--soft);font:500 8px var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+    td{color:var(--muted)}td b{display:block;color:var(--ink);font-weight:600}td small{display:block;margin-top:3px;color:#66737a;line-height:1.4}
+    td a{color:var(--mint)}tr:last-child td{border-bottom:0}
+    .pill{display:inline-flex;padding:4px 6px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font:500 7px/1 var(--mono);text-transform:uppercase;white-space:nowrap}
+    .source-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+    .source-card{padding:15px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
+    .source-card b{font-family:var(--display);font-size:16px}.source-card span{display:block;margin-top:7px;color:var(--muted);font-size:10px}.source-card a{display:inline-flex;margin-top:10px;color:var(--mint);font:500 8px var(--mono);text-transform:uppercase}
+    .boundary{border-color:rgba(255,83,125,.24);background:linear-gradient(145deg,rgba(29,12,18,.7),rgba(8,10,12,.9))}
+    .boundary p{color:#bea7ae;font-size:11px;line-height:1.7}.boundary strong{color:#ff9ab0}
+    footer{padding:26px 0 60px;color:var(--muted);font-size:10px;text-align:center}
+    @media(max-width:1080px){.layout{grid-template-columns:1fr}.toc{position:static;display:flex;gap:6px;overflow:auto;padding:0 0 4px}.toc__label{display:none}.toc a{border:1px solid var(--line);border-radius:999px;white-space:nowrap}.gate-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:760px){.top__actions .top__link:not(.top__link--accent){display:none}.layout{width:min(100% - 20px,1440px);padding-top:14px}.hero{min-height:560px;padding:24px}.facts{grid-template-columns:repeat(2,1fr)}.section{padding:20px}.section__head,.custom__body{grid-template-columns:1fr}.custom__spec{border-right:0;border-bottom:1px solid var(--line)}.custom__head{grid-template-columns:70px 1fr}.custom__head .status{display:none}.chem-grid,.source-list{grid-template-columns:1fr}.gate-grid{grid-template-columns:1fr}.spec-list div{grid-template-columns:100px 1fr}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top__inner">
+      <a class="brand" href="/cbm/"><span class="brand__mark"></span><span>CBM G1 · Build book</span></a>
+      <div class="top__actions"><a class="top__link" href="/cbm/">Overview</a><a class="top__link" href="/cbm/viewer/">Interactive CAD</a><a class="top__link top__link--accent" href="/cbm/g1/assets/cbm-g1-bom.csv" download>Download BOM</a></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" id="toc" aria-label="Build book contents">
+      <div class="toc__label">Contents</div>
+      <a href="#top">00 · Package</a>
+      <a href="#gates">01 · Build gates</a>
+      <a href="#cp01">CP-01 · Interface PCB</a>
+      <a href="#cp02">CP-02 · Polymer tiles</a>
+      <a href="#cp03">CP-03 · Metal alternate</a>
+      <a href="#cp04">CP-04 · Flex + boss</a>
+      <a href="#cp05">CP-05 · References</a>
+      <a href="#chemistry">CP-06 · Chemistry</a>
+      <a href="#cp07">CP-07 · Mechanical stack</a>
+      <a href="#bom">Sourced BOM</a>
+      <a href="#sources">Primary sources</a>
+      <a href="#boundary">Safety boundary</a>
+    </nav>
+
+    <main class="content" id="top">
+      <section class="hero">
+        <div class="hero__orbit" aria-hidden="true"></div>
+        <div class="hero__eyebrow">Current STEP-backed mechanical reference · 2026-07-19</div>
+        <h1>Every part retained. Every clearance inspectable.</h1>
+        <p class="hero__lede">The CBM G1 engineering package now includes the actual populated Biocoin envelope, upstream-exact dock headers, a full guarded daughterboard, retained cartridge connector, offset battery cradle and harness, board clips, hard stops, gaskets, latches, source materials, and the gates that prevent nominal CAD from becoming a medical claim.</p>
+        <div class="downloads">
+          <a class="download download--primary" href="/cbm/g1/assets/cbm-g1-bom.csv" download>BOM · CSV ↓</a>
+          <a class="download" href="/cbm/g1/assets/CBM-G1-custom-parts.md" download>Custom parts · MD ↓</a>
+          <a class="download" href="/cbm/g1/assets/CBM-G1-build-validation.md" download>Build + validation · MD ↓</a>
+          <a class="download" href="/cbm/g1/assets/cbm-g1-assembly.scad" download>OpenSCAD source ↓</a>
+          <a class="download" href="/cbm/g1/assets/cbm_g1_assembled.stl" download>Assembly STL ↓</a>
+          <a class="download" href="/cbm/g1/assets/cbm_g1_cartridge.stl" download>Cartridge STL ↓</a>
+          <a class="download" href="/cbm/g1/assets/cbm_g1_daughterboard.stl" download>Daughterboard STL ↓</a>
+          <a class="download" href="/cbm/g1/assets/cbm_g1_reader_shell.stl" download>Shell STL ↓</a>
+          <a class="download" href="/cbm/g1/assets/CBM-G1-mechanical-integration.md" download>Mechanical integration · MD ↓</a>
+          <a class="download" href="/cbm/g1/assets/CBM-G1-fit-report.md" download>Fit report · MD ↓</a>
+          <a class="download" href="/cbm/g1/assets/CBM-G1-utilitarian-case.md" download>Why build it · MD ↓</a>
+          <a class="download" href="/cbm/g1/assets/validate-mechanical-stack.py" download>Fit checker · PY ↓</a>
+          <a class="download" href="/cbm/g1/assets/Biocoin_v1.3.step" download>Upstream Biocoin STEP ↓</a>
+          <a class="download" href="/cbm/g1/assets/Biocoin-LICENSE-NOTICE.txt" download>Biocoin license ↓</a>
+        </div>
+      </section>
+
+      <div class="facts">
+        <div class="fact"><div class="fact__label">Reader core</div><strong>Biocoin v1.3</strong><span>Published hardware + firmware</span></div>
+        <div class="fact"><div class="fact__label">Dry interface</div><strong>12 @ 2.54</strong><span>Mill-Max 817 at 2.24 mm working height</span></div>
+        <div class="fact"><div class="fact__label">Wet field</div><strong>8 × 2×3</strong><span>Six needles per working tile</span></div>
+        <div class="fact"><div class="fact__label">Nominal fit</div><strong>12 / 12 pass</strong><span>Physical tests remain explicitly gated</span></div>
+      </div>
+
+      <section class="section" id="gates">
+        <div class="section__head"><div><div class="eyebrow">Build logic</div><h2>Custom spend follows proof.</h2></div><p>A passed stage unlocks only the next engineering stage. It never automatically unlocks skin wear.</p></div>
+        <div class="gate-grid">
+          <article class="gate"><div class="gate__id">Gate E</div><h3>Electrical truth</h3><p>≤0.5 mV loading error at 1 GΩ; settled cross-talk, temperature, humidity, BLE, and charge checks.</p></article>
+          <article class="gate"><div class="gate__id">Gate C</div><h3>Chemistry</h3><p>Three independent commercial arrays; ladders, residuals, interference, drift, and post-run calibration.</p></article>
+          <article class="gate"><div class="gate__id">Gate Q</div><h3>Quality behavior</h3><p>Every induced fault suppresses the intended output while retaining the labeled raw trace.</p></article>
+          <article class="gate"><div class="gate__id">Gate M / W0</div><h3>Mechanical + integrated</h3><p>Contact, ingress, insertion, fracture, isolation, and full artificial-ISF repeat on the real cartridge.</p></article>
+        </div>
+      </section>
+
+      <article class="custom" id="cp01" style="--accent:var(--cyan)">
+        <div class="custom__head"><div class="custom__id">CP-01</div><h3>Guarded interface daughterboard</h3><span class="status">Custom PCB</span></div>
+        <div class="custom__body">
+          <div class="custom__spec"><div class="mini-label">Frozen specification</div><div class="spec-list">
+            <div><b>Envelope</b><span>Ø38 × 0.8 mm full disc</span></div><div><b>Channels</b><span>Na, K, pH, blank, RE-A, RE-B</span></div><div><b>Front end</b><span>6 × LMP7721 + ADS124S08</span></div><div><b>Upward</b><span>2×10 + 2×8 Mill-Max 855 dock headers</span></div><div><b>Downward</b><span>12-position Mill-Max 817 connector</span></div>
+          </div><div class="acceptance"><b>Release gate:</b> 1.25 mm nominal package edge clearance; ≤0.5 mV loading at 1 GΩ; 6.08 mm Biocoin and 2.24 mm cartridge working heights; reviewed schematic/layout before RFQ.</div></div>
+          <div class="custom__process"><div class="mini-label">Manufacturing sequence</div><ol class="process">
+            <li>Route six guarded islands at radius 15.8 mm and keep each unbuffered run under 8 mm.</li><li>Place LMP7721 followers, central ADS124S08, four published dock footprints, and the retained cartridge connector.</li><li>Assemble, ionically clean, bake, and verify header/connector coplanarity.</li><li>Seat Biocoin in four shell-supported edge clips, compressing J3/J4/J7/J8 by 0.70 mm.</li><li>Measure loading, crosstalk, humidity, radio, and charge-state behavior after full mating.</li>
+          </ol></div>
+        </div>
+      </article>
+
+      <article class="custom" id="cp02" style="--accent:var(--orange)">
+        <div class="custom__head"><div class="custom__id">CP-02</div><h3>Modular polymer microneedle tile</h3><span class="status">Microfabrication</span></div>
+        <div class="custom__body">
+          <div class="custom__spec"><div class="mini-label">Frozen specification</div><div class="spec-list">
+            <div><b>Tile</b><span>3.5 × 5.0 × 0.45 mm target</span></div><div><b>Array</b><span>2×3, electrically common</span></div><div><b>Needles</b><span>1.00 ±0.05 mm × Ø0.30 ±0.03 mm</span></div><div><b>Tip</b><span>≤25 µm radius target</span></div><div><b>Metal</b><span>~10 nm Cr + ~150 nm Au; no nickel</span></div>
+          </div><div class="acceptance"><b>Inspection:</b> 100% optical, sampled dimensional/SEM, witness-film thickness, continuity/isolation, locked phantom insertion, compression safety factor ≥3, residual-DMF plan.</div></div>
+          <div class="custom__process"><div class="mini-label">Published 2026 starting route</div><ol class="process">
+            <li>Mix SYLGARD 184 at 9:1; stir 20 min, vacuum-degas 15 min, cure 80 °C for 2 h.</li><li>Laser-machine the 2×3 negative mold; 2 W, 100 mm/s, 0.05 mm pitch are starting machine settings, not inspection.</li><li>Prepare polystyrene at 300 mg/mL in DMF. Fill mold and centrifuge 5,000 rpm for 5 min.</li><li>Dry at 80 °C for 12 h and demold without side-loading tips.</li><li>Sputter ~10 nm Cr then ~150 nm Au. Release thickness by witness coupon, not elapsed time.</li>
+          </ol></div>
+        </div>
+      </article>
+
+      <article class="custom" id="cp03" style="--accent:var(--rose)">
+        <div class="custom__head"><div class="custom__id">CP-03</div><h3>316L metal tile · vendor alternate</h3><span class="status">RFQ</span></div>
+        <div class="custom__body">
+          <div class="custom__spec"><div class="mini-label">RFQ requirements</div><div class="spec-list">
+            <div><b>Base</b><span>Traceable 316L stainless steel</span></div><div><b>Geometry</b><span>Six isolated 30–36G needles, 0.70–1.00 mm</span></div><div><b>Finish</b><span>Nickel-free gold wet electrode</span></div><div><b>Returns</b><span>STEP, 2D drawing, C of C, coating and insertion data</span></div><div><b>Starting vendor</b><span>ZorayPT ZPT-SMN-001 custom</span></div>
+          </div><div class="acceptance"><b>Incoming QC:</b> dimensions, tip radius, buckling, isolation, coating thickness/pinholes, nickel screen, corrosion in artificial ISF, coating integrity after insertion.</div></div>
+          <div class="custom__process"><div class="mini-label">Vendor package must disclose</div><ol class="process">
+            <li>Material lot and full coating stack, including adhesion layer.</li><li>Nominal/minimum coating thickness and uniformity method.</li><li>Electrical isolation architecture between tiles.</li><li>Cleaning, packaging, residuals, bioburden, and available biological evidence.</li><li>Clear nonsterile-research labeling unless a validated sterile package is separately quoted.</li>
+          </ol></div>
+        </div>
+      </article>
+
+      <article class="custom" id="cp04" style="--accent:var(--mint)">
+        <div class="custom__head"><div class="custom__id">CP-04</div><h3>Twelve-net flex and dry contact boss</h3><span class="status">Custom flex</span></div>
+        <div class="custom__body">
+          <div class="custom__spec"><div class="mini-label">Stack + geometry</div><div class="spec-list">
+            <div><b>Core</b><span>25 µm adhesive-less polyimide</span></div><div><b>Copper</b><span>18 µm rolled-annealed target</span></div><div><b>Disc</b><span>Ø36 inside Ø40 open frame</span></div><div><b>Tile radius</b><span>12.0 mm; eight 3.5×5.0 mm landings</span></div><div><b>Boss</b><span>2×6 at 2.54 mm; 1.55×1.80 mm pads</span></div>
+          </div><div class="acceptance"><b>Wet-side rule:</b> no nickel, copper, ENIG edge, or conductive adhesive exposed. Three latch lands target ≥17.7 N combined retention.</div></div>
+          <div class="custom__process"><div class="mini-label">Assembly sequence</div><ol class="process">
+            <li>Vendor fabricates and 100% open/short tests the flex.</li><li>Converter cuts wet barrier, ARcare passivation, gasket, and adhesive registration features.</li><li>Bond separately characterized tiles in the keyed fixture, one chemistry class at a time.</li><li>Laminate passivation with ±0.10 mm opening alignment.</li><li>Verify continuity, >100 MΩ dry isolation, flatness, pad coplanarity, motion, and ingress.</li>
+          </ol></div>
+        </div>
+      </article>
+
+      <article class="custom" id="cp05" style="--accent:#ffd45b">
+        <div class="custom__head"><div class="custom__id">CP-05</div><h3>Reference A, reference B, and Pt counter</h3><span class="status">Custom electrochemical</span></div>
+        <div class="custom__body">
+          <div class="custom__spec"><div class="mini-label">Reference architecture</div><div class="spec-list">
+            <div><b>RE-A</b><span>Primary Ag/AgCl measurement reference</span></div><div><b>RE-B</b><span>Separate lane/batch differential sentinel</span></div><div><b>Reservoir</b><span>NaCl / PVB protection matrix</span></div><div><b>Counter</b><span>Central Pt six-needle cluster</span></div><div><b>Truth ref</b><span>eDAQ ET073-1 on the bench</span></div>
+          </div><div class="acceptance"><b>Gate:</b> RE-A/RE-B differential drift ≤1 mV over the intended bench interval; counter remains inside AFE compliance with margin.</div></div>
+          <div class="custom__process"><div class="mini-label">2026 starting reference route</div><ol class="process">
+            <li>Deposit the qualified silver layer on each separate reference tile.</li><li>Apply 10 µL of 0.05 M FeCl₃ for 30 s; rinse three times with DI water.</li><li>Apply 50 mg NaCl + 79.1 mg PVB in 1 mL methanol.</li><li>Dry/condition under the locked process and record offset against ET073-1.</li><li>Track each reference's fabrication lane, lot, initial offset, and drift independently.</li>
+          </ol></div>
+        </div>
+      </article>
+
+      <section class="section" id="chemistry">
+        <div class="section__head"><div><div class="eyebrow">CP-06 · functionalization</div><h2>Starting recipes, not invented certainty.</h2></div><p>These are transfers from primary methods. Final volumes, thickness, activity, and cure lock only after the G0 area and drift DOE.</p></div>
+        <div class="chem-grid">
+          <article class="chem" style="--accent:var(--orange)"><div class="chem__tag">Glucose + duplicate</div><h3>PB / GOx</h3><ol><li>PB CV: −0.2→+0.4 V, 20 mV/s, 15 cycles in fresh 2.5 mM FeCl₃ + 2.5 mM K₃Fe(CN)₆ + 0.1 M KCl in 0.1 M HCl.</li><li>GOx 10 mg/mL mixed 1:1 v/v with 1 wt% chitosan in 1% acetic acid.</li><li>Dry, then 1% PEGDE protection. Duplicate uses a separate deposition lane.</li></ol></article>
+          <article class="chem" style="--accent:var(--rose)"><div class="chem__tag">β-hydroxybutyrate</div><h3>HBD / NAD+ / poly-TBO</h3><ol><li>1 µL 0.2 mM TBO; dry 45 min; electropolymerize +0.9 V for 6 min in 400 µL 0.1 M PBS.</li><li>1 µL 0.1 mg/mL COOH-MWCNT in 0.5 wt% chitosan / 0.1 M acetic acid.</li><li>1 µL HBD 2.5 mg/mL : NAD+ 40 mM at 1:2 v/v in 0.1 M Tris-HCl; overnight 4 °C.</li><li>1 µL 0.5% chitosan then 1 µL 2.0% PVC.</li></ol></article>
+          <article class="chem" style="--accent:var(--cyan)"><div class="chem__tag">Sodium + potassium</div><h3>PEDOT:PSS / ISE</h3><ol><li>PEDOT:PSS: 0.2 wt% EDOT + 4 wt% PSS; CV 0.2→0.9 V, 50 mV/s, 10 cycles; cure 80 °C 1 h before assembly.</li><li>Na: 1 mg ionophore X + 0.55 mg Na-TFPB + 33 mg PVC + 65.45 mg DOS in 660 µL THF.</li><li>K: 2 mg valinomycin + 0.55 mg sodium tetraphenylborate + 33 mg PVC + 65.45 mg DOS in 660 µL THF.</li></ol></article>
+          <article class="chem" style="--accent:var(--violet)"><div class="chem__tag">pH + blank</div><h3>PANI / control</h3><ol><li>PANI: 0.1 M aniline in 0.1 M HCl; CV −0.2→+1.0 V, 100 mV/s, 30 cycles.</li><li>The blank matches the physical stack relevant to the validated use while omitting recognition chemistry.</li><li>No single blank is allowed to “correct” every analyte without a dedicated experiment.</li></ol></article>
+        </div>
+        <div class="warning"><b>Method boundary:</b> the dopamine–hyaluronic-acid hydrogel ketone route and a P4VP patent embodiment are separate. G1 does not blend them and call the hybrid published.</div>
+      </section>
+
+      <article class="custom" id="cp07" style="--accent:var(--violet)">
+        <div class="custom__head"><div class="custom__id">CP-07</div><h3>Shell, passivation, gasket, and adhesive</h3><span class="status">Print + convert</span></div>
+        <div class="custom__body">
+          <div class="custom__spec"><div class="mini-label">Mechanical stack</div><div class="spec-list">
+            <div><b>Shell</b><span>Ø44 × 19.0 mm; 1.5 mm wall</span></div><div><b>Battery</b><span>Offset cradle + JST tab harness</span></div><div><b>Adhesive</b><span>Solventum 4077, Ø54 / Ø34 mm</span></div><div><b>Retention</b><span>4 board clips + 3 cartridge hooks + 3 PEEK screws</span></div><div><b>Seals</b><span>Separate enclosure-seam and contact gaskets</span></div>
+          </div><div class="acceptance"><b>Release:</b> 0.81 mm battery/component gap, 1.05 mm ceiling gap, 2.31 mm full-Raytac-body keepout, no ingress or insertion-load transfer.</div></div>
+          <div class="custom__process"><div class="mini-label">Prototype sequence</div><ol class="process">
+            <li>Import and center the actual populated Biocoin STEP, not a board envelope.</li><li>Print the lower chassis, four clips, hard stops, battery cradle, and top cap in Tough 1500 for fit only.</li><li>Install tabbed CP1240 leads through JST ACHR-02V-S; never solder the cell.</li><li>Run 500 mate/demate, shell closure, motion, ingress, latch-load, and phantom-insertion tests.</li><li>Select production material and sterilization only through the device biological-risk program.</li>
+          </ol></div>
+        </div>
+      </article>
+
+      <section class="section" id="bom">
+        <div class="section__head"><div><div class="eyebrow">Live sourced BOM</div><h2>Catalog, open, RFQ, or custom.</h2></div><p>Search the engineering CSV. Links point to the manufacturer or primary open-hardware source; prices are intentionally not presented as live quotes.</p></div>
+        <div class="bom-controls"><input class="search" id="search" type="search" placeholder="Search part, manufacturer, part number, or note…"><select class="filter" id="phase"><option value="">All phases</option><option>G0</option><option>G1</option><option>CHEM</option><option>VALIDATION</option></select><select class="filter" id="kind"><option value="">All status</option><option value="catalog">Catalog</option><option value="RFQ">RFQ</option><option value="open">Open hardware</option><option value="custom">Custom</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>Phase</th><th>Part / function</th><th>Manufacturer / part</th><th>Status</th><th>Critical specification</th><th>Source</th></tr></thead><tbody id="bomBody"><tr><td colspan="6">Loading BOM…</td></tr></tbody></table></div>
+      </section>
+
+      <section class="section" id="sources">
+        <div class="section__head"><div><div class="eyebrow">Primary anchors</div><h2>Methods trace back to sources.</h2></div><p>The full evidence ledger is downloadable with the package.</p></div>
+        <div class="source-list">
+          <article class="source-card"><b>Biocoin</b><span>Open multimodal reader, hardware, firmware, software, and STEP.</span><a href="https://doi.org/10.1038/s44328-026-00103-z" target="_blank" rel="noopener">npj Biosensing 2026 ↗</a></article>
+          <article class="source-card"><b>eMPatch</b><span>2×3 PS microneedle tiles, six-analyte rat platform, fabrication methods.</span><a href="https://doi.org/10.1007/s40820-026-02095-x" target="_blank" rel="noopener">Nano-Micro Letters 2026 ↗</a></article>
+          <article class="source-card"><b>Human ketone microneedle</b><span>poly-TBO / HBD / NAD+ / CNT / chitosan / PVC process.</span><a href="https://doi.org/10.1021/acssensors.3c02677" target="_blank" rel="noopener">ACS Sensors 2024 ↗</a></article>
+          <article class="source-card"><b>Ketone drift warning</b><span>Seven-person randomized study with progressive 14-day signal decline.</span><a href="https://doi.org/10.2196/85548" target="_blank" rel="noopener">JMIR Diabetes 2026 ↗</a></article>
+          <article class="source-card"><b>Control-heavy human array</b><span>Eight cortisol molecular switches plus eight controls; n=3 + n=3.</span><a href="https://doi.org/10.2337/db26-2893-lb" target="_blank" rel="noopener">Diabetes 2026 ↗</a></article>
+          <article class="source-card"><b>FDA investigational device</b><span>IDE, NSR, exemption, and IRB decision framework.</span><a href="https://www.fda.gov/medical-devices/investigational-device-exemption-ide/faqs-about-investigational-device-exemption" target="_blank" rel="noopener">FDA guidance ↗</a></article>
+        </div>
+      </section>
+
+      <section class="section boundary" id="boundary">
+        <div class="eyebrow" style="color:var(--rose)">Non-negotiable boundary</div><h2>Exact manufacturing notes are not a self-test protocol.</h2>
+        <p><strong>Bench work stops at artificial ISF, mechanical phantoms, and approved ex-vivo fixtures.</strong> A human microneedle study requires IRB review, the correct IDE/NSR or exemption determination, investigational labeling, informed consent, device-level biological evaluation, sterilization and packaging evidence, electrical and battery safety, comparators, monitoring, and adverse-event stop rules. Passing Gate W0 does not waive any of that.</p>
+      </section>
+      <footer>CBM G1 is a research-stage engineering reference. Not a medical device. Source snapshot: 2026-07-19.</footer>
+    </main>
+  </div>
+
+  <script>
+    const parseCSV = text => {
+      const rows=[]; let row=[],field="",quoted=false;
+      for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+        if(c==='"'&&quoted&&n==='"'){field+='"';i++}
+        else if(c==='"'){quoted=!quoted}
+        else if(c===','&&!quoted){row.push(field);field=""}
+        else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(field);if(row.some(Boolean))rows.push(row);row=[];field=""}
+        else field+=c;
+      }
+      if(field||row.length){row.push(field);rows.push(row)} return rows;
+    };
+    let bom=[];
+    const renderBOM=()=>{
+      const q=document.getElementById("search").value.toLowerCase(),phase=document.getElementById("phase").value,kind=document.getElementById("kind").value.toLowerCase();
+      const rows=bom.filter(r=>(!phase||r.phase===phase)&&(!kind||`${r.status} ${r.custom}`.toLowerCase().includes(kind))&&(!q||Object.values(r).join(" ").toLowerCase().includes(q)));
+      document.getElementById("bomBody").innerHTML=rows.map(r=>`<tr><td><span class="pill">${r.phase}</span></td><td><b>${r.item}</b><small>${r.assembly}</small></td><td><b>${r.manufacturer}</b><small>${r.part_number}</small></td><td><span class="pill">${r.status}</span></td><td>${r.critical_spec}<small>${r.note}</small></td><td>${r.source_url?`<a href="${r.source_url}" target="_blank" rel="noopener">Open ↗</a>`:"—"}</td></tr>`).join("")||`<tr><td colspan="6">No matching parts.</td></tr>`;
+    };
+    fetch("/cbm/g1/assets/cbm-g1-bom.csv").then(r=>r.text()).then(text=>{const rows=parseCSV(text),headers=rows.shift();bom=rows.map(row=>Object.fromEntries(headers.map((h,i)=>[h,row[i]||""])));renderBOM()}).catch(()=>document.getElementById("bomBody").innerHTML='<tr><td colspan="6">BOM download remains available above.</td></tr>');
+    ["search","phase","kind"].forEach(id=>document.getElementById(id).addEventListener("input",renderBOM));
+    const sections=[...document.querySelectorAll("[id]")],links=[...document.querySelectorAll(".toc a")];
+    const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+e.target.id))}}),{rootMargin:"-25% 0px -65% 0px"});
+    sections.forEach(s=>io.observe(s));
+  </script>
+</body>
+</html>

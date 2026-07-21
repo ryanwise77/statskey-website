@@ -284,6 +284,18 @@ export type BristolType = 1 | 2 | 3 | 4 | 5 | 6 | 7
 
 export type BowelMovementSize = 'small' | 'medium' | 'large' | 'veryLarge'
 
+export type BowelSegmentPortion = 'trace' | 'some' | 'most' | 'all'
+
+export type BowelControlStatus = 'normal' | 'rushed' | 'hardToHold' | 'nearAccident' | 'accident'
+
+/** One phase of a mixed bowel episode — mirrors BowelSegment in
+ *  biometrics/StatsKey/Models/WellnessEntry.swift. */
+export interface BowelSegment {
+  id: string
+  bristolType: BristolType
+  portion: BowelSegmentPortion
+}
+
 export interface SymptomEntry {
   symptom: string
   /** Severity on the 0–10 numeric rating scale iOS uses (older entries were 1–5). */
@@ -311,6 +323,7 @@ export interface EnergyEntry {
 export interface BowelMovementEntry {
   bristolType: BristolType
   color?: StoolColor
+  /** Urgency 1–5 (Normal / Soon / Rushed / Hard to hold / Could not hold). */
   urgency?: number
   durationInSeconds?: number
   notes?: string
@@ -318,6 +331,17 @@ export interface BowelMovementEntry {
   /** iOS-only private photo attachment — preserved on web round-trips. */
   photoStoragePath?: string
   photoCreatedAt?: Date
+  /** Mixed-episode phases; empty means a single episode of `bristolType`. */
+  segments: BowelSegment[]
+  /** "How It Passed" chips (Straining, Pain, Burning, Cramping, Gas, Bloating, Incomplete, Mucus). */
+  passageSymptoms: string[]
+  control?: BowelControlStatus
+  /** "Cleanup & Comfort" chips (Easy cleanup, Messy, Wiped a lot, Bidet, ...). */
+  cleanup: string[]
+  /** "Worth Flagging" chips (Blood, Black/tarry, Pale/clay, Severe pain, Fever, Woke from sleep). */
+  redFlags: string[]
+  /** 0–10 burden score, persisted on save like iOS (computedGIBurdenScore). */
+  giBurdenScore?: number
 }
 
 export type WellnessData =

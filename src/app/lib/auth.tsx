@@ -11,6 +11,8 @@ import {
   OAuthProvider,
   getRedirectResult,
   onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signOut as fbSignOut,
   type User,
@@ -26,8 +28,10 @@ interface AuthState {
   profileLoaded: boolean
   loading: boolean
   error: string | null
+  signInWithEmail: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   signInWithApple: () => Promise<void>
+  sendPasswordReset: (email: string) => Promise<void>
   signOut: () => Promise<void>
   saveProfile: (profile: UserProfile) => Promise<void>
 }
@@ -137,6 +141,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profileLoaded,
       loading,
       error,
+      async signInWithEmail(email, password) {
+        setError(null)
+        setLoading(true)
+        try {
+          const result = await signInWithEmailAndPassword(
+            auth,
+            email.trim(),
+            password
+          )
+          await ensureProfile(result.user)
+        } catch (e) {
+          setError(toMessage(e))
+          throw e
+        } finally {
+          setLoading(false)
+        }
+      },
       async signInWithGoogle() {
         setError(null)
         setLoading(true)
@@ -168,6 +189,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false)
         }
       },
+      async sendPasswordReset(email) {
+        setError(null)
+        setLoading(true)
+        try {
+          await sendPasswordResetEmail(auth, email.trim())
+        } catch (e) {
+          // Do not reveal whether an address has a StatsKey account.
+          if (authErrorCode(e) !== 'auth/user-not-found') {
+            setError(toMessage(e))
+            throw e
+          }
+        } finally {
+          setLoading(false)
+        }
+      },
       async signOut() {
         await fbSignOut(auth)
       },
@@ -190,6 +226,30 @@ export function useAuth(): AuthState {
 }
 
 function toMessage(err: unknown): string {
+  switch (authErrorCode(err)) {
+    case 'auth/invalid-credential':
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+      return 'Incorrect email or password.'
+    case 'auth/invalid-email':
+      return 'Enter a valid email address.'
+    case 'auth/user-disabled':
+      return 'This account has been disabled. Contact support for help.'
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Wait a few minutes and try again.'
+    case 'auth/network-request-failed':
+      return 'Network error. Check your connection and try again.'
+    case 'auth/operation-not-allowed':
+      return 'Email and password sign-in is currently unavailable.'
+    case 'auth/popup-closed-by-user':
+      return 'The sign-in window was closed before completion.'
+  }
   if (err instanceof Error) return err.message
   return String(err)
+}
+
+function authErrorCode(err: unknown): string | undefined {
+  return typeof err === 'object' && err !== null && 'code' in err
+    ? String((err as { code?: unknown }).code)
+    : undefined
 }

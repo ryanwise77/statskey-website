@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Interactive CBM / StatsKey Continuous Panel 3D BOM viewer: reusable puck, disposable microneedle cartridge, and the orderable bench prototype at true datasheet scale.">
+<meta name="theme-color" content="#0d1117">
+<link rel="canonical" href="https://statskeybiometrics.com/cbm/viewer/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<title>CBM Panel · 3D BOM Viewer</title>
+<style>
+:root{--bg:#0d1117;--panel:rgba(10,14,20,.94);--line:#243041;--ink:#eef6ff;--soft:#c5d3e1;--muted:#91a5b8;--aqua:#8fd3ff;--mint:#70f0cb;--amber:#ffbd68;--violet:#b79bff;--danger:#ff7a85}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Barlow,ui-sans-serif,system-ui,sans-serif}
+body{background:radial-gradient(circle at 18% 12%,rgba(44,158,255,.16),transparent 30%),radial-gradient(circle at 88% 18%,rgba(112,240,203,.10),transparent 28%),linear-gradient(145deg,#03060b 0%,#07101a 48%,#04070d 100%)}
+#canvas{display:block;width:100vw;height:100vh;touch-action:none}
+.fallback-render{position:fixed;inset:0;z-index:1;display:grid;place-items:center;padding:28px;background:radial-gradient(circle at 50% 38%,rgba(112,240,203,.12),transparent 26rem),linear-gradient(145deg,#03060b 0%,#07101a 48%,#04070d 100%)}
+.fallback-render.hidden{display:none}.fallback-card{width:min(920px,calc(100vw - 48px));border:1px solid var(--line);border-radius:24px;background:rgba(7,12,19,.88);padding:20px}.fallback-card svg{width:100%;height:auto;display:block}.fallback-card p{margin:12px 0 0;color:var(--soft);font-size:13px;line-height:1.55}.fallback-card b{color:var(--ink)}
+.panel{position:fixed;z-index:3;background:linear-gradient(180deg,rgba(13,22,34,.92),rgba(7,12,19,.84));border:1px solid var(--line);backdrop-filter:blur(14px)}
+.brand{left:18px;top:18px;width:min(322px,calc(100vw - 36px));padding:12px 14px;border-radius:18px}
+.back{display:inline-flex;gap:7px;margin-bottom:10px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;text-decoration:none}
+.eyebrow,.panel-title,.button,.chip,.type,.source-link{letter-spacing:.13em;text-transform:uppercase}.eyebrow{color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700}.brand h1{margin:4px 0 0;font-family:Rajdhani,sans-serif;font-size:31px;line-height:.92}.brand p{margin:9px 0 0;color:var(--soft);font-size:11px;line-height:1.45}
+.brand-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chip{display:inline-flex;gap:7px;align-items:center;min-height:28px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.035);font-size:10px;font-weight:700}.chip:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--aqua)}.chip.safe:before{background:var(--mint)}.chip.warn:before{background:var(--amber)}
+.toolbar{right:18px;top:18px;width:min(300px,calc(100vw - 36px));padding:14px;border-radius:18px}.panel-title{margin:0 0 10px;color:var(--aqua);font-family:Rajdhani,sans-serif;font-size:15px;font-weight:700}.views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.button{appearance:none;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.055);color:var(--ink);padding:9px 10px;font:700 11px Rajdhani,sans-serif;cursor:pointer}.button.active{background:rgba(112,240,203,.14);border-color:rgba(112,240,203,.55);color:#f8fffd}
+.parts-panel{left:18px;bottom:18px;width:min(392px,calc(100vw - 36px));max-height:34vh;overflow:auto;padding:14px;border-radius:18px}.part-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.part-button{appearance:none;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.045);color:var(--soft);padding:8px 9px;text-align:left;font:700 11px Rajdhani,sans-serif;letter-spacing:.06em;cursor:pointer}.part-button.active{border-color:rgba(112,240,203,.65);background:rgba(112,240,203,.12);color:#f8fffd}.part-button span{display:block;margin-top:2px;color:var(--muted);font:600 10px Barlow,sans-serif;letter-spacing:0;text-transform:none}
+.inspector{right:18px;bottom:18px;width:min(455px,calc(100vw - 36px));max-height:48vh;overflow:auto;padding:16px;border-radius:18px}.type{color:var(--amber);font-size:10px;font-weight:700}.title{margin-top:4px;font-family:Rajdhani,sans-serif;font-size:26px;font-weight:700;line-height:1}.inspector p{margin:8px 0 0;color:var(--soft);font-size:12px;line-height:1.5}.inspector b{color:var(--ink)}.source-link{display:inline-flex;margin-top:12px;color:var(--mint);font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700}.hint{position:fixed;left:18px;bottom:calc(34vh + 38px);z-index:2;color:var(--muted);font-size:11px;background:rgba(10,14,20,.72);border:1px solid var(--line);border-radius:999px;padding:9px 12px}
+.legend{position:fixed;left:50%;bottom:18px;z-index:2;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:min(680px,calc(100vw - 36px));padding:9px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(10,14,20,.72);backdrop-filter:blur(12px);color:var(--muted);font-size:11px}.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.legend i{width:9px;height:9px;border-radius:999px;display:inline-block}.legend .enz i{background:#ff9d43}.legend .ion i{background:#4ea3ff}.legend .qc i{background:#8995a1}.legend .ref i{background:#ffe08a}.legend .elec i{background:#36d399}
+body.capture-mode .panel,body.capture-mode .hint,body.capture-mode .legend{display:none!important}
+body.capture-mode canvas{background:radial-gradient(circle at 52% 45%,rgba(143,211,255,.10),transparent 34rem),linear-gradient(145deg,#03060b 0%,#07101a 54%,#04070d 100%)}
+@media(max-width:760px){.toolbar{top:auto;bottom:18px;left:18px;right:auto}.inspector,.parts-panel{display:none}.hint{display:none}.brand{max-height:44vh;overflow:auto}}
+</style>
+</head>
+<body>
+<div class="fallback-render" id="fallbackRender" aria-label="Static CBM panel render">
+  <div class="fallback-card">
+    <svg viewBox="0 0 760 470" role="img" aria-label="CBM continuous panel static assembly blueprint">
+      <rect x="40" y="40" width="680" height="384" rx="30" fill="#071217" stroke="#243041"/>
+      <text x="60" y="78" fill="#8fd3ff" font-family="Rajdhani, sans-serif" font-size="18" font-weight="700">REUSABLE PUCK · &#8960;40 &times; 12 mm</text>
+      <rect x="150" y="96" width="460" height="120" rx="20" fill="#0e1a22" stroke="#35556b"/>
+      <rect x="176" y="120" width="150" height="70" rx="8" fill="#122733" stroke="#70f0cb"/>
+      <text x="182" y="150" fill="#eef6ff" font-family="Rajdhani, sans-serif" font-size="14" font-weight="700">EmStat Pico</text>
+      <text x="182" y="170" fill="#c5d3e1" font-family="Barlow, sans-serif" font-size="11">30.5 x 18 x 2.6</text>
+      <rect x="350" y="120" width="86" height="52" rx="6" fill="#132530" stroke="#8fd3ff"/><text x="360" y="150" fill="#c5d3e1" font-family="Barlow" font-size="11">Raytac BLE</text>
+      <circle cx="520" cy="150" r="30" fill="#26313a" stroke="#8fd3ff"/><text x="520" y="154" fill="#c5d3e1" font-family="Barlow" font-size="10" text-anchor="middle">VARTA</text>
+      <text x="60" y="262" fill="#70f0cb" font-family="Rajdhani, sans-serif" font-size="18" font-weight="700">DISPOSABLE CARTRIDGE · &#8960;30 mm · 8-WE panel</text>
+      <g font-family="Barlow, sans-serif" font-size="9" text-anchor="middle" font-weight="700">
+        <circle cx="250" cy="322" r="15" fill="#ff9d43"/><text x="250" y="326" fill="#03110e">Glc</text>
+        <circle cx="292" cy="322" r="15" fill="#ff9d43"/><text x="292" y="326" fill="#03110e">Ket</text>
+        <circle cx="334" cy="322" r="15" fill="#ff9d43"/><text x="334" y="326" fill="#03110e">Lac</text>
+        <circle cx="376" cy="322" r="15" fill="#8995a1"/><text x="376" y="326" fill="#03110e">DUP</text>
+        <circle cx="418" cy="322" r="15" fill="#4ea3ff"/><text x="418" y="326" fill="#03110e">Na</text>
+        <circle cx="460" cy="322" r="15" fill="#4ea3ff"/><text x="460" y="326" fill="#03110e">K</text>
+        <circle cx="502" cy="322" r="15" fill="#4ea3ff"/><text x="502" y="326" fill="#03110e">pH</text>
+        <circle cx="544" cy="322" r="15" fill="#8995a1"/><text x="544" y="326" fill="#03110e">BLK</text>
+      </g>
+      <g font-family="Barlow, sans-serif" font-size="9" text-anchor="middle" font-weight="700">
+        <circle cx="330" cy="372" r="13" fill="#2a3641" stroke="#c5d3e1"/><text x="330" y="376" fill="#eef6ff">CE</text>
+        <circle cx="386" cy="372" r="13" fill="#ffe08a"/><text x="386" y="376" fill="#03110e">RE-A</text>
+        <circle cx="442" cy="372" r="13" fill="#ffd24d"/><text x="442" y="376" fill="#03110e">RE-B</text>
+      </g>
+      <text x="470" y="376" fill="#91a5b8" font-family="Barlow, sans-serif" font-size="11">33G microneedles &middot; ~0.9 mm</text>
+    </svg>
+    <p><b>Static fallback render.</b> If the 3D scene is not visible, this still identifies the panel geometry and channel map. The WebGL viewer replaces it when Three.js loads.</p>
+  </div>
+</div>
+<canvas id="canvas"></canvas>
+<section class="panel brand">
+  <a class="back" href="/cbm/">Back to CBM</a>
+  <div class="eyebrow">3D BOM viewer</div>
+  <h1>CBM Panel</h1>
+  <p>Reusable puck + disposable microneedle cartridge, modeled at datasheet scale (1 unit = 1 mm). Click any part for the exact component, modeled dimensions, function, and the source/order link.</p>
+  <div class="brand-row"><span class="chip safe">Orderable parts</span><span class="chip warn">RFQ custom head</span><span class="chip">1 mm scale</span></div>
+</section>
+<section class="panel toolbar"><h2 class="panel-title">Views</h2><div class="views" id="views"></div></section>
+<section class="panel parts-panel"><h2 class="panel-title">Parts</h2><div class="part-list" id="partList"></div></section>
+<section class="panel inspector" id="inspector"></section>
+<div class="hint">Drag to rotate · Scroll to zoom · Click a part</div>
+<div class="legend" aria-label="Render legend"><span class="enz"><i></i>enzyme (Glc/Ket/Lac)</span><span class="ion"><i></i>ion-selective (Na/K/pH)</span><span class="qc"><i></i>QC (blank/dup)</span><span class="ref"><i></i>reference / counter</span><span class="elec"><i></i>reader electronics</span></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const query = new URLSearchParams(location.search);
+if (query.get("capture") === "1") document.body.classList.add("capture-mode");
+
+const parts = [
+  {id:"puck-shell",name:"Reusable puck shell",type:"custom reusable",exact:"3D-printed SLA/FDM prototype shell; future injection-molded PC/ABS",dims:"⌀40 x 12 mm, 1.6 mm wall, skin-facing thermal window",detail:"Sealed reusable housing that carries the electronics stack, battery, and the recessed pogo interface. Worn for many cartridge cycles.",risk:"Must seal against sweat, survive daily wear/charge, and hold the dual-island board + battery in ~12 mm of height.",source:"LMU / Formlabs print (this repo CAD)",href:"/cbm/"},
+  {id:"espico",name:"PalmSens EmStat Pico module",type:"orderable electronics",exact:"PalmSens EmStat Pico OEM potentiostat module",dims:"30.5 x 18.0 x 2.6 mm (35.4 mm diagonal fits the 40 mm puck as the analog island)",detail:"Runs chronoamperometry and square-wave voltammetry for the enzyme/aptamer channels; the proven electrochem core.",risk:"Largest single component; its diagonal drives the minimum puck diameter and the dual-island layout.",source:"PalmSens EmStat Pico datasheet",href:"https://www.palmsens.com/product/oem-emstat-pico-module/"},
+  {id:"raytac",name:"BLE module",type:"orderable electronics",exact:"Raytac MDBT50Q-P1MV2 (Nordic nRF52840)",dims:"15.5 x 10.5 x 2.0 mm; PCB antenna",detail:"MCU + Bluetooth radio. Schedules the measurement cycle, runs the fail-closed trust state machine, and streams per-channel results.",risk:"Antenna keepout must stay clear of the analog island and battery; offset RF island in the layout.",source:"Raytac MDBT50Q datasheet",href:"https://www.raytac.com/product/ins.php?index_id=81"},
+  {id:"mux",name:"8:1 analog mux",type:"orderable electronics",exact:"Analog Devices ADG1608BRUZ (TSSOP-16)",dims:"5.0 x 4.4 x 1.1 mm",detail:"Routes the single amperometric front end across the enzyme working electrodes; cascade for >8 channels.",risk:"Low charge-injection/leakage matters; keep switching off the potentiometric nodes.",source:"Analog Devices ADG1608",href:"https://www.analog.com/en/products/adg1608.html"},
+  {id:"buffer",name:"Femtoamp buffer",type:"orderable electronics",exact:"Texas Instruments LMP7721 (3 fA bias, SOIC-8)",dims:"4.9 x 3.9 x 1.5 mm",detail:"Unity-gain guarded buffer for each ion-selective / reference node. A gigaohm ISE membrane needs a femtoamp input or the reading is meaningless.",risk:"Requires guarded PCB layout, driven shields, and low-leakage standoffs.",source:"TI LMP7721",href:"https://www.ti.com/product/LMP7721"},
+  {id:"adc",name:"24-bit ADC",type:"orderable electronics",exact:"Texas Instruments ADS1220 (TSSOP-16)",dims:"5.0 x 4.4 x 1.1 mm",detail:"Digitizes the buffered open-circuit potentials (Na/K/pH/blank/reference) with sub-microvolt resolution after averaging.",risk:"Settling time and channel isolation must be validated for potentiometric multiplexing.",source:"TI ADS1220",href:"https://www.ti.com/product/ADS1220"},
+  {id:"tmp",name:"Temperature sensor",type:"orderable electronics",exact:"Texas Instruments TMP117AIDRVR (WSON-6)",dims:"2.0 x 2.0 x 0.8 mm; skin-facing",detail:"Nernst-slope and enzyme-kinetics temperature correction; also flags thermal transients that invalidate a reading.",risk:"Must track the wet-interface temperature, not just board temperature.",source:"TI TMP117",href:"https://www.ti.com/product/TMP117"},
+  {id:"pmic",name:"Power / charge PMIC",type:"orderable electronics",exact:"Texas Instruments BQ25120A (DSBGA-25)",dims:"2.5 x 2.5 x 0.5 mm",detail:"Wearable-class charger and power path; keeps the puck rechargeable for daily reuse.",risk:"Charge/seal workflow must not compromise sweat ingress protection.",source:"TI BQ25120A",href:"https://www.ti.com/product/BQ25120A"},
+  {id:"battery",name:"Battery",type:"orderable electronics",exact:"VARTA CoinPower CP1240 A4X Li-ion",dims:"⌀12.1 x 4.0 mm",detail:"Thin coin cell stacked centrally over the board stack; sized for duty-cycled ~5-minute measurement bursts.",risk:"RFQ sample path; final cell depends on frozen puck thickness.",source:"VARTA CoinPower",href:"https://www.varta-ag.com/en/industry/smart-patch"},
+  {id:"pogo",name:"Cartridge interface (pogo field)",type:"orderable interconnect",exact:"Mill-Max 0951 spring-loaded pins in a recessed 2x5 field",dims:"11 nets, 2.5 mm pitch, ~1.9 mm travel; asymmetric key + compression stop",detail:"Recessed pogo field on the puck mates the cartridge's gold pad boss: 8 working electrodes + Pt counter + RE-A + RE-B, sealed by a gasket perimeter.",risk:"Contact stability under motion and sweat is a primary reliability risk; gasket + key + compression stop mitigate it.",source:"Mill-Max 0951",href:"https://www.mill-max.com/products/discrete-spring-loaded-pins/surface-mount-spring-loaded-pin/0951"},
+  {id:"cartridge-shell",name:"Disposable cartridge shell",type:"custom disposable",exact:"Printed carrier + die-cut stack (prototype); future molded",dims:"⌀30 x 2.0 mm sensing stack (excl. needle protrusion)",detail:"Single-use carrier holding the microneedle head, flex, references, and adhesive. Replaced every 1-3 days in early versions.",risk:"Sterility, biocompatibility, and repeatable mate/de-mate with the puck.",source:"Design target (this repo CAD)",href:"/cbm/"},
+  {id:"flex",name:"Sensing flex / interposer",type:"custom disposable",exact:"Polyimide ENIG flex, 11 routed traces (RFQ)",dims:"~⌀26 mm round with contact tail; hard-gold pads",detail:"Routes the 8 working electrodes + CE + RE-A + RE-B from the needle head to the pad boss that mates the puck.",risk:"RFQ item; trace routing and pad wear surface must tolerate repeated pogo engagement.",source:"RayPCB / JHYPCB flex",href:"https://www.raypcb.com/flex-pcb/"},
+  {id:"head",name:"Microneedle sensing head",type:"custom disposable",exact:"ZorayPT / Zimmer & Peacock gold-coated 316L array (RFQ)",dims:"33G (⌀0.20 mm) needles, 0.7-0.9 mm length, ~⌀14 mm head",detail:"Shallow dermal-ISF access. Eight independently addressable gold working electrodes plus solid Pt counter and Ag/AgCl reference needles.",risk:"The one true RFQ blocker for the wearable; not needed for the bench prototype.",source:"ZorayPT microneedle array",href:"https://zoraypt.com/products/microneedle-array/"},
+  {id:"glc",name:"WE1 · Glucose",type:"enzyme channel",exact:"Prussian Blue mediator + glucose oxidase + Nafion + crosslinker",dims:"~⌀1.4 mm electrode; 33G needle",detail:"Metabolic anchor. Amperometric at ~0 V so the Prussian-Blue mediator rejects ascorbate/acetaminophen interference.",risk:"Enzyme decay and biofouling over wear; gated by the duplicate channel.",source:"MilliporeSigma GOx",href:"https://www.sigmaaldrich.com/US/en/search/glucose-oxidase-enzyme"},
+  {id:"ket",name:"WE2 · Ketone (BHB)",type:"enzyme channel",exact:"3-hydroxybutyrate dehydrogenase + NAD+ + Toluidine Blue O + MWCNT/chitosan; tyrosinase + P4VP cofactor cap",dims:"~⌀1.4 mm electrode; 33G needle",detail:"The DKA wedge - the clinical reason to measure 'more than glucose'. The tyrosinase + poly(4-vinylpyridine) cap confines the NAD+ cofactor to <1% loss over 10 h.",risk:"NAD+ depletion is the characteristic failure; leans hardest on self-calibration + QC.",source:"ACS Sensors 2024 / Adv Mater 2024",href:"https://doi.org/10.1021/acssensors.3c02677"},
+  {id:"lac",name:"WE3 · Lactate",type:"enzyme channel",exact:"Prussian Blue + lactate oxidase + Nafion + crosslinker",dims:"~⌀1.4 mm electrode; 33G needle",detail:"Exertion / illness / sepsis metabolite. ISF↔blood correlation r≈0.85 with ~10-minute lag.",risk:"Oxygen dependence and shorter enzyme life; flag hypoxic artifact.",source:"MilliporeSigma LOx",href:"https://www.sigmaaldrich.com/IN/en/product/sigma/l9795"},
+  {id:"dup",name:"WE4 · Duplicate glucose (QC)",type:"QC channel",exact:"Identical to WE1 glucose",dims:"~⌀1.4 mm electrode; 33G needle",detail:"Within-cartridge agreement channel. Disagreement with WE1 flags partial wetting or a single-needle fault before a bad number is shown.",risk:"Only useful if it fails independently of WE1; same lot/lane hides shared failures.",source:"QC architecture (this repo)",href:"/cbm/"},
+  {id:"na",name:"WE5 · Sodium (Na+)",type:"ion channel",exact:"PEDOT:PSS solid contact + sodium ionophore X + PVC/DOS",dims:"~⌀1.4 mm electrode; 33G needle",detail:"Hydration/electrolyte context and extracellular-matrix sanity check. Open-circuit potentiometry vs the shared reference.",risk:"Shares the reference-drift failure mode with K and pH.",source:"Sigma-Aldrich ionophore X",href:"https://www.sigmaaldrich.com/AU/en/product/sial/71747"},
+  {id:"k",name:"WE6 · Potassium (K+)",type:"ion channel",exact:"PEDOT:PSS + valinomycin + PVC/DOS",dims:"~⌀1.4 mm electrode; 33G needle",detail:"The life-critical channel and the accuracy exemplar: its actionable window is only ~27.5 mV wide, so it carries the tightest fail-closed budget.",risk:"Reference drift can fabricate a >1 mM error in a day; RE-A/RE-B sentinel is mandatory.",source:"Cayman valinomycin",href:"https://www.caymanchem.com/product/10009152/valinomycin"},
+  {id:"ph",name:"WE7 · pH",type:"ion channel",exact:"Electrodeposited iridium oxide (IrOx)",dims:"~⌀1.4 mm electrode; 33G needle",detail:"Acid-base context and a correction input for the other channels (junction and reference behavior shift with pH).",risk:"IrOx deposition repeatability; commercial pH can substitute on the bench.",source:"Alfa Chemistry IrOx precursors",href:"https://www.alfa-chemistry.com/hexachloroiridic-acid-hexahydrate-cas-16941-92-7-item-81407.htm"},
+  {id:"blk",name:"WE8 · Blank (QC)",type:"QC channel",exact:"Non-ionophore / non-enzyme membrane",dims:"~⌀1.4 mm electrode; 33G needle",detail:"Membrane-independent drift and fouling baseline. Moves with artifact, not analyte, so it can be subtracted.",risk:"Must stay hidden from the user; QC only.",source:"QC architecture (this repo)",href:"/cbm/"},
+  {id:"ce",name:"Counter electrode (Pt)",type:"reference / counter",exact:"Solid platinum counter needle",dims:"33G; center of the head",detail:"Current return path that closes the loop for the amperometric enzyme channels.",risk:"Placement/area affects amperometric stability.",source:"BASi MW-1032 / Pt wire",href:"https://www.basinc.com/products/MW-1032"},
+  {id:"rea",name:"Reference A (Ag/AgCl)",type:"reference / counter",exact:"Ag/AgCl over silver core + chloride reservoir",dims:"~⌀1.2 mm pad + reservoir",detail:"The voltage anchor for every potentiometric channel. Built from silver wire converted with Ag/AgCl ink.",risk:"Reference drift is the single dominant accuracy failure across all ISE channels.",source:"Creative Materials Ag/AgCl ink",href:"https://www.creativematerials.com/products/ag-agcl-inks/"},
+  {id:"reb",name:"Reference B (sentinel)",type:"reference / counter",exact:"Independent reference of different construction",dims:"~⌀1.2 mm pad",detail:"Sentinel: RE-A minus RE-B is the reference-drift detector. If they diverge, all ion channels are suppressed rather than reported wrong.",risk:"Needs enough independence to expose reference failure.",source:"Creative Materials Ag/AgCl ink",href:"https://www.creativematerials.com/products/ag-agcl-inks/"},
+  {id:"adhesive",name:"Adhesive stack",type:"disposable material",exact:"3M/Solventum 4077 retention + 9833 comfort skirt",dims:"die-cut rings, OD ~36 mm",detail:"Keeps the cartridge on skin through motion and sweat; larger than the sensing area for retention.",risk:"Wear time, comfort, and clean removal.",source:"Solventum 4077 / 9833",href:"https://www.solventum.com/en-us/home/f/b5005093112/"},
+  {id:"bench-reader",name:"Bench reader (EmStat4 MUX)",type:"bench instrument",exact:"PalmSens EmStat4 MUX (potentiostat + 8-channel multiplexer)",dims:"~140 x 120 x 40 mm benchtop; USB / PSTrace",detail:"The orderable bench path: drives the 8-cell array over USB with zero firmware. Data on day one.",risk:"Benchtop only; the wearable puck replaces it later.",source:"PalmSens EmStat4 MUX",href:"https://www.palmsens.com/product/emstat4-mux/"},
+  {id:"bench-array",name:"Bench electrode array",type:"bench substrate",exact:"Metrohm DropSens DRP-8X220AT (8 gold cells) + CAST8X",dims:"34.6 x 78.9 x 1.0 mm; WE ⌀2.5 mm",detail:"One disposable card = the whole 8-channel panel. Deposit the six chemistries + blank + duplicate, run standard curves in artificial ISF.",risk:"Bench substrate; production needs the custom microneedle head.",source:"DropSens 8X gold array",href:"https://metrohm-dropsens.com/products/electrodes/screen-printed-electrodes/8x-screen-printed-gold-electrode/"},
+  {id:"bench-ref",name:"Bench reference + vial",type:"bench reference",exact:"eDAQ ET073-1 Ag/AgCl reference in artificial ISF",dims:"65 x ⌀2.0 mm reference; vial of artificial interstitial fluid",detail:"Stable bench-truth reference that separates membrane behavior from reference drift during characterization.",risk:"Bench only; the wearable integrates its own Ag/AgCl reference.",source:"eDAQ ET073-1",href:"https://edaq.com/ET073-1"}
+];
+const partById = new Map(parts.map(p=>[p.id,p]));
+const views = {
+  assembled:{label:"Assembled",camera:[76,64,98],target:[0,4,0]},
+  exploded:{label:"Exploded",camera:[92,74,112],target:[0,4,0]},
+  puck:{label:"Reader",camera:[58,44,70],target:[0,6,0]},
+  cartridge:{label:"Cartridge",camera:[40,52,54],target:[0,-14,0]},
+  bench:{label:"Bench proto",camera:[150,150,182],target:[-30,22,-64]}
+};
+let activeView="assembled"; let activePart="k";
+const objectById = new Map();
+const canvas=document.getElementById("canvas");
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0d1117);
+const camera=new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 2000);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
+const controls=new OrbitControls(camera, renderer.domElement); controls.enableDamping=true;
+scene.add(new THREE.AmbientLight(0xffffff,.56)); const key=new THREE.DirectionalLight(0xffffff,1.05); key.position.set(60,110,70); scene.add(key); const fill=new THREE.DirectionalLight(0x8fd3ff,.34); fill.position.set(-80,40,-70); scene.add(fill); const rim=new THREE.DirectionalLight(0x70f0cb,.24); rim.position.set(10,50,-110); scene.add(rim);
+const root=new THREE.Group(); root.scale.setScalar(1.9); scene.add(root);
+function mat(hex, opacity=1, metal=.1){return new THREE.MeshStandardMaterial({color:new THREE.Color(hex),roughness:.48,metalness:metal,transparent:opacity<1,opacity,depthWrite:opacity>=.6,side:THREE.DoubleSide});}
+function remember(id,obj){obj.userData.partId=id; if(!objectById.has(id)) objectById.set(id,[]); objectById.get(id).push(obj); return obj;}
+function box(id,size,pos,hex,opacity=1,metal=.1){const m=remember(id,new THREE.Mesh(new THREE.BoxGeometry(...size),mat(hex,opacity,metal))); m.position.set(...pos); root.add(m); return m;}
+function cyl(id,r,h,pos,hex,opacity=1,metal=.1,axis="y"){const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,64),mat(hex,opacity,metal))); if(axis==="x")m.rotation.z=Math.PI/2; if(axis==="z")m.rotation.x=Math.PI/2; m.position.set(...pos); root.add(m); return m;}
+function cone(id,r,h,pos,hex,opacity=1){const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r*0.15,r,h,32),mat(hex,opacity,.12))); m.position.set(...pos); root.add(m); return m;}
+function sphere(id,r,pos,hex,opacity=1,metal=.1){const m=remember(id,new THREE.Mesh(new THREE.SphereGeometry(r,28,14),mat(hex,opacity,metal))); m.position.set(...pos); root.add(m); return m;}
+function tube(id,start,end,r,hex,opacity=.9){const mid=new THREE.Vector3((start[0]+end[0])/2,(start[1]+end[1])/2,(start[2]+end[2])/2); const dir=new THREE.Vector3(end[0]-start[0],end[1]-start[1],end[2]-start[2]); const len=dir.length()||.001; const mesh=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,20),mat(hex,opacity,.05))); mesh.position.copy(mid); mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); root.add(mesh); return mesh;}
+function labelSprite(id,text,pos,color="#8fd3ff",width=22){
+  const c=document.createElement("canvas"); c.width=512; c.height=128; const ctx=c.getContext("2d");
+  ctx.fillStyle="rgba(5,11,14,.78)"; ctx.strokeStyle=color; ctx.lineWidth=4; ctx.beginPath(); ctx.roundRect(10,18,492,92,22); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#eef6ff"; ctx.font="700 42px Rajdhani, Arial, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(text,256,66);
+  const tex=new THREE.CanvasTexture(c); const spr=remember(id,new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,opacity:.92}))); spr.position.set(...pos); spr.scale.set(width,width/4,1); root.add(spr); return spr;
+}
+// 8-WE panel channel map: [id, label, color]
+const chan=[["glc","Glc","#ff9d43"],["ket","Ket","#ff8a1f"],["lac","Lac","#ffb066"],["dup","DUP","#8995a1"],["na","Na","#4ea3ff"],["k","K","#2f8dff"],["ph","pH","#7dc0ff"],["blk","BLK","#8995a1"]];
+function cclr(t){return t==="enzyme channel"?"#ff9d43":t==="ion channel"?"#4ea3ff":t==="QC channel"?"#8995a1":"#ffe08a";}
+
+function setVisibilityForView(){
+  const include={
+    assembled:null, exploded:null,
+    puck:["puck-shell","espico","raytac","mux","buffer","adc","tmp","pmic","battery","pogo"],
+    cartridge:["cartridge-shell","flex","head","glc","ket","lac","dup","na","k","ph","blk","ce","rea","reb","adhesive"],
+    bench:["bench-reader","bench-array","bench-ref"]
+  }[activeView];
+  if(!include){ for(const [id,objs] of objectById) objs.forEach(o=>o.visible=!id.startsWith("bench-")); return; }
+  for(const [id,objs] of objectById) objs.forEach(o=>o.visible=include.includes(id));
+}
+function build(){
+  root.clear(); objectById.clear();
+  const exploded=activeView==="exploded";
+  const e=exploded?1:0;
+
+  // ---- Reusable puck (centered at origin, top half) ----
+  const puckY = 4 + e*16;
+  cyl("puck-shell",20,12,[0,puckY,0],"#151d27",.30,.1);                 // translucent shell
+  cyl("puck-shell",20,1.2,[0,puckY-5.4,0],"#1b2733",.72,.1);            // base plate
+  cyl("puck-shell",18.6,1.0,[0,puckY-4.2,0],"#0d5c39",.85,.05);         // analog island PCB (green)
+  box("espico",[30.5,2.6,18],[-1,puckY-2.4,0],"#12202b",.98,.12);       // EmStat Pico module
+  labelSprite("espico","EmStat Pico",[-1,puckY+10+e*4,8],"#8fd3ff",24);
+  box("raytac",[15.5,2.0,10.5],[9,puckY-2.2,-6],"#132430",.98,.12);     // BLE module (RF island)
+  box("mux",[5.0,1.1,4.4],[12,puckY-0.6,6],"#1a2a36",1,.16);            // mux
+  box("adc",[5.0,1.1,4.4],[6,puckY-0.6,9],"#1a2a36",1,.16);             // adc
+  box("buffer",[4.9,1.5,3.9],[-13,puckY-0.6,7],"#1a2a36",1,.16);        // femtoamp buffer
+  box("tmp",[2,0.8,2],[-12,puckY-3.0,-7],"#36d399",1,.2);               // temp (skin side)
+  box("pmic",[2.5,0.5,2.5],[14,puckY-0.9,-3],"#1a2a36",1,.16);          // pmic
+  cyl("battery",6.05,4,[0,puckY+1+e*6,0],"#9aa3ad",.98,.35);            // VARTA coin
+  labelSprite("battery","VARTA CP1240",[0,puckY+9+e*6,0],"#c5d3e1",26);
+  // pogo field on puck underside (2x5)
+  for(let r=0;r<2;r++)for(let c=0;c<5;c++) cyl("pogo",.45,1.6,[-5+c*2.5,puckY-6.4-e*4,-1.25+r*2.5],"#e3b23c",1,.4);
+
+  // ---- Disposable cartridge (below the puck, needles pointing down -Y) ----
+  const cartY = -8 - e*14;
+  cyl("cartridge-shell",15,2,[0,cartY,0],"#e7edf4",.28,.05);            // shell
+  cyl("flex",13,0.4,[0,cartY-1.0,0],"#caa63a",.55,.06);                 // flex
+  cyl("head",11,0.6,[0,cartY-0.2,0],"#dfe6ef",.5,.05);                  // head disk
+  // 8 working electrodes on a ring, needles down
+  const rr=8.4;
+  chan.forEach((ch,i)=>{
+    const a=i*Math.PI/4; const x=rr*Math.cos(a), z=rr*Math.sin(a);
+    cyl(ch[0],1.0,0.5,[x,cartY-0.4,z],ch[2],1,.1);                       // electrode pad
+    cone(ch[0],0.55,1.6,[x,cartY-1.5,z],ch[2],1);                        // 33G needle (down)
+  });
+  // center CE + RE-A + RE-B
+  cone("ce",0.5,1.8,[0,cartY-1.6,0],"#c9d3dc",1);
+  cyl("rea",0.9,0.5,[2.8,cartY-0.4,0],"#ffe08a",1,.12);
+  cyl("reb",0.9,0.5,[-2.8,cartY-0.4,0],"#ffd24d",1,.12);
+  // adhesive skirt
+  cyl("adhesive",18,0.3,[0,cartY+1.0,0],"#2fae6f",.35,.03);
+  labelSprite("head","8-WE panel · 33G",[0,cartY-6-e*2,0],"#70f0cb",30);
+  if(exploded){ labelSprite("rea","RE-A + RE-B sentinel",[0,cartY+5,10],"#ffe08a",34); }
+
+  // connecting nets (assembled/exploded)
+  if(activeView==="assembled"||activeView==="exploded"){
+    for(let c=0;c<5;c++){ tube("pogo",[-5+c*2.5,puckY-6.4-e*4,0],[-5+c*2.5,cartY+1.2,0],.12,"#e3b23c",.5); }
+  }
+
+  // ---- Orderable bench prototype (separate view) ----
+  const bx=-30, bz=30;
+  box("bench-reader",[140,40,120],[bx,20,bz-40],"#7b828b",.96,.2);      // EmStat4 MUX box
+  box("bench-reader",[120,10,3],[bx,26,bz+20],"#0d141b",.9,.1);
+  labelSprite("bench-reader","EmStat4 MUX",[bx,46,bz+20],"#8fd3ff",40);
+  box("bench-array",[35,1,79],[bx+6,1,bz-100],"#1b2129",.98,.1);        // 8X array
+  for(let i=0;i<8;i++) cyl("bench-array",1.25,.4,[bx+6,1.7,bz-135+i*9.2],"#e3b23c",1,.4);
+  labelSprite("bench-array","DRP-8X220AT · 8 gold cells",[bx+6,10,bz-135],"#e3b23c",50);
+  tube("bench-array",[bx+22,2,bz-100],[bx+40,20,bz-60],1.2,"#3a4048",.9);// ribbon
+  cyl("bench-ref",8,26,[bx+38,13,bz-108],"#bfe0ff",.32,.05);            // vial
+  cyl("bench-ref",7,20,[bx+38,11,bz-108],"#fff0a8",.3,.02);             // artificial ISF
+  cyl("bench-ref",1,40,[bx+38,20,bz-108],"#eef2f6",.95,.1);             // reference rod
+  labelSprite("bench-ref","Ag/AgCl ref · artificial ISF",[bx+38,44,bz-108],"#70f0cb",48);
+
+  setVisibilityForView();
+}
+function setView(id){activeView=id; build(); const v=views[id]; camera.position.set(...v.camera); controls.target.set(...v.target); controls.update(); renderUI();}
+function selectPart(id){activePart=id; if(!partById.has(id))return; renderUI();}
+function renderUI(){
+  document.getElementById("views").innerHTML=Object.entries(views).map(([id,v])=>`<button class="button ${id===activeView?"active":""}" data-view="${id}">${v.label}</button>`).join("");
+  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+  document.getElementById("partList").innerHTML=parts.map(p=>`<button class="part-button ${p.id===activePart?"active":""}" data-part="${p.id}">${p.name}<span>${p.exact}</span></button>`).join("");
+  document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>selectPart(b.dataset.part));
+  const p=partById.get(activePart)||parts[0];
+  document.getElementById("inspector").innerHTML=`<div class="type">${p.type}</div><div class="title">${p.name}</div><p><b>Exact part / family:</b> ${p.exact}</p><p><b>Modeled dimensions:</b> ${p.dims}</p><p><b>Function:</b> ${p.detail}</p><p><b>Risk / note:</b> ${p.risk}</p><p><b>Source:</b> ${p.source}</p><a class="source-link" href="${p.href}" target="_blank" rel="noopener">Open source / order page</a>`;
+  for(const [id,objs] of objectById){objs.forEach(obj=>{if(obj.material && "emissive" in obj.material){obj.material.emissive=new THREE.Color(id===activePart?0x2b5470:0x000000);obj.material.emissiveIntensity=id===activePart?0.6:0;}})}
+}
+const raycaster=new THREE.Raycaster(); const mouse=new THREE.Vector2();
+canvas.addEventListener("click",e=>{mouse.x=e.clientX/innerWidth*2-1; mouse.y=-(e.clientY/innerHeight)*2+1; raycaster.setFromCamera(mouse,camera); const hit=raycaster.intersectObjects(root.children,true).find(h=>h.object.userData.partId); if(hit) selectPart(hit.object.userData.partId);});
+addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight);});
+function animate(){requestAnimationFrame(animate); controls.update(); renderer.render(scene,camera);}
+const initialView = views[query.get("view")] ? query.get("view") : "assembled";
+setView(initialView);
+if (partById.has(query.get("part"))) selectPart(query.get("part"));
+animate();
+requestAnimationFrame(()=>document.getElementById("fallbackRender")?.classList.add("hidden"));
+</script>
+</body>
+</html>

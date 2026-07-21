@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0b7373">
+  <title>Friend invitation · StatsKey</title>
+  <style>
+    :root{color-scheme:light dark;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f4f7f7;color:#142020;padding:24px}
+    main{width:min(100%,460px);padding:30px;border:1px solid #d7e3e3;border-radius:24px;background:#fff;text-align:center}
+    .mark{width:64px;height:64px;margin:0 auto 18px;border-radius:18px;background:#0b7373;display:grid;place-items:center;color:#fff;font-size:28px;font-weight:800}
+    h1{font-size:28px;line-height:1.15;margin:0 0 12px}
+    p{color:#526565;line-height:1.55;margin:0 0 22px}
+    .actions{display:grid;gap:10px}
+    a{display:block;padding:14px 18px;border-radius:13px;text-decoration:none;font-weight:700}
+    .primary{background:#0b7373;color:#fff}
+    .secondary{border:1px solid #b8cccc;color:#0b7373}
+    small{display:block;margin-top:20px;color:#738585;line-height:1.45}
+    @media(prefers-color-scheme:dark){
+      body{background:#101717;color:#eff8f8}
+      main{background:#182222;border-color:#314141}
+      p,small{color:#a9bbbb}
+      .secondary{border-color:#4e6666;color:#8bd0d0}
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mark" aria-hidden="true">SK</div>
+    <h1>A friend invited you to StatsKey</h1>
+    <p>Open StatsKey to preview their profile and choose whether to send a friend request. Nothing is shared automatically.</p>
+    <div class="actions">
+      <a class="primary" id="open-app" href="#">Open in StatsKey</a>
+      <a class="secondary" href="https://apps.apple.com/us/app/statskey/id6751132823">Get StatsKey on the App Store</a>
+    </div>
+    <small>If you install StatsKey first, return to this invitation afterward. The invitation reveals no phone number, email address, or health data.</small>
+  </main>
+  <script>
+    const parts = location.pathname.split('/').filter(Boolean);
+    const token = parts[0] === 'friend' && /^[A-Za-z0-9_-]{24,80}$/.test(parts[1] || '') ? parts[1] : '';
+    const open = document.getElementById('open-app');
+    if (token) {
+      open.href = `statskey://friend/${encodeURIComponent(token)}`;
+    } else {
+      open.textContent = 'Invitation unavailable';
+      open.removeAttribute('href');
+      open.setAttribute('aria-disabled', 'true');
+    }
+  </script>
+</body>
+</html>

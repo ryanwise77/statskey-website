@@ -1,4 +1,5 @@
 import type { DailyTotals } from '../aggregates'
+import { bristolSummary, computeGIBurdenScore } from '../gi'
 import type {
   GlucoseReading,
   MacroTargets,
@@ -150,9 +151,14 @@ export function buildSystemPrompt(inputs: ContextInputs): string {
         case 'symptom':
           wellLines.push(`  ${fmtTimeOfDay(w.date)} Symptom: ${w.data.entry.symptom} (sev ${w.data.entry.severity})`)
           break
-        case 'bowelMovement':
-          wellLines.push(`  ${fmtTimeOfDay(w.date)} Gut check: Bristol ${w.data.entry.bristolType}${w.data.entry.color ? `, ${w.data.entry.color}` : ''}`)
+        case 'bowelMovement': {
+          const bm = w.data.entry
+          const burden = bm.giBurdenScore ?? computeGIBurdenScore(bm).score
+          wellLines.push(
+            `  ${fmtTimeOfDay(w.date)} Gut check: ${bristolSummary(bm)}, GI burden ${burden}/10${bm.color ? `, ${bm.color}` : ''}${bm.redFlags.length ? `, red flags: ${bm.redFlags.join(', ')}` : ''}`
+          )
           break
+        }
         case 'sleep':
           wellLines.push(`  ${fmtTimeOfDay(w.date)} Sleep ${w.data.hours.toFixed(1)}h, quality ${w.data.quality}/5`)
           break

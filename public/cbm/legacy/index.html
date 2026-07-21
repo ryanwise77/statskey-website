@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CBM is the reusable reader and disposable cartridge platform for evidence-driven wearable biochemical monitoring programs.">
+  <meta name="theme-color" content="#030407">
+  <link rel="canonical" href="https://statskeybiometrics.com/cbm/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>CBM | Wearable Biochemical Monitoring Platform</title>
+  <style>
+    :root {
+      --bg: #030407;
+      --ink: #f5f5f7;
+      --soft: #c2c8d1;
+      --muted: #858b96;
+      --line: rgba(255,255,255,.11);
+      --cyan: #30d5c8;
+      --blue: #6e8eff;
+      --violet: #9b7cff;
+      --amber: #ffbd68;
+      --font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: "Space Grotesk", Inter, sans-serif;
+      --mono: "JetBrains Mono", "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg); color: var(--ink); font-family: var(--font); scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(110,142,255,.18), transparent 28rem),
+        radial-gradient(circle at 86% 18%, rgba(48,213,200,.12), transparent 24rem),
+        linear-gradient(180deg, #05060a 0%, #030407 52%, #000 100%);
+      line-height: 1.5;
+    }
+    body:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.9), transparent 74%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 30;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(3,4,7,.72);
+      backdrop-filter: blur(24px) saturate(160%);
+    }
+    .nav__inner { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand, .nav__links, .eyebrow, .button, .micro { font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; }
+    .brand__mark { width: 20px; height: 20px; border-radius: 8px; background: radial-gradient(circle at 70% 30%, #fff 0 8%, transparent 9%), linear-gradient(135deg, var(--cyan), var(--blue) 52%, var(--violet)); }
+    .nav__links { display: flex; align-items: center; gap: 22px; color: rgba(194,200,209,.78); font-size: 10px; font-weight: 600; }
+    .hero { min-height: 100svh; padding: 132px 0 80px; display: grid; align-items: center; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .78fr); gap: clamp(36px, 7vw, 88px); align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px; color: var(--cyan); font-size: 11px; font-weight: 600; }
+    .eyebrow:before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 18px currentColor; }
+    h1, h2, h3 { font-family: var(--display); letter-spacing: -.055em; line-height: .94; }
+    h1 { max-width: 880px; font-size: clamp(3.3rem, 7vw, 6.8rem); font-weight: 700; }
+    h2 { max-width: 840px; font-size: clamp(2.4rem, 5vw, 5.1rem); font-weight: 700; }
+    h3 { font-size: clamp(1.45rem, 2.2vw, 2.1rem); }
+    .lede { max-width: 700px; margin-top: 26px; color: var(--soft); font-size: clamp(1.05rem, 1.55vw, 1.28rem); line-height: 1.65; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(255,255,255,.055); font-size: 10px; font-weight: 700; }
+    .button--primary { color: #03110e; border-color: transparent; background: linear-gradient(135deg, var(--cyan), #8fd3ff); }
+    .phone-preview {
+      position: relative;
+      min-height: 630px;
+      border: 1px solid var(--line);
+      border-radius: 38px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 8%, rgba(48,213,200,.16), transparent 24rem),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    }
+    .phone {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 286px;
+      min-height: 546px;
+      transform: translate(-50%, -50%) rotate(-2.5deg);
+      padding: 13px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 42px;
+      background: #05080d;
+    }
+    .screen {
+      min-height: 516px;
+      overflow: hidden;
+      border-radius: 31px;
+      padding: 18px;
+      background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+      color: #10141a;
+    }
+    .screen-top { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; font-weight: 800; }
+    .pill { padding: 6px 8px; border-radius: 999px; background: rgba(0,0,0,.06); color: #58616d; font: 700 9px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .panel { margin-top: 14px; padding: 16px; border-radius: 24px; background: #fff; }
+    .label { color: #64748b; font: 800 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .reading { display: flex; align-items: flex-end; gap: 10px; margin-top: 10px; }
+    .reading strong { font-family: var(--display); font-size: 54px; line-height: .88; letter-spacing: -.07em; color: #0f172a; font-variant-numeric: tabular-nums; }
+    .reading-units { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding-bottom: 5px; }
+    .reading-units > span { color: #1e293b; font-size: 13px; font-weight: 800; line-height: 1; }
+    .reading-units > em { color: #64748b; font: 700 9px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; font-style: normal; }
+    .status { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; color: #475569; font-size: 12px; line-height: 1.4; }
+    .status b { flex-shrink: 0; align-self: center; padding: 7px 9px; border-radius: 999px; background: #30d5c8; color: #03110e; font: 800 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .rows { display: grid; gap: 10px; margin-top: 14px; }
+    .row { display: grid; grid-template-columns: 30px minmax(0, 1fr) minmax(64px, auto); gap: 9px; align-items: center; padding: 11px; border-radius: 16px; background: rgba(15,23,42,.055); font-size: 12px; }
+    .row > div { min-width: 0; }
+    .dot { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: rgba(48,213,200,.13); color: #008b7a; font-weight: 900; }
+    .row small { display: block; margin-top: 2px; color: #64748b; font-size: 10px; line-height: 1.25; }
+    .row-value { justify-self: end; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; white-space: nowrap; }
+    .row-value b { font-family: var(--display); font-size: 17px; font-weight: 700; color: #0f172a; letter-spacing: -.025em; line-height: 1; font-variant-numeric: tabular-nums; }
+    .row-value span { color: #64748b; font: 700 8.5px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+    .section { padding: clamp(76px, 10vw, 136px) 0; }
+    .section-head { display: grid; grid-template-columns: minmax(0, .9fr) minmax(320px, .62fr); gap: 36px; align-items: end; margin-bottom: 34px; }
+    .section-head p, .card p, .wide p { color: var(--soft); font-size: 15px; line-height: 1.72; }
+    .viewer-frame {
+      height: min(760px, 82vh);
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      overflow: hidden;
+      background: #050910;
+    }
+    .viewer-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card, .wide { border: 1px solid var(--line); border-radius: 28px; padding: 24px; background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.026)); }
+    .card-number { color: var(--cyan); font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+    .card h3 { margin-top: 30px; }
+    .truth-table { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 24px; }
+    .truth-cell { min-height: 140px; padding: 16px; border: 1px solid rgba(255,255,255,.08); border-radius: 20px; background: rgba(0,0,0,.2); }
+    .truth-cell b { display: block; font-family: var(--display); font-size: 25px; line-height: 1; letter-spacing: -.04em; }
+    .truth-cell span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .stack-list { display: grid; gap: 10px; margin-top: 24px; }
+    .stack-row { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: start; padding: 13px 0; border-top: 1px solid rgba(255,255,255,.07); }
+    .stack-row b { color: var(--ink); font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+    .stack-row span { color: var(--soft); font-size: 14px; line-height: 1.65; }
+    .source-link { display: inline-flex; margin-top: 16px; color: var(--cyan); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .claim-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 24px; }
+    .claim { padding: 20px; border-radius: 22px; background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.08); }
+    .claim h3 { font-size: 24px; letter-spacing: -.04em; }
+    .claim--no { border-color: rgba(255,189,104,.24); background: rgba(255,189,104,.055); }
+    .claim--yes { border-color: rgba(48,213,200,.24); background: rgba(48,213,200,.055); }
+    footer { border-top: 1px solid rgba(255,255,255,.07); padding: 26px 0; color: var(--muted); font-size: 12px; }
+    footer .shell { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+    @media (max-width: 900px) { .nav__links { display: none; } .hero-grid, .section-head, .grid, .truth-table, .claim-grid { grid-template-columns: 1fr; } .stack-row { grid-template-columns: 1fr; gap: 6px; } .phone-preview { min-height: 660px; } h1 { font-size: clamp(3rem, 13vw, 5rem); } }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="Primary navigation">
+    <div class="shell nav__inner">
+      <a class="brand" href="/" aria-label="StatsKey home"><span class="brand__mark"></span><span>CBM</span></a>
+      <div class="nav__links"><a href="#thesis">Thesis</a><a href="#gap">Care gap</a><a href="#applications">Applications</a><a href="#architecture">Architecture</a><a href="#investment">Investment</a><a href="#validation">Validation</a><a href="/cbm/viewer/">Viewer</a><a href="/cbm/procurement/">BOM</a><a href="/ckm/">CKM</a></div>
+    </div>
+  </nav>
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow">Clinical biochemical monitoring platform</div>
+          <h1>CBM is the hardware base for validated biochemical cartridges.</h1>
+          <p class="lede">CBM fills specific biochemical monitoring gaps where current care still relies on sparse blood draws. It provides the reusable reader, skin interface, cartridge contact system, and confidence-gated software needed to validate one cartridge at a time. The first fundable cartridge is CKM-HF 30: post-discharge potassium trend monitoring for high-risk heart-failure patients.</p>
+          <div class="actions">
+            <a class="button button--primary" href="/cbm/viewer/">Open 3D viewer</a>
+            <a class="button" href="#investment">Investment thesis</a>
+          </div>
+        </div>
+        <aside class="phone-preview" aria-label="Phone-style CBM readings graphic">
+          <div class="phone">
+            <div class="screen">
+              <div class="screen-top"><span>StatsKey</span><span class="pill">Live preview</span></div>
+              <div class="panel">
+                <div class="label">First clinical cartridge</div>
+                <div class="reading">
+                  <strong>94</strong>
+                  <div class="reading-units">
+                    <span>mg/dL</span>
+                    <em>&plusmn; 5 &middot; glucose</em>
+                  </div>
+                </div>
+                <div class="status"><span>UI example only. Clinical use requires cartridge-specific validation.</span><b>bounded</b></div>
+              </div>
+              <div class="rows">
+                <div class="row"><span class="dot">1</span><div><b>Glucose</b><small>Commercial precedent exists</small></div><div class="row-value"><b>94</b><span>&plusmn;5 mg/dL</span></div></div>
+                <div class="row"><span class="dot">2</span><div><b>Potassium</b><small>CKM clinical wedge</small></div><div class="row-value"><b>4.2</b><span>&plusmn;0.3 mmol/L</span></div></div>
+                <div class="row"><span class="dot">3</span><div><b>Lactate</b><small>Research program only</small></div><div class="row-value"><b>1.2</b><span>&plusmn;0.2 mmol/L</span></div></div>
+                <div class="row"><span class="dot">4</span><div><b>Signal quality</b><small>Calibration and QC first</small></div><div class="row-value"><b>96%</b><span>&plusmn;2 conf</span></div></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <section id="thesis" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Medical thesis</div><h2>Build the reusable device once. Validate each biochemical cartridge separately.</h2></div>
+          <p>CBM is the shared infrastructure for clinical biochemical monitoring: reusable electronics, disposable chemistry, controlled skin contact, data quality gates, and an app layer that can suppress outputs when confidence fails.</p>
+        </div>
+        <div class="grid">
+          <article class="card"><div class="card-number">01 / READER</div><h3>Reusable electronics.</h3><p>Electrochemical AFE, BLE, battery, charger, optical path, thermal sensing, haptics, firmware scheduler, and sealed cartridge contacts.</p></article>
+          <article class="card"><div class="card-number">02 / CARTRIDGE</div><h3>Disposable chemistry.</h3><p>Replaceable electrochemical flex with working electrodes, reference/counter system, microneedle access, gasket, contact field, and analyte-specific membranes or enzymes.</p></article>
+          <article class="card"><div class="card-number">03 / SOFTWARE</div><h3>Confidence-gated output.</h3><p>The app displays channel status, calibration age, sensor confidence, and confirmation rules before it displays biomarker interpretation.</p></article>
+        </div>
+        <article class="wide" style="margin-top:14px">
+          <div class="eyebrow">Program selection criteria</div>
+          <h2>Each program must name the clinical decision it changes.</h2>
+          <div class="stack-list">
+            <div class="stack-row"><b>Accept</b><span>Programs where a trend triggers a specific action: confirmatory lab, medication review, protocol escalation, or treatment de-escalation.</span></div>
+            <div class="stack-row"><b>Reject</b><span>Programs where the biomarker is interesting but not actionable, has weak ISF-to-blood interpretation, or cannot meet drift and fouling limits over wear time.</span></div>
+            <div class="stack-row"><b>First wedge</b><span>CKM-HF 30, because post-discharge HFrEF medication management has a measured monitoring gap, high event density, clear workflow, and strong economics.</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="gap" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Current care gap</div><h2>Remote monitoring sees physiology. It usually does not see chemistry.</h2></div>
+          <p>Heart-failure remote patient monitoring is clinically useful: meta-analyses show lower mortality and fewer HF hospitalizations. But most noninvasive RPM programs transmit weight, symptoms, blood pressure, heart rate, and ECG. They do not continuously measure potassium, glucose/ketone dynamics, lactate, or other biochemical variables that drive medication safety and escalation decisions.</p>
+        </div>
+        <article class="wide">
+          <div class="truth-table">
+            <div class="truth-cell"><b>0.81 OR</b><span>HF RPM meta-analysis: lower mortality risk vs. usual care.</span></div>
+            <div class="truth-cell"><b>0.78 OR</b><span>HF RPM meta-analysis: lower first HF hospitalization risk vs. usual care.</span></div>
+            <div class="truth-cell"><b>46.5%</b><span>Eligible HFrEF patients with no serum K+ check within 7 days after MRA initiation in a multicenter cohort.</span></div>
+            <div class="truth-cell"><b>2026</b><span>Microneedle ISF monitoring remains an emerging clinical technology with unresolved validation, reliability, regulatory, and reimbursement barriers.</span></div>
+          </div>
+          <div class="stack-list">
+            <div class="stack-row"><b>Where care fails</b><span>The patient leaves the hospital after medication changes. Potassium, renal function, and metabolic status are checked only when the schedule, patient access, and clinician orders align. High-risk drift can occur between those points.</span></div>
+            <div class="stack-row"><b>What CBM adds</b><span>A chemistry channel between visits. It does not replace confirmatory labs; it determines when the next lab should happen sooner.</span></div>
+            <div class="stack-row"><b>First use</b><span>Potassium trend monitoring after HF discharge, paired with a protocol for confirmatory potassium/creatinine/magnesium testing and medication review.</span></div>
+          </div>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12502459/" target="_blank" rel="noopener" style="margin-left:16px">HF RPM meta-analysis</a>
+          <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCHEARTFAILURE.113.000709" target="_blank" rel="noopener" style="margin-left:16px">MRA monitoring gap</a>
+          <a class="source-link" href="https://pubs.rsc.org/en/content/articlehtml/2026/lc/d5lc00993f" target="_blank" rel="noopener" style="margin-left:16px">2026 microneedle review</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="applications" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Medical applications</div><h2>Prioritize the applications where a trend changes clinical timing.</h2></div>
+          <p>Below is the practical roadmap. Only potassium is ready to be treated as the first clinical cartridge program. Other analytes are future programs with clear medical rationale but material validation gaps.</p>
+        </div>
+        <div class="grid">
+          <article class="card"><div class="card-number">01 / HF POTASSIUM</div><h3>Post-discharge HFrEF.</h3><p>Patients on loop/thiazide diuretics, MRA/RAASi titration, CKD, diabetes, ischemic cardiomyopathy, or ICD history. Action: earlier K+/creatinine/magnesium confirmation and medication review.</p></article>
+          <article class="card"><div class="card-number">02 / CKD + RAASi</div><h3>Hyperkalemia prevention.</h3><p>CKD/HF patients benefit from RAASi but hyperkalemia leads to dose reduction or discontinuation. Action: earlier detection of rising K+ so clinicians can preserve therapy with binders, dose changes, or closer labs.</p></article>
+          <article class="card"><div class="card-number">03 / DIALYSIS</div><h3>Interdialytic K+ risk.</h3><p>Hemodialysis patients experience rapid K+ shifts and long interdialytic intervals associated with arrhythmia concern. Action: identify high-risk pre-dialysis drift and support dialysate / binder / diet review.</p></article>
+          <article class="card"><div class="card-number">04 / DKA</div><h3>Insulin infusion safety.</h3><p>DKA treatment rapidly shifts potassium intracellularly. 2025 real-world DKA data reported hypokalemia during treatment in 67.9% of patients. Action: continuous K+ trend between scheduled BMPs.</p></article>
+          <article class="card"><div class="card-number">05 / SEPSIS</div><h3>Lactate dynamics.</h3><p>Sepsis guidelines require lactate measurement and remeasurement when elevated. Continuous lactate remains developmental, but a hospital cartridge could reduce blind time between serial draws.</p></article>
+          <article class="card"><div class="card-number">06 / VANCOMYCIN</div><h3>Antibiotic TDM.</h3><p>Vancomycin has a narrow therapeutic window and nephrotoxicity risk. ISF/microneedle TDM is promising but preclinical. Action: future dose adjustment support if ISF-to-blood correlation is validated.</p></article>
+          <article class="card"><div class="card-number">07 / TRANSPLANT</div><h3>Tacrolimus monitoring.</h3><p>Tacrolimus requires frequent therapeutic drug monitoring with narrow toxicity/rejection margins. Future CBM cartridges could support home or clinic trend monitoring after strong comparator validation.</p></article>
+          <article class="card"><div class="card-number">08 / GLUCOSE + KETONE</div><h3>Diabetes safety.</h3><p>CGM proves glucose monitoring. Continuous ketone monitoring is emerging for DKA prevention but shows drift challenges. Action: future glucose/BHB/K+ safety cartridge if multi-day enzyme accuracy is proven.</p></article>
+          <article class="card"><div class="card-number">09 / CORTISOL</div><h3>Research only.</h3><p>Wearable cortisol is advancing, but medical actionability is less direct. It remains lower priority until time-resolved cortisol can change a specific endocrine decision.</p></article>
+        </div>
+        <article class="wide" style="margin-top:14px">
+          <div class="eyebrow">Prioritization rule</div>
+          <h2>The first funded use case should maximize lives saved per dollar.</h2>
+          <div class="stack-list">
+            <div class="stack-row"><b>Rank 1</b><span>CKM-HF 30: large risk pool, defined monitoring failure, mortality/readmission relevance, low cartridge cost, and clear confirmatory-lab action.</span></div>
+            <div class="stack-row"><b>Rank 2</b><span>Hospital electrolyte and DKA potassium surveillance: shorter wear, easier calibration, direct workflow integration, and clear scheduled-lab gaps.</span></div>
+            <div class="stack-row"><b>Rank 3</b><span>CKD/RAASi, dialysis, sepsis lactate, and therapeutic drug monitoring are credible medical programs but require separate comparator studies and operational integration.</span></div>
+          </div>
+          <a class="source-link" href="https://www.jacc.org/doi/10.1016/j.jacc.2020.04.021" target="_blank" rel="noopener">K+ in HF</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11844669/" target="_blank" rel="noopener" style="margin-left:16px">CKD/HF hyperkalemia</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6218301/" target="_blank" rel="noopener" style="margin-left:16px">Dialysis K+ shifts</a>
+          <a class="source-link" href="https://www.frontiersin.org/journals/endocrinology/articles/10.3389/fendo.2025.1669400" target="_blank" rel="noopener" style="margin-left:16px">DKA potassium</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12319150/" target="_blank" rel="noopener" style="margin-left:16px">Ketone monitoring</a>
+          <a class="source-link" href="https://bmcemergmed.biomedcentral.com/article/10.1186/s12873-025-01391-w" target="_blank" rel="noopener" style="margin-left:16px">Lactate dynamics</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12570155/" target="_blank" rel="noopener" style="margin-left:16px">Vancomycin TDM</a>
+          <a class="source-link" href="https://www.nature.com/articles/s41467-025-61549-9" target="_blank" rel="noopener" style="margin-left:16px">Microneedle TDM</a>
+          <a class="source-link" href="https://www.nature.com/articles/s44460-025-00008-w" target="_blank" rel="noopener" style="margin-left:16px">Cortisol wearable work</a>
+        </article>
+
+        <article class="wide" style="margin-top:14px">
+          <div class="eyebrow">Evidence matrix</div>
+          <h2>Condition-specific cost / benefit anchors.</h2>
+          <div class="stack-list">
+            <div class="stack-row"><b>HF potassium</b><span><strong>Burden:</strong> ~1.09M U.S. HF hospitalizations/year; vulnerable-phase mortality can approach 10%; MRA monitoring gap: 46.5% untested by day 7. <strong>Cost:</strong> ~$18k per HF hospitalization. <strong>CBM benefit hypothesis:</strong> earlier confirmatory K+/Cr/Mg testing and medication review during the first 30 days after discharge. <strong>Validation endpoint:</strong> fewer days below/above protocol K+ range, faster lab confirmation, fewer urgent electrolyte events, readmissions, ICD therapies, and mortality signal.</span></div>
+            <div class="stack-row"><b>CKD / RAASi</b><span><strong>Burden:</strong> hyperkalemia causes RAASi dose reduction or discontinuation; RAASi interruption is associated with higher hospitalization and mortality in large observational analyses. <strong>Cost:</strong> hyperkalemia in CKD/HF is associated with roughly $24k higher 1-year cost vs. controls in U.S. claims analyses. <strong>CBM benefit hypothesis:</strong> detect rising K+ early enough to preserve RAASi with binder, dose, diet, or lab strategy. <strong>Validation endpoint:</strong> RAASi continuation, fewer severe hyperkalemia events, fewer hyperkalemia admissions.</span></div>
+            <div class="stack-row"><b>Dialysis</b><span><strong>Burden:</strong> arrhythmia/cardiac arrest is the leading known cause of death in hemodialysis; long interdialytic intervals and K+ shifts are recognized risk periods. <strong>Cost:</strong> ESRD inpatient Medicare spending is >$24k per patient-year in historical USRDS data. <strong>CBM benefit hypothesis:</strong> identify high-risk interdialytic K+ drift before dialysis sessions or weekend gaps. <strong>Validation endpoint:</strong> pre-dialysis K+ prediction, urgent hyperkalemia detection, dialysate/binder/diet changes, arrhythmia-event tracking.</span></div>
+            <div class="stack-row"><b>DKA</b><span><strong>Burden:</strong> DKA admissions cost ~$26.6k per admission in inflation-adjusted 2014 U.S. data; aggregate costs reached ~$5.1B. During treatment, 2025 data show hypokalemia developed in 67.9% of DKA patients. <strong>CBM benefit hypothesis:</strong> continuous K+ trend between q2-4h BMPs during insulin infusion. <strong>Validation endpoint:</strong> fewer severe hypokalemia episodes, fewer insulin holds, faster K+ replacement, fewer arrhythmias/ICU escalations.</span></div>
+            <div class="stack-row"><b>Sepsis lactate</b><span><strong>Burden:</strong> sepsis accounts for millions of U.S. hospital stays and >$50B aggregate hospital costs; mortality in sepsis stays remains high. Guidelines recommend lactate measurement and repeat measurement when elevated. <strong>CBM benefit hypothesis:</strong> hospital lactate cartridge reduces blind time between serial draws and detects unfavorable lactate clearance. <strong>Validation endpoint:</strong> agreement with blood lactate, time-to-detection of rising lactate, resuscitation changes, ICU transfer and mortality endpoints.</span></div>
+            <div class="stack-row"><b>Vancomycin</b><span><strong>Burden:</strong> vancomycin has a narrow therapeutic window; nephrotoxicity/AKI is reported in ~5-43% depending on population and exposure. <strong>Cost:</strong> nephrotoxicity prolongs stay, can require additional antibiotics or dialysis, and increases medical cost. <strong>CBM benefit hypothesis:</strong> future TDM cartridge improves AUC-guided dose timing and toxicity avoidance. <strong>Validation endpoint:</strong> ISF-to-blood correlation, AUC prediction, AKI reduction, dose adjustment accuracy.</span></div>
+            <div class="stack-row"><b>Transplant TDM</b><span><strong>Burden:</strong> tacrolimus has a narrow therapeutic index; variability is associated with rejection, renal insufficiency, and graft failure. <strong>Cost:</strong> antibody-mediated rejection adds tens of thousands of dollars per patient-year; graft failure incremental costs can exceed $150k/year. <strong>CBM benefit hypothesis:</strong> home or clinic trend monitoring to reduce trough variability and missed toxic/subtherapeutic windows. <strong>Validation endpoint:</strong> trough prediction, time in therapeutic range, rejection, nephrotoxicity, graft survival.</span></div>
+            <div class="stack-row"><b>Glucose / ketone</b><span><strong>Burden:</strong> CGM lowers severe hypoglycemia hospitalization risk in insulin-treated T2D; DKA remains costly and dangerous. Continuous ketone monitors can capture BHB dynamics but 2026 trial data show drift across 14 days. <strong>CBM benefit hypothesis:</strong> future combined glucose/BHB/K+ cartridge for pump failure, illness, and DKA prevention. <strong>Validation endpoint:</strong> BHB accuracy over wear time, DKA alerts, severe hypoglycemia/DKA admissions.</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+    <section id="architecture" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Architecture &amp; build</div><h2>One reusable reader owns the measurement. Each disposable cartridge owns the chemistry.</h2></div>
+          <p>The panel is buildable from proven, orderable parts. The reader carries the electrochemical modalities; the cartridge carries the analyte chemistry, so adding an analyte is a cartridge change, not a redesign. Two internal signal chains keep a gigaohm ion electrode off the current-driven node.</p>
+        </div>
+        <div class="grid">
+          <article class="card"><div class="card-number">SIGNAL / ENZYME</div><h3>Amperometric path.</h3><p>Glucose, ketone, and lactate route through an 8:1 multiplexer into the potentiostat front end, read by chronoamperometry at ~0&nbsp;V on a Prussian-Blue mediator that rejects ascorbate and acetaminophen.</p></article>
+          <article class="card"><div class="card-number">SIGNAL / ION</div><h3>Potentiometric path.</h3><p>Sodium, potassium, and pH read open-circuit through a femtoamp buffer into a 24-bit ADC &mdash; a separate high-impedance chain, because an ion-selective membrane is a gigaohm source.</p></article>
+          <article class="card"><div class="card-number">TRUST</div><h3>Fail-closed per channel.</h3><p>A blank, a duplicate, and a reference sentinel (RE-A minus RE-B) feed a state machine that withholds any channel it cannot stand behind &mdash; the behavior no shipping panel has.</p></article>
+        </div>
+        <article class="wide" style="margin-top:14px">
+          <div class="eyebrow">Real-dimensioned parts</div>
+          <h2>Every core part is sourced at its datasheet size, so the render is true scale.</h2>
+          <div class="truth-table">
+            <div class="truth-cell"><b>30.5 &times; 18</b><span>PalmSens EmStat Pico electrochem module (&times; 2.6&nbsp;mm); 35.4&nbsp;mm diagonal fits a 40&nbsp;mm puck as the analog island.</span></div>
+            <div class="truth-cell"><b>15.5 &times; 10.5</b><span>Raytac MDBT50Q-P1MV2 BLE module (&times; 2.0&nbsp;mm); offset RF island.</span></div>
+            <div class="truth-cell"><b>&#8960;12.1 &times; 4.0</b><span>VARTA CoinPower CP1240 cell; stacked centrally in the puck.</span></div>
+            <div class="truth-cell"><b>34.6 &times; 78.9</b><span>DropSens 8-cell gold array; the whole bench panel on one disposable (WE &#8960;2.5&nbsp;mm).</span></div>
+          </div>
+        </article>
+        <article class="wide" style="margin-top:14px">
+          <div class="eyebrow">Orderable bench prototype</div>
+          <h2>A working multi-analyte bench instrument with zero custom parts.</h2>
+          <div class="stack-list">
+            <div class="stack-row"><b>Reader</b><span>PalmSens EmStat4 MUX (potentiostat plus 8-channel multiplexer) driven by PSTrace software &mdash; data on day one, no firmware to write.</span></div>
+            <div class="stack-row"><b>Electrodes</b><span>A single DropSens 8X gold array holds all six chemistries plus a blank and a duplicate; a miniature Ag/AgCl reference anchors them in artificial interstitial fluid.</span></div>
+            <div class="stack-row"><b>Outcome</b><span>Standard curves for glucose, ketone, lactate, sodium, potassium, and pH &mdash; and a demonstrated fail-closed response &mdash; before any microneedle is fabricated.</span></div>
+            <div class="stack-row"><b>Ketone upgrade</b><span>Tyrosinase and a poly(4-vinylpyridine) topcoat confine the ketone channel&rsquo;s NAD&#8314; cofactor to under 1% loss over 10&nbsp;hours, de-risking the hardest new chemistry.</span></div>
+          </div>
+        </article>
+        <article class="wide" style="margin-top:14px">
+          <div class="eyebrow">Honest novelty</div>
+          <h2>Not the first panel, not the first control channels. The defensible thing is the integration.</h2>
+          <div class="claim-grid">
+            <div class="claim claim--no"><h3>Already done</h3><p>Multi-analyte ISF panels exist in the lab; glucose-plus-ketone shipped (Abbott, 2026); dedicated control channels and fail-closed abstention are being commercialized (Adaptyx, first-in-human 2026). A &ldquo;first ever&rdquo; claim would be false.</p></div>
+            <div class="claim claim--yes"><h3>Still open</h3><p>A broad enzyme, ion-selective, and aptamer panel governed by per-channel fail-closed trust, as one product, is not demonstrated as a whole. Any novelty claim starts with a patent search of the adjacent work.</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="viewer" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Product viewer</div><h2>Explore the wearable hardware in 3D.</h2></div>
+          <p>Inspect the reusable puck, disposable cartridge, contact field, microneedle array, optical path, and electronics in a dedicated interactive viewer.</p>
+        </div>
+        <div class="actions" style="margin-top:0;margin-bottom:18px"><a class="button button--primary" href="/cbm/viewer/">Open standalone product viewer</a></div>
+        <div class="viewer-frame"><iframe src="/cbm/viewer/" title="CBM Panel interactive 3D BOM viewer" loading="lazy"></iframe></div>
+      </div>
+    </section>
+
+    <section id="investment" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Investment thesis</div><h2>Fund the first cartridge that validates the platform and the clinical workflow.</h2></div>
+          <p>The investment case is a specific post-discharge heart-failure monitoring product that uses CBM hardware and CKM potassium chemistry to close a documented medication-safety gap.</p>
+        </div>
+        <article class="wide">
+          <div class="truth-table">
+            <div class="truth-cell"><b>~4 / mo</b><span>Target cartridges per monitored patient at 7-day wear, not daily replacement.</span></div>
+            <div class="truth-cell"><b>$20-$124</b><span>Modeled monthly disposable cost after reader placement, using current prototype BOM assumptions.</span></div>
+            <div class="truth-cell"><b>$18k</b><span>Mean U.S. heart-failure hospitalization cost used on the CKM evidence page.</span></div>
+            <div class="truth-cell"><b>12-75 yrs</b><span>One avoided HF hospitalization offsets roughly 12-75 patient-years of cartridge cost at prototype ranges.</span></div>
+          </div>
+          <div class="stack-list">
+            <div class="stack-row"><b>Use of funds</b><span>Bench fixtures, sterile K+ cartridge fabrication, reference stability, biofouling controls, 7-day wear testing, paired laboratory potassium study, and clinician dashboard workflow.</span></div>
+            <div class="stack-row"><b>Why CBM matters</b><span>If CKM-HF 30 succeeds, the reusable reader, app, manufacturing envelope, and fail-closed architecture become reusable infrastructure for future cartridges.</span></div>
+          </div>
+          <a class="source-link" href="/ckm/">CKM mortality and economics model</a>
+          <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCOUTCOMES.123.009999" target="_blank" rel="noopener" style="margin-left:16px">HF hospitalization costs</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="validation" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <div><div class="eyebrow">Prototype limitations</div><h2>The current CBM package is an engineering envelope, not a validated monitor.</h2></div>
+          <p>The viewer and page define physical architecture. They do not prove any analyte. The investment case depends on retiring the specific risks below.</p>
+        </div>
+        <div class="grid">
+          <article class="card"><div class="card-number">LIMIT 01</div><h3>Biofluid correlation.</h3><p>ISF and blood are related but not identical. Each analyte needs paired comparator data, lag characterization, and thresholds that map to clinical action.</p></article>
+          <article class="card"><div class="card-number">LIMIT 02</div><h3>Electrode stability.</h3><p>Reference drift, membrane leaching, enzymatic decay, fouling, sweat ingress, and motion artifact can dominate the signal unless the cartridge is designed to fail closed.</p></article>
+          <article class="card"><div class="card-number">LIMIT 03</div><h3>Wear and manufacturing.</h3><p>Microneedle insertion, adhesive wear, biocompatibility, sterile packaging, lot control, and 7- to 14-day repeatability must be validated before clinical or consumer deployment.</p></article>
+        </div>
+        <article class="wide" style="margin-top:14px">
+          <div class="eyebrow">Future model roadmap</div>
+          <h2>What future CBM versions could do after validation.</h2>
+          <div class="stack-list">
+            <div class="stack-row"><b>V1</b><span>Potassium-only CKM-HF 30 cartridge with post-discharge clinician dashboard and confirmatory lab workflow.</span></div>
+            <div class="stack-row"><b>V2</b><span>Hospital tethered electrolyte cartridge with larger references, bay-driven recalibration, shorter wear, and EHR-integrated trend alerts.</span></div>
+            <div class="stack-row"><b>V3</b><span>Diabetes safety cartridge combining glucose, beta-hydroxybutyrate, and potassium if enzyme stability and DKA intervention endpoints are validated.</span></div>
+            <div class="stack-row"><b>V4</b><span>Multiplex research cartridge only after individual channels prove drift, cross-talk, and clinical decision value.</span></div>
+          </div>
+          <div class="claim-grid">
+            <div class="claim claim--no"><h3>Does not claim</h3><p>Validated multi-analyte diagnosis, treatment guidance, stress scoring, hydration diagnosis, lactate threshold prescription, or medical-device readiness.</p></div>
+            <div class="claim claim--yes"><h3>Does claim</h3><p>A reusable reader and disposable cartridge architecture designed to support analyte-specific validation programs, starting with CKM potassium monitoring.</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer><div class="shell"><span>CBM is a research-stage platform concept. Not a medical device.</span><nav><a href="/">Home</a><a href="/cbm/viewer/">Product viewer</a><a href="/ckm/">CKM</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav></div></footer>
+</body>
+</html>

@@ -15,6 +15,7 @@ import {
   decodeWorkout,
 } from '../decoders'
 import { dailyTotals } from '../aggregates'
+import { bristolSummary, computeGIBurdenScore } from '../gi'
 import { endOfDay, localDateString, startOfDay } from '../firestore'
 import { glucoseStats } from '../data/useGlucoseRange'
 import type { ReportTopic } from '../types'
@@ -257,10 +258,13 @@ function wellnessLine(w: WellnessEntry): string {
       return `${fmtTime(w.date)} energy ${w.data.entry.level}/5`
     case 'symptom':
       return `${fmtTime(w.date)} symptom: ${w.data.entry.symptom} (severity ${w.data.entry.severity})`
-    case 'bowelMovement':
-      return `${fmtTime(w.date)} gut check: Bristol ${w.data.entry.bristolType}${
-        w.data.entry.urgency != null ? `, urgency ${w.data.entry.urgency}` : ''
-      }`
+    case 'bowelMovement': {
+      const bm = w.data.entry
+      const burden = bm.giBurdenScore ?? computeGIBurdenScore(bm).score
+      return `${fmtTime(w.date)} gut check: ${bristolSummary(bm)}, GI burden ${burden}/10${
+        bm.urgency != null ? `, urgency ${bm.urgency}/5` : ''
+      }${bm.redFlags.length ? `, red flags: ${bm.redFlags.join(', ')}` : ''}`
+    }
     case 'sleep':
       return `${fmtTime(w.date)} sleep ${w.data.hours.toFixed(1)}h`
     case 'hydration':

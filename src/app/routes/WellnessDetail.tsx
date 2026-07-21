@@ -5,7 +5,18 @@ import { useWellnessDetail } from '../lib/data/useWellnessDetail'
 import { deleteWellness } from '../lib/writers'
 import { WellnessLogForm } from '../components/log/WellnessLogForm'
 import { formatDuration } from '../lib/format'
-import type { WellnessEntry, WellnessData } from '../lib/types'
+import {
+  BRISTOL_INFO,
+  CONTROL_LABELS,
+  PORTION_LABELS,
+  URGENCY_LABELS,
+  bristolSummary,
+  computeGIBurdenScore,
+  isMixedEpisode,
+  normalizedSegments,
+  parseFeelTagsFromNotes,
+} from '../lib/gi'
+import type { BowelMovementEntry, WellnessEntry, WellnessData } from '../lib/types'
 
 export function WellnessDetail() {
   const { user } = useAuth()
@@ -82,6 +93,10 @@ export function WellnessDetail() {
     )
   }
 
+  const bowel = entry.data.kind === 'bowelMovement' ? entry.data.entry : undefined
+  const bowelNotes = bowel ? parseFeelTagsFromNotes(bowel.notes ?? entry.notes) : undefined
+  const displayNotes = bowel ? bowelNotes?.notes : entry.notes
+
   return (
     <div className="space-y-6 max-w-[720px]">
       <header>
@@ -124,16 +139,90 @@ export function WellnessDetail() {
         </div>
       )}
 
+      {bowel && <GIBurdenPanel bowel={bowel} />}
+
       <div className="panel space-y-4">
         <span className="card-title">{wellnessKindLabel(entry)}</span>
         <DetailGrid data={entry.data} />
+        {bowel && bowel.redFlags.length > 0 && (
+          <div className="rounded-lg border border-red-400/30 bg-red-400/[0.07] p-3">
+            <div className="text-[11px] uppercase tracking-wider text-red-300/90">Worth flagging</div>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {bowel.redFlags.map((flag) => (
+                <span
+                  key={flag}
+                  className="rounded-full border border-red-400/40 bg-red-400/10 px-2.5 py-1 text-[12px] text-red-200"
+                >
+                  {flag}
+                </span>
+              ))}
+            </div>
+            <p className="text-[11.5px] text-text-muted mt-2">
+              These do not diagnose anything, but they make a clinician summary clearer.
+            </p>
+          </div>
+        )}
+        {bowel && bowelNotes && bowelNotes.tags.length > 0 && (
+          <div>
+            <div className="card-subtext">How it felt</div>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {bowelNotes.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[12px] text-text-secondary"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {entry.notes && (
+      {displayNotes && (
         <div className="panel">
           <span className="card-title">Notes</span>
-          <p className="text-text-primary text-[14px] mt-2 whitespace-pre-wrap">{entry.notes}</p>
+          <p className="text-text-primary text-[14px] mt-2 whitespace-pre-wrap">{displayNotes}</p>
         </div>
+      )}
+    </div>
+  )
+}
+
+/** Persisted score if present (what iOS saved), otherwise computed live —
+ *  mirroring computedGIBurdenScore's stored-value precedence. */
+function GIBurdenPanel({ bowel }: { bowel: BowelMovementEntry }) {
+  const computed = computeGIBurdenScore(bowel)
+  const score = bowel.giBurdenScore ?? computed.score
+  return (
+    <div className="panel">
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="card-title">GI burden</span>
+          <p className="text-text-secondary text-[12.5px] mt-1">
+            Form × portion, plus urgency, passage, cleanup, and control — red flags floor it at 8.
+          </p>
+        </div>
+        <span
+          className="font-display text-[34px] font-bold tabular-nums leading-none"
+          style={{ color: burdenColor(score) }}
+        >
+          {score}
+          <span className="text-[15px] text-text-muted font-normal">/10</span>
+        </span>
+      </div>
+      {computed.breakdown.length > 0 && (
+        <ul className="mt-3 border-t border-white/[0.06] pt-2">
+          {computed.breakdown.map((row) => (
+            <li
+              key={row.label}
+              className="flex justify-between gap-4 py-1 text-[12px] text-text-secondary font-mono"
+            >
+              <span>{row.label}</span>
+              <span className="text-text-primary whitespace-nowrap">{row.amount}</span>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   )
@@ -162,15 +251,33 @@ function detailRows(data: WellnessData): Array<{ label: string; value: string | 
     case 'bowelMovement': {
       const entry = data.entry
       const rows: Array<{ label: string; value: string | number }> = [
-        { label: 'Bristol type', value: `Type ${entry.bristolType}` },
+        { label: 'Form', value: bristolSummary(entry) },
       ]
+      if (isMixedEpisode(entry)) {
+        rows.push({
+          label: 'Phases',
+          value: normalizedSegments(entry)
+            .map((s) => `T${s.bristolType} · ${PORTION_LABELS[s.portion]}`)
+            .join('  →  '),
+        })
+      } else {
+        rows.push({ label: 'Reading', value: BRISTOL_INFO[entry.bristolType].description })
+      }
       if (entry.color) rows.push({ label: 'Color', value: stoolColorLabel(entry.color) })
-      if (entry.urgency != null) rows.push({ label: 'Urgency', value: urgencyLabel(entry.urgency) })
+      if (entry.urgency != null) {
+        rows.push({ label: 'Urgency', value: URGENCY_LABELS[entry.urgency] ?? String(entry.urgency) })
+      }
+      if (entry.control) rows.push({ label: 'Control', value: CONTROL_LABELS[entry.control] })
       if (entry.estimatedSize) rows.push({ label: 'Size', value: sizeLabel(entry.estimatedSize) })
       if (entry.durationInSeconds != null && entry.durationInSeconds > 0) {
         rows.push({ label: 'Duration', value: formatDuration(entry.durationInSeconds) })
       }
-      if (entry.notes) rows.push({ label: 'GI notes', value: entry.notes })
+      if (entry.passageSymptoms.length) {
+        rows.push({ label: 'How it passed', value: entry.passageSymptoms.join(', ') })
+      }
+      if (entry.cleanup.length) {
+        rows.push({ label: 'Cleanup & comfort', value: entry.cleanup.join(', ') })
+      }
       return rows
     }
     case 'symptom': {
@@ -193,6 +300,7 @@ function detailRows(data: WellnessData): Array<{ label: string; value: string | 
     }
     case 'energy': {
       const rows = [{ label: 'Energy', value: `${data.entry.level}/5` }]
+      if (data.entry.tags?.length) rows.push({ label: 'Context', value: data.entry.tags.join(', ') })
       if (data.entry.crashTime) {
         rows.push({ label: 'Crash time', value: data.entry.crashTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) })
       }
@@ -242,7 +350,7 @@ function wellnessKindLabel(entry: WellnessEntry): string {
 function wellnessTitle(entry: WellnessEntry): string {
   switch (entry.data.kind) {
     case 'bowelMovement':
-      return `Gut Check - Type ${entry.data.entry.bristolType}`
+      return `Gut Check — ${bristolSummary(entry.data.entry)}`
     case 'symptom':
       return entry.data.entry.symptom || 'Symptom'
     case 'mood':
@@ -258,17 +366,11 @@ function wellnessTitle(entry: WellnessEntry): string {
   }
 }
 
-function urgencyLabel(level: number): string {
-  switch (level) {
-    case 1:
-      return 'Normal'
-    case 2:
-      return 'Moderate'
-    case 3:
-      return 'Urgent'
-    default:
-      return String(level)
-  }
+function burdenColor(score: number): string {
+  if (score <= 2) return '#51CF66'
+  if (score <= 4) return '#FFCE6B'
+  if (score <= 7) return '#FFA94D'
+  return '#FF6B6B'
 }
 
 function stoolColorLabel(color: string): string {

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Interactive lifelike product and STEP-backed mechanical viewer for the CBM G1 continuous biochemical monitoring research platform.">
+  <meta name="theme-color" content="#050709">
+  <link rel="canonical" href="https://statskeybiometrics.com/cbm/viewer/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2218%22 fill=%22%23050a0d%22/%3E%3Ccircle cx=%2224%22 cy=%2234%22 r=%2211%22 fill=%22%2371f5c6%22/%3E%3Ccircle cx=%2243%22 cy=%2220%22 r=%226%22 fill=%22%237edcff%22/%3E%3C/svg%3E">
+  <title>CBM G1 · Interactive CAD</title>
+  <style>
+    :root{--bg:#050709;--panel:rgba(8,13,17,.87);--line:rgba(210,235,238,.14);--ink:#f3f7f9;--soft:#bdc9ce;--muted:#748188;--mint:#71f5c6;--cyan:#7edcff;--orange:#ff8d55;--rose:#ff537d;--violet:#9d88ff;--mono:"DM Mono",monospace;--body:"Manrope",sans-serif;--display:"Space Grotesk",sans-serif}
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+    body{background:radial-gradient(circle at 52% 40%,#0d1920 0,#071015 35%,#050709 72%)}
+    a{color:inherit;text-decoration:none}
+    #stage{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:0}
+    .noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.22;background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+      background-size:56px 56px;mask-image:radial-gradient(circle at 50% 48%,#000 20%,transparent 76%)}
+    .panel{position:fixed;z-index:4;border:1px solid var(--line);background:linear-gradient(150deg,rgba(11,18,23,.94),rgba(5,8,11,.82));backdrop-filter:blur(18px) saturate(130%);box-shadow:0 18px 50px rgba(0,0,0,.25)}
+    .topbar{left:18px;right:18px;top:18px;min-height:64px;padding:11px 13px;border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .topbar__left,.topbar__right{display:flex;align-items:center;gap:10px}
+    .back{display:grid;place-items:center;width:39px;height:39px;border:1px solid var(--line);border-radius:12px;color:var(--soft);transition:.2s}
+    .back:hover{color:var(--mint);border-color:rgba(113,245,198,.35)}
+    .back svg{width:17px}
+    .identity{display:flex;align-items:center;gap:12px;min-width:0}
+    .identity__mark{position:relative;width:34px;height:34px;border:1px solid rgba(113,245,198,.38);border-radius:50%;box-shadow:inset 0 0 16px rgba(113,245,198,.12)}
+    .identity__mark:before,.identity__mark:after{content:"";position:absolute;border-radius:50%;background:var(--mint)}
+    .identity__mark:before{width:8px;height:8px;left:6px;top:13px}.identity__mark:after{width:5px;height:5px;right:7px;top:8px;background:var(--cyan)}
+    .identity h1{margin:0;font:600 16px/1 var(--display);letter-spacing:-.03em}
+    .identity p{margin:4px 0 0;color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+    .badge{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .badge:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 12px var(--mint)}
+    .download{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 12px;border:1px solid rgba(113,245,198,.3);border-radius:11px;color:var(--mint);font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .views{right:18px;top:98px;width:326px;padding:13px;border-radius:18px}
+    .panel-label{margin:0 0 10px;color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+    .view-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+    button{font:inherit}
+    .view-btn,.part-btn,.mobile-info{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.035);color:var(--soft);cursor:pointer}
+    .view-btn{min-height:38px;border-radius:11px;font:500 9px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;transition:.2s}
+    .view-btn:hover,.view-btn.active{border-color:rgba(113,245,198,.45);color:var(--ink);background:rgba(113,245,198,.09)}
+    .parts{left:18px;bottom:18px;width:min(390px,calc(100vw - 36px));max-height:42vh;padding:13px;border-radius:20px;overflow:auto}
+    .part-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+    .part-btn{position:relative;min-height:48px;padding:9px 10px;border-radius:11px;text-align:left;transition:.2s}
+    .part-btn:hover,.part-btn.active{border-color:rgba(126,220,255,.42);background:rgba(126,220,255,.075);color:var(--ink)}
+    .part-btn b{display:block;font:500 9px/1.2 var(--mono);letter-spacing:.04em}
+    .part-btn span{display:block;margin-top:4px;color:var(--muted);font-size:9px;line-height:1.2}
+    .part-btn i{position:absolute;right:9px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--part-color,#7edcff);box-shadow:0 0 10px var(--part-color,#7edcff)}
+    .inspector{right:18px;bottom:18px;width:min(420px,calc(100vw - 36px));padding:18px;border-radius:20px}
+    .inspector__tag{color:var(--accent,var(--mint));font:500 8px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase}
+    .inspector h2{margin:8px 0 0;font:600 28px/.95 var(--display);letter-spacing:-.05em}
+    .inspector__exact{margin:12px 0 0;color:var(--soft);font-size:12px;line-height:1.55}
+    .inspector__rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+    .inspector__row{padding:10px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.025)}
+    .inspector__row b{display:block;color:var(--muted);font:500 7px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+    .inspector__row span{display:block;margin-top:5px;color:var(--soft);font-size:10px;line-height:1.4}
+    .source{display:inline-flex;margin-top:14px;color:var(--mint);font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .hint{position:fixed;left:50%;bottom:21px;z-index:3;transform:translateX(-50%);padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(5,9,12,.7);color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;backdrop-filter:blur(12px);pointer-events:none}
+    .scale{position:fixed;left:50%;top:102px;z-index:3;transform:translateX(-50%);display:flex;align-items:center;gap:10px;color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .scale i{display:block;width:60px;height:5px;border-left:1px solid var(--cyan);border-right:1px solid var(--cyan);border-bottom:1px solid var(--cyan)}
+    .loading{position:fixed;inset:0;z-index:8;display:grid;place-items:center;background:#050709;transition:opacity .5s,visibility .5s}
+    .loading.done{opacity:0;visibility:hidden}
+    .loading__inner{text-align:center}
+    .loading__ring{width:62px;height:62px;margin:auto;border:1px solid rgba(113,245,198,.18);border-top-color:var(--mint);border-radius:50%;animation:spin 1.2s linear infinite}
+    .loading p{margin:16px 0 0;color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+    .mobile-info{display:none}
+    body.capture .panel,body.capture .hint,body.capture .scale,body.capture .noise{display:none!important}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:820px){
+      .topbar{left:10px;right:10px;top:10px;min-height:58px}.identity__mark,.badge,.download{display:none}.identity p{max-width:160px;overflow:hidden;text-overflow:ellipsis}
+      .views{left:10px;right:10px;top:auto;bottom:10px;width:auto;padding:9px}.view-grid{grid-template-columns:repeat(6,1fr)}.view-btn{min-height:40px;font-size:7px}
+      .parts{display:none}.inspector{left:10px;right:10px;bottom:67px;width:auto;max-height:225px;overflow:auto;padding:14px}.inspector h2{font-size:22px}.inspector__exact{font-size:10px}.inspector__rows{display:none}
+      .source{margin-top:9px}.hint{display:none}.scale{top:80px}.mobile-info{display:block;position:fixed;right:12px;top:82px;z-index:5;width:38px;height:38px;border-radius:50%;color:var(--cyan)}
+    }
+    @media(max-width:480px){.identity p{display:none}.scale{display:none}.view-btn{letter-spacing:0}.inspector__exact{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}}
+    @media(prefers-reduced-motion:reduce){.loading__ring{animation:none}}
+  </style>
+</head>
+<body>
+  <canvas id="stage" tabindex="0" aria-label="Interactive CBM G1 assembled CAD model"></canvas>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="panel topbar">
+    <div class="topbar__left">
+      <a class="back" href="/cbm/" aria-label="Back to CBM"><svg viewBox="0 0 20 20" fill="none"><path d="m12.5 4.5-5 5.5 5 5.5M8 10h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <div class="identity"><span class="identity__mark" aria-hidden="true"></span><div><h1>CBM G1 · Product</h1><p>STEP-backed stack · connectors, retainers, clearances</p></div></div>
+    </div>
+    <div class="topbar__right"><span class="badge">Mechanical fit · pass</span><a class="download" href="/cbm/g1/assets/cbm-g1-assembly.scad" download>OpenSCAD source ↓</a></div>
+  </header>
+
+  <section class="panel views"><h2 class="panel-label">Assembly views</h2><div class="view-grid" id="viewGrid"></div></section>
+  <section class="panel parts"><h2 class="panel-label">Select a part</h2><div class="part-grid" id="partGrid"></div></section>
+  <aside class="panel inspector" id="inspector" aria-live="polite"></aside>
+  <div class="hint">Drag to orbit · Scroll to zoom · Click a part</div>
+  <div class="scale"><i></i><span>Model units · mm</span></div>
+  <div class="loading" id="loading"><div class="loading__inner"><div class="loading__ring"></div><p>Loading measured Biocoin geometry</p></div></div>
+
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from "three";
+    import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+    import {STLLoader} from "three/addons/loaders/STLLoader.js";
+
+    const query=new URLSearchParams(location.search);
+    if(query.get("capture")==="1")document.body.classList.add("capture");
+
+    const parts = [
+      {id:"shell",name:"Sealed reader shell",kind:"Custom mechanical",color:"#91e9ff",status:"Nominal fit passed",dims:"Ø44 × 19.0 mm; 1.5 mm wall",exact:"Two-piece reusable enclosure with seam gasket, battery cradle, board clips, hard stops, and three PEEK fasteners.",note:"Opaque in Product view; Cutaway exposes the measured internal stack.",href:"/cbm/procurement/#cp07"},
+      {id:"fasteners",name:"Retention hardware",kind:"Reusable mechanical",color:"#b7c6cc",status:"Prototype specification",dims:"3 × M1.6 PEEK; four board clips; three cartridge hooks",exact:"Fasteners close the shell, clips compress Biocoin against its dock headers, and hooks react cartridge preload.",note:"Snap-hook fatigue and release force remain physical test gates.",href:"/cbm/procurement/#cp07"},
+      {id:"biocoin",name:"Biocoin v1.3",kind:"Open hardware · sourced",color:"#71f5c6",status:"Published 2026",dims:"24.901 × 26.101 × 4.911 mm populated STEP",exact:"The actual upstream AD5940 + nRF52840 mesh, positioned from its PCB pad plane.",note:"PCB/fixtures are CERN-OHL-W-2.0; firmware/software are MIT.",href:"https://github.com/ProfDrewHall/Biocoin"},
+      {id:"daughter",name:"Guarded interface PCB",kind:"Custom electronics · CP-01",color:"#38e3aa",status:"Nominal fit passed",dims:"Ø38 × 0.8 mm full disc",exact:"Six LMP7721 islands, ADS124S08, four Biocoin dock footprints, and the downward cartridge connector.",note:"The full disc provides guarded routing and 1.25 mm nominal package-edge clearance.",href:"/cbm/procurement/#cp01"},
+      {id:"headers",name:"Biocoin docking headers",kind:"Upstream-exact interconnect",color:"#f1bb3d",status:"Catalog parts",dims:"2 × 10-pin + 2 × 8-pin; 6.08 mm working height",exact:"Mill-Max 855 headers copied from the published dock BOM and J3/J4/J7/J8 coordinates.",note:"Compression: 0.70 mm of 1.397 mm available stroke.",href:"/cbm/procurement/#cp01"},
+      {id:"battery",name:"Offset VARTA CP1240",kind:"Sourced power",color:"#dbe4e8",status:"RFQ tabbed sample",dims:"Ø12.1 × 4.0 mm; 50 mAh",exact:"Shell-supported at x=-11.5 mm—not balanced on PCB components.",note:"0.81 mm above the highest component, 1.05 mm below the ceiling, and 2.31 mm clear of the full Raytac body.",href:"https://www.varta-ag.com/en/industry/smart-patch"},
+      {id:"harness",name:"Battery harness",kind:"Sourced interconnect",color:"#ff6a5f",status:"Catalog + welded tabs",dims:"JST ACHR-02V-S + 2 × SACH-003G-P0.2",exact:"Red/black tab leads route around the populated board to existing Biocoin J1.",note:"Direct soldering to the cell is prohibited.",href:"/cbm/procurement/#cp07"},
+      {id:"connector",name:"Cartridge connector",kind:"Low-profile spring connector",color:"#f0b93d",status:"Catalog part",dims:"Mill-Max 817; 12 positions; 2.54 mm pitch",exact:"One retained connector body mounted to the daughterboard at 2.24 mm working height.",note:"Four hard stops—not the gasket—set its 0.30 mm compression.",href:"/cbm/procurement/#cp04"},
+      {id:"gasket",name:"Dry-interface gasket",kind:"Converted seal",color:"#71f5c6",status:"DOE required",dims:"22.5 × 12.0 mm outer; 0.40 mm compressed",exact:"Rounded gasket surrounds the field without carrying connector load.",note:"Compression set and sweat ingress remain physical tests.",href:"/cbm/procurement/#cp07"},
+      {id:"latch",name:"Vertical cartridge latch",kind:"Custom mechanical",color:"#89a0aa",status:"17.7 N design load",dims:"3 hooks + 3 disposable latch lands",exact:"The cartridge presses straight in; contacts do not wipe across pads.",note:"Target retention is 2.5× the approximately 7.1 N connector preload.",href:"/cbm/procurement/#cp07"},
+      {id:"carrier",name:"Open cartridge frame",kind:"Custom disposable · CP-04",color:"#d7e0e3",status:"RFQ",dims:"Ø40 frame; Ø34 open sensing field",exact:"Open frame and latch lip support the flex without intersecting sensor tiles.",note:"The sensing field remains open while the outer frame carries latch and adhesive loads.",href:"/cbm/procurement/#cp04"},
+      {id:"flex",name:"Twelve-net flex",kind:"Custom flex · CP-04",color:"#d69b38",status:"RFQ",dims:"Ø36 mm; 25 µm polyimide core target",exact:"Routes eight WEs, CE, RE-A, RE-B, and cartridge identity to hard-gold pads.",note:"No copper, nickel, ENIG edge, or conductive adhesive may be exposed wet-side.",href:"/cbm/procurement/#cp04"},
+      {id:"glc",name:"Glucose tile",kind:"Enzyme tile · WE1",color:"#ff8d55",status:"Commercial precedent",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"Au / Prussian Blue / GOx / chitosan / PEGDE starting stack.",note:"Independent G0 calibration transfers to G1 only after a new effective-area calibration.",href:"/cbm/procurement/#chemistry"},
+      {id:"bhb",name:"Ketone tile",kind:"Enzyme tile · WE2",color:"#ff537d",status:"Human pilot chemistry",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"Au/Pt + poly-TBO + CNT/chitosan + HBD/NAD+ + protective layers.",note:"NAD+ loss and long-wear drift are explicit failure modes.",href:"https://doi.org/10.1021/acssensors.3c02677"},
+      {id:"lac",name:"Lactate tile",kind:"Enzyme tile · WE3",color:"#ffb36a",status:"Human pilot precedent",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"Mediated LOx research lane.",note:"Oxygen dependence, lag, fouling, and clinical context require separate validation.",href:"https://doi.org/10.1038/s41551-022-00887-1"},
+      {id:"dup",name:"Glucose duplicate",kind:"Control tile · WE4",color:"#93a1a8",status:"Quality control",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"Same nominal glucose stack, fabricated in a separate deposition lane.",note:"Exposes lane-specific coating failure and incomplete insertion; shared failures still require other controls.",href:"/cbm/procurement/#chemistry"},
+      {id:"na",name:"Sodium tile",kind:"Ion-selective tile · WE5",color:"#62b1ff",status:"Animal multi-panel",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"PEDOT:PSS + sodium ionophore X / PVC / DOS membrane.",note:"Read through its own femtoamp buffer versus RE-A.",href:"https://doi.org/10.1007/s40820-026-02095-x"},
+      {id:"k",name:"Potassium tile",kind:"Ion-selective tile · WE6",color:"#32d7ff",status:"Research channel",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"PEDOT:PSS + valinomycin / PVC / DOS membrane.",note:"A 5→6 mmol/L move is only ~4.87 mV at 37 °C. This lane owns the strictest electrical gate.",href:"/cbm/procurement/#chemistry"},
+      {id:"ph",name:"pH tile",kind:"Potentiometric tile · WE7",color:"#9d88ff",status:"Animal multi-panel",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"Electropolymerized polyaniline starting route.",note:"Provides context and reference/junction diagnostics; it is not a universal correction.",href:"https://doi.org/10.1007/s40820-026-02095-x"},
+      {id:"blank",name:"Background tile",kind:"Control tile · WE8",color:"#7f8b92",status:"Quality control",dims:"3.5 × 5.0 mm; six 1.0 mm needles",exact:"Matched physical stack with recognition element omitted for the validated use.",note:"One blank cannot mathematically correct every chemistry; each subtraction is separately proven.",href:"/cbm/procurement/#chemistry"},
+      {id:"ce",name:"Platinum counter",kind:"Custom electrode · CP-05",color:"#c7d0d5",status:"RFQ / fabricate",dims:"Central six-needle cluster",exact:"Pt-coated current-return electrode.",note:"Released by polarization and compliance testing, not geometric area alone.",href:"/cbm/procurement/#cp05"},
+      {id:"refs",name:"RE-A + RE-B",kind:"Custom references · CP-05",color:"#ffd45b",status:"Fabricate separately",dims:"Two physically separate Ag/AgCl tiles",exact:"Primary measurement reference plus independent differential sentinel.",note:"Agreement cannot rule out common-mode drift; the blank, cross-ion behavior, and calibration age remain active.",href:"/cbm/procurement/#cp05"},
+      {id:"adhesive",name:"Adhesive skirt",kind:"Converted material · CP-07",color:"#e3d9c7",status:"Sample / convert",dims:"Ø54 / Ø34 × ~0.32 mm",exact:"Solventum Medical Tape 4077 starting construction.",note:"Needle protrusion beyond the compressed skin plane is 0.78 mm.",href:"https://www.solventum.com/en-us/home/f/b5005097120/"}
+    ];
+    const byId = new Map(parts.map(p=>[p.id,p]));
+    const views = {
+      product:{label:"Product",camera:[62,42,68],target:[0,7,0],mode:"product"},
+      cutaway:{label:"Cutaway",camera:[64,48,70],target:[0,7,0],mode:"all"},
+      exploded:{label:"Exploded",camera:[90,88,115],target:[0,45,0],mode:"all"},
+      electronics:{label:"Electronics",camera:[58,42,62],target:[0,7,0],mode:"reader"},
+      cartridge:{label:"Cartridge",camera:[45,29,48],target:[0,-.4,0],mode:"cartridge"},
+      underside:{label:"Needles",camera:[34,-27,42],target:[0,-.8,0],mode:"cartridge"}
+    };
+
+    const canvas = document.getElementById("stage");
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050709);
+    scene.fog = new THREE.FogExp2(0x050709,.006);
+    const camera = new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,500);
+    const renderer = new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(innerWidth,innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.30;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    const controls = new OrbitControls(camera,canvas);
+    controls.enableDamping=true; controls.dampingFactor=.055; controls.minDistance=28; controls.maxDistance=180;
+
+    scene.add(new THREE.HemisphereLight(0xeafaff,0x030709,1.5));
+    const key=new THREE.SpotLight(0xffffff,240,180,Math.PI/5,.45,1.2);key.position.set(46,72,46);key.target.position.set(0,6,0);key.castShadow=true;key.shadow.mapSize.set(2048,2048);scene.add(key,key.target);
+    const rim=new THREE.DirectionalLight(0x62ffd0,3.0);rim.position.set(-54,36,-48);scene.add(rim);
+    const blue=new THREE.PointLight(0x58bfff,95,110);blue.position.set(30,18,-34);scene.add(blue);
+    const warm=new THREE.PointLight(0xff8059,54,85);warm.position.set(-28,2,24);scene.add(warm);
+
+    const floorMat=new THREE.MeshStandardMaterial({color:0x060a0c,roughness:.72,metalness:.08});
+    const floor=new THREE.Mesh(new THREE.CircleGeometry(88,128),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-1.95;floor.receiveShadow=true;scene.add(floor);
+    const grid=new THREE.GridHelper(150,30,0x18353d,0x0d2026);grid.position.y=-1.91;grid.material.transparent=true;grid.material.opacity=.22;scene.add(grid);
+
+    const root=new THREE.Group();scene.add(root);
+    const objectById=new Map(),layerGroups={},mats=new Map();
+    const material=(hex,{metal=.12,rough=.42,opacity=1,transmission=0,clearcoat=0,clearcoatRough=.2}={})=>{
+      const cacheKey=`${hex}-${metal}-${rough}-${opacity}-${transmission}-${clearcoat}-${clearcoatRough}`;
+      if(!mats.has(cacheKey))mats.set(cacheKey,new THREE.MeshPhysicalMaterial({color:new THREE.Color(hex),metalness:metal,roughness:rough,transparent:opacity<1,opacity,transmission,thickness:1.5,clearcoat,clearcoatRoughness:clearcoatRough,side:THREE.DoubleSide}));
+      return mats.get(cacheKey).clone();
+    };
+    const remember=(id,obj,layer)=>{obj.userData.partId=id;obj.castShadow=true;obj.receiveShadow=true;if(!objectById.has(id))objectById.set(id,[]);objectById.get(id).push(obj);if(layer){if(!layerGroups[layer]){layerGroups[layer]=new THREE.Group();root.add(layerGroups[layer])}layerGroups[layer].add(obj)}else root.add(obj);return obj};
+    const box=(id,size,pos,hex,layer,opts={})=>{const m=remember(id,new THREE.Mesh(new THREE.BoxGeometry(...size),material(hex,opts)),layer);m.position.set(...pos);return m};
+    const cyl=(id,r,h,pos,hex,layer,opts={})=>{const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,72),material(hex,opts)),layer);m.position.set(...pos);return m};
+    const cone=(id,r,h,pos,hex,layer)=>{const m=remember(id,new THREE.Mesh(new THREE.CylinderGeometry(r*.12,r,h,28),material(hex,{metal:.3,rough:.18})),layer);m.position.set(...pos);return m};
+    function ring(id,outer,inner,h,pos,hex,layer,opts={}){const s=new THREE.Shape();s.absarc(0,0,outer,0,Math.PI*2,false);const hole=new THREE.Path();hole.absarc(0,0,inner,0,Math.PI*2,true);s.holes.push(hole);const g=new THREE.ExtrudeGeometry(s,{depth:h,bevelEnabled:false,curveSegments:72});g.rotateX(-Math.PI/2);g.translate(0,-h/2,0);const m=remember(id,new THREE.Mesh(g,material(hex,opts)),layer);m.position.set(...pos);return m}
+    function roundedRectPath(w,h,r){const s=new THREE.Shape();s.moveTo(-w/2+r,-h/2);s.lineTo(w/2-r,-h/2);s.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);s.lineTo(w/2,h/2-r);s.quadraticCurveTo(w/2,h/2,w/2-r,h/2);s.lineTo(-w/2+r,h/2);s.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);s.lineTo(-w/2,-h/2+r);s.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);return s}
+    function roundedPlate(id,w,d,h,r,pos,hex,layer,opts={}){const g=new THREE.ExtrudeGeometry(roundedRectPath(w,d,r),{depth:h,bevelEnabled:false,curveSegments:20});g.rotateX(-Math.PI/2);g.translate(0,-h/2,0);const m=remember(id,new THREE.Mesh(g,material(hex,opts)),layer);m.position.set(...pos);return m}
+    function roundedRing(id,ow,od,iw,idp,h,pos,hex,layer,opts={}){const s=roundedRectPath(ow,od,Math.min(ow,od)*.18);const hole=roundedRectPath(iw,idp,Math.min(iw,idp)*.16);s.holes.push(hole);const g=new THREE.ExtrudeGeometry(s,{depth:h,bevelEnabled:false,curveSegments:20});g.rotateX(-Math.PI/2);g.translate(0,-h/2,0);const m=remember(id,new THREE.Mesh(g,material(hex,opts)),layer);m.position.set(...pos);return m}
+    function tubeCurve(id,pts,r,hex,layer){const curve=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));return remember(id,new THREE.Mesh(new THREE.TubeGeometry(curve,48,r,10,false),material(hex,{metal:.08,rough:.4})),layer)}
+    function addTile(id,index){const p=byId.get(id),a=index*Math.PI/4,r=12,x=Math.sin(a)*r,z=Math.cos(a)*r;const g=new THREE.Group();g.userData.partId=id;const tile=new THREE.Mesh(new THREE.BoxGeometry(3.5,.45,5),material(0x151b20,{rough:.42}));g.add(tile);const cap=new THREE.Mesh(new THREE.BoxGeometry(3.15,.10,4.65),material(p.color,{metal:.28,rough:.24,clearcoat:.25}));cap.position.y=-.275;g.add(cap);for(const dx of [-.62,.62])for(const dz of [-1.2,0,1.2]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.045,.15,1,20),material(p.color,{metal:.5,rough:.16}));n.position.set(dx,-.725,dz);g.add(n)}g.position.set(x,-.425,z);g.rotation.y=a;remember(id,g,"tiles")}
+    function header855(center,contacts,rotation=0){const cols=contacts/2,g=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry((cols-1)*1.27+1.45,.7,2.7),material(0x11161a,{rough:.4}));body.position.y=3.39;g.add(body);for(const rz of [-.635,.635])for(let c=0;c<cols;c++){const x=(c-(cols-1)/2)*1.27;const pin=new THREE.Mesh(new THREE.CylinderGeometry(.12,.24,6.08,16),material(0xe2ad32,{metal:.78,rough:.14}));pin.position.set(x,6.08,rz);g.add(pin)}g.position.set(center[0],0,center[1]);g.rotation.y=rotation;remember("headers",g,"headers")}
+    // Disposable cartridge: open frame, flex, tiles, pads and seal.
+    ring("adhesive",27,17,.32,[0,-.71,0],0xe3d9c7,"adhesive",{rough:.86,opacity:.92});
+    ring("carrier",20,17,.70,[0,-.15,0],0xc6d0d4,"carrier",{metal:.04,rough:.38});
+    ring("latch",20,18.8,.42,[0,.22,0],0x26343a,"interface",{metal:.12,rough:.34});
+    for(const a of [0,Math.PI*2/3,Math.PI*4/3]){const land=box("latch",[2.0,.7,4.4],[Math.sin(a)*18.9,.25,Math.cos(a)*18.9],0x26343a,"interface",{rough:.34});land.rotation.y=a}
+    cyl("flex",18,.20,[0,-.10,0],0xc98928,"flex",{metal:.24,rough:.32,opacity:.94});
+    [["glc"],["bhb"],["lac"],["dup"],["na"],["k"],["ph"],["blank"]].forEach((d,i)=>addTile(d[0],i));
+    const ceGroup=new THREE.Group();for(const dx of [-.62,.62])for(const dz of [-1.2,0,1.2]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.045,.15,1.1,20),material(0xc7d0d5,{metal:.72,rough:.14}));n.position.set(dx,-1.0,dz);ceGroup.add(n)}remember("ce",ceGroup,"tiles");
+    const refsGroup=new THREE.Group();for(const x of [-3.4,3.4])for(const z of [-.75,.75]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.05,.15,1.05,20),material(0xffd45b,{metal:.58,rough:.18}));n.position.set(x,-.975,z);refsGroup.add(n)}remember("refs",refsGroup,"tiles");
+    roundedPlate("connector",18.5,8.7,.34,1.4,[0,.17,0],0x151e23,"interface",{rough:.4});
+    for(let row=0;row<2;row++)for(let col=0;col<6;col++){const x=(col-2.5)*2.54,z=(row-.5)*2.54;roundedPlate("connector",1.55,1.8,.08,.45,[x,.39,z],0xe7b53a,"interface",{metal:.82,rough:.12})}
+    roundedRing("gasket",22.5,12,19,8.2,.40,[0,.58,0],0x3adca9,"interface",{rough:.58,opacity:.78});
+    // One retained low-profile Mill-Max 817 connector.
+    roundedPlate("connector",15.7,4.15,.64,.45,[0,1.92,0],0x10161a,"connector",{rough:.42});
+    for(let row=0;row<2;row++)for(let col=0;col<6;col++){const x=(col-2.5)*2.54,z=(row-.5)*2.54;cyl("connector",.26,2.24,[x,1.12,z],0xe6b13a,"connector",{metal:.82,rough:.12})}
+    // 38 mm guarded daughterboard, buffers and ADC.
+    cyl("daughter",19,.80,[0,2.64,0],0x087557,"daughter",{metal:.08,rough:.34});
+    for(let i=0;i<6;i++){const a=i*Math.PI/3;const chip=box("daughter",[3.9,1.5,4.9],[Math.sin(a)*15.8,3.79,Math.cos(a)*15.8],0x10171b,"daughter",{metal:.18,rough:.28});chip.rotation.y=a}
+    box("daughter",[5,1,5],[0,3.54,0],0x0d1418,"daughter",{metal:.18,rough:.26});
+    header855([-4.88,7.15],8,Math.PI/2);header855([-.51,7.15],8,Math.PI/2);header855([1.01,-9.79],10,0);header855([1.01,-4.49],10,0);
+    // Four shell-supported board clips and three cartridge hooks.
+    for(const a of [Math.PI/4,3*Math.PI/4,5*Math.PI/4,7*Math.PI/4]){const x=Math.sin(a)*15.15,z=Math.cos(a)*15.15;box("fasteners",[1.5,7.65,3.4],[x,6.87,z],0x1b282e,"hardware",{rough:.34}).rotation.y=a}
+    for(const a of [0,Math.PI*2/3,Math.PI*4/3]){const h=box("latch",[1.2,2.65,3],[Math.sin(a)*20.1,1.38,Math.cos(a)*20.1],0x1b282e,"hardware",{rough:.34});h.rotation.y=a}
+    // Actual populated Biocoin mesh loads at its measured stack center.
+    const loader=new STLLoader();
+    const boardFallback=()=>{const m=cyl("biocoin",13,.96,[0,9.60,0],0x0a644b,"board",{metal:.06,rough:.45});m.userData.fallback=true};
+    loader.load("/cbm/g1/assets/Biocoin_v1.3.stl",geometry=>{geometry.center();geometry.computeVertexNormals();const mesh=remember("biocoin",new THREE.Mesh(geometry,material(0x08775a,{metal:.18,rough:.28,clearcoat:.18})),"board");mesh.rotation.x=-Math.PI/2;mesh.position.y=9.69;document.getElementById("loading").classList.add("done")},undefined,()=>{boardFallback();document.getElementById("loading").classList.add("done")});
+    // Offset battery, cradle and actual routed harness to J1.
+    ring("battery",7,6.125,.55,[-11.5,12.75,0],0x1b282e,"battery",{rough:.34});
+    cyl("battery",6.05,4,[-11.5,14.95,0],0xdbe4e8,"battery",{metal:.72,rough:.18,clearcoat:.35});
+    tubeCurve("harness",[[-9.5,13.3,-2],[-5.5,12.65,-5],[0,11.5,-7],[5.33,10.8,-7.95]],.22,0xd8443b,"harness");
+    tubeCurve("harness",[[-10.5,13.2,-2.6],[-6.2,12.4,-5.8],[-.4,11.2,-7.4],[5.33,10.6,-8.45]],.22,0x111315,"harness");
+    box("harness",[2.8,1.2,2.1],[5.33,10.5,-8.2],0xf0eee6,"harness",{rough:.42});
+    // Lifelike closed shell with satin seam, PEEK screws and top mark.
+    const profile=[[0,.2],[19.8,.2],[21.4,1],[22,3],[22,16],[21.6,17.1],[20.2,18.3],[17,19],[0,19]].map(p=>new THREE.Vector2(...p));
+    const shellMaterial=material(0x101820,{metal:.16,rough:.21,clearcoat:.72,clearcoatRough:.16});
+    const shell=remember("shell",new THREE.Mesh(new THREE.LatheGeometry(profile,128),shellMaterial),"shell");
+    const seam=ring("shell",22.04,21.55,.5,[0,9.35,0],0x46e7bd,"shell",{metal:.35,rough:.18});seam.material.emissive.set(0x164f43);seam.material.emissiveIntensity=.45;
+    for(const a of [Math.PI/6,5*Math.PI/6,3*Math.PI/2]){const x=Math.sin(a)*19,z=Math.cos(a)*19;cyl("fasteners",1.2,.45,[x,18.65,z],0x303a3f,"shell",{metal:.22,rough:.24})}
+    // Top logo plate.
+    const logoCanvas=document.createElement("canvas");logoCanvas.width=640;logoCanvas.height=200;const lctx=logoCanvas.getContext("2d");lctx.clearRect(0,0,640,200);lctx.fillStyle="#83ffd0";lctx.font="600 112px Space Grotesk, Arial";lctx.textAlign="center";lctx.textBaseline="middle";lctx.fillText("CBM",320,100);const logoTex=new THREE.CanvasTexture(logoCanvas);logoTex.colorSpace=THREE.SRGBColorSpace;const logo=remember("shell",new THREE.Mesh(new THREE.PlaneGeometry(10,3.1),new THREE.MeshBasicMaterial({map:logoTex,transparent:true,depthWrite:false,toneMapped:false})),"shell");logo.rotation.x=-Math.PI/2;logo.position.y=19.04;
+
+    const baseY={adhesive:0,tiles:0,carrier:0,flex:0,interface:0,connector:0,daughter:0,headers:0,board:0,battery:0,harness:0,hardware:0,shell:0};
+    const explodeY={adhesive:-4,tiles:0,carrier:3,flex:6,interface:9,connector:13,daughter:18,headers:24,board:31,battery:42,harness:42,hardware:18,shell:65};
+    let activeView="product",activePart="shell";
+    const targets={};
+    Object.keys(layerGroups).forEach(k=>targets[k]=0);
+    const setView=id=>{
+      activeView=id;const v=views[id];
+      const readerLayers=["connector","daughter","headers","board","battery","harness","hardware","shell"];
+      const cartridgeLayers=["adhesive","tiles","carrier","flex","interface"];
+      const productLayers=["shell","adhesive","carrier","interface"];
+      Object.entries(layerGroups).forEach(([name,g])=>{
+        g.visible=v.mode==="all"||
+          (v.mode==="reader"&&readerLayers.includes(name))||
+          (v.mode==="cartridge"&&cartridgeLayers.includes(name))||
+          (v.mode==="product"&&productLayers.includes(name));
+        if(id==="electronics"&&name==="shell")g.visible=false;
+        targets[name]=id==="exploded"?(explodeY[name]||0):(baseY[name]||0);
+      });
+      shellMaterial.transparent=id==="cutaway";
+      shellMaterial.opacity=id==="cutaway"?.13:1;
+      shellMaterial.depthWrite=id!=="cutaway";
+      logo.visible=id==="product"||id==="exploded";
+      floor.visible=grid.visible=id!=="cartridge"&&id!=="underside";
+      camera.position.set(...v.camera);controls.target.set(...v.target);controls.update();renderUI();
+      if(innerWidth<=820){
+        const mobileScale=id==="exploded"?1.25:1.48;
+        camera.position.copy(controls.target.clone().add(camera.position.clone().sub(controls.target).multiplyScalar(mobileScale)));
+        controls.update();
+      }
+    };
+    const selectPart=id=>{if(!byId.has(id))return;activePart=id;renderUI()};
+    function renderUI(){
+      document.getElementById("viewGrid").innerHTML=Object.entries(views).map(([id,v])=>`<button class="view-btn ${id===activeView?"active":""}" data-view="${id}">${v.label}</button>`).join("");
+      document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+      document.getElementById("partGrid").innerHTML=parts.map(p=>`<button class="part-btn ${p.id===activePart?"active":""}" style="--part-color:${p.color}" data-part="${p.id}"><i></i><b>${p.name}</b><span>${p.kind}</span></button>`).join("");
+      document.querySelectorAll("[data-part]").forEach(b=>b.onclick=()=>selectPart(b.dataset.part));
+      const p=byId.get(activePart);
+      document.getElementById("inspector").style.setProperty("--accent",p.color);
+      document.getElementById("inspector").innerHTML=`<div class="inspector__tag">${p.kind}</div><h2>${p.name}</h2><p class="inspector__exact">${p.exact}</p><div class="inspector__rows"><div class="inspector__row"><b>Modeled size</b><span>${p.dims}</span></div><div class="inspector__row"><b>Status</b><span>${p.status}</span></div><div class="inspector__row" style="grid-column:1/-1"><b>Engineering note</b><span>${p.note}</span></div></div><a class="source" href="${p.href}" target="_blank" rel="noopener">Open source / specification ↗</a>`;
+      for(const [id,objs] of objectById)for(const obj of objs)obj.traverse?.(child=>{
+        if(child.material?.emissive){
+          child.material.emissive.set(id===activePart?p.color:0x000000);
+          child.material.emissiveIntensity=id===activePart ? .22 : 0;
+        }
+      });
+    }
+    const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+    canvas.addEventListener("pointerup",e=>{
+      if(Math.abs(e.movementX||0)+Math.abs(e.movementY||0)>4)return;
+      pointer.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);raycaster.setFromCamera(pointer,camera);
+      const hit=raycaster.intersectObjects(root.children,true).find(h=>{let o=h.object;while(o&&o!==root){if(o.userData.partId)return true;o=o.parent}return false});
+      if(hit){let o=hit.object;while(o&&!o.userData.partId)o=o.parent;if(o?.userData.partId)selectPart(o.userData.partId)}
+    });
+    addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+    const clock=new THREE.Clock();
+    function animate(){
+      requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);
+      for(const [name,g] of Object.entries(layerGroups))g.position.y=THREE.MathUtils.damp(g.position.y,targets[name]||0,6,dt);
+      controls.update();renderer.render(scene,camera);
+    }
+    setView(query.get("view") in views?query.get("view"):"product");
+    if(query.get("capture")==="1"){
+      const captureScale=query.get("view")==="exploded"?.92:.80;
+      camera.position.copy(controls.target.clone().add(camera.position.clone().sub(controls.target).multiplyScalar(captureScale)));
+      controls.update();
+    }
+    const requested=query.get("part");if(byId.has(requested))selectPart(requested);
+    animate();
+    setTimeout(()=>document.getElementById("loading").classList.add("done"),7000);
+  </script>
+</body>
+</html>

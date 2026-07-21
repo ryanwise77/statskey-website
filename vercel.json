@@ -4,14 +4,28 @@
     "api/libre-history.js": { "maxDuration": 30 },
     "api/dietitian-lead.js": { "maxDuration": 15 }
   },
+  "headers": [
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
+  ],
   "rewrites": [
+    { "source": "/friend/:token", "destination": "/friend/index.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/web-terms", "destination": "/web-terms.html" },
     { "source": "/support", "destination": "/support.html" },
-    { "source": "/cbm", "destination": "/cbm.html" },
-    { "source": "/cbm/", "destination": "/cbm/index.html" },
+    { "source": "/cbm", "destination": "/cbm/g1/index.html" },
+    { "source": "/cbm/", "destination": "/cbm/g1/index.html" },
     { "source": "/cbm.html", "destination": "/cbm.html" },
+    { "source": "/cbm/viewer", "destination": "/cbm/g1/viewer/index.html" },
+    { "source": "/cbm/viewer/", "destination": "/cbm/g1/viewer/index.html" },
+    { "source": "/cbm/procurement", "destination": "/cbm/g1/build/index.html" },
+    { "source": "/cbm/procurement/", "destination": "/cbm/g1/build/index.html" },
     { "source": "/ckm", "destination": "/ckm.html" },
     { "source": "/ckm/", "destination": "/ckm/index.html" },
     { "source": "/ckm/viewer", "destination": "/ckm/viewer/index.html" },
@@ -49,6 +63,10 @@
     { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
     { "source": "/energy", "destination": "/energy.html" },
     { "source": "/energy/", "destination": "/energy.html" },
+    { "source": "/wellness", "destination": "/wellness.html" },
+    { "source": "/wellness/", "destination": "/wellness.html" },
+    { "source": "/gut", "destination": "/wellness.html" },
+    { "source": "/gut-health", "destination": "/wellness.html" },
     { "source": "/join", "destination": "/join.html" },
     { "source": "/join/", "destination": "/join.html" },
     { "source": "/for-dietitians", "destination": "/for-dietitians.html" },

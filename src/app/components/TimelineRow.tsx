@@ -3,6 +3,7 @@ import type { Meal, WellnessEntry } from '../lib/types'
 import { mealDisplayName, mealTotal } from '../lib/aggregates'
 import { NUTRIENT_KEYS } from '../lib/types'
 import { formatDuration } from '../lib/format'
+import { URGENCY_LABELS, bristolSummary, computeGIBurdenScore } from '../lib/gi'
 
 function formatTime(d: Date): string {
   return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
@@ -50,7 +51,7 @@ function wellnessTitle(entry: WellnessEntry): string {
     case 'energy':
       return `Energy ${entry.data.entry.level}/5`
     case 'bowelMovement':
-      return `Gut Check — Type ${entry.data.entry.bristolType}`
+      return `Gut Check — ${bristolSummary(entry.data.entry)}`
     case 'sleep':
       return `Sleep ${entry.data.hours.toFixed(1)}h`
     case 'hydration':
@@ -64,18 +65,22 @@ function wellnessSubtitle(entry: WellnessEntry): string | undefined {
   switch (entry.data.kind) {
     case 'symptom': {
       const parts: string[] = []
-      if (entry.data.entry.severity) parts.push(`Severity ${entry.data.entry.severity}/5`)
+      if (entry.data.entry.severity) parts.push(`Severity ${entry.data.entry.severity}/10`)
       if (entry.data.entry.bodyArea) parts.push(entry.data.entry.bodyArea)
       return parts.join(' · ') || entry.notes
     }
     case 'bowelMovement': {
       const e = entry.data.entry
       const parts: string[] = []
+      // Match the iOS timeline: surface the burden score once it's meaningful (≥5).
+      const burden = e.giBurdenScore ?? computeGIBurdenScore(e).score
+      if (burden >= 5) parts.push(`GI burden ${burden}/10`)
       if (e.color) parts.push(e.color)
-      if (e.urgency != null) parts.push(`urgency ${e.urgency}`)
+      if (e.urgency != null) parts.push((URGENCY_LABELS[e.urgency] ?? `urgency ${e.urgency}`).toLowerCase())
       if (e.durationInSeconds != null && e.durationInSeconds > 0) {
         parts.push(formatDuration(e.durationInSeconds))
       }
+      if (e.redFlags.length > 0) parts.push('flagged')
       return parts.join(' · ') || entry.notes
     }
     case 'mood':

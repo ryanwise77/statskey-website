@@ -32,7 +32,11 @@
   --shadow: 0 24px 90px rgba(0, 0, 0, 0.42);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Layered so Tailwind utilities (px-*, py-*, space-y-*) can override the
+   reset; unlayered rules would silently beat every layered utility. */
+@layer base {
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+}
 
 html {
   scroll-behavior: smooth;

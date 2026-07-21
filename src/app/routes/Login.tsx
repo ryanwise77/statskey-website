@@ -1,14 +1,26 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 
 const REDIRECT_PATH_KEY = 'statskey.login.redirectPath'
 
 export function Login() {
-  const { user, signInWithGoogle, signInWithApple, error, loading } = useAuth()
+  const {
+    user,
+    signInWithEmail,
+    signInWithGoogle,
+    signInWithApple,
+    sendPasswordReset,
+    error,
+    loading,
+  } = useAuth()
   const location = useLocation()
-  const [busy, setBusy] = useState<null | 'google' | 'apple'>(null)
+  const [busy, setBusy] = useState<null | 'email' | 'google' | 'apple' | 'reset'>(null)
   const [localError, setLocalError] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [resetMode, setResetMode] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
   const from = (location.state as { from?: { pathname: string; search?: string; hash?: string } } | null)?.from
 
   useEffect(() => { setLocalError(error) }, [error])
@@ -38,35 +50,216 @@ export function Login() {
     }
   }
 
+  function rememberRedirect() {
+    if (from) {
+      sessionStorage.setItem(
+        REDIRECT_PATH_KEY,
+        `${from.pathname}${from.search ?? ''}${from.hash ?? ''}`
+      )
+    }
+  }
+
+  async function submitEmail(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const normalizedEmail = email.trim()
+    if (!normalizedEmail) {
+      setLocalError('Enter your email.')
+      return
+    }
+    if (!password) {
+      setLocalError('Enter your password.')
+      return
+    }
+
+    setBusy('email')
+    setLocalError(null)
+    try {
+      rememberRedirect()
+      await signInWithEmail(normalizedEmail, password)
+    } catch {
+      // error surfaced via context state
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function submitReset(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const normalizedEmail = email.trim()
+    if (!normalizedEmail) {
+      setLocalError('Enter your email.')
+      return
+    }
+
+    setBusy('reset')
+    setLocalError(null)
+    setResetSent(false)
+    try {
+      await sendPasswordReset(normalizedEmail)
+      setResetSent(true)
+    } catch {
+      // error surfaced via context state
+    } finally {
+      setBusy(null)
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-[400px]">
         <div className="text-center mb-10">
           <a href="/" className="font-display font-semibold text-[14px] text-text-secondary hover:text-text-primary transition-colors">StatsKey</a>
-          <h1 className="font-display text-[32px] font-bold tracking-[-0.02em] mt-6 mb-2">Sign in</h1>
-          <p className="text-text-secondary text-[14px]">Use the same account as the iOS app.</p>
+          <h1 className="font-display text-[32px] font-bold tracking-[-0.02em] mt-6 mb-2">
+            {resetMode ? 'Reset password' : 'Sign in'}
+          </h1>
+          <p className="text-text-secondary text-[14px]">
+            {resetMode
+              ? 'We’ll email you a secure password reset link.'
+              : 'Use the same account as the iOS app.'}
+          </p>
         </div>
 
-        <div className="panel space-y-3">
-          <button
-            className="btn btn-secondary w-full"
-            onClick={() => go('google')}
-            disabled={busy !== null}
-          >
-            <GoogleIcon />
-            <span>{busy === 'google' ? 'Signing in…' : 'Continue with Google'}</span>
-          </button>
+        <div className="panel">
+          {resetMode ? (
+            <form className="space-y-4" onSubmit={submitReset}>
+              <div>
+                <label
+                  className="text-text-secondary text-[12px] font-medium block mb-1.5"
+                  htmlFor="reset-email"
+                >
+                  Email
+                </label>
+                <input
+                  id="reset-email"
+                  className="input"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  autoComplete="email"
+                  inputMode="email"
+                  autoFocus
+                  disabled={busy !== null}
+                />
+              </div>
 
-          <button
-            className="btn btn-secondary w-full"
-            onClick={() => go('apple')}
-            disabled={busy !== null}
-          >
-            <AppleIcon />
-            <span>{busy === 'apple' ? 'Signing in…' : 'Continue with Apple'}</span>
-          </button>
+              <button
+                className="btn btn-primary w-full"
+                type="submit"
+                disabled={busy !== null}
+              >
+                {busy === 'reset' ? 'Sending…' : 'Email reset link'}
+              </button>
 
-          {localError && <div className="error-banner">{localError}</div>}
+              {resetSent && (
+                <div className="success-banner text-[13px] leading-relaxed">
+                  If that email has a StatsKey account, a reset link is on its way.
+                </div>
+              )}
+
+              <button
+                className="btn btn-ghost w-full"
+                type="button"
+                onClick={() => {
+                  setResetMode(false)
+                  setResetSent(false)
+                  setLocalError(null)
+                }}
+                disabled={busy !== null}
+              >
+                Back to sign in
+              </button>
+            </form>
+          ) : (
+            <>
+              <form className="space-y-4" onSubmit={submitEmail}>
+                <div>
+                  <label
+                    className="text-text-secondary text-[12px] font-medium block mb-1.5"
+                    htmlFor="login-email"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="login-email"
+                    className="input"
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    autoComplete="email"
+                    inputMode="email"
+                    disabled={busy !== null}
+                  />
+                </div>
+
+                <div>
+                  <span className="flex items-center justify-between mb-1.5">
+                    <label
+                      className="text-text-secondary text-[12px] font-medium"
+                      htmlFor="login-password"
+                    >
+                      Password
+                    </label>
+                    <button
+                      className="link text-[12px]"
+                      type="button"
+                      onClick={() => {
+                        setResetMode(true)
+                        setResetSent(false)
+                        setLocalError(null)
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                  </span>
+                  <input
+                    id="login-password"
+                    className="input"
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    autoComplete="current-password"
+                    disabled={busy !== null}
+                  />
+                </div>
+
+                <button
+                  className="btn btn-primary w-full"
+                  type="submit"
+                  disabled={busy !== null}
+                >
+                  {busy === 'email' ? 'Signing in…' : 'Sign in'}
+                </button>
+              </form>
+
+              <div className="flex items-center gap-3 my-5" aria-hidden>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-text-muted text-[11px] font-medium">OR</span>
+                <div className="h-px flex-1 bg-white/10" />
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  className="btn btn-secondary w-full"
+                  onClick={() => go('google')}
+                  disabled={busy !== null}
+                >
+                  <GoogleIcon />
+                  <span>{busy === 'google' ? 'Signing in…' : 'Continue with Google'}</span>
+                </button>
+
+                <button
+                  className="btn btn-secondary w-full"
+                  onClick={() => go('apple')}
+                  disabled={busy !== null}
+                >
+                  <AppleIcon />
+                  <span>{busy === 'apple' ? 'Signing in…' : 'Continue with Apple'}</span>
+                </button>
+              </div>
+            </>
+          )}
+
+          {localError && <div className="error-banner mt-4">{localError}</div>}
         </div>
 
         <p className="text-text-muted text-[12px] mt-6 text-center leading-relaxed">

@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "QSKTTJ7A2W.statskey.biometrics"
+        ],
+        "components": [
+          {
+            "/": "/friend/*",
+            "comment": "Open an opaque StatsKey friend invitation"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -19,12 +19,14 @@ interface TokenPack {
   featured?: boolean
 }
 
+// Prices match the iOS App Store token packs ($12.99 / $59.99 / $299.99);
+// the web-only 100M pack keeps the same ~$12/M unit rate.
 const TOKEN_PACKS: TokenPack[] = [
   {
     id: '1m',
     name: 'Starter top-up',
     tokens: '1M',
-    price: '$6.99',
+    price: '$12.99',
     subtitle: 'Small overflow pack for extra Intelligence questions.',
     bestFor: 'A few deeper chats',
   },
@@ -32,7 +34,7 @@ const TOKEN_PACKS: TokenPack[] = [
     id: '5m',
     name: 'Power month',
     tokens: '5M',
-    price: '$29.99',
+    price: '$59.99',
     subtitle: 'The cleanest option for heavy Intelligence use.',
     bestFor: 'Frequent deep analysis',
     featured: true,
@@ -41,7 +43,7 @@ const TOKEN_PACKS: TokenPack[] = [
     id: '25m',
     name: 'Research pack',
     tokens: '25M',
-    price: '$149.99',
+    price: '$299.99',
     subtitle: 'Large one-time reserve for long context and bulk analysis.',
     bestFor: 'Power users and reports',
   },
@@ -49,7 +51,7 @@ const TOKEN_PACKS: TokenPack[] = [
     id: '100m',
     name: 'Frontier reserve',
     tokens: '100M',
-    price: '$599.99',
+    price: '$1,199.99',
     subtitle: 'High-volume reserve for users who do not want BYOK.',
     bestFor: 'Never think about tokens',
   },
@@ -231,7 +233,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
               </div>
             </div>
 
-            <div className="mt-6 flex items-end justify-between gap-4">
+            <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <div className="font-display text-[24px] font-bold tracking-[-0.03em] text-text-primary">
                   {pack.price}
@@ -239,7 +241,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
                 <p className="text-[12px] text-text-muted">{pack.bestFor}</p>
               </div>
               <button
-                className={pack.featured ? 'btn btn-primary' : 'btn btn-secondary'}
+                className={`${pack.featured ? 'btn btn-primary' : 'btn btn-secondary'} w-full sm:w-auto`}
                 onClick={() => buy(pack.id)}
                 disabled={busyPack !== null}
               >

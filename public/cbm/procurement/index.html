@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Sourced, dimensioned bill of materials for the CBM / StatsKey Continuous Panel Biomarker Monitor: exact part numbers, modeled and datasheet dimensions, vendors, price ranges, status, and order links across bench, puck, cartridge, chemistry, and assembly tracks.">
+<link rel="canonical" href="https://statskeybiometrics.com/cbm/procurement/">
+<link rel="icon" href="/favicon.svg">
+<title>CBM Panel &mdash; Procurement &amp; BOM</title>
+<style>
+:root{
+  --bg:#0d1117;
+  --bg-soft:#0a0e14;
+  --surface:#111826;
+  --surface-2:#131b27;
+  --surface-3:#172031;
+  --border:#243041;
+  --border-soft:#1b2534;
+  --ink:#e6edf3;
+  --ink-2:#c9d1d9;
+  --muted:#7d8590;
+  --muted-2:#96a3b3;
+  --cyan:#30d5c8;
+  --blue:#8fd3ff;
+  --amber:#f0c674;
+  --mint:#7ee3c0;
+  --rose:#ff8aa1;
+  --shadow:0 10px 40px rgba(0,0,0,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+code,kbd,pre{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:.92em}
+code{background:var(--surface);border:1px solid var(--border-soft);border-radius:4px;padding:1px 5px;color:var(--ink-2)}
+pre{background:var(--surface);border:1px solid var(--border-soft);border-radius:8px;padding:12px 14px;overflow:auto;color:var(--ink-2);line-height:1.55}
+.bar{position:sticky;top:0;z-index:50;background:rgba(10,14,20,.92);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.bar__row{display:flex;align-items:center;justify-content:space-between;padding:10px 22px;gap:14px;flex-wrap:wrap}
+.bar__brand{display:flex;align-items:center;gap:12px;font-size:14px}
+.bar__chip{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);border:1px solid var(--border);padding:3px 8px;border-radius:999px;background:var(--surface)}
+.bar__title{color:var(--ink);font-weight:700}
+.bar__meta{color:var(--muted);font-size:12px}
+.bar__actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink-2);padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-2);border-color:#2d3a4b;color:var(--ink);text-decoration:none}
+.btn--primary{background:var(--cyan);color:#03110e;border-color:var(--cyan);font-weight:800}
+.btn--primary:hover{background:#70f0cb;color:#03110e}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:28px;max-width:1240px;margin:0 auto;padding:28px 22px 96px}
+.toc{position:sticky;top:68px;align-self:start;max-height:calc(100vh - 96px);overflow:auto}
+.toc h4{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin:18px 0 8px}
+.toc h4:first-child{margin-top:0}
+.toc a{display:block;font-size:13px;color:var(--ink-2);padding:6px 10px;border-radius:6px;border:1px solid transparent}
+.toc a:hover{background:var(--surface);border-color:var(--border-soft);text-decoration:none;color:var(--ink)}
+.toc a.active{background:var(--surface);border-color:var(--cyan);color:var(--ink)}
+.content{min-width:0}
+section.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:22px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+section.card>h2{font-size:20px;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em}
+section.card>h2 .n{color:var(--cyan);font-weight:700;margin-right:10px}
+section.card>p.lead{color:var(--muted-2);font-size:14px;margin-bottom:14px}
+section.card h3{font-size:14px;color:var(--amber);margin:18px 0 10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+section.card p{color:var(--ink-2);margin:10px 0}
+section.card ul,section.card ol{padding-left:22px;color:var(--ink-2);margin:8px 0}
+section.card li{margin:5px 0}
+section.card strong{color:var(--ink)}
+.cinema{position:relative;overflow:hidden;border-radius:18px;border:1px solid var(--border);margin-bottom:22px;background:linear-gradient(160deg,#0a1821 0%,#060b11 100%);min-height:clamp(460px,72vh,760px);isolation:isolate}
+.cinema__stage{position:absolute;inset:0;z-index:0;overflow:hidden}
+.cinema__poster{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(ellipse 70% 60% at 70% 58%,rgba(48,213,200,.22),transparent 70%),
+  radial-gradient(ellipse 55% 40% at 20% 78%,rgba(143,211,255,.15),transparent 70%),
+  linear-gradient(160deg,#0d1a2b 0%,#061316 70%,#05090f 100%)}
+.cinema__poster::before{content:"";position:absolute;inset:0;background-image:
+  linear-gradient(rgba(143,211,255,.06) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(143,211,255,.05) 1px,transparent 1px);
+  background-size:90px 90px;mask-image:radial-gradient(ellipse at 60% 55%,rgba(0,0,0,.9),transparent 75%)}
+.cinema__grain{position:absolute;inset:0;pointer-events:none;z-index:1;background-image:radial-gradient(circle at 15% 15%,rgba(48,213,200,.14),transparent 42%),radial-gradient(circle at 88% 92%,rgba(240,198,116,.10),transparent 46%);mix-blend-mode:screen;opacity:.9}
+.cinema__veil{position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(180deg,rgba(6,11,18,0) 0%,rgba(6,11,18,.05) 42%,rgba(6,11,18,.72) 88%,rgba(6,11,18,.92) 100%)}
+.cinema__frame{position:absolute;inset:0;pointer-events:none;z-index:3;border:1px solid rgba(143,211,255,.06);border-radius:inherit;box-shadow:inset 0 0 80px rgba(0,0,0,.45)}
+.cinema__content{position:relative;z-index:4;display:grid;grid-template-rows:1fr auto;padding:32px 34px 28px;min-height:inherit;pointer-events:none}
+.cinema__chip-row{display:flex;gap:10px;flex-wrap:wrap;align-self:start;margin-bottom:auto}
+.cinema__chip{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border:1px solid var(--border);border-radius:999px;background:rgba(9,15,22,.55);backdrop-filter:blur(6px);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
+.cinema__chip--amber{color:var(--amber);border-color:rgba(240,198,116,.4)}
+.cinema__chip--mint{color:var(--mint);border-color:rgba(126,227,192,.4)}
+.cinema__chip .dot{width:6px;height:6px;border-radius:999px;background:currentColor;box-shadow:0 0 10px currentColor}
+.cinema__headline{display:grid;gap:16px;max-width:940px}
+.cinema__eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--amber)}
+.cinema__title{margin:0;font-size:clamp(34px,6.1vw,76px);line-height:.96;letter-spacing:-.025em;color:#e8f4ff;font-weight:750}
+.cinema__title em{font-style:normal;color:var(--cyan);position:relative;white-space:nowrap}
+.cinema__kicker{margin:0;color:var(--ink-2);font-size:clamp(14px,1.6vw,18px);line-height:1.5;max-width:68ch}
+.cinema__ctas{display:flex;gap:10px;flex-wrap:wrap;pointer-events:auto;margin-top:6px}
+.cinema__ctas .btn{padding:10px 16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.fact{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.fact::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);opacity:.7}
+.fact.fact--amber::before{background:var(--amber)}
+.fact.fact--mint::before{background:var(--mint)}
+.fact__label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:6px}
+.fact__value{font-size:20px;font-weight:750;color:var(--ink);letter-spacing:-.01em}
+.fact__value--num{font-variant-numeric:tabular-nums}
+.fact__sub{margin-top:4px;font-size:11px;color:var(--muted-2)}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:22px}
+.spec{background:rgba(14,22,34,.6);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.spec .k{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
+.spec .v{color:var(--ink);font-size:13px;font-weight:650}
+.tbl-wrap{overflow:auto;border:1px solid var(--border);border-radius:10px;margin:12px 0}
+table.tbl{border-collapse:collapse;width:100%;font-size:13px}
+table.tbl th,table.tbl td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--ink-2);vertical-align:top}
+table.tbl thead th{background:var(--surface-2);color:var(--ink);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.1em;border-bottom:1px solid var(--border)}
+table.tbl tbody tr:hover{background:var(--surface-2)}
+table.tbl tbody tr:last-child td{border-bottom:0}
+table.tbl td.num,table.tbl th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.tbl .total td{background:var(--surface-3);color:var(--ink);font-weight:700}
+table.tbl .grand td{background:linear-gradient(180deg,#183343,#142435);color:var(--cyan);font-weight:800;font-size:14px}
+.caption{margin-top:6px;font-size:11px;color:var(--muted)}
+.note{border-left:3px solid var(--cyan);background:linear-gradient(90deg,rgba(48,213,200,.08),transparent);padding:12px 14px;margin:14px 0;border-radius:0 8px 8px 0;font-size:13px;color:var(--ink-2)}
+.note.amber{border-left-color:var(--amber);background:linear-gradient(90deg,rgba(240,198,116,.08),transparent)}
+.note.mint{border-left-color:var(--mint);background:linear-gradient(90deg,rgba(126,227,192,.08),transparent)}
+.muted{color:var(--muted)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.quote-band{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.quote-item{border:1px solid var(--border-soft);border-radius:10px;background:var(--surface-2);padding:12px}
+.quote-item .k{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:5px}
+.quote-item .v{font-size:18px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.quote-item .s{font-size:11px;color:var(--muted-2);margin-top:3px}
+.callout-total{border:1px solid rgba(48,213,200,.38);border-radius:12px;background:linear-gradient(180deg,rgba(48,213,200,.12),rgba(48,213,200,.035));padding:16px;margin-top:14px}
+.callout-total strong{display:block;font-size:22px;color:var(--cyan);font-variant-numeric:tabular-nums}
+.copy-status{font-size:11px;color:var(--mint);align-self:center}
+.cell-title{color:var(--ink);font-weight:650}
+.cell-sub{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.qty{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.src-link{white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--border);background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:999px;background:currentColor;box-shadow:0 0 8px currentColor}
+.pill--catalog{color:var(--mint);border-color:rgba(126,227,192,.42)}
+.pill--quoted{color:var(--cyan);border-color:rgba(48,213,200,.42)}
+.pill--inhand{color:var(--blue);border-color:rgba(143,211,255,.42)}
+.pill--print{color:var(--amber);border-color:rgba(240,198,116,.42)}
+.pill--rfq{color:var(--rose);border-color:rgba(255,138,161,.45)}
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr;gap:16px;padding:16px 14px 80px}
+  .toc{position:static;max-height:none;display:flex;flex-wrap:wrap;gap:6px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+  .toc h4{width:100%;margin:8px 0 2px}
+  .toc a{padding:5px 9px;font-size:12px;background:var(--surface-2);border:1px solid var(--border-soft)}
+  .two-col,.three-col,.quote-band{grid-template-columns:1fr}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cinema{min-height:clamp(480px,72vh,720px)}
+  .cinema__content{padding:22px 22px 26px}
+}
+@media (max-width:640px){
+  .bar__row{padding:9px 14px}
+  .bar__title{display:none}
+  section.card{padding:20px 18px}
+  .cinema{min-height:clamp(420px,70vh,620px);border-radius:14px}
+  .cinema__content{padding:20px 18px 22px}
+  .cinema__title{font-size:clamp(30px,10vw,46px)}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .bar,.toc,.bar__actions,.cinema__stage,.cinema__grain,.cinema__veil,.cinema__frame,.cinema__ctas{display:none!important}
+  .layout{grid-template-columns:1fr;padding:0;max-width:none}
+  section.card,.cinema,.facts,.specs,.fact,.spec{box-shadow:none;border:1px solid #ddd;background:#fff;color:#111;break-inside:avoid;page-break-inside:avoid}
+  .cinema{min-height:0;padding:18px 22px;margin-bottom:18px}
+  .cinema__content{position:static;padding:0}
+  .cinema__title,.cinema__kicker,.cinema__eyebrow,.cinema__chip{color:#111}
+  .cinema__chip{background:#f7f7f7;border-color:#ddd}
+  section.card h2,section.card h3,.cinema__title{color:#111}
+  table.tbl th,table.tbl td{color:#111;border-color:#ddd}
+  a{color:#0b5fa5}
+  .fact,.spec,.note,pre,code,.quote-item,.callout-total{background:#f7f7f7;color:#111;border-color:#ddd}
+  .pill{border-color:#ddd;color:#111}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="bar">
+    <div class="bar__row">
+      <div class="bar__brand">
+        <span class="bar__chip">Procurement &middot; BOM</span>
+        <span class="bar__title">CBM Panel Procurement &amp; BOM</span>
+        <span class="bar__meta">Sourced, dimensioned bill of materials</span>
+      </div>
+      <div class="bar__actions">
+        <a class="btn" href="/cbm/">&larr; Back to CBM</a>
+        <button class="btn" id="copyBtn">Copy BOM summary</button>
+        <span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span>
+        <button class="btn" id="printBtn">Print / PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="toc" id="toc">
+      <h4>Contents</h4>
+      <a href="#cover">Cover</a>
+      <a href="#overview">Overview</a>
+      <a href="#bench">1. Bench prototype</a>
+      <a href="#puck">2. Reusable reader (puck)</a>
+      <a href="#cartridge">3. Disposable cartridge</a>
+      <a href="#chem-ise">4. Ion-selective chemistry</a>
+      <a href="#chem-enz">5. Enzyme chemistry</a>
+      <a href="#chem">6. Shared reagents &amp; matrix</a>
+      <a href="#assembly">7. Assembly &amp; bonding</a>
+      <a href="#notes">Notes &amp; boundaries</a>
+    </nav>
+
+    <div class="content">
+      <header class="cinema" id="cover" aria-labelledby="cinema-title">
+        <div class="cinema__stage" aria-hidden="true">
+          <div class="cinema__poster"></div>
+        </div>
+        <div class="cinema__grain" aria-hidden="true"></div>
+        <div class="cinema__veil" aria-hidden="true"></div>
+        <div class="cinema__frame" aria-hidden="true"></div>
+        <div class="cinema__content">
+          <div class="cinema__chip-row">
+            <span class="cinema__chip cinema__chip--amber"><span class="dot"></span>Procurement &middot; BOM</span>
+            <span class="cinema__chip">Research platform</span>
+            <span class="cinema__chip cinema__chip--mint">CBM / StatsKey</span>
+          </div>
+          <div class="cinema__headline">
+            <div class="cinema__eyebrow">CBM Panel &middot; Procurement &amp; BOM</div>
+            <h1 class="cinema__title" id="cinema-title">A sourced, dimensioned BOM for the <em>continuous panel biomarker monitor</em>.</h1>
+            <p class="cinema__kicker">Every part of the CBM platform &mdash; the orderable bench prototype, the reusable reader puck, the disposable microneedle cartridge, and the ion-selective plus enzyme chemistry &mdash; with exact part numbers, modeled and datasheet dimensions, vendors, price ranges, status, and order links. The bench build is catalog-orderable today; custom items are marked RFQ until a vendor quotes.</p>
+            <div class="cinema__ctas">
+              <a class="btn btn--primary" href="#overview">Overview &darr;</a>
+              <a class="btn" href="#bench">Bench prototype</a>
+              <a class="btn" href="#cartridge">Cartridge</a>
+              <a class="btn" href="#notes">Boundaries</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="facts" aria-label="Procurement headline numbers">
+        <div class="fact"><div class="fact__label">Bench prototype</div><div class="fact__value fact__value--num">$3.3K&ndash;$7.2K</div><div class="fact__sub">Fully catalog-orderable today</div></div>
+        <div class="fact fact--amber"><div class="fact__label">RFQ / custom</div><div class="fact__value fact__value--num">6 items</div><div class="fact__sub">No committed price until quoted</div></div>
+        <div class="fact"><div class="fact__label">Line items</div><div class="fact__value fact__value--num">46</div><div class="fact__sub">Across 7 tracks</div></div>
+        <div class="fact fact--mint"><div class="fact__label">Catalog-ready</div><div class="fact__value fact__value--num">32</div><div class="fact__sub">Orderable from listed vendors</div></div>
+      </div>
+
+      <div class="specs" aria-label="Program facts">
+        <div class="spec"><div class="k">Platform</div><div class="v">CBM &mdash; Continuous Panel Biomarker Monitor</div></div>
+        <div class="spec"><div class="k">Document type</div><div class="v">Sourced, dimensioned bill of materials</div></div>
+        <div class="spec"><div class="k">Panel channels</div><div class="v">Na, K, pH, glucose, ketone, lactate</div></div>
+        <div class="spec"><div class="k">Tracks</div><div class="v">Bench, puck, cartridge, chemistry, assembly</div></div>
+        <div class="spec"><div class="k">Bench reader</div><div class="v">PalmSens EmStat4 MUX / EmStat Pico</div></div>
+        <div class="spec"><div class="k">Sensing substrate</div><div class="v">8-well screen-printed gold array</div></div>
+        <div class="spec"><div class="k">Data source</div><div class="v">BOM_master_dimensioned.csv</div></div>
+        <div class="spec"><div class="k">Regulatory status</div><div class="v">Not a medical device; research-stage</div></div>
+      </div>
+
+      <section class="card" id="overview">
+        <h2>Overview</h2>
+        <p class="lead">This sheet turns the CBM platform's dimensioned bill of materials into an orderable procurement view, grouped by build track. Every line carries the exact part number, the modeled or datasheet dimensions, the vendor, an indicative price range, a status, and a source link.</p>
+        <div class="quote-band" aria-label="Procurement summary">
+          <div class="quote-item"><div class="k">Bench prototype today</div><div class="v">$3,300&ndash;$7,200</div><div class="s">Catalog-orderable, no custom fabrication</div></div>
+          <div class="quote-item"><div class="k">RFQ-only custom items</div><div class="v">4 core parts</div><div class="s">Microneedle head, flex, battery, puck PCB</div></div>
+          <div class="quote-item"><div class="k">Total line items</div><div class="v">46 parts</div><div class="s">Bench, puck, cartridge, chemistry, assembly</div></div>
+        </div>
+        <p>The <strong>bench prototype is fully catalog-orderable today at roughly $3,300&ndash;$7,200</strong>: a benchtop potentiostat, the 8-well screen-printed gold array, reference and counter electrodes, and controllers &mdash; enough to bring up the full panel chemistry with zero custom fabrication. The reusable puck, disposable cartridge, and chemistry tracks are largely catalog reagents and components.</p>
+        <div class="note amber">A handful of <strong>RFQ-only custom items</strong> &mdash; the microneedle sensing head, the sensing flex / interposer, the VARTA CoinPower battery, and the PalmSens puck PCB &mdash; have no committed catalog price until a vendor quotes them. Where a figure is shown for an RFQ line it is indicative only.</div>
+        <p class="caption">Prices are indicative planning ranges from <code>BOM_master_dimensioned.csv</code>. Vendor quotes, quantity breaks, tax, and shipping are excluded. Dimensions are datasheet/package values (real) or modeled design targets (noted per row).</p>
+      </section>
+
+      <section class="card" id="bench">
+        <h2><span class="n">1</span>Bench prototype (orderable now)</h2>
+        <p class="lead">Orderable today from listed vendors. A benchtop potentiostat with 8-channel mux, the screen-printed gold sensing array, bench-truth reference and counter electrodes, and bring-up controllers &mdash; the fastest path to first panel data with no custom parts.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Part &amp; function</th><th>Part number</th><th>Dimensions (mm)</th><th>Vendor</th><th class="num">Price (USD)</th><th>Status</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title">EmStat4 MUX potentiostat + 8ch mux</span><span class="cell-sub">Bench reader (zero firmware)</span></td>
+                <td><code>EmStat4 MUX</code></td>
+                <td>~140 x 120 x 40 (benchtop housing)<span class="cell-sub">PalmSens MUX8-R2 housing 138x121x37 brochure</span></td>
+                <td>PalmSens</td>
+                <td class="num">$2,500&ndash;$3,500</td>
+                <td><span class="pill pill--rfq">RFQ</span></td>
+                <td><a class="src-link" href="https://www.palmsens.com/product/emstat4-mux/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">EmStat Pico MUX16 kit (quoted alt)</span><span class="cell-sub">Bench reader alt</span></td>
+                <td><code>C-ESPICO-MUX16</code></td>
+                <td>MUX16 board 75 x 75<span class="cell-sub">PalmSens brochure</span></td>
+                <td>PalmSens</td>
+                <td class="num">$1,368</td>
+                <td><span class="pill pill--quoted">Quoted</span></td>
+                <td><a class="src-link" href="https://www.palmsens.com/product/oem-emstat-pico-mux16/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">8X gold screen-printed array (8-WE panel)</span><span class="cell-sub">Sensing substrate</span></td>
+                <td><code>DRP-8X220AT-U20 (20-pack) + CAST8X</code></td>
+                <td>34.6 x 78.9 x 1.0; WE dia 2.5<span class="cell-sub">DropSens datasheet (3.46x7.89x0.1 cm)</span></td>
+                <td>Metrohm DropSens</td>
+                <td class="num">$300&ndash;$600</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://metrohm-dropsens.com/products/electrodes/screen-printed-electrodes/8x-screen-printed-gold-electrode/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Miniature Ag/AgCl reference</span><span class="cell-sub">Bench truth reference</span></td>
+                <td><code>ET073-1</code></td>
+                <td>L65 x dia 2.0 (PTFE body)<span class="cell-sub">eDAQ datasheet</span></td>
+                <td>eDAQ</td>
+                <td class="num">$135&ndash;$235</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://edaq.com/ET073-1" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Pt counter electrode</span><span class="cell-sub">Amperometric counter</span></td>
+                <td><code>MW-1032</code></td>
+                <td>wire dia ~0.5 x L~50 (typ)<span class="cell-sub">BASi listing</span></td>
+                <td>BASi</td>
+                <td class="num">$50&ndash;$130</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.basinc.com/products/MW-1032" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Feather nRF52840</span><span class="cell-sub">Controller (bench MCU/BLE)</span></td>
+                <td><code>4062</code></td>
+                <td>51 x 23 x 8<span class="cell-sub">Adafruit board spec</span></td>
+                <td>Adafruit</td>
+                <td class="num">$25&ndash;$50</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.adafruit.com/product/4062" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">ESP32-S3 devkit</span><span class="cell-sub">Controller (bring-up)</span></td>
+                <td><code>ESP32-S3-DEVKITC-1-N8R8</code></td>
+                <td>~69 x 26 x 5<span class="cell-sub">Espressif board spec</span></td>
+                <td>Espressif</td>
+                <td class="num">In hand</td>
+                <td><span class="pill pill--inhand">In hand</span></td>
+                <td><a class="src-link" href="https://www.espressif.com/en/products/devkits/esp32-s3-devkitc-1" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="puck">
+        <h2><span class="n">2</span>Reusable reader (puck)</h2>
+        <p class="lead">The reusable wearable reader. Mostly catalog electronics &mdash; analog front end, ADC, mux, temperature, BLE radio, and PMIC &mdash; while the PalmSens OEM core and the VARTA cell are RFQ and the shell is printed in-house.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Part &amp; function</th><th>Part number</th><th>Dimensions (mm)</th><th>Vendor</th><th class="num">Price (USD)</th><th>Status</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title">PalmSens EmStat Pico OEM module</span><span class="cell-sub">Wearable electrochem core (puck PCB)</span></td>
+                <td><code>EmStat Pico module</code></td>
+                <td>30.5 x 18.0 x 2.6 (SMT pads 3.0 x 1.5)<span class="cell-sub">EmStat Pico datasheet Rev.7-2023</span></td>
+                <td>PalmSens</td>
+                <td class="num">$714</td>
+                <td><span class="pill pill--rfq">RFQ</span></td>
+                <td><a class="src-link" href="https://www.palmsens.com/product/oem-emstat-pico-module/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">AD5941 AFE</span><span class="cell-sub">CA/SWV/EIS AFE (custom/wearable path)</span></td>
+                <td><code>AD5941BCPZ (LFCSP-56)</code></td>
+                <td>7.0 x 7.0 x 0.75<span class="cell-sub">ADI datasheet LFCSP-56</span></td>
+                <td>Analog Devices</td>
+                <td class="num">$15&ndash;$40</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.analog.com/en/products/ad5940.html" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Femtoamp buffer <span class="qty">&times;2</span></span><span class="cell-sub">High-Z potentiometry (ISE front end)</span></td>
+                <td><code>LMP7721MA/NOPB</code></td>
+                <td>SOIC-8 4.9 x 3.9 x 1.5<span class="cell-sub">TI SOIC-8 (D) package</span></td>
+                <td>Texas Instruments</td>
+                <td class="num">$10&ndash;$60</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.ti.com/product/LMP7721" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">24-bit ADC (OCP)</span><span class="cell-sub">Potentiometric ADC</span></td>
+                <td><code>ADS1220IPWR</code></td>
+                <td>TSSOP-16 5.0 x 4.4 x 1.1<span class="cell-sub">TI PW (TSSOP-16) package</span></td>
+                <td>Texas Instruments</td>
+                <td class="num">$30&ndash;$100</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.ti.com/product/ADS1220" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">8:1 analog mux <span class="qty">&times;3</span></span><span class="cell-sub">Channel routing</span></td>
+                <td><code>ADG1608BRUZ</code></td>
+                <td>TSSOP-16 5.0 x 4.4 x 1.1<span class="cell-sub">ADI RU-16 (TSSOP) package</span></td>
+                <td>Analog Devices</td>
+                <td class="num">$10&ndash;$30</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.analog.com/en/products/adg1608.html" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Temperature sensor <span class="qty">&times;2</span></span><span class="cell-sub">Nernst/enzyme temp correction</span></td>
+                <td><code>TMP117AIDRVR</code></td>
+                <td>WSON-6 2.0 x 2.0 x 0.8<span class="cell-sub">TI DRV (WSON-6) package</span></td>
+                <td>Texas Instruments</td>
+                <td class="num">$3&ndash;$12</td>
+                <td><span class="pill pill--inhand">In hand</span></td>
+                <td><a class="src-link" href="https://www.ti.com/product/TMP117" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">BLE module (wearable)</span><span class="cell-sub">Radio + MCU</span></td>
+                <td><code>MDBT50Q-P1MV2</code></td>
+                <td>15.5 x 10.5 x 2.0<span class="cell-sub">Raytac datasheet Ver.L</span></td>
+                <td>Raytac</td>
+                <td class="num">$9&ndash;$15</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.raytac.com/product/ins.php?index_id=81" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">PMIC / charger</span><span class="cell-sub">Wearable power path</span></td>
+                <td><code>BQ25120AYFPR</code></td>
+                <td>DSBGA-25 2.5 x 2.5 x 0.5<span class="cell-sub">TI YFP (DSBGA-25) package</span></td>
+                <td>Texas Instruments</td>
+                <td class="num">$3&ndash;$10</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.ti.com/product/BQ25120A" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Battery</span><span class="cell-sub">Wearable cell</span></td>
+                <td><code>CoinPower CP1240 A4X</code></td>
+                <td>dia 12.1 (+0.1/-0.3) x 4.0 (+/-0.1)<span class="cell-sub">VARTA CoinPower datasheet</span></td>
+                <td>VARTA</td>
+                <td class="num">RFQ</td>
+                <td><span class="pill pill--rfq">RFQ</span></td>
+                <td><a class="src-link" href="https://www.varta-ag.com/en/industry/smart-patch" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Debug interface</span><span class="cell-sub">SWD programming</span></td>
+                <td><code>TC2030-CTX</code></td>
+                <td>footprint 6-pad row (no connector on board)<span class="cell-sub">Tag-Connect TC2030 footprint</span></td>
+                <td>Tag-Connect</td>
+                <td class="num">$35&ndash;$80</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.tag-connect.com/product/tc2030-ctx-6-pin-cable-for-arm-cortex" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Pogo interface pins <span class="qty">&times;11</span></span><span class="cell-sub">Cartridge contact</span></td>
+                <td><code>0951-0-15-20-71-14-11-0</code></td>
+                <td>pin dia ~0.9 x travel ~1.9<span class="cell-sub">Mill-Max 0951 series</span></td>
+                <td>Mill-Max</td>
+                <td class="num">$10&ndash;$50</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.mill-max.com/products/discrete-spring-loaded-pins/surface-mount-spring-loaded-pin/0951" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Puck shell (LMU/SLA print)</span><span class="cell-sub">Enclosure</span></td>
+                <td><code>custom STL</code></td>
+                <td>dia 40 x 12 (wall 1.6)<span class="cell-sub">design target (this repo)</span></td>
+                <td>LMU / Formlabs</td>
+                <td class="num">$0&ndash;$50</td>
+                <td><span class="pill pill--print">Print</span></td>
+                <td><span class="muted src-link">Local CAD</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="cartridge">
+        <h2><span class="n">3</span>Disposable cartridge</h2>
+        <p class="lead">The disposable, skin-facing carrier. The microneedle sensing head and the sensing flex are custom RFQ builds; reference ink, silver wire, adhesives, and passivation are catalog or in-hand; the shell is printed in-house.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Part &amp; function</th><th>Part number</th><th>Dimensions (mm)</th><th>Vendor</th><th class="num">Price (USD)</th><th>Status</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title">Custom microneedle sensing head</span><span class="cell-sub">8-WE + CE + RE array (RFQ)</span></td>
+                <td><code>custom 8-WE gold 316L</code></td>
+                <td>needle 33G (OD 0.20) x len 0.7-0.9; head dia ~14<span class="cell-sub">K1 brief geometry (repo)</span></td>
+                <td>ZorayPT / Zimmer &amp; Peacock</td>
+                <td class="num">RFQ</td>
+                <td><span class="pill pill--rfq">RFQ</span></td>
+                <td><a class="src-link" href="https://zoraypt.com/products/microneedle-array/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Sensing flex / interposer</span><span class="cell-sub">Routes 11 nets to pad boss</span></td>
+                <td><code>polyimide ENIG 10-11 trace</code></td>
+                <td>~26 dia round or 20 x 26 tail<span class="cell-sub">prototype flex estimate</span></td>
+                <td>RayPCB / JHYPCB</td>
+                <td class="num">$200&ndash;$800</td>
+                <td><span class="pill pill--rfq">RFQ</span></td>
+                <td><a class="src-link" href="https://www.raypcb.com/flex-pcb/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Ag/AgCl ink (RE build)</span><span class="cell-sub">Integrated reference</span></td>
+                <td><code>113-09 / 125-20</code></td>
+                <td>reagent (kit)<span class="cell-sub">vendor kit</span></td>
+                <td>Creative Materials</td>
+                <td class="num">$100&ndash;$300</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.creativematerials.com/products/ag-agcl-inks/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Silver wire (RE core)</span><span class="cell-sub">Reference base</span></td>
+                <td><code>Ag wire dia 0.25-0.5</code></td>
+                <td>dia 0.25-0.5 x spool<span class="cell-sub">Goodfellow stock</span></td>
+                <td>Goodfellow</td>
+                <td class="num">$20&ndash;$80</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.goodfellow.com/usa/silver-wire-group" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Cartridge shell (LMU/SLA print)</span><span class="cell-sub">Disposable carrier</span></td>
+                <td><code>custom STL</code></td>
+                <td>dia 30 x 2.0 stack<span class="cell-sub">K1 brief 30-38 x 1.5-2.5</span></td>
+                <td>LMU / Formlabs</td>
+                <td class="num">$0&ndash;$50</td>
+                <td><span class="pill pill--print">Print</span></td>
+                <td><span class="muted src-link">Local CAD</span></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Retention adhesive</span><span class="cell-sub">Skin adhesion (in hand)</span></td>
+                <td><code>4077</code></td>
+                <td>die-cut ring OD ~36<span class="cell-sub">Solventum 4077</span></td>
+                <td>3M / Solventum</td>
+                <td class="num">In hand</td>
+                <td><span class="pill pill--inhand">In hand</span></td>
+                <td><a class="src-link" href="https://www.solventum.com/en-us/home/f/b5005093112/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Comfort adhesive</span><span class="cell-sub">Breathable skirt (in hand)</span></td>
+                <td><code>9833</code></td>
+                <td>die-cut ring<span class="cell-sub">Solventum 9833</span></td>
+                <td>3M / Solventum</td>
+                <td class="num">In hand</td>
+                <td><span class="pill pill--inhand">In hand</span></td>
+                <td><a class="src-link" href="https://www.solventum.com/en-us/home/f/b10176406/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Passivation film</span><span class="cell-sub">Expose only needle tips</span></td>
+                <td><code>ARcare 7759</code></td>
+                <td>die-cut<span class="cell-sub">ARcare 7759</span></td>
+                <td>Adhesives Research</td>
+                <td class="num">$50&ndash;$250</td>
+                <td><span class="pill pill--rfq">RFQ</span></td>
+                <td><a class="src-link" href="https://www.adhesivesresearch.com/arcare-7759/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="chem-ise">
+        <h2><span class="n">4</span>Ion-selective chemistry (Na/K/pH)</h2>
+        <p class="lead">Ion-selective chemistry for the sodium, potassium, and pH channels &mdash; ionophores, membrane matrix, the solid-contact transducer, and IrOx precursors. All catalog reagents.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Part &amp; function</th><th>Part number</th><th>Dimensions (mm)</th><th>Vendor</th><th class="num">Price (USD)</th><th>Status</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title">PEDOT:PSS solid contact</span><span class="cell-sub">Ion&rarr;electron transducer (in hand)</span></td>
+                <td><code>Clevios PH1000</code></td>
+                <td>reagent 100 mL<span class="cell-sub">repo receipt</span></td>
+                <td>Ossila</td>
+                <td class="num">In hand</td>
+                <td><span class="pill pill--inhand">In hand</span></td>
+                <td><a class="src-link" href="https://www.ossila.com/products/pedot-pss-ph-1000" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Valinomycin</span><span class="cell-sub">K+ ionophore</span></td>
+                <td><code>10009152</code></td>
+                <td>reagent 50 mg<span class="cell-sub">vendor</span></td>
+                <td>Cayman</td>
+                <td class="num">$152</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.caymanchem.com/product/10009152/valinomycin" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Sodium ionophore X</span><span class="cell-sub">Na+ selectivity</span></td>
+                <td><code>71747</code></td>
+                <td>reagent 50 mg<span class="cell-sub">vendor</span></td>
+                <td>Sigma-Aldrich</td>
+                <td class="num">$348</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/AU/en/product/sial/71747" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Membrane matrix set</span><span class="cell-sub">PVC/DOS/KTpClPB/THF</span></td>
+                <td><code>set</code></td>
+                <td>reagent set<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma</td>
+                <td class="num">$250&ndash;$700</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">IrOx precursors</span><span class="cell-sub">pH channel</span></td>
+                <td><code>hexachloroiridic acid + oxalic + K2CO3</code></td>
+                <td>reagent set<span class="cell-sub">vendor</span></td>
+                <td>Alfa Chemistry / Sigma</td>
+                <td class="num">$280&ndash;$500</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.alfa-chemistry.com/hexachloroiridic-acid-hexahydrate-cas-16941-92-7-item-81407.htm" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="chem-enz">
+        <h2><span class="n">5</span>Enzyme chemistry (glucose/ketone/lactate)</h2>
+        <p class="lead">Enzyme chemistry for the glucose, ketone, and lactate channels &mdash; oxidases and dehydrogenase, cofactor, mediators, permselective overcoat, and crosslinker. All catalog reagents.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Part &amp; function</th><th>Part number</th><th>Dimensions (mm)</th><th>Vendor</th><th class="num">Price (USD)</th><th>Status</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title">Glucose oxidase</span><span class="cell-sub">Glucose</span></td>
+                <td><code>GOx</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma</td>
+                <td class="num">$70&ndash;$150</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/US/en/search/glucose-oxidase-enzyme" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Lactate oxidase</span><span class="cell-sub">Lactate</span></td>
+                <td><code>L9795</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma</td>
+                <td class="num">$180&ndash;$350</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/IN/en/product/sigma/l9795" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">3-hydroxybutyrate dehydrogenase</span><span class="cell-sub">Ketone</span></td>
+                <td><code>HBDH</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma / Megazyme</td>
+                <td class="num">$120&ndash;$300</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/US/en/search/3-hydroxybutyrate-dehydrogenase" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">NAD+ cofactor</span><span class="cell-sub">Ketone cofactor</span></td>
+                <td><code>N0632</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma</td>
+                <td class="num">$40&ndash;$120</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/US/en/product/sigma/n0632" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Toluidine Blue O</span><span class="cell-sub">Ketone mediator</span></td>
+                <td><code>198161</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma</td>
+                <td class="num">$30&ndash;$80</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/US/en/product/sial/198161" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Tyrosinase + poly(4-vinylpyridine)</span><span class="cell-sub">NAD+ confinement (frontier upgrade)</span></td>
+                <td><code>tyrosinase + P4VP</code></td>
+                <td>reagent<span class="cell-sub">Adv Mater 2024 / UC Irvine 2026</span></td>
+                <td>MilliporeSigma</td>
+                <td class="num">$60&ndash;$180</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Prussian blue reagents</span><span class="cell-sub">Low-potential mediator</span></td>
+                <td><code>FeCl3 + K3/K4 Fe(CN)6</code></td>
+                <td>reagent set<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma</td>
+                <td class="num">$40&ndash;$120</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/LT/en/product/sigma/60299" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Nafion 5%</span><span class="cell-sub">Permselective overcoat</span></td>
+                <td><code>D520</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>Ion Power</td>
+                <td class="num">$150&ndash;$320</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://ion-power.com/store/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Glutaraldehyde / PEGDE</span><span class="cell-sub">Enzyme crosslinker</span></td>
+                <td><code>25% / PEGDE</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>MilliporeSigma / Thermo</td>
+                <td class="num">$40&ndash;$120</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.thermofisher.com/order/catalog/product/A10500.22" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="chem">
+        <h2><span class="n">6</span>Shared reagents &amp; matrix</h2>
+        <p class="lead">Shared validation matrix and electrode-prep reagents used across every channel.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Part &amp; function</th><th>Part number</th><th>Dimensions (mm)</th><th>Vendor</th><th class="num">Price (USD)</th><th>Status</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title">Artificial ISF salts</span><span class="cell-sub">Validation matrix</span></td>
+                <td><code>NaCl/KCl/CaCl2/HEPES/glucose/etc</code></td>
+                <td>reagent set<span class="cell-sub">repo</span></td>
+                <td>Fisher / Sigma</td>
+                <td class="num">$150&ndash;$400</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9280758/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Gold cleaning</span><span class="cell-sub">Electrode prep</span></td>
+                <td><code>0.5 M H2SO4</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>Sigma</td>
+                <td class="num">$40&ndash;$150</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.sigmaaldrich.com/TG/en/product/aldrich/651818" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="assembly">
+        <h2><span class="n">7</span>Assembly &amp; bonding</h2>
+        <p class="lead">Bonding, sealing, and protection consumables for building and finishing the reader and cartridge.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Part &amp; function</th><th>Part number</th><th>Dimensions (mm)</th><th>Vendor</th><th class="num">Price (USD)</th><th>Status</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-title">Silver conductive epoxy</span><span class="cell-sub">Prototype bonding</span></td>
+                <td><code>8331D</code></td>
+                <td>kit<span class="cell-sub">vendor</span></td>
+                <td>MG Chemicals</td>
+                <td class="num">$40&ndash;$120</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://mgchemicals.com/products/adhesives/electrically-conductive-adhesives/silver-epoxy/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Silicone gasket sheet</span><span class="cell-sub">Seal / compression</span></td>
+                <td><code>30A sheet</code></td>
+                <td>thickness 0.25-1.0<span class="cell-sub">McMaster</span></td>
+                <td>McMaster-Carr</td>
+                <td class="num">$20&ndash;$100</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://www.mcmaster.com/products/silicone-rubber-sheets/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+              <tr>
+                <td><span class="cell-title">Conformal coating</span><span class="cell-sub">Reader protection</span></td>
+                <td><code>422B</code></td>
+                <td>reagent<span class="cell-sub">vendor</span></td>
+                <td>MG Chemicals</td>
+                <td class="num">$20&ndash;$50</td>
+                <td><span class="pill pill--catalog">Catalog</span></td>
+                <td><a class="src-link" href="https://mgchemicals.com/products/conformal-coatings/silicone-conformal-coating/" target="_blank" rel="noreferrer">Source / order &#8599;</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="notes">
+        <h2><span class="n">8</span>Notes &amp; boundaries</h2>
+        <ul>
+          <li>Prices are indicative planning ranges from the dimensioned BOM (<code>BOM_master_dimensioned.csv</code>); vendor quotes, quantity breaks, tax, and shipping are excluded.</li>
+          <li>Dimensions are either datasheet/package values (real) or modeled design targets from the CAD (noted per row); printed and custom parts are subject to first-fit measurement.</li>
+          <li>RFQ items have no committed catalog price until a vendor quotes; any figure shown for an RFQ line is indicative only.</li>
+          <li>The two printed shells reference a local CAD file (<code>panel_cartridge.scad</code>) and are produced in-house rather than ordered from a vendor.</li>
+          <li>&ldquo;In hand&rdquo; parts are already on the bench and carry no incremental purchase cost for the first build.</li>
+        </ul>
+        <p class="muted" style="margin-top:14px">CBM / StatsKey Continuous Panel Biomarker Monitor is a research-stage platform. Not a medical device. Not for diagnosis, treatment, or patient-care decisions.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+const bomSummary = `CBM Panel — Procurement & BOM
+
+Platform: CBM / StatsKey Continuous Panel Biomarker Monitor (research-stage)
+Source: BOM_master_dimensioned.csv (sourced, dimensioned)
+Line items: 46 across 7 tracks
+
+Bench prototype (orderable now): ~$3,300–$7,200, fully catalog-orderable today with no custom fabrication.
+
+RFQ-only custom items (no committed catalog price until quoted):
+- Custom microneedle sensing head (ZorayPT / Zimmer & Peacock)
+- Sensing flex / interposer (RayPCB / JHYPCB)
+- VARTA CoinPower CP1240 battery
+- PalmSens EmStat Pico OEM module (puck PCB)
+
+Tracks:
+1. Bench prototype (orderable now)
+2. Reusable reader (puck)
+3. Disposable cartridge
+4. Ion-selective chemistry (Na/K/pH)
+5. Enzyme chemistry (glucose/ketone/lactate)
+6. Shared reagents & matrix
+7. Assembly & bonding
+
+Boundary: Research-stage platform. Not a medical device. Not for diagnosis, treatment, or patient-care decisions.`;
+
+const copyBtn = document.getElementById("copyBtn");
+const copyStatus = document.getElementById("copyStatus");
+copyBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(bomSummary);
+    copyStatus.textContent = "Copied";
+  } catch (_error) {
+    copyStatus.textContent = "Copy unavailable";
+  }
+  window.setTimeout(() => {
+    copyStatus.textContent = "";
+  }, 2200);
+});
+
+(function(){
+  const links = [...document.querySelectorAll("#toc a")];
+  const sections = links
+    .map(link => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+  if (!("IntersectionObserver" in window)) return;
+  const visible = new Map();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => visible.set(entry.target.id, entry.isIntersecting));
+    const active = sections.find(section => visible.get(section.id)) || sections[0];
+    if (!active) return;
+    links.forEach(link => link.classList.toggle("active", link.getAttribute("href") === `#${active.id}`));
+  }, { rootMargin: "-18% 0px -70% 0px", threshold: [0, .1, .5] });
+  sections.forEach(section => observer.observe(section));
+})();
+</script>
+</body>
+</html>

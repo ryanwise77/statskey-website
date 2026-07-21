@@ -1,0 +1,1921 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey Wellness | The Gut Check, GI Burden Score &amp; a Private Wellness Journal</title>
+    <meta name="description" content="The Wellness Journal records your gut, mood, energy, symptoms, and substances in seconds — Bristol-scale precise, scored 0–10 for GI burden, locked behind Face ID, and connected to every meal you eat." />
+    <meta property="og:title" content="StatsKey Wellness — the signal everyone has, recorded properly" />
+    <meta property="og:description" content="A fifteen-second Gut Check with mixed-episode Bristol phases, a live 0–10 GI Burden Score, Face ID record lock, gut–brain patterns, and clinician-ready exports." />
+    <meta property="og:url" content="https://statskeybiometrics.com/wellness" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      /* ===== Wellness page — scoped styles (shared tokens come from style.css) ===== */
+
+      .teal-pill {
+        border-color: rgba(48, 213, 200, 0.24);
+        color: var(--cyan);
+        background: rgba(48, 213, 200, 0.08);
+      }
+
+      /* --- Hero journal card --- */
+      .wj-rows { margin-top: 20px; }
+
+      .wj-row {
+        display: grid;
+        grid-template-columns: 52px 1fr;
+        gap: 14px;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--line-soft);
+      }
+
+      .wj-row:last-child { border-bottom: 0; }
+
+      .wj-row > span {
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        padding-top: 3px;
+        white-space: nowrap;
+      }
+
+      .wj-row strong {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink);
+        font-size: 14.5px;
+        font-weight: 650;
+      }
+
+      .wj-row p {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 13px;
+        transition: filter 0.45s ease, opacity 0.45s ease;
+      }
+
+      .wj-dot {
+        flex: 0 0 auto;
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        box-shadow: 0 0 12px currentColor;
+      }
+
+      .wj-lock-tag {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--cyan);
+        font-family: var(--font-mono);
+        font-size: 9.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .wj-row--locked { position: relative; cursor: pointer; }
+      .wj-row--locked p { filter: blur(5px); opacity: 0.75; user-select: none; }
+      .wj-row--locked.is-open p { filter: blur(0); opacity: 1; }
+
+      .wj-row--locked::after {
+        content: "";
+        position: absolute;
+        inset: 4px -10px;
+        border-radius: 14px;
+        background: linear-gradient(100deg, transparent 30%, rgba(48, 213, 200, 0.16) 50%, transparent 70%) no-repeat;
+        background-size: 220% 100%;
+        background-position: 120% 0;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      .wj-row--locked.is-scanning::after {
+        opacity: 1;
+        animation: wj-scan 0.9s ease-in-out;
+      }
+
+      @keyframes wj-scan {
+        from { background-position: 120% 0; }
+        to { background-position: -120% 0; }
+      }
+
+      /* --- Bristol explorer --- */
+      .bristol-panel {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: clamp(18px, 3vw, 26px);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.024));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
+      .bristol-panel .panel-label { display: flex; justify-content: space-between; gap: 10px; }
+      .bristol-panel .panel-label i { font-style: normal; color: var(--muted-2); letter-spacing: 0.06em; }
+
+      .bp-rows { margin-top: 14px; display: grid; gap: 6px; }
+
+      .bp-row {
+        display: grid;
+        grid-template-columns: 14px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: transparent;
+        color: var(--ink-2);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .bp-row:hover { background: rgba(255, 255, 255, 0.04); }
+
+      .bp-row.on {
+        border-color: rgba(48, 213, 200, 0.35);
+        background: rgba(48, 213, 200, 0.07);
+      }
+
+      .bp-row i {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--bp, var(--muted));
+        box-shadow: 0 0 10px var(--bp, transparent);
+      }
+
+      .bp-row b { color: var(--ink); font-weight: 650; }
+      .bp-row small { color: var(--muted); font-size: 12px; }
+
+      .bp-row em {
+        color: var(--muted-2);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-style: normal;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .bp-ideal {
+        margin-left: 7px;
+        border: 1px solid rgba(81, 207, 102, 0.4);
+        border-radius: 999px;
+        padding: 2px 8px;
+        color: #51cf66;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .bp-detail {
+        margin-top: 12px;
+        border-top: 1px solid var(--line-soft);
+        padding-top: 13px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+        min-height: 3em;
+      }
+
+      .bp-detail b { color: var(--ink-2); font-weight: 600; }
+
+      .bp-mixed {
+        margin-top: 14px;
+        border: 1px solid rgba(48, 213, 200, 0.16);
+        border-radius: 18px;
+        padding: 14px;
+        background: rgba(48, 213, 200, 0.045);
+      }
+
+      .bp-mixed__label {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--cyan);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .bp-mixed__label i { font-style: normal; color: var(--muted-2); text-transform: none; letter-spacing: 0.03em; }
+
+      .bp-segments { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; }
+
+      .bp-seg {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 13px;
+        background: rgba(0, 0, 0, 0.26);
+        color: var(--ink-2);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+
+      .bp-seg:hover { border-color: rgba(48, 213, 200, 0.4); }
+      .bp-seg i { width: 8px; height: 8px; border-radius: 999px; background: var(--bp); }
+      .bp-seg b { color: var(--ink); font-weight: 600; }
+      .bp-seg u { text-decoration: none; color: var(--cyan); }
+
+      .bp-mixed__out { margin-top: 11px; color: var(--muted); font-size: 12.5px; }
+      .bp-mixed__out b { color: var(--cyan); font-family: var(--font-mono); font-weight: 500; }
+
+      /* --- GI Burden lab --- */
+      .gi-lab {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: clamp(20px, 3.4vw, 32px);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.024));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
+      .gi-lab__head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .gi-lab__head b {
+        display: block;
+        margin-top: 6px;
+        font-family: var(--font-display);
+        font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+        font-weight: 700;
+        letter-spacing: -0.035em;
+      }
+
+      .gi-lab__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+        gap: clamp(20px, 3.4vw, 40px);
+        margin-top: 24px;
+        align-items: start;
+      }
+
+      .gi-group + .gi-group { margin-top: 18px; }
+
+      .gi-group__label {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .gi-group__label i { font-style: normal; color: var(--muted-2); text-transform: none; letter-spacing: 0.02em; }
+
+      .gi-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+
+      .gi-chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 13px;
+        background: rgba(255, 255, 255, 0.035);
+        color: var(--ink-2);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 550;
+        cursor: pointer;
+        transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+      }
+
+      .gi-chip:hover { transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.22); }
+
+      .gi-chip.on {
+        border-color: rgba(48, 213, 200, 0.45);
+        background: rgba(48, 213, 200, 0.15);
+        color: var(--cyan);
+      }
+
+      .gi-chip b { font-weight: 650; }
+      .gi-chip small { color: inherit; opacity: 0.72; font-size: 11.5px; }
+
+      .gi-chip--b { display: inline-flex; align-items: center; gap: 7px; }
+      .gi-chip--b i { width: 8px; height: 8px; border-radius: 999px; background: var(--bp); box-shadow: 0 0 8px var(--bp); }
+      .gi-chip--b.on { border-color: var(--bp); background: color-mix(in srgb, var(--bp) 14%, transparent); color: var(--ink); }
+
+      .gi-chip--flag.on {
+        border-color: rgba(255, 107, 107, 0.55);
+        background: rgba(255, 107, 107, 0.14);
+        color: #ff8a80;
+      }
+
+      .gi-result {
+        border: 1px solid var(--line-soft);
+        border-radius: 22px;
+        padding: clamp(16px, 2.4vw, 24px);
+        background: rgba(0, 0, 0, 0.24);
+        position: sticky;
+        top: 84px;
+      }
+
+      .gi-dial {
+        width: min(178px, 60vw);
+        aspect-ratio: 1;
+        margin: 6px auto 0;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: conic-gradient(from 220deg, rgba(255, 255, 255, 0.08) 0 100%), rgba(255, 255, 255, 0.03);
+        box-shadow: inset 0 0 34px rgba(0, 0, 0, 0.45);
+        transition: filter 0.4s ease;
+      }
+
+      .gi-dial__inner {
+        width: 76%;
+        aspect-ratio: 1;
+        border: 1px solid var(--line);
+        border-radius: inherit;
+        display: grid;
+        place-items: center;
+        align-content: center;
+        background: rgba(3, 4, 7, 0.82);
+      }
+
+      .gi-dial__inner span {
+        font-family: var(--font-display);
+        font-size: 46px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .gi-dial__inner small {
+        margin-top: 4px;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .gi-verdict {
+        margin-top: 14px;
+        text-align: center;
+        color: var(--ink-2);
+        font-size: 13.5px;
+        line-height: 1.5;
+        min-height: 3em;
+      }
+
+      .gi-breakdown {
+        list-style: none;
+        margin-top: 12px;
+        border-top: 1px solid var(--line-soft);
+        padding-top: 6px;
+      }
+
+      .gi-breakdown li {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 0;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+      }
+
+      .gi-breakdown li b { color: var(--ink-2); font-weight: 500; white-space: nowrap; }
+      .gi-breakdown li.gi-flagline { color: #ff8a80; }
+      .gi-breakdown li.gi-flagline b { color: #ff8a80; }
+
+      /* --- Capture board --- */
+      .capture-board {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: clamp(20px, 3.4vw, 32px);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
+      .cb-group {
+        display: grid;
+        grid-template-columns: 168px 1fr;
+        gap: 18px;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--line-soft);
+        align-items: baseline;
+      }
+
+      .cb-group:first-child { padding-top: 0; }
+      .cb-group:last-child { border-bottom: 0; padding-bottom: 0; }
+
+      .cb-group > span {
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        line-height: 1.6;
+      }
+
+      .cb-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+      .cb-chips i {
+        font-style: normal;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        padding: 6px 11px;
+        background: rgba(0, 0, 0, 0.22);
+        color: var(--ink-2);
+        font-size: 12.5px;
+        transition: border-color 0.2s ease, color 0.2s ease;
+      }
+
+      .cb-chips i:hover { border-color: rgba(48, 213, 200, 0.4); color: var(--ink); }
+
+      .cb-chips i.cb-flag { border-color: rgba(255, 107, 107, 0.28); color: #ff9d95; background: rgba(255, 107, 107, 0.06); }
+
+      .cb-swatch {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .cb-swatch em {
+        width: 11px;
+        height: 11px;
+        border-radius: 999px;
+        background: var(--sw);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        font-style: normal;
+      }
+
+      /* --- Privacy demo --- */
+      .pv-card {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: clamp(18px, 3vw, 26px);
+        background: linear-gradient(180deg, rgba(12, 14, 22, 0.92), rgba(5, 6, 10, 0.94));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
+      .pv-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+      .pv-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: 1px solid rgba(48, 213, 200, 0.24);
+        border-radius: 999px;
+        padding: 6px 11px;
+        color: var(--cyan);
+        background: rgba(48, 213, 200, 0.08);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+
+      .pv-rows { margin-top: 14px; }
+
+      .pv-row {
+        display: grid;
+        grid-template-columns: 46px 1fr;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line-soft);
+      }
+
+      .pv-row:last-child { border-bottom: 0; }
+      .pv-row > span { color: var(--muted); font-family: var(--font-mono); font-size: 11px; padding-top: 2px; }
+      .pv-row strong { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 14px; font-weight: 650; }
+      .pv-row p { margin-top: 2px; color: var(--muted); font-size: 12.5px; transition: filter 0.5s ease, opacity 0.5s ease; }
+
+      .pv-row--masked p { filter: blur(5px); opacity: 0.7; user-select: none; }
+      .pv-card.is-open .pv-row--masked p { filter: blur(0); opacity: 1; }
+
+      .pv-lock-note {
+        color: var(--cyan);
+        font-family: var(--font-mono);
+        font-size: 9.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-left: auto;
+        white-space: nowrap;
+      }
+
+      .pv-photo {
+        margin-top: 14px;
+        border: 1px solid var(--line-soft);
+        border-radius: 16px;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.26);
+        display: grid;
+        grid-template-columns: 74px 1fr auto;
+        gap: 13px;
+        align-items: center;
+      }
+
+      .pv-photo__img {
+        width: 74px;
+        height: 56px;
+        border-radius: 10px;
+        background:
+          radial-gradient(circle at 30% 36%, rgba(48, 213, 200, 0.55), transparent 62%),
+          radial-gradient(circle at 74% 68%, rgba(110, 142, 255, 0.5), transparent 58%),
+          linear-gradient(140deg, #1d2432, #0b0f18);
+        filter: blur(9px) saturate(1.3);
+        clip-path: inset(0 round 10px);
+        transition: filter 0.5s ease;
+      }
+
+      .pv-photo.is-revealed .pv-photo__img { filter: blur(0) saturate(1); }
+
+      .pv-photo__meta span { display: block; color: var(--ink); font-size: 13.5px; font-weight: 600; }
+      .pv-photo__meta em { display: block; margin-top: 3px; color: var(--muted); font-size: 11.5px; font-style: normal; }
+
+      .pv-reveal {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--ink-2);
+        font-family: var(--font-sans);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+
+      .pv-reveal:hover { border-color: rgba(255, 255, 255, 0.24); background: rgba(255, 255, 255, 0.07); }
+      .pv-reveal:disabled { opacity: 0.35; cursor: not-allowed; }
+
+      .pv-unlock {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        margin-top: 16px;
+        border: 1px solid rgba(48, 213, 200, 0.35);
+        border-radius: 16px;
+        padding: 13px;
+        background: rgba(48, 213, 200, 0.09);
+        color: var(--cyan);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        font-weight: 650;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .pv-unlock:hover { background: rgba(48, 213, 200, 0.14); }
+
+      .pv-faceid { width: 20px; height: 20px; flex: 0 0 auto; }
+      .pv-faceid path, .pv-faceid circle { stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+
+      .pv-card.is-scanning .pv-faceid { animation: pv-pulse 0.9s ease-in-out; }
+
+      @keyframes pv-pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.28); opacity: 0.55; }
+      }
+
+      .pv-passdots { display: inline-flex; gap: 5px; }
+      .pv-passdots i { width: 6px; height: 6px; border-radius: 999px; background: currentColor; opacity: 0.4; }
+      .pv-card.is-open .pv-passdots i { opacity: 1; }
+
+      /* --- Gut-brain check-in --- */
+      .ci-card {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: clamp(18px, 3vw, 26px);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.024));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
+      .ci-title { margin-top: 3px; font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.03em; }
+      .ci-sub { margin-top: 3px; color: var(--muted); font-size: 12.5px; }
+
+      .ci-moods { display: flex; justify-content: space-between; gap: 6px; margin-top: 16px; }
+
+      .ci-mood {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 10px 0 7px;
+        background: rgba(255, 255, 255, 0.03);
+        font-size: 21px;
+        line-height: 1;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        gap: 5px;
+        transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+      }
+
+      .ci-mood small { color: var(--muted-2); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+      .ci-mood:hover { transform: translateY(-2px); }
+      .ci-mood.on { border-color: rgba(48, 213, 200, 0.45); background: rgba(48, 213, 200, 0.1); }
+      .ci-mood.on small { color: var(--cyan); }
+
+      .ci-stress { margin-top: 18px; }
+
+      .ci-stress__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .ci-stress__head b { color: var(--cyan); font-size: 13px; letter-spacing: 0; }
+
+      .ci-stress input[type="range"] {
+        width: 100%;
+        margin-top: 10px;
+        appearance: none;
+        -webkit-appearance: none;
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(48, 213, 200, 0.6), rgba(255, 206, 107, 0.55), rgba(255, 107, 107, 0.65));
+        outline: none;
+        cursor: pointer;
+      }
+
+      .ci-stress input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        background: #fff;
+        border: 3px solid var(--cyan);
+        box-shadow: 0 0 14px rgba(48, 213, 200, 0.6);
+      }
+
+      .ci-stress input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        background: #fff;
+        border: 3px solid var(--cyan);
+        box-shadow: 0 0 14px rgba(48, 213, 200, 0.6);
+      }
+
+      .ci-stress__ends {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        color: var(--muted-2);
+        font-family: var(--font-mono);
+        font-size: 9.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .ci-symptoms { margin-top: 16px; }
+      .ci-autotag {
+        display: none;
+        margin-top: 9px;
+        color: var(--amber);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.05em;
+      }
+      .ci-card.is-stressed .ci-autotag { display: block; }
+
+      .ci-patterns {
+        margin-top: 18px;
+        border: 1px solid rgba(48, 213, 200, 0.18);
+        border-radius: 18px;
+        padding: 15px;
+        background: rgba(48, 213, 200, 0.055);
+      }
+
+      .ci-patterns__kicker {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--cyan);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .ci-patterns h4 { margin-top: 8px; color: var(--ink); font-size: 15px; font-weight: 650; letter-spacing: -0.01em; }
+      .ci-patterns p { margin-top: 5px; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+      .ci-patterns p b { color: var(--ink-2); }
+
+      .ci-progress { margin-top: 11px; display: none; }
+      .ci-patterns.is-building .ci-progress { display: block; }
+
+      .ci-progress i {
+        display: block;
+        height: 5px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .ci-progress i::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: 70%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), var(--blue));
+      }
+
+      .ci-progress span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted-2);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+      }
+
+      /* --- Quick-record cards --- */
+      .qr-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        color: var(--qr, var(--cyan));
+      }
+
+      .qr-icon::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: currentColor;
+        box-shadow: 0 0 14px currentColor;
+      }
+
+      /* --- Report mock --- */
+      .rp-card {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: clamp(18px, 3vw, 28px);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.062), rgba(255, 255, 255, 0.024));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+      }
+
+      .rp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+      .rp-head b { font-family: var(--font-display); font-size: 19px; font-weight: 700; letter-spacing: -0.03em; }
+      .rp-head span { color: var(--muted-2); font-family: var(--font-mono); font-size: 11px; }
+
+      .rp-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-top: 16px; }
+
+      .rp-stats > div {
+        border: 1px solid var(--line-soft);
+        border-radius: 14px;
+        padding: 11px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .rp-stats span { display: block; color: var(--muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
+      .rp-stats b { display: block; margin-top: 5px; font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+      .rp-stats em { display: block; margin-top: 2px; color: var(--muted-2); font-size: 10px; font-style: normal; }
+
+      .rp-dist { margin-top: 18px; display: grid; gap: 8px; }
+
+      .rp-dist > div {
+        display: grid;
+        grid-template-columns: 66px 1fr 40px;
+        align-items: center;
+        gap: 11px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .rp-dist b { color: var(--ink-2); font-weight: 500; text-align: right; }
+
+      .rp-dist i {
+        display: block;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .rp-dist i::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: var(--w, 0%);
+        border-radius: inherit;
+        background: var(--c, var(--cyan));
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+        transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1) calc(0.25s + var(--i, 0) * 0.09s);
+      }
+
+      .reveal.visible .rp-dist i::after { transform: scaleX(1); }
+
+      .rp-foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+
+      .rp-foot span {
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        padding: 6px 11px;
+        color: var(--muted);
+        background: rgba(0, 0, 0, 0.22);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.05em;
+      }
+
+      .rp-foot span b { color: var(--cyan); font-weight: 500; }
+
+      .rp-ready { margin-top: 20px; }
+      .rp-ready__head {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .rp-ready__head b { color: var(--green); letter-spacing: 0.04em; }
+      .rp-ready i {
+        display: block;
+        height: 5px;
+        margin-top: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.07);
+        position: relative;
+        overflow: hidden;
+      }
+      .rp-ready i::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), var(--green));
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+        transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.4s;
+      }
+      .reveal.visible .rp-ready i::after { transform: scaleX(1); }
+
+      /* --- Responsive --- */
+      @media (max-width: 1120px) {
+        .gi-result { position: static; }
+      }
+
+      @media (max-width: 860px) {
+        .gi-lab__grid { grid-template-columns: 1fr; }
+        .cb-group { grid-template-columns: 1fr; gap: 8px; }
+        .rp-stats { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      @media (max-width: 720px) {
+        .ci-moods { flex-wrap: wrap; }
+        .ci-mood { flex: 1 1 30%; }
+        .pv-photo { grid-template-columns: 60px 1fr; }
+        .pv-photo .pv-reveal { grid-column: 1 / -1; }
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <nav id="nav" class="site-nav">
+      <div class="site-nav__inner">
+        <a href="/" class="site-brand" aria-label="StatsKey home">
+          <span class="site-brand__mark"></span>
+          <span>StatsKey</span>
+        </a>
+        <div class="site-nav__links" aria-label="Primary navigation">
+          <a href="#gut-check">Gut Check</a>
+          <a href="#burden">Burden Score</a>
+          <a href="#privacy">Privacy</a>
+          <a href="#gut-brain">Gut–Brain</a>
+          <a href="#reports">Reports</a>
+          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">iOS app</a>
+          <a href="/app/login">Sign in</a>
+        </div>
+        <a class="site-nav__cta" href="/app/signup">Sign up</a>
+        <button id="mobile-menu-btn" class="site-menu-btn" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+      <div id="mobile-menu" class="site-mobile-menu hidden">
+        <a href="#gut-check">Gut Check</a>
+        <a href="#burden">Burden Score</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#gut-brain">Gut–Brain</a>
+        <a href="#reports">Reports</a>
+        <a href="/app/login">Sign in</a>
+        <a href="/app/signup">Sign up</a>
+        <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero-section">
+        <div class="hero-orb hero-orb--data" style="top: 10%; right: 6%; bottom: auto; left: auto"></div>
+        <div class="hero-orb hero-orb--blue" style="bottom: 6%; left: 8%; top: auto; right: auto"></div>
+        <div class="page-shell hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow reveal">The Wellness Journal</div>
+            <h1 class="hero-title reveal d1">The signal everyone has. The record no one keeps.</h1>
+            <p class="hero-lede reveal d2">
+              StatsKey turns gut health into structured, private, clinician-legible data: a fifteen-second Gut Check with Bristol-scale precision, a live 0–10 GI Burden Score, Face ID on the record, and a straight line from every episode back to what you ate.
+            </p>
+            <div class="hero-actions reveal d3">
+              <a class="button button--primary" href="/app/signup">Start recording free</a>
+              <a class="button button--secondary" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+              <a class="button button--secondary" data-store="play" href="#" target="_blank" rel="noopener" hidden>Get it on Google Play</a>
+            </div>
+            <div class="hero-note reveal d3">Private by default — wellness records never appear to friends, red flags never become diagnoses, and the whole bowel record can sit behind a passcode and Face ID.</div>
+          </div>
+
+          <div class="command-card tilt-card reveal d2" id="hero-card" aria-label="Wellness Journal preview">
+            <div class="command-card__top">
+              <div>
+                <div class="panel-label">Wellness Journal</div>
+                <div class="command-card__title">Today, compiled</div>
+              </div>
+              <span class="live-pill teal-pill"><span></span> Private by default</span>
+            </div>
+            <div class="wj-rows">
+              <div class="wj-row wj-row--locked" id="wj-locked" role="button" tabindex="0" aria-label="Locked bowel record — tap to unlock">
+                <span>07:58</span>
+                <div>
+                  <strong><i class="wj-dot" style="color: var(--cyan); background: var(--cyan)"></i> Gut check <span class="wj-lock-tag" id="wj-lock-tag">
+                    <svg width="9" height="11" viewBox="0 0 9 11" fill="none" aria-hidden="true"><rect x="0.7" y="4.2" width="7.6" height="6" rx="1.6" stroke="currentColor" stroke-width="1.1"/><path d="M2.4 4V3a2.1 2.1 0 1 1 4.2 0v1" stroke="currentColor" stroke-width="1.1"/></svg>
+                    Locked — tap to unlock</span></strong>
+                  <p>Type 4 · Smooth snake · GI burden 1/10 · effortless</p>
+                </div>
+              </div>
+              <div class="wj-row">
+                <span>08:10</span>
+                <div>
+                  <strong><i class="wj-dot" style="color: #b6bac5; background: #b6bac5"></i> Mood</strong>
+                  <p>Good · stress 3/10 · calm morning</p>
+                </div>
+              </div>
+              <div class="wj-row">
+                <span>12:41</span>
+                <div>
+                  <strong><i class="wj-dot" style="color: var(--green); background: var(--green)"></i> Lunch recorded</strong>
+                  <p>31g protein · 9g fiber · glucose mapped</p>
+                </div>
+              </div>
+              <div class="wj-row">
+                <span>15:12</span>
+                <div>
+                  <strong><i class="wj-dot" style="color: #ff6b9d; background: #ff6b9d"></i> Energy</strong>
+                  <p>Afternoon dip · after caffeine</p>
+                </div>
+              </div>
+              <div class="wj-row">
+                <span>16:20</span>
+                <div>
+                  <strong><i class="wj-dot" style="color: var(--amber); background: var(--amber)"></i> Symptom</strong>
+                  <p>Bloating · 4/10 · optional follow-up at 8:20 PM</p>
+                </div>
+              </div>
+            </div>
+            <div class="insight-strip">
+              <span class="insight-strip__dot"></span>
+              <span class="rot" data-rotator>
+                <span class="rot-item on">Dairy-heavy lunches preceded 4 of your 5 high-burden afternoons this month.</span>
+                <span class="rot-item">Type 4 share is up 11% since the fiber change — your calmest stretch this quarter.</span>
+                <span class="rot-item">High-stress days average 6.2/10 gut severity versus 3.1/10 on calm days.</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Spec strip -->
+      <section class="spec-section">
+        <div class="page-shell">
+          <div class="spec-strip reveal">
+            <div class="spec"><b data-count-to="7">7</b><span>Bristol stool types</span></div>
+            <div class="spec"><b>0–10</b><span>GI Burden Score</span></div>
+            <div class="spec"><b data-count-to="8">8</b><span>stool colors</span></div>
+            <div class="spec"><b data-count-to="15" data-count-suffix="s">15s</b><span>gut-brain check-in</span></div>
+            <div class="spec"><b>Face ID</b><span>bowel record lock</span></div>
+            <div class="spec"><b>PDF · CSV</b><span>clinician exports</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statement -->
+      <section class="statement-section">
+        <div class="page-shell">
+          <p class="statement-text reveal" data-sweep>
+            Around 40% of people live with a gut–brain disorder, and most hide it — even from their own doctor. StatsKey makes the hardest signal in health effortless to record, impossible to judge, and ready to answer for itself.
+          </p>
+        </div>
+      </section>
+
+      <!-- 01 · The Gut Check -->
+      <section id="gut-check" class="section-block section-block--split">
+        <div class="page-shell intelligence-grid">
+          <div class="section-heading reveal" style="margin-bottom: 0">
+            <div class="kicker">The Gut Check</div>
+            <h2>Seven types. Mixed episodes. Fifteen seconds.</h2>
+            <p>The recorder is three tabs deep and zero judgment wide. Most days it's two taps; on the days that matter, it captures what a gastroenterologist would actually ask about.</p>
+            <div class="axes">
+              <div class="axis"><span>Type</span><p>The Bristol scale, color-coded and named — and when one movement changes form mid-episode, add phases: each gets its own type and portion, from Trace to All.</p></div>
+              <div class="axis"><span>Timing</span><p>Quick-select capsules (1–20 min), an exact minutes:seconds entry, or a live stopwatch you start when you sit down.</p></div>
+              <div class="axis"><span>Details</span><p>Size, color, urgency, control, passage, cleanup, red flags, a private photo, feel tags, and notes — every one optional, every one structured.</p></div>
+            </div>
+            <p class="src-note">Bristol Stool Form Scale (Lewis &amp; Heaton, 1997) — the same instrument used in IBS clinical trials.</p>
+          </div>
+          <div class="app-visual reveal d2">
+            <div>
+              <div class="bristol-panel" aria-label="Interactive Bristol scale explorer">
+                <div class="panel-label">Bristol scale <i>tap a type</i></div>
+                <div class="bp-rows" id="bp-rows"></div>
+                <div class="bp-detail" id="bp-detail"></div>
+                <div class="bp-mixed">
+                  <div class="bp-mixed__label">Mixed episode <i>tap a phase to change its portion</i></div>
+                  <div class="bp-segments" id="bp-segments"></div>
+                  <div class="bp-mixed__out" id="bp-mixed-out"></div>
+                </div>
+              </div>
+              <div class="app-cap">Same movement, two phases — the burden model reads the worst phase, weighted by how much of the episode it was.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 · GI Burden lab -->
+      <section id="burden" class="section-block">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="kicker">GI Burden Score</div>
+            <h2>Every episode, scored 0–10. This is the exact model.</h2>
+            <p>Not a vibe, not a smiley face — a deterministic score built from form, urgency, passage, cleanup, and control, with red flags that refuse to be averaged away. The demo below runs the same math the app runs.</p>
+          </div>
+          <div class="gi-lab reveal" id="gi-lab" aria-label="Interactive GI Burden Score demonstration — illustrative">
+            <div class="gi-lab__head">
+              <div>
+                <div class="panel-label">Score an episode</div>
+                <b>Build a Gut Check. Watch the burden move.</b>
+              </div>
+              <div class="glucose-lab__toggle" role="group" aria-label="Preset episodes" id="gi-presets">
+                <button type="button" class="on" data-preset="calm" aria-pressed="true">Textbook morning</button>
+                <button type="button" data-preset="rough" aria-pressed="false">Rough afternoon</button>
+                <button type="button" data-preset="flag" aria-pressed="false">Worth flagging</button>
+              </div>
+            </div>
+            <div class="gi-lab__grid">
+              <div class="gi-controls">
+                <div class="gi-group">
+                  <div class="gi-group__label">Stool form — Bristol <i>worst phase drives the base</i></div>
+                  <div class="gi-chips" id="gi-bristol" role="group" aria-label="Bristol type"></div>
+                </div>
+                <div class="gi-group">
+                  <div class="gi-group__label">Portion of the episode <i>phases are weighted</i></div>
+                  <div class="gi-chips" id="gi-portion" role="group" aria-label="Portion"></div>
+                </div>
+                <div class="gi-group">
+                  <div class="gi-group__label">Urgency <i>1–5</i></div>
+                  <div class="gi-chips" id="gi-urgency" role="group" aria-label="Urgency"></div>
+                </div>
+                <div class="gi-group">
+                  <div class="gi-group__label">Control</div>
+                  <div class="gi-chips" id="gi-control" role="group" aria-label="Control"></div>
+                </div>
+                <div class="gi-group">
+                  <div class="gi-group__label">How it passed <i>select any</i></div>
+                  <div class="gi-chips" id="gi-passage" role="group" aria-label="Passage symptoms"></div>
+                </div>
+                <div class="gi-group">
+                  <div class="gi-group__label">Cleanup &amp; comfort</div>
+                  <div class="gi-chips" id="gi-cleanup" role="group" aria-label="Cleanup"></div>
+                </div>
+                <div class="gi-group">
+                  <div class="gi-group__label" style="color: #ff8a80">Worth flagging <i>floors the score at 8</i></div>
+                  <div class="gi-chips" id="gi-flags" role="group" aria-label="Red flags"></div>
+                </div>
+              </div>
+              <div class="gi-result">
+                <div class="gi-dial" id="gi-dial">
+                  <div class="gi-dial__inner">
+                    <span id="gi-score">1</span>
+                    <small>GI burden / 10</small>
+                  </div>
+                </div>
+                <div class="gi-verdict" id="gi-verdict"></div>
+                <ul class="gi-breakdown" id="gi-breakdown"></ul>
+                <p class="src-note">The app's exact model: worst phase (form × portion), plus urgency, passage, cleanup, and control — any red flag floors the score at 8. It summarizes burden; it never diagnoses.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 · The full capture surface -->
+      <section id="capture" class="section-block section-block--split">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="kicker">The full capture surface</div>
+            <h2>Every dimension a clinician would ask about.</h2>
+            <p>These aren't mockup words — this is the actual capture surface in the app, string for string. All of it optional, none of it awkward.</p>
+          </div>
+          <div class="capture-board reveal d1">
+            <div class="cb-group">
+              <span>Approximate size</span>
+              <div class="cb-chips"><i>Small</i><i>Medium</i><i>Large</i><i>Very Large</i></div>
+            </div>
+            <div class="cb-group">
+              <span>Color</span>
+              <div class="cb-chips">
+                <i class="cb-swatch"><em style="--sw: #7a4f2a"></em>Brown</i>
+                <i class="cb-swatch"><em style="--sw: #4e3117"></em>Dark Brown</i>
+                <i class="cb-swatch"><em style="--sw: #a97c50"></em>Light Brown</i>
+                <i class="cb-swatch"><em style="--sw: #d9a521"></em>Yellow</i>
+                <i class="cb-swatch"><em style="--sw: #5f7d3f"></em>Green</i>
+                <i class="cb-swatch"><em style="--sw: #15110c"></em>Black</i>
+                <i class="cb-swatch"><em style="--sw: #a03c34"></em>Red</i>
+                <i class="cb-swatch"><em style="--sw: #c8b49a"></em>Clay</i>
+              </div>
+            </div>
+            <div class="cb-group">
+              <span>Urgency</span>
+              <div class="cb-chips"><i>1 · Normal</i><i>2 · Soon</i><i>3 · Rushed</i><i>4 · Hard to hold</i><i>5 · Could not hold</i></div>
+            </div>
+            <div class="cb-group">
+              <span>Control</span>
+              <div class="cb-chips"><i>Normal control</i><i>Rushed</i><i>Hard to hold</i><i>Near accident</i><i>Accident</i></div>
+            </div>
+            <div class="cb-group">
+              <span>How it passed</span>
+              <div class="cb-chips"><i>Straining</i><i>Pain</i><i>Burning</i><i>Cramping</i><i>Gas</i><i>Bloating</i><i>Incomplete</i><i>Mucus</i></div>
+            </div>
+            <div class="cb-group">
+              <span>Cleanup &amp; comfort</span>
+              <div class="cb-chips"><i>Easy cleanup</i><i>Messy</i><i>Wiped a lot</i><i>Bidet</i><i>Rinsed out</i><i>Showered</i><i>Changed clothes</i><i>Irritation</i></div>
+            </div>
+            <div class="cb-group">
+              <span>Worth flagging</span>
+              <div class="cb-chips"><i class="cb-flag">Blood</i><i class="cb-flag">Black/tarry</i><i class="cb-flag">Pale/clay</i><i class="cb-flag">Severe pain</i><i class="cb-flag">Fever</i><i class="cb-flag">Woke from sleep</i></div>
+            </div>
+            <div class="cb-group">
+              <span>How did it feel?</span>
+              <div class="cb-chips"><i>After Coffee</i><i>Post-Meal</i><i>Morning</i><i>Late Night</i><i>Strained</i><i>Effortless</i><i>Incomplete</i><i>Urgent</i><i>Bloating</i><i>Cramping</i></div>
+            </div>
+            <div class="cb-group">
+              <span>Timing</span>
+              <div class="cb-chips"><i>Quick select — 1 · 2 · 5 · 10 · 15 · 20 min</i><i>Enter time — minutes : seconds</i><i>Live timer — start · stop · reset</i></div>
+            </div>
+            <div class="cb-group">
+              <span>And then some</span>
+              <div class="cb-chips"><i>Private photo — owner-only storage, blurred until revealed</i><i>Notes</i><i>Mixed-episode phases — Trace · Some · Most · All</i></div>
+            </div>
+          </div>
+          <p class="src-note reveal">Red-flag entries never diagnose anything — they make a clinician summary clearer, and they always surface in the score.</p>
+        </div>
+      </section>
+
+      <!-- 04 · Privacy -->
+      <section id="privacy" class="section-block">
+        <div class="page-shell intelligence-grid">
+          <div class="section-heading reveal" style="margin-bottom: 0">
+            <div class="kicker">Private by design</div>
+            <h2>Your record. Your face to unlock it.</h2>
+            <p>The Bowel Record Lock masks every bowel row in the app — timeline, history, search — behind a 4–8 digit passcode with Face ID or Touch ID. Unlock once; it relocks the moment the app leaves the foreground.</p>
+            <p>Private photos go further: owner-only cloud storage, never shown on the timeline, and blurred until you deliberately tap Reveal. Wellness records never appear to friends, and substance records are excluded from Intelligence, reports, and sharing by default.</p>
+            <p class="src-note">Honest fine print, straight from the app: it is an in-app viewing lock, not end-to-end encryption — and a forgotten passcode requires re-confirming your sign-in to reset.</p>
+          </div>
+          <div class="app-visual reveal d2">
+            <div>
+              <div class="pv-card" id="pv-card" aria-label="Interactive privacy lock demonstration">
+                <div class="pv-head">
+                  <div>
+                    <div class="panel-label">Wellness timeline</div>
+                  </div>
+                  <span class="pv-pill" id="pv-pill"><span class="pv-passdots" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Locked</span>
+                </div>
+                <div class="pv-rows">
+                  <div class="pv-row pv-row--masked">
+                    <span>07:58</span>
+                    <div>
+                      <strong>Gut check <span class="pv-lock-note">locked</span></strong>
+                      <p>Type 4 · GI burden 1/10 · effortless · easy cleanup</p>
+                    </div>
+                  </div>
+                  <div class="pv-row pv-row--masked">
+                    <span>13:20</span>
+                    <div>
+                      <strong>Gut check <span class="pv-lock-note">locked</span></strong>
+                      <p>Mixed types 4/6 · GI burden 6/10 · urgent · after coffee</p>
+                    </div>
+                  </div>
+                  <div class="pv-row">
+                    <span>16:20</span>
+                    <div>
+                      <strong>Symptom</strong>
+                      <p>Bloating · 4/10 · lower abdomen — symptom rows stay visible</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="pv-photo" id="pv-photo">
+                  <div class="pv-photo__img" aria-hidden="true"></div>
+                  <div class="pv-photo__meta">
+                    <span>Private photo</span>
+                    <em>Owner-only storage · never on the timeline</em>
+                  </div>
+                  <button type="button" class="pv-reveal" id="pv-reveal" disabled>Reveal</button>
+                </div>
+                <button type="button" class="pv-unlock" id="pv-unlock">
+                  <svg class="pv-faceid" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 8V6a3 3 0 0 1 3-3h2" /><path d="M16 3h2a3 3 0 0 1 3 3v2" /><path d="M21 16v2a3 3 0 0 1-3 3h-2" /><path d="M8 21H6a3 3 0 0 1-3-3v-2" />
+                    <circle cx="9" cy="10" r="0.6" fill="currentColor" /><circle cx="15" cy="10" r="0.6" fill="currentColor" />
+                    <path d="M12 10v3h-0.8" /><path d="M9 15.4c1.8 1.4 4.2 1.4 6 0" />
+                  </svg>
+                  <span id="pv-unlock-label">Unlock with Face ID</span>
+                </button>
+              </div>
+              <div class="app-cap">An interactive imitation of the app's Bowel Record Lock — bowel rows mask, symptom rows don't, photos stay blurred until revealed.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 · Gut–brain -->
+      <section id="gut-brain" class="section-block section-block--split">
+        <div class="page-shell intelligence-grid">
+          <div class="section-heading reveal" style="margin-bottom: 0">
+            <div class="kicker">The gut–brain axis</div>
+            <h2>Stress talks to your gut. Read the transcript.</h2>
+            <p>The Gut-Brain Check-In takes fifteen seconds: mood, a 0–10 stress read, and optional gut symptoms. Record stress of 6 or higher alongside a symptom and StatsKey quietly tags stress as a trigger.</p>
+            <p>Once ten days carry both a stress reading and a gut record, the Patterns card computes a real correlation across your days — and tells you the honest version: a link, an inverse link, or "no clear pattern yet."</p>
+            <p class="src-note">Pearson correlation on paired days only · requires ≥10 paired days and |r| ≥ 0.20 before claiming anything · high-stress vs calm-day contrast needs ≥4 days per bucket. An association, not proof — and not medical advice.</p>
+          </div>
+          <div class="app-visual reveal d2">
+            <div>
+              <div class="ci-card" id="ci-card" aria-label="Interactive gut-brain check-in demonstration">
+                <div class="panel-label">Gut-Brain Check-In</div>
+                <div class="ci-title">Mood, stress &amp; gut in 15 seconds</div>
+                <div class="ci-sub">Tap a mood, slide the stress — watch the pattern engine respond.</div>
+                <div class="ci-moods" id="ci-moods" role="group" aria-label="Mood">
+                  <button type="button" class="ci-mood" data-mood="1">😞<small>Very bad</small></button>
+                  <button type="button" class="ci-mood" data-mood="2">🙁<small>Bad</small></button>
+                  <button type="button" class="ci-mood" data-mood="3">😐<small>Neutral</small></button>
+                  <button type="button" class="ci-mood on" data-mood="4">🙂<small>Good</small></button>
+                  <button type="button" class="ci-mood" data-mood="5">😄<small>Great</small></button>
+                </div>
+                <div class="ci-stress">
+                  <div class="ci-stress__head"><span>Stress</span><b id="ci-stress-val">3/10</b></div>
+                  <input type="range" id="ci-stress" min="0" max="10" step="1" value="3" aria-label="Stress, 0 to 10" />
+                  <div class="ci-stress__ends"><span>Calm</span><span>Tense</span></div>
+                </div>
+                <div class="ci-symptoms">
+                  <div class="gi-group__label">Gut symptoms <i>optional · 9 in the app</i></div>
+                  <div class="gi-chips" id="ci-symptoms">
+                    <button type="button" class="gi-chip">Bloating</button>
+                    <button type="button" class="gi-chip">Cramping</button>
+                    <button type="button" class="gi-chip">Nausea</button>
+                    <button type="button" class="gi-chip">Urgency</button>
+                  </div>
+                  <div class="ci-autotag">↳ stress ≥ 6 auto-tags "Stress" as a trigger</div>
+                </div>
+                <div class="ci-patterns" id="ci-patterns">
+                  <div class="ci-patterns__kicker">✦ Gut-Brain Patterns</div>
+                  <h4 id="ci-headline">Building your gut-brain picture</h4>
+                  <p id="ci-detail">Keep pairing stress check-ins with gut records — the engine stays quiet until it has real evidence.</p>
+                  <div class="ci-progress"><i></i><span>7/10 paired days recorded</span></div>
+                </div>
+              </div>
+              <div class="app-cap">Notification quick-replies record a check-in without opening the app: 🙂 Good · 😐 Okay · 🙁 Low.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 · The whole journal -->
+      <section id="journal" class="section-block">
+        <div class="page-shell intelligence-grid">
+          <div class="section-heading reveal" style="margin-bottom: 0">
+            <div class="kicker">The whole journal</div>
+            <h2>Five quick records. One timeline.</h2>
+            <p>Bowel movements are the headline, but the journal reads your whole day: symptoms, mood, energy, and substances merge with meals into a single connected timeline — tap any entry to edit, and locked rows stay masked.</p>
+            <p>A date navigator walks you back through any day, and a 14-day GI Observation Block turns it into a focused experiment when you want one.</p>
+          </div>
+          <div class="app-visual reveal d2">
+            <div>
+              <div class="app-device">
+                <img src="/statskey-app/gut-journal.png" alt="StatsKey Wellness Journal — Bristol-scale bowel movements, symptoms, mood, and energy on one timeline" />
+              </div>
+              <div class="app-cap">The live Wellness Journal — quick-record cards, the Gut-Brain Check-In, and the day's timeline. Actual screenshot.</div>
+            </div>
+          </div>
+        </div>
+        <div class="page-shell" style="margin-top: clamp(40px, 6vw, 72px)">
+          <div class="feature-grid">
+            <article class="feature-card reveal reveal-stagger-1">
+              <div class="qr-icon" style="--qr: #ffa94d">Symptom</div>
+              <h3>Severity with structure.</h3>
+              <p>Fourteen curated GI symptoms — bloating to brain fog — on a 0–10 clinical severity scale, with duration, body area, and triggers like "After eating" or "Poor sleep."</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-2">
+              <div class="qr-icon" style="--qr: #b6bac5">Mood</div>
+              <h3>Mood, with the mediator.</h3>
+              <p>A five-point mood plus a 0–10 stress read underneath — because stress is the central mediator of the gut–brain axis, not a footnote to it.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-3">
+              <div class="qr-icon" style="--qr: #ff6b9d">Energy</div>
+              <h3>Crashes, explained.</h3>
+              <p>Five levels with crash time and context tags — post-meal crash, after caffeine, poor sleep, well rested — so the afternoon dip stops being a mystery.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-4">
+              <div class="qr-icon" style="--qr: #30d5c8">Bowel movement</div>
+              <h3>The Gut Check.</h3>
+              <p>The most complete gut recorder in consumer health — everything on this page, in a flow that usually takes two taps.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-5">
+              <div class="qr-icon" style="--qr: #6b8e4e">Substance</div>
+              <h3>Recorded, not judged.</h3>
+              <p>Nicotine, cannabis, alcohol, caffeine, and more across 14 intake methods, with one-tap templates and photo-scan intelligence — private by default, everywhere.</p>
+            </article>
+            <article class="feature-card feature-card--accent reveal reveal-stagger-6">
+              <div class="qr-icon">One timeline</div>
+              <h3>The day, assembled.</h3>
+              <p>Wellness entries, meals, and substances on one connected-dot timeline with monospaced time stamps — the same view Intelligence reads when you ask about your day.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 · Intelligence -->
+      <section id="intelligence" class="section-block section-block--split">
+        <div class="page-shell flow-layout">
+          <div class="flow-copy reveal">
+            <div class="kicker">Ask your own gut</div>
+            <h2>Intelligence that remembers what you ate before it hurt.</h2>
+            <p>Intelligence carries tools built specifically for the gut: pull every meal from the hours before an episode, search any food across your history and check what followed within 24 hours, or read the full wellness timeline day by day — Bristol averages and burden scores ride along in context.</p>
+            <p class="src-note">Grounded in your records · cites its methods · refuses to invent numbers · never diagnoses.</p>
+          </div>
+          <div class="agent-console reveal d2" id="agent-console" aria-label="Scripted demonstration of Intelligence reading the gut record">
+            <div class="agent-console__bar">
+              <span class="ac-dot"></span><span class="ac-dot"></span><span class="ac-dot"></span>
+              <span class="agent-console__title">Intelligence · Wellness</span>
+              <span class="agent-console__model" id="ac-model"><i></i>Auto · frontier routing</span>
+            </div>
+            <div class="agent-console__body" id="ac-body">
+              <div class="ac-msg ac-msg--user">Rough gut afternoons this month — what did I eat beforehand?</div>
+              <div class="ac-tool"><span class="ac-tool__st"></span><code>get_full_wellness_timeline</code><span>28 days · 41 records</span></div>
+              <div class="ac-tool"><span class="ac-tool__st"></span><code>get_meals_before_event · 6h window</code><span>9 meals matched</span></div>
+              <div class="ac-msg ac-msg--ai">Four of your five high-burden afternoons (GI burden ≥ 6) followed a dairy-heavy lunch within six hours — average burden <strong>6.2/10</strong> versus <strong>2.1/10</strong> after other lunches. Both Type 6 episodes were tagged <strong>After Coffee</strong>. Worth one controlled retry before concluding anything.</div>
+            </div>
+            <div class="agent-console__foot">
+              <span>get_meals_before_event</span>
+              <span>search_food_history</span>
+              <span>get_daily_overview</span>
+            </div>
+          </div>
+        </div>
+        <div class="page-shell" style="margin-top: clamp(48px, 7vw, 88px)">
+          <div class="feature-grid">
+            <article class="feature-card reveal reveal-stagger-1">
+              <div class="feature-icon">01 · Daily</div>
+              <h3>A gut check that asks first.</h3>
+              <p>An optional daily reminder — suggested for 9:00 AM — keeps the gut picture complete. Off by default, quiet-hours aware, and never smug about it.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-2">
+              <div class="feature-icon">02 · Follow-up</div>
+              <h3>The 4-hour check-back.</h3>
+              <p>After a symptom or a loose episode, an optional follow-up asks "How's your gut now?" — answer "Still bothering me" or "Resolved" right from the notification.</p>
+            </article>
+            <article class="feature-card reveal reveal-stagger-3">
+              <div class="feature-icon">03 · Post-meal</div>
+              <h3>Ninety minutes later.</h3>
+              <p>An optional post-meal gut check lands 90 minutes after you eat — at most once a day — exactly when a food reaction is worth writing down.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 · Reports -->
+      <section id="reports" class="section-block">
+        <div class="page-shell intelligence-grid">
+          <div class="section-heading reveal" style="margin-bottom: 0">
+            <div class="kicker">Clinician-ready</div>
+            <h2>Walk in with data, not a description.</h2>
+            <p>One tap builds a GI Health Records section into your PDF report: totals, days recorded, daily average, ideal-Type-4 share, your full Bristol distribution with meanings, and per-day tables of time, form, color, size, urgency, and notes.</p>
+            <p>CSV ships a dedicated GI_RECORDS block; JSON carries every field — mixed episodes encoded like <b style="font-family: var(--font-mono); font-weight: 500; color: var(--cyan)">T4:most|T6:some</b> — for anyone who wants the raw record.</p>
+            <p class="src-note">Ten recorded meals plus four gut checks and your food–gut context is ready — the app counts it down for you and marks the milestone.</p>
+          </div>
+          <div class="app-visual reveal d2">
+            <div>
+              <div class="rp-card" aria-label="GI Health Records report preview — illustrative">
+                <div class="rp-head"><b>GI Health Records</b><span>Apr 14 – May 11</span></div>
+                <div class="rp-stats">
+                  <div><span>Total</span><b data-count-to="42">42</b><em>records</em></div>
+                  <div><span>Days</span><b data-count-to="28">28</b><em>covered</em></div>
+                  <div><span>Daily avg</span><b data-count-to="1.5" data-count-decimals="1">1.5</b><em>per day</em></div>
+                  <div><span>Ideal · T4</span><b data-count-to="38" data-count-suffix="%">38%</b><em>of records</em></div>
+                </div>
+                <div class="rp-dist">
+                  <div><span>T1 · Hard</span><i style="--w: 5%; --c: #ffa94d; --i: 0"></i><b>2%</b></div>
+                  <div><span>T2 · Lumpy</span><i style="--w: 15%; --c: #ffa94d; --i: 1"></i><b>7%</b></div>
+                  <div><span>T3 · Cracked</span><i style="--w: 51%; --c: #51cf66; --i: 2"></i><b>24%</b></div>
+                  <div><span>T4 · Smooth</span><i style="--w: 80%; --c: #51cf66; --i: 3"></i><b>38%</b></div>
+                  <div><span>T5 · Soft</span><i style="--w: 30%; --c: #339af0; --i: 4"></i><b>14%</b></div>
+                  <div><span>T6 · Mushy</span><i style="--w: 26%; --c: #ff6b6b; --i: 5"></i><b>12%</b></div>
+                  <div><span>T7 · Liquid</span><i style="--w: 7%; --c: #ff6b6b; --i: 6"></i><b>3%</b></div>
+                </div>
+                <div class="rp-ready">
+                  <div class="rp-ready__head"><span>GI context readiness</span><b>14/14 · ready</b></div>
+                  <i></i>
+                </div>
+                <div class="rp-foot">
+                  <span><b>PDF</b> · GI Health Records</span>
+                  <span><b>CSV</b> · GI_RECORDS</span>
+                  <span><b>JSON</b> · gi_records</span>
+                </div>
+              </div>
+              <div class="app-cap">The report's stat boxes and Bristol distribution — built from real records, exportable over any date range.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Disclaimer + CTA -->
+      <section id="download" class="cta-section">
+        <div class="page-shell">
+          <div class="exercise-note reveal" style="margin-bottom: clamp(28px, 4vw, 44px)">
+            <div class="exercise-note__label">Wellness, not a medical device</div>
+            <p>The Wellness Journal is a self-tracking tool. GI burden summarizes what you recorded, red flags make a clinician summary clearer, and gut–brain patterns are associations — not proof, not diagnoses, and never a substitute for care.</p>
+          </div>
+          <div class="cta-card cta-card--aurora reveal">
+            <div>
+              <div class="eyebrow">Your gut already keeps score</div>
+              <h2>Start writing it down.</h2>
+              <p>The Wellness Journal is part of StatsKey — free to start, with the same fifteen-second capture philosophy as everything else: meals, glucose, training, and now the signal nobody talks about.</p>
+            </div>
+            <div class="cta-card__actions">
+              <a class="button button--primary" href="/app/signup">Sign up free</a>
+              <a class="button button--secondary" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+              <a class="button button--secondary" data-store="play" href="#" target="_blank" rel="noopener" hidden>Get it on Google Play</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="page-shell site-footer__inner">
+        <span>StatsKey &copy; 2026</span>
+        <div>
+          <a href="/">Home</a>
+          <a href="/hardware">Hardware</a>
+          <a href="/for-dietitians">For dietitians</a>
+          <a href="https://statskeybiometrics.com/support">Support</a>
+          <a href="https://statskeybiometrics.com/privacy">Privacy</a>
+          <a href="https://statskeybiometrics.com/terms">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        'use strict';
+
+        /* ===== Shared Bristol + GI burden model (mirrors the app exactly) ===== */
+        var BRISTOL = {
+          1: { name: 'Hard lumps', desc: 'Slow transit', color: '#ffa94d', severity: 5 },
+          2: { name: 'Lumpy sausage', desc: 'Mild constipation', color: '#ffa94d', severity: 4 },
+          3: { name: 'Cracked sausage', desc: 'Normal', color: '#51cf66', severity: 1 },
+          4: { name: 'Smooth snake', desc: 'Smooth and soft — ideal', color: '#51cf66', severity: 1 },
+          5: { name: 'Soft pieces', desc: 'Rapid transit', color: '#339af0', severity: 2 },
+          6: { name: 'Mushy', desc: 'Loose', color: '#ff6b6b', severity: 5 },
+          7: { name: 'Liquid', desc: 'Watery', color: '#ff6b6b', severity: 7 }
+        };
+        var PORTIONS = ['trace', 'some', 'most', 'all'];
+        var PORTION_LABEL = { trace: 'Trace', some: 'Some', most: 'Most', all: 'All' };
+        var PORTION_WEIGHT = { trace: 0.15, some: 0.35, most: 0.7, all: 1.0 };
+
+        /* ===== Hero: locked row reveal ===== */
+        var lockedRow = document.getElementById('wj-locked');
+        var lockTag = document.getElementById('wj-lock-tag');
+        if (lockedRow) {
+          var relockTimer = null;
+          var toggleLock = function () {
+            if (lockedRow.classList.contains('is-open')) return;
+            lockedRow.classList.add('is-scanning');
+            setTimeout(function () {
+              lockedRow.classList.remove('is-scanning');
+              lockedRow.classList.add('is-open');
+              if (lockTag) lockTag.lastChild.textContent = 'Unlocked';
+              clearTimeout(relockTimer);
+              relockTimer = setTimeout(function () {
+                lockedRow.classList.remove('is-open');
+                if (lockTag) lockTag.lastChild.textContent = 'Locked — tap to unlock';
+              }, 5200);
+            }, 650);
+          };
+          lockedRow.addEventListener('click', toggleLock);
+          lockedRow.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleLock(); }
+          });
+        }
+
+        /* ===== Bristol explorer ===== */
+        var bpRows = document.getElementById('bp-rows');
+        var bpDetail = document.getElementById('bp-detail');
+        var bpSegments = document.getElementById('bp-segments');
+        var bpMixedOut = document.getElementById('bp-mixed-out');
+
+        if (bpRows) {
+          var bpSelected = 4;
+          var renderBpDetail = function () {
+            var b = BRISTOL[bpSelected];
+            bpDetail.innerHTML =
+              '<b>Type ' + bpSelected + ' — ' + b.name + '.</b> ' + b.desc +
+              '. Form severity <b>' + b.severity + '</b> — the number the burden model starts from.';
+          };
+          Object.keys(BRISTOL).forEach(function (t) {
+            var b = BRISTOL[t];
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'bp-row' + (Number(t) === bpSelected ? ' on' : '');
+            btn.style.setProperty('--bp', b.color);
+            btn.innerHTML =
+              '<i></i><span><b>Type ' + t + '</b> <small>· ' + b.name + '</small>' +
+              (t === '4' ? '<span class="bp-ideal">ideal</span>' : '') +
+              '</span><em>' + b.desc.replace(' — ideal', '') + '</em>';
+            btn.addEventListener('click', function () {
+              bpSelected = Number(t);
+              bpRows.querySelectorAll('.bp-row').forEach(function (r) { r.classList.remove('on'); });
+              btn.classList.add('on');
+              renderBpDetail();
+            });
+            bpRows.appendChild(btn);
+          });
+          renderBpDetail();
+
+          var segs = [ { type: 4, portion: 'most' }, { type: 6, portion: 'some' } ];
+          var renderSegs = function () {
+            bpSegments.innerHTML = '';
+            var worst = 0;
+            var worstLabel = '';
+            segs.forEach(function (s, i) {
+              var b = BRISTOL[s.type];
+              var contribution = b.severity * PORTION_WEIGHT[s.portion];
+              if (contribution > worst) {
+                worst = contribution;
+                worstLabel = 'Type ' + s.type + ' × ' + PORTION_LABEL[s.portion];
+              }
+              var pill = document.createElement('button');
+              pill.type = 'button';
+              pill.className = 'bp-seg';
+              pill.style.setProperty('--bp', b.color);
+              pill.setAttribute('aria-label', 'Phase ' + (i + 1) + ': Type ' + s.type + ', portion ' + PORTION_LABEL[s.portion] + ' — tap to change portion');
+              pill.innerHTML = '<i></i><b>T' + s.type + '</b> · <u>' + PORTION_LABEL[s.portion] + '</u>';
+              pill.addEventListener('click', function () {
+                s.portion = PORTIONS[(PORTIONS.indexOf(s.portion) + 1) % PORTIONS.length];
+                renderSegs();
+              });
+              bpSegments.appendChild(pill);
+            });
+            var types = segs.map(function (s) { return s.type; }).sort().join('/');
+            bpMixedOut.innerHTML =
+              'Mixed types ' + types + ' — worst phase is <b>' + worstLabel + ' → base ' +
+              (Math.round(worst * 10) / 10).toFixed(1) + '</b>';
+          };
+          renderSegs();
+        }
+
+        /* ===== GI Burden lab ===== */
+        var giLab = document.getElementById('gi-lab');
+        if (giLab) {
+          var URGENCY = [
+            { v: 1, label: 'Normal' }, { v: 2, label: 'Soon' }, { v: 3, label: 'Rushed' },
+            { v: 4, label: 'Hard to hold' }, { v: 5, label: 'Could not hold' }
+          ];
+          var CONTROL = [
+            { v: 'normal', label: 'Normal control', add: 0 }, { v: 'rushed', label: 'Rushed', add: 0 },
+            { v: 'hardToHold', label: 'Hard to hold', add: 1 }, { v: 'nearAccident', label: 'Near accident', add: 2 },
+            { v: 'accident', label: 'Accident', add: 3 }
+          ];
+          var PASSAGE = ['Straining', 'Pain', 'Burning', 'Cramping', 'Gas', 'Bloating', 'Incomplete', 'Mucus'];
+          var PASSAGE_SCORED = ['Pain', 'Cramping', 'Incomplete', 'Straining'];
+          var CLEANUP = ['Easy cleanup', 'Messy', 'Wiped a lot', 'Bidet', 'Rinsed out', 'Showered', 'Changed clothes', 'Irritation'];
+          var CLEANUP_SCORED = ['Bidet', 'Rinsed out', 'Showered', 'Changed clothes'];
+          var FLAGS = ['Blood', 'Black/tarry', 'Pale/clay', 'Severe pain', 'Fever', 'Woke from sleep'];
+
+          var state = {
+            type: 4, portion: 'all', urgency: 1, control: 'normal',
+            passage: new Set(), cleanup: new Set(['Easy cleanup']), flags: new Set()
+          };
+
+          var els = {
+            bristol: document.getElementById('gi-bristol'),
+            portion: document.getElementById('gi-portion'),
+            urgency: document.getElementById('gi-urgency'),
+            control: document.getElementById('gi-control'),
+            passage: document.getElementById('gi-passage'),
+            cleanup: document.getElementById('gi-cleanup'),
+            flags: document.getElementById('gi-flags'),
+            dial: document.getElementById('gi-dial'),
+            score: document.getElementById('gi-score'),
+            verdict: document.getElementById('gi-verdict'),
+            breakdown: document.getElementById('gi-breakdown'),
+            presets: document.getElementById('gi-presets')
+          };
+
+          var chip = function (html, cls) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'gi-chip' + (cls ? ' ' + cls : '');
+            b.innerHTML = html;
+            b.setAttribute('aria-pressed', 'false');
+            return b;
+          };
+
+          // Bristol chips
+          Object.keys(BRISTOL).forEach(function (t) {
+            var b = BRISTOL[t];
+            var c = chip('<i></i><b>' + t + '</b> <small>' + b.name + '</small>', 'gi-chip--b');
+            c.style.setProperty('--bp', b.color);
+            c.dataset.type = t;
+            c.addEventListener('click', function () { state.type = Number(t); update(); });
+            els.bristol.appendChild(c);
+          });
+          // Portion chips
+          PORTIONS.forEach(function (p) {
+            var c = chip('<b>' + PORTION_LABEL[p] + '</b> <small>×' + PORTION_WEIGHT[p] + '</small>');
+            c.dataset.portion = p;
+            c.addEventListener('click', function () { state.portion = p; update(); });
+            els.portion.appendChild(c);
+          });
+          // Urgency chips
+          URGENCY.forEach(function (u) {
+            var c = chip('<b>' + u.v + '</b> <small>' + u.label + '</small>');
+            c.dataset.urgency = String(u.v);
+            c.addEventListener('click', function () { state.urgency = u.v; update(); });
+            els.urgency.appendChild(c);
+          });
+          // Control chips
+          CONTROL.forEach(function (k) {
+            var c = chip(k.label);
+            c.dataset.control = k.v;
+            c.addEventListener('click', function () { state.control = k.v; update(); });
+            els.control.appendChild(c);
+          });
+          // Multi-select groups. Presets swap the Set objects on `state`, so
+          // handlers must resolve the current Set via its key at click time.
+          var multi = function (container, values, stateKey, cls) {
+            values.forEach(function (v) {
+              var c = chip(v, cls);
+              c.dataset.value = v;
+              c.addEventListener('click', function () {
+                var set = state[stateKey];
+                if (set.has(v)) set.delete(v); else set.add(v);
+                update();
+              });
+              container.appendChild(c);
+            });
+          };
+          multi(els.passage, PASSAGE, 'passage');
+          multi(els.cleanup, CLEANUP, 'cleanup');
+          multi(els.flags, FLAGS, 'flags', 'gi-chip--flag');
+
+          var compute = function () {
+            var rows = [];
+            var b = BRISTOL[state.type];
+            var base = b.severity * PORTION_WEIGHT[state.portion];
+            var score = base;
+            rows.push(['Worst phase — T' + state.type + ' × ' + PORTION_LABEL[state.portion].toLowerCase(), base.toFixed(2).replace(/\.?0+$/, '') ]);
+            if (state.urgency >= 4) { score += 2; rows.push(['Urgency — ' + URGENCY[state.urgency - 1].label, '+2']); }
+            else if (state.urgency === 3) { score += 1; rows.push(['Urgency — Rushed', '+1']); }
+            var pHits = PASSAGE_SCORED.filter(function (x) { return state.passage.has(x); });
+            if (pHits.length) { score += 2; rows.push(['Passage — ' + pHits.join(', '), '+2']); }
+            var cHits = CLEANUP_SCORED.filter(function (x) { return state.cleanup.has(x); });
+            if (cHits.length) { score += 1.5; rows.push(['Cleanup — ' + cHits.join(', '), '+1.5']); }
+            var ctl = CONTROL.find(function (k) { return k.v === state.control; });
+            if (ctl && ctl.add > 0) { score += ctl.add; rows.push(['Control — ' + ctl.label, '+' + ctl.add]); }
+            var flagged = state.flags.size > 0;
+            if (flagged) {
+              score = Math.max(score, 8);
+              rows.push(['Worth flagging — ' + Array.from(state.flags).join(', '), 'floors at 8']);
+            }
+            var final = Math.min(10, Math.max(0, Math.round(score)));
+            return { final: final, rows: rows, flagged: flagged };
+          };
+
+          var VERDICTS = [
+            [2, 'Quiet — ideal forms with easy passage barely register.', '#46e2a3'],
+            [4, 'Worth watching — the model is picking up friction.', '#ffce6b'],
+            [7, 'High burden — the kind of day worth correlating with food.', '#ffa94d'],
+            [10, 'Severe burden — the kind of episode a clinician summary exists for.', '#ff6b6b']
+          ];
+          var FLAG_VERDICT = 'Flagged — red-flag entries always surface at 8 or above, so they are impossible to miss in a report.';
+
+          var shownScore = 1;
+          var animScore = function (to, color) {
+            var from = shownScore;
+            shownScore = to;
+            var start = performance.now();
+            var frame = function (now) {
+              var t = Math.min(1, (now - start) / 420);
+              var eased = 1 - Math.pow(1 - t, 3);
+              var val = from + (to - from) * eased;
+              els.score.textContent = String(Math.round(val));
+              var pct = (val / 10) * 100;
+              els.dial.style.background =
+                'conic-gradient(from 220deg, ' + color + ' ' + pct + '%, rgba(255,255,255,0.08) ' + pct + '%), rgba(255,255,255,0.03)';
+              els.score.style.color = color;
+              if (t < 1) requestAnimationFrame(frame);
+            };
+            requestAnimationFrame(frame);
+          };
+
+          var syncChips = function () {
+            els.bristol.querySelectorAll('.gi-chip').forEach(function (c) {
+              var on = Number(c.dataset.type) === state.type;
+              c.classList.toggle('on', on); c.setAttribute('aria-pressed', String(on));
+            });
+            els.portion.querySelectorAll('.gi-chip').forEach(function (c) {
+              var on = c.dataset.portion === state.portion;
+              c.classList.toggle('on', on); c.setAttribute('aria-pressed', String(on));
+            });
+            els.urgency.querySelectorAll('.gi-chip').forEach(function (c) {
+              var on = Number(c.dataset.urgency) === state.urgency;
+              c.classList.toggle('on', on); c.setAttribute('aria-pressed', String(on));
+            });
+            els.control.querySelectorAll('.gi-chip').forEach(function (c) {
+              var on = c.dataset.control === state.control;
+              c.classList.toggle('on', on); c.setAttribute('aria-pressed', String(on));
+            });
+            [[els.passage, state.passage], [els.cleanup, state.cleanup], [els.flags, state.flags]].forEach(function (pair) {
+              pair[0].querySelectorAll('.gi-chip').forEach(function (c) {
+                var on = pair[1].has(c.dataset.value);
+                c.classList.toggle('on', on); c.setAttribute('aria-pressed', String(on));
+              });
+            });
+          };
+
+          var update = function () {
+            syncChips();
+            var r = compute();
+            var verdict = VERDICTS.find(function (v) { return r.final <= v[0]; });
+            animScore(r.final, verdict[2]);
+            els.verdict.textContent = r.flagged ? FLAG_VERDICT : verdict[1];
+            els.breakdown.innerHTML = r.rows.map(function (row) {
+              var flagLine = row[1] === 'floors at 8';
+              return '<li' + (flagLine ? ' class="gi-flagline"' : '') + '><span>' + row[0] + '</span><b>' + row[1] + '</b></li>';
+            }).join('');
+          };
+
+          var PRESETS = {
+            calm: { type: 4, portion: 'all', urgency: 1, control: 'normal', passage: [], cleanup: ['Easy cleanup'], flags: [] },
+            rough: { type: 6, portion: 'most', urgency: 3, control: 'normal', passage: ['Cramping', 'Gas'], cleanup: ['Messy'], flags: [] },
+            flag: { type: 4, portion: 'all', urgency: 1, control: 'normal', passage: [], cleanup: ['Easy cleanup'], flags: ['Blood'] }
+          };
+
+          els.presets.querySelectorAll('button').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var p = PRESETS[btn.dataset.preset];
+              state.type = p.type; state.portion = p.portion; state.urgency = p.urgency; state.control = p.control;
+              state.passage = new Set(p.passage); state.cleanup = new Set(p.cleanup); state.flags = new Set(p.flags);
+              els.presets.querySelectorAll('button').forEach(function (b) {
+                var on = b === btn;
+                b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+              });
+              update();
+            });
+          });
+
+          update();
+        }
+
+        /* ===== Privacy lock demo ===== */
+        var pvCard = document.getElementById('pv-card');
+        if (pvCard) {
+          var pvPill = document.getElementById('pv-pill');
+          var pvUnlock = document.getElementById('pv-unlock');
+          var pvUnlockLabel = document.getElementById('pv-unlock-label');
+          var pvReveal = document.getElementById('pv-reveal');
+          var pvPhoto = document.getElementById('pv-photo');
+          var pvOpen = false;
+
+          var setLocked = function (open) {
+            pvOpen = open;
+            pvCard.classList.toggle('is-open', open);
+            pvPill.innerHTML = open
+              ? '<span class="pv-passdots" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Unlocked'
+              : '<span class="pv-passdots" aria-hidden="true"><i></i><i></i><i></i><i></i></span> Locked';
+            pvUnlockLabel.textContent = open ? 'Lock the record' : 'Unlock with Face ID';
+            pvReveal.disabled = !open;
+            pvCard.querySelectorAll('.pv-lock-note').forEach(function (n) {
+              n.textContent = open ? 'unlocked' : 'locked';
+            });
+            if (!open) {
+              pvPhoto.classList.remove('is-revealed');
+              pvReveal.textContent = 'Reveal';
+            }
+          };
+
+          pvUnlock.addEventListener('click', function () {
+            if (pvOpen) { setLocked(false); return; }
+            pvCard.classList.add('is-scanning');
+            setTimeout(function () {
+              pvCard.classList.remove('is-scanning');
+              setLocked(true);
+            }, 850);
+          });
+
+          pvReveal.addEventListener('click', function () {
+            var revealed = pvPhoto.classList.toggle('is-revealed');
+            pvReveal.textContent = revealed ? 'Blur' : 'Reveal';
+          });
+        }
+
+        /* ===== Gut-brain check-in demo ===== */
+        var ciCard = document.getElementById('ci-card');
+        if (ciCard) {
+          var slider = document.getElementById('ci-stress');
+          var stressVal = document.getElementById('ci-stress-val');
+          var headline = document.getElementById('ci-headline');
+          var detail = document.getElementById('ci-detail');
+          var patterns = document.getElementById('ci-patterns');
+
+          document.getElementById('ci-moods').querySelectorAll('.ci-mood').forEach(function (m) {
+            m.addEventListener('click', function () {
+              ciCard.querySelectorAll('.ci-mood').forEach(function (x) { x.classList.remove('on'); });
+              m.classList.add('on');
+            });
+          });
+
+          document.getElementById('ci-symptoms').querySelectorAll('.gi-chip').forEach(function (c) {
+            c.addEventListener('click', function () {
+              c.classList.toggle('on');
+              c.setAttribute('aria-pressed', String(c.classList.contains('on')));
+            });
+          });
+
+          var renderStress = function () {
+            var v = Number(slider.value);
+            stressVal.textContent = v + '/10';
+            ciCard.classList.toggle('is-stressed', v >= 6);
+            patterns.classList.remove('is-building');
+            if (v >= 6) {
+              headline.textContent = 'Stress and your gut move together';
+              detail.innerHTML = 'On high-stress days your gut severity averages <b>6.2/10</b> versus <b>3.1/10</b> on calm days. This is an association, not proof — and not medical advice.';
+            } else if (v <= 3) {
+              headline.textContent = 'Calm tracks with a happier gut';
+              detail.innerHTML = 'Your calmest days carry your lowest GI burden — the inverse pattern is real evidence too. An association, not proof — and not medical advice.';
+            } else {
+              headline.textContent = 'Building your gut-brain picture';
+              detail.textContent = 'Keep pairing stress check-ins with gut records — the engine stays quiet until it has real evidence.';
+              patterns.classList.add('is-building');
+            }
+          };
+          slider.addEventListener('input', renderStress);
+          renderStress();
+        }
+      })();
+    </script>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

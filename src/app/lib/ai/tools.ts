@@ -16,6 +16,7 @@ import {
   decodeWorkout,
 } from '../decoders'
 import { dailyTotals, mealTotal, mealDisplayName } from '../aggregates'
+import { bristolSummary, computeGIBurdenScore } from '../gi'
 import { localDateString } from '../firestore'
 import { NUTRIENT_KEYS } from '../types'
 import type { GlucoseReading, Meal, WellnessEntry, WorkoutSession, WeightEntry, Split } from '../types'
@@ -971,8 +972,17 @@ function wellnessSummary(e: WellnessEntry): string {
       return `mood ${e.data.entry.rating}/5${e.data.entry.stress != null ? `, stress ${e.data.entry.stress}/10` : ''}`
     case 'energy':
       return `energy ${e.data.entry.level}/5`
-    case 'bowelMovement':
-      return `Bristol ${e.data.entry.bristolType}${e.data.entry.urgency != null ? `, urgency ${e.data.entry.urgency}` : ''}`
+    case 'bowelMovement': {
+      const bm = e.data.entry
+      const parts = [bristolSummary(bm)]
+      const burden = bm.giBurdenScore ?? computeGIBurdenScore(bm).score
+      parts.push(`GI burden ${burden}/10`)
+      if (bm.urgency != null) parts.push(`urgency ${bm.urgency}/5`)
+      if (bm.control && bm.control !== 'normal') parts.push(`control: ${bm.control}`)
+      if (bm.passageSymptoms.length) parts.push(`passage: ${bm.passageSymptoms.join(', ')}`)
+      if (bm.redFlags.length) parts.push(`red flags: ${bm.redFlags.join(', ')}`)
+      return parts.join(' · ')
+    }
     case 'sleep':
       return `sleep ${e.data.hours.toFixed(1)}h, quality ${e.data.quality}/5`
     case 'hydration':

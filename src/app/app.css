@@ -1,14 +1,29 @@
 /* App-specific overrides on top of the shared marketing style.css */
 
+:root {
+  color-scheme: dark;
+}
+
 /* Enable vertical scrolling inside the web app (marketing site hides overflow-y on body) */
 body {
   overflow-y: auto;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* App shell */
 .app-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   background: #000;
+  /* Total sticky-nav + main-padding height, used to size full-height views
+     (Intelligence chat). Mobile adds the pill-strip row. */
+  --app-chrome: 8rem;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    --app-chrome: 10.5rem;
+  }
 }
 
 .app-nav {
@@ -19,6 +34,54 @@ body {
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   background: rgba(0, 0, 0, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Mobile nav — one swipeable row of pills, no wrapping, edges fade out */
+.app-nav-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 16px 10px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 24px;
+  mask-image: linear-gradient(to right, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+}
+
+.app-nav-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.app-nav-pill {
+  flex-shrink: 0;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.app-nav-pill:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-nav-pill.active {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.app-main {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }
 
 .panel {
@@ -54,9 +117,14 @@ body {
   padding: 0.65rem 1rem;
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, transform 0.1s ease;
   border: 1px solid transparent;
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .btn:disabled {
@@ -363,6 +431,14 @@ body {
 
 .intel-page {
   position: relative;
+}
+
+/* Full-height chat viewport. dvh tracks Android/iOS browser chrome as it
+   collapses, so the composer is never hidden behind the URL bar. */
+.intel-viewport {
+  height: calc(100vh - var(--app-chrome, 8rem));
+  height: calc(100dvh - var(--app-chrome, 8rem));
+  min-height: 320px;
 }
 
 .intel-page::before {

@@ -172,6 +172,22 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
       prev.map((it, i) => {
         if (i !== idx) return it
         const servingUnit = value.trim() || 'serving'
+        if (servingUnit === it.servingUnit) return it
+        // Unit change = convert, preserving the physical amount with nutrients
+        // untouched (mirrors iOS FoodItem.convertingUnit(to:)). When the two
+        // units share a gram bridge, the serving size number itself changes
+        // (e.g. 1 serving → 28.35 g) instead of silently staying put.
+        const convertedSize = convertServingAmount(it, it.servingSize, it.servingUnit, servingUnit)
+        if (typeof convertedSize === 'number' && Number.isFinite(convertedSize) && convertedSize > 0) {
+          return {
+            ...it,
+            servingUnit,
+            servingSize: Math.round(convertedSize * 100) / 100,
+            quantityWasUserAdjusted: true,
+          }
+        }
+        // No gram bridge between the units — keep the amount and re-scale
+        // nutrients for the new unit instead.
         return {
           ...it,
           servingUnit,

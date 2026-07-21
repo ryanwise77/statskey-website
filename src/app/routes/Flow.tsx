@@ -238,7 +238,7 @@ export function Flow() {
   }
 
   return (
-    <div className="intel-page space-y-4 h-[calc(100vh-8rem)] flex flex-col">
+    <div className="intel-page intel-viewport space-y-4 flex flex-col">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="intel-mark w-10 h-10 text-[16px]">✦</span>

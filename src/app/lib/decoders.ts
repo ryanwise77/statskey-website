@@ -2,8 +2,11 @@ import { toDate, toDateOrNow } from './firestore'
 import { deriveTrustMetadata } from './provenance'
 import type {
   AnalysisMode,
+  BowelControlStatus,
   BowelMovementEntry,
   BowelMovementSize,
+  BowelSegment,
+  BowelSegmentPortion,
   BristolType,
   CadenceSample,
   EnergyEntry,
@@ -320,6 +323,41 @@ export function decodeGlucose(raw: Raw, id: string): GlucoseReading {
 
 // MARK: - WellnessEntry
 
+function clampBristol(value: number): BristolType {
+  return Math.min(7, Math.max(1, Math.round(value))) as BristolType
+}
+
+const BOWEL_PORTIONS = new Set<BowelSegmentPortion>(['trace', 'some', 'most', 'all'])
+const BOWEL_CONTROLS = new Set<BowelControlStatus>(['normal', 'rushed', 'hardToHold', 'nearAccident', 'accident'])
+
+function decodeControl(v: unknown): BowelControlStatus | undefined {
+  const s = str(v)
+  return s && BOWEL_CONTROLS.has(s as BowelControlStatus) ? (s as BowelControlStatus) : undefined
+}
+
+function decodeBowelSegments(v: unknown): BowelSegment[] {
+  if (!Array.isArray(v)) return []
+  const out: BowelSegment[] = []
+  for (const [idx, item] of v.entries()) {
+    const r = asRaw(item)
+    if (!r) continue
+    const type = num(r.bristolType)
+    if (type == null) continue
+    const portionRaw = str(r.portion)
+    // Mirror Swift's decodeIfPresent(portion) ?? .all fallback.
+    const portion =
+      portionRaw && BOWEL_PORTIONS.has(portionRaw as BowelSegmentPortion)
+        ? (portionRaw as BowelSegmentPortion)
+        : 'all'
+    out.push({
+      id: str(r.id) ?? `segment-${idx}`,
+      bristolType: clampBristol(type),
+      portion,
+    })
+  }
+  return out
+}
+
 function decodeWellnessData(raw: Raw): WellnessData | undefined {
   const type = str(raw.type)
   switch (type) {
@@ -362,7 +400,7 @@ function decodeWellnessData(raw: Raw): WellnessData | undefined {
       if (!e) return undefined
       const bristolType = num(e.bristolType) ?? 4
       const entry: BowelMovementEntry = {
-        bristolType: Math.min(7, Math.max(1, Math.round(bristolType))) as BristolType,
+        bristolType: clampBristol(bristolType),
         color: str(e.color) as StoolColor | undefined,
         urgency: num(e.urgency),
         durationInSeconds: num(e.durationInSeconds),
@@ -370,6 +408,12 @@ function decodeWellnessData(raw: Raw): WellnessData | undefined {
         estimatedSize: str(e.estimatedSize) as BowelMovementSize | undefined,
         photoStoragePath: str(e.photoStoragePath),
         photoCreatedAt: toDate(e.photoCreatedAt),
+        segments: decodeBowelSegments(e.segments),
+        passageSymptoms: strArray(e.passageSymptoms),
+        control: decodeControl(e.control),
+        cleanup: strArray(e.cleanup),
+        redFlags: strArray(e.redFlags),
+        giBurdenScore: num(e.giBurdenScore),
       }
       return { kind: 'bowelMovement', entry }
     }
