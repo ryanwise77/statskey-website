@@ -740,7 +740,14 @@ a { color: inherit; text-decoration: none; }
 .app-device > img {
   display: block;
   width: 100%;
+  height: auto;
   border-radius: 34px;
+}
+
+/* Hero variant: slightly larger, capped by viewport height so the
+   full phone stays visible inside the hero on shorter screens. */
+.app-device--hero {
+  width: min(clamp(260px, 30vw, 340px), 33vh);
 }
 
 .app-cap {

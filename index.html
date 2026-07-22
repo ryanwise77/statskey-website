@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18341057139"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'AW-18341057139');
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StatsKey | Nutrition, Biometrics, and Metabolic Intelligence</title>
@@ -65,50 +74,18 @@
             <div class="hero-note reveal d3">Free today, with optional Pro ($4.99/mo) and Pro+ ($19.99/mo) — annual plans for less, with the same pricing on the web and the App Store. Free access is introductory and may move to paid pricing as StatsKey grows.</div>
           </div>
 
-          <div class="command-card tilt-card reveal d2" id="hero-card" aria-label="StatsKey data model preview">
-            <div class="command-card__top">
-              <div>
-                <div class="panel-label">Metabolic model</div>
-                <div class="command-card__title">Today, compiled</div>
-              </div>
-              <span class="live-pill"><span></span> Live inputs</span>
-            </div>
-            <div class="score-ring" id="hero-ring" aria-hidden="true">
-              <div class="score-ring__inner">
-                <span data-count-to="83" data-count-dur="1600">83</span>
-                <small>readiness</small>
-              </div>
-            </div>
-            <div class="signal-grid">
-              <div class="signal-card">
-                <span>Protein</span>
-                <strong data-count-to="118" data-count-suffix="g">118g</strong>
-                <em>+22g to target</em>
-              </div>
-              <div class="signal-card">
-                <span>Glucose peak</span>
-                <strong data-count-to="131">131</strong>
-                <em>smooth response</em>
-              </div>
-              <div class="signal-card">
-                <span>Water</span>
-                <strong data-count-to="2.4" data-count-decimals="1" data-count-suffix="L">2.4L</strong>
-                <em>on pace</em>
-              </div>
-              <div class="signal-card">
-                <span>Training</span>
-                <strong data-count-to="47" data-count-suffix="m">47m</strong>
-                <em>zone 2 base</em>
-              </div>
-            </div>
-            <div class="insight-strip">
-              <span class="insight-strip__dot"></span>
-              <span class="rot" data-rotator>
-                <span class="rot-item on">Dinner patterns with 30g+ fiber correlate with flatter overnight glucose this week.</span>
-                <span class="rot-item">Maintenance revised +140 kcal — your weight trend says the formula ran low.</span>
-                <span class="rot-item">Recovery day detected: protein target held, carbs eased 12%.</span>
-              </span>
-            </div>
+          <div class="app-device app-device--hero tilt-card reveal d2" id="hero-card" aria-label="StatsKey app preview">
+            <video
+              src="/statskey-app/hero-preview.mp4"
+              poster="/statskey-app/hero-preview-poster.jpg"
+              width="660"
+              height="1430"
+              autoplay
+              loop
+              muted
+              playsinline
+              aria-label="StatsKey app preview: nutrition facts for every meal, GPS runs with splits and heart rate, your metabolic day, and Intelligence — actual screen recording"
+            ></video>
           </div>
         </div>
       </section>
