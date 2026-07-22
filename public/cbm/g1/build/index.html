@@ -13,110 +13,206 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="The CBM G1 build book: sourced BOM, custom-part manufacturing specifications, material sources, assembly sequence, and validation gates.">
-  <meta name="theme-color" content="#080b0e">
+  <meta name="theme-color" content="#eef1f1">
   <link rel="canonical" href="https://statskeybiometrics.com/cbm/procurement/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2218%22 fill=%22%23050a0d%22/%3E%3Ccircle cx=%2224%22 cy=%2234%22 r=%2211%22 fill=%22%2371f5c6%22/%3E%3Ccircle cx=%2243%22 cy=%2220%22 r=%226%22 fill=%22%237edcff%22/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%228%22 fill=%22%23eef1f1%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2215%22 fill=%22none%22 stroke=%22%23125e5c%22 stroke-width=%223%22/%3E%3Cpath d=%22M32 9v46M9 32h46%22 stroke=%22%23125e5c%22 stroke-width=%222.4%22/%3E%3C/svg%3E">
   <title>CBM G1 · Source & Build Book</title>
   <style>
-    :root{--bg:#080b0e;--panel:#0d1318;--panel2:#111a20;--ink:#f3f7f9;--soft:#bdc8cd;--muted:#738087;--line:rgba(210,235,238,.13);--mint:#71f5c6;--cyan:#7edcff;--orange:#ff8d55;--rose:#ff537d;--violet:#9d88ff;--mono:"DM Mono",monospace;--body:"Manrope",sans-serif;--display:"Space Grotesk",sans-serif}
+    :root{
+      --paper:#eef1f1;
+      --panel:#f9fbfb;
+      --panel-2:#f2f5f5;
+      --ink:#0e1518;
+      --ink-2:#39454a;
+      --muted:#647177;
+      --faint:#96a1a6;
+      --line:rgba(14,21,24,.16);
+      --line-2:rgba(14,21,24,.09);
+      --accent:#125e5c;
+      --accent-ink:#0b4442;
+      --accent-dark:#5fd0c4;
+      --steel:#2b5871;
+      --slate:#5c6970;
+      --amber:#8a5a15;
+      --brick:#a23a37;
+      --plate:#0a0f10;
+      --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+    }
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth;background:var(--bg)}
-    body{margin:0;background:linear-gradient(180deg,#080b0e,#050709 70%);color:var(--ink);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased}
-    body:before{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(#000,transparent 85%)}
+    html{scroll-behavior:smooth;background:var(--paper);-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+      background-image:
+        linear-gradient(rgba(14,21,24,.038) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(14,21,24,.038) 1px,transparent 1px);
+      background-size:46px 46px;
+      mask-image:radial-gradient(ellipse 130% 92% at 50% -2%,#000 32%,transparent 80%)}
     a{color:inherit;text-decoration:none}
-    .top{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--line);background:rgba(8,11,14,.82);backdrop-filter:blur(22px)}
-    .top__inner{width:min(1440px,calc(100% - 30px));height:64px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{display:flex;align-items:center;gap:11px;font:500 10px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase}
-    .brand__mark{width:22px;height:22px;border:1px solid rgba(113,245,198,.45);border-radius:50%;position:relative}.brand__mark:before{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:var(--mint);left:4px;top:8px}
-    .top__actions{display:flex;align-items:center;gap:8px}
-    .top__link{padding:9px 11px;border:1px solid var(--line);border-radius:10px;color:var(--soft);font:500 8px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
-    .top__link--accent{color:var(--mint);border-color:rgba(113,245,198,.32)}
-    .layout{width:min(1440px,calc(100% - 30px));margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;padding:28px 0 90px}
-    .toc{position:sticky;top:92px;align-self:start;max-height:calc(100vh - 120px);overflow:auto;padding-right:10px}
-    .toc__label{margin:0 0 10px;color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-    .toc a{display:block;padding:8px 10px;border-left:1px solid var(--line);color:#87959b;font-size:11px;line-height:1.25;transition:.2s}
-    .toc a:hover,.toc a.active{border-left-color:var(--mint);color:var(--ink);background:linear-gradient(90deg,rgba(113,245,198,.06),transparent)}
-    .content{min-width:0}
-    .hero{position:relative;min-height:610px;padding:clamp(30px,5vw,62px);border:1px solid var(--line);border-radius:30px;overflow:hidden;background:
-      radial-gradient(circle at 78% 28%,rgba(126,220,255,.15),transparent 35%),
-      radial-gradient(circle at 14% 82%,rgba(113,245,198,.08),transparent 35%),
-      linear-gradient(145deg,#101b22,#080c10 68%);display:flex;flex-direction:column;justify-content:flex-end}
-    .hero:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(circle at 72% 30%,#000,transparent 65%)}
-    .hero__orbit{position:absolute;right:-4%;top:-24%;width:min(700px,62vw);aspect-ratio:1;border:1px solid rgba(126,220,255,.13);border-radius:50%;box-shadow:0 0 0 60px rgba(126,220,255,.025),0 0 0 132px rgba(126,220,255,.015)}
-    .hero__eyebrow,.eyebrow{position:relative;z-index:2;color:var(--mint);font:500 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase}
-    h1,h2,h3{font-family:var(--display);letter-spacing:-.05em}
-    h1{position:relative;z-index:2;max-width:920px;margin:17px 0 0;font-size:clamp(3rem,6vw,6.7rem);line-height:.89;font-weight:600}
-    .hero__lede{position:relative;z-index:2;max-width:760px;margin:24px 0 0;color:var(--soft);font-size:15px;line-height:1.7}
-    .downloads{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:27px}
-    .download{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 13px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.03);color:var(--soft);font:500 8px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
-    .download--primary{border-color:transparent;background:var(--mint);color:#04100d}
-    .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 28px}
-    .fact{padding:16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}
-    .fact__label{color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
-    .fact strong{display:block;margin-top:10px;font:600 24px/.95 var(--display);letter-spacing:-.045em}
-    .fact span{display:block;margin-top:7px;color:var(--muted);font-size:10px}
-    .section{scroll-margin-top:90px;margin-top:22px;padding:clamp(24px,4vw,42px);border:1px solid var(--line);border-radius:24px;background:linear-gradient(150deg,rgba(16,24,30,.92),rgba(8,12,15,.82))}
-    .section__head{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.4fr);gap:30px;align-items:end;margin-bottom:28px}
-    h2{margin:12px 0 0;font-size:clamp(2rem,4.2vw,4.4rem);line-height:.94;font-weight:600}
-    .section__head p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
-    .gate-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-    .gate{padding:17px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025)}
-    .gate__id{color:var(--cyan);font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .gate h3{margin:18px 0 0;font-size:21px;line-height:1}
-    .gate p{margin:10px 0 0;color:var(--muted);font-size:10px;line-height:1.55}
-    .custom{scroll-margin-top:90px;margin-top:12px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#0a0f13}
-    .custom__head{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(113,245,198,.05),transparent)}
-    .custom__id{color:var(--accent,var(--mint));font:500 10px/1 var(--mono);letter-spacing:.1em}
-    .custom h3{margin:0;font-size:25px;line-height:1}
-    .status{padding:6px 8px;border:1px solid currentColor;border-radius:999px;color:var(--accent,var(--mint));font:500 7px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
-    .custom__body{display:grid;grid-template-columns:minmax(0,.85fr) minmax(300px,1.15fr);gap:0}
-    .custom__spec,.custom__process{padding:20px}
+
+    /* ---- top bar ---- */
+    .top{position:sticky;top:0;z-index:50;background:rgba(238,241,241,.85);backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--line)}
+    .top__inner{width:min(1440px,calc(100% - 40px));height:60px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:inline-flex;align-items:center;gap:11px;font:600 12px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink)}
+    .brand__mark{position:relative;width:20px;height:20px;border:1px solid var(--accent);border-radius:50%}
+    .brand__mark:before,.brand__mark:after{content:"";position:absolute;background:var(--accent)}
+    .brand__mark:before{left:50%;top:3px;bottom:3px;width:1px;transform:translateX(-50%)}
+    .brand__mark:after{top:50%;left:3px;right:3px;height:1px;transform:translateY(-50%)}
+    .top__actions{display:flex;align-items:center;gap:10px}
+    .top__link{padding:9px 13px;border:1px solid var(--line);border-radius:2px;color:var(--ink-2);font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:border-color .18s,color .18s,background .18s}
+    .top__link:hover{border-color:var(--ink);color:var(--ink);background:rgba(14,21,24,.045)}
+    .top__link--accent{color:#fff;background:var(--accent);border-color:var(--accent)}
+    .top__link--accent:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:#fff}
+
+    /* ---- layout ---- */
+    .layout{width:min(1440px,calc(100% - 40px));margin:0 auto;display:grid;grid-template-columns:248px minmax(0,1fr);gap:32px;padding:30px 0 96px}
+
+    /* ---- table of contents ---- */
+    .toc{position:sticky;top:84px;align-self:start;max-height:calc(100vh - 116px);overflow:auto}
+    .toc__label{margin:0 0 12px;color:var(--muted);font:600 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase}
+    .toc a{display:block;padding:9px 12px;margin-bottom:4px;border:1px solid var(--line-2);border-left:2px solid transparent;border-radius:2px;color:var(--muted);font:500 11px/1.3 var(--mono);letter-spacing:.02em;text-transform:none;transition:border-color .18s,color .18s,background .18s}
+    .toc a:hover{border-color:var(--line);color:var(--ink);background:var(--panel)}
+    .toc a.active{border-color:var(--line);border-left-color:var(--accent);color:var(--accent-ink);background:rgba(18,94,92,.06)}
+
+    .content{min-width:0;scroll-margin-top:84px}
+
+    /* ---- shared type ---- */
+    h1,h2,h3{margin:0;font-family:var(--sans);letter-spacing:-.02em;color:var(--ink)}
+    .eyebrow,.hero__eyebrow{display:inline-flex;align-items:center;gap:11px;color:var(--accent);font:500 11px/1.4 var(--mono);letter-spacing:.17em;text-transform:uppercase}
+    .eyebrow:before,.hero__eyebrow:before{content:"";width:24px;height:1px;background:currentColor}
+
+    /* ---- hero ---- */
+    .hero{position:relative;padding:clamp(28px,4.6vw,56px);border:1px solid var(--line);border-radius:3px;background:var(--panel);overflow:hidden}
+    h1{margin:18px 0 0;font-size:clamp(2.1rem,4.4vw,3.5rem);line-height:1.03;font-weight:600;letter-spacing:-.028em;max-width:18ch;text-wrap:balance}
+    .hero__lede{max-width:780px;margin:22px 0 0;color:var(--ink-2);font-size:clamp(1rem,1.15vw,1.08rem);line-height:1.62}
+    .downloads{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+    .download{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:2px;background:var(--panel-2);color:var(--ink-2);font:500 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;transition:border-color .18s,background .18s,color .18s}
+    .download:hover{border-color:var(--ink);color:var(--ink);background:rgba(14,21,24,.05)}
+    .download--primary{border-color:var(--accent);background:var(--accent);color:#fff}
+    .download--primary:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:#fff}
+
+    /* ---- facts ---- */
+    .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 26px}
+    .fact{padding:18px;border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+    .fact__label{color:var(--muted);font:500 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+    .fact strong{display:block;margin-top:11px;font:600 24px/1 var(--sans);letter-spacing:-.03em;color:var(--ink)}
+    .fact span{display:block;margin-top:8px;color:var(--muted);font-size:11px;line-height:1.45}
+
+    /* ---- section frame ---- */
+    .section{scroll-margin-top:84px;margin-top:20px;padding:clamp(24px,3.6vw,40px);border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+    .section__head{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.42fr);gap:32px;align-items:end;padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid var(--line)}
+    .section__head h2{margin-top:12px}
+    h2{font-size:clamp(1.7rem,3vw,2.55rem);line-height:1.07;font-weight:600;letter-spacing:-.025em;max-width:20ch;text-wrap:balance}
+    .section__head p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.62}
+
+    /* ---- build gates ---- */
+    .gate-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .gate{padding:20px;border:1px solid var(--line);border-top:2px solid var(--cp,var(--accent));border-radius:3px;background:var(--panel-2)}
+    .gate__id{color:var(--cp,var(--accent));font:600 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .gate h3{margin:16px 0 0;font-size:19px;line-height:1.1;font-weight:600}
+    .gate p{margin:10px 0 0;color:var(--muted);font-size:11.5px;line-height:1.55}
+
+    /* ---- custom part blocks ---- */
+    .custom{scroll-margin-top:84px;margin-top:12px;border:1px solid var(--line);border-top:2px solid var(--cp,var(--accent));border-radius:3px;overflow:hidden;background:var(--panel)}
+    .custom__head{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+    .custom__id{color:var(--cp,var(--accent));font:600 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .custom h3{margin:0;font-size:22px;line-height:1.05;font-weight:600}
+    .status{padding:6px 9px;border:1px solid var(--cp,var(--accent));border-radius:2px;color:var(--cp,var(--accent));font:600 8px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
+    .custom__body{display:grid;grid-template-columns:minmax(0,.82fr) minmax(300px,1.18fr)}
+    .custom__spec,.custom__process{padding:22px}
     .custom__spec{border-right:1px solid var(--line)}
-    .mini-label{color:var(--muted);font:500 8px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
-    .spec-list{display:grid;gap:8px;margin-top:13px}
-    .spec-list div{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:10px}
-    .spec-list b{color:var(--soft);font-weight:600}.spec-list span{color:var(--muted)}
-    .process{counter-reset:step;display:grid;gap:8px;margin:13px 0 0;padding:0;list-style:none}
-    .process li{counter-increment:step;display:grid;grid-template-columns:29px 1fr;gap:10px;color:var(--soft);font-size:10.5px;line-height:1.55}
-    .process li:before{content:counter(step,decimal-leading-zero);display:grid;place-items:center;width:27px;height:27px;border:1px solid var(--line);border-radius:8px;color:var(--accent,var(--mint));font:500 8px/1 var(--mono)}
-    .acceptance{margin-top:16px;padding:12px 13px;border-left:2px solid var(--accent,var(--mint));background:linear-gradient(90deg,color-mix(in srgb,var(--accent,var(--mint)) 7%,transparent),transparent);color:var(--muted);font-size:10px;line-height:1.55}
-    .acceptance b{color:var(--soft)}
+    .mini-label{color:var(--muted);font:600 9px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase}
+    .spec-list{display:grid;gap:0;margin-top:14px}
+    .spec-list div{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line-2);font-size:11.5px}
+    .spec-list b{color:var(--ink);font-weight:600}
+    .spec-list span{color:var(--muted)}
+    .process{counter-reset:step;display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}
+    .process li{counter-increment:step;display:grid;grid-template-columns:30px 1fr;gap:12px;color:var(--ink-2);font-size:12px;line-height:1.55}
+    .process li:before{content:counter(step,decimal-leading-zero);display:grid;place-items:center;width:27px;height:27px;border:1px solid var(--line);border-radius:2px;color:var(--accent);font:600 9px/1 var(--mono);background:var(--panel-2)}
+    .acceptance{margin-top:16px;padding:13px 15px;border:1px solid var(--line);border-left:2px solid var(--accent);border-radius:2px;background:var(--panel-2);color:var(--muted);font-size:11.5px;line-height:1.55}
+    .acceptance b{color:var(--ink)}
+
+    /* ---- chemistry cards ---- */
     .chem-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .chem{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02)}
-    .chem__tag{color:var(--accent,var(--orange));font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .chem h3{margin:18px 0 0;font-size:23px;line-height:1}
-    .chem ol{margin:13px 0 0;padding-left:18px;color:var(--muted);font-size:10px;line-height:1.6}
-    .chem li{margin:5px 0}
-    .warning{margin-top:14px;padding:13px;border:1px solid rgba(255,83,125,.22);border-radius:13px;background:rgba(255,83,125,.045);color:#bd9aa3;font-size:10px;line-height:1.6}
-    .warning b{color:#ff91aa}
-    .bom-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px}
-    .search{flex:1;min-width:220px;height:42px;padding:0 13px;border:1px solid var(--line);border-radius:11px;background:#080c0f;color:var(--ink);font:500 11px var(--body);outline:0}
-    .search:focus{border-color:rgba(113,245,198,.45)}
-    .filter{height:42px;padding:0 11px;border:1px solid var(--line);border-radius:11px;background:#080c0f;color:var(--soft);font:500 8px var(--mono);letter-spacing:.08em;text-transform:uppercase}
-    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
-    table{width:100%;border-collapse:collapse;font-size:10px}
-    th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-    th{position:sticky;top:0;background:#111a20;color:var(--soft);font:500 8px var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-    td{color:var(--muted)}td b{display:block;color:var(--ink);font-weight:600}td small{display:block;margin-top:3px;color:#66737a;line-height:1.4}
-    td a{color:var(--mint)}tr:last-child td{border-bottom:0}
-    .pill{display:inline-flex;padding:4px 6px;border:1px solid var(--line);border-radius:999px;color:var(--soft);font:500 7px/1 var(--mono);text-transform:uppercase;white-space:nowrap}
-    .source-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-    .source-card{padding:15px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
-    .source-card b{font-family:var(--display);font-size:16px}.source-card span{display:block;margin-top:7px;color:var(--muted);font-size:10px}.source-card a{display:inline-flex;margin-top:10px;color:var(--mint);font:500 8px var(--mono);text-transform:uppercase}
-    .boundary{border-color:rgba(255,83,125,.24);background:linear-gradient(145deg,rgba(29,12,18,.7),rgba(8,10,12,.9))}
-    .boundary p{color:#bea7ae;font-size:11px;line-height:1.7}.boundary strong{color:#ff9ab0}
-    footer{padding:26px 0 60px;color:var(--muted);font-size:10px;text-align:center}
-    @media(max-width:1080px){.layout{grid-template-columns:1fr}.toc{position:static;display:flex;gap:6px;overflow:auto;padding:0 0 4px}.toc__label{display:none}.toc a{border:1px solid var(--line);border-radius:999px;white-space:nowrap}.gate-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:760px){.top__actions .top__link:not(.top__link--accent){display:none}.layout{width:min(100% - 20px,1440px);padding-top:14px}.hero{min-height:560px;padding:24px}.facts{grid-template-columns:repeat(2,1fr)}.section{padding:20px}.section__head,.custom__body{grid-template-columns:1fr}.custom__spec{border-right:0;border-bottom:1px solid var(--line)}.custom__head{grid-template-columns:70px 1fr}.custom__head .status{display:none}.chem-grid,.source-list{grid-template-columns:1fr}.gate-grid{grid-template-columns:1fr}.spec-list div{grid-template-columns:100px 1fr}}
+    .chem{padding:20px;border:1px solid var(--line);border-top:2px solid var(--cp,var(--accent));border-radius:3px;background:var(--panel)}
+    .chem__tag{color:var(--cp,var(--accent));font:600 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .chem h3{margin:14px 0 0;font-size:20px;line-height:1.05;font-weight:600}
+    .chem ol{margin:13px 0 0;padding-left:18px;color:var(--muted);font-size:11.5px;line-height:1.6}
+    .chem li{margin:6px 0}
+    .warning{margin-top:14px;padding:14px 15px;border:1px solid var(--line);border-left:2px solid var(--brick);border-radius:2px;background:var(--panel-2);color:var(--ink-2);font-size:11.5px;line-height:1.6}
+    .warning b{color:var(--brick)}
+
+    /* ---- BOM ---- */
+    .bom-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .search{flex:1;min-width:220px;height:42px;padding:0 14px;border:1px solid var(--line);border-radius:2px;background:var(--panel);color:var(--ink);font:500 12px var(--sans);outline:0}
+    .search::placeholder{color:var(--faint)}
+    .search:focus{border-color:var(--accent)}
+    .filter{height:42px;padding:0 12px;border:1px solid var(--line);border-radius:2px;background:var(--panel);color:var(--ink-2);font:500 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;outline:0}
+    .filter:focus{border-color:var(--accent)}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+    table{width:100%;border-collapse:collapse;font-size:11.5px}
+    th,td{padding:12px 14px;border-bottom:1px solid var(--line-2);text-align:left;vertical-align:top}
+    th{position:sticky;top:0;z-index:1;background:var(--panel-2);color:var(--ink-2);font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:inset 0 -1px 0 var(--line)}
+    td{color:var(--muted)}
+    td b{display:block;color:var(--ink);font-weight:600}
+    td small{display:block;margin-top:4px;color:var(--faint);line-height:1.45}
+    td a{color:var(--accent);font-weight:600}
+    td a:hover{text-decoration:underline}
+    tr:last-child td{border-bottom:0}
+    .pill{display:inline-flex;padding:4px 7px;border:1px solid var(--line);border-radius:2px;background:var(--panel-2);color:var(--ink-2);font:600 8.5px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+
+    /* ---- primary sources ---- */
+    .source-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .source-card{padding:18px;border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+    .source-card b{font:600 16px/1.15 var(--sans);letter-spacing:-.02em;color:var(--ink)}
+    .source-card span{display:block;margin-top:8px;color:var(--muted);font-size:11.5px;line-height:1.5}
+    .source-card a{display:inline-flex;margin-top:12px;color:var(--accent);font:600 9.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+    .source-card a:hover{text-decoration:underline}
+
+    /* ---- safety boundary ---- */
+    .section.boundary{border-left:3px solid var(--brick)}
+    .boundary h2{margin-top:12px;max-width:none}
+    .boundary p{margin:16px 0 0;color:var(--ink-2);font-size:13px;line-height:1.7}
+    .boundary strong{color:var(--brick)}
+
+    /* ---- footer ---- */
+    footer{margin-top:26px;padding:24px 0 40px;border-top:1px solid var(--line);color:var(--muted);font:500 11px/1.6 var(--mono);letter-spacing:.03em;text-align:center}
+
+    /* ---- responsive ---- */
+    @media(max-width:1080px){
+      .layout{grid-template-columns:1fr}
+      .toc{position:static;max-height:none;display:flex;gap:6px;overflow:auto;padding-bottom:6px;margin-bottom:6px}
+      .toc__label{display:none}
+      .toc a{flex:0 0 auto;white-space:nowrap;margin-bottom:0;border-left-width:1px}
+      .toc a.active{border-color:var(--accent);color:var(--accent-ink)}
+      .gate-grid,.facts{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:760px){
+      .top__actions .top__link:not(.top__link--accent){display:none}
+      .layout{width:min(100% - 24px,1440px);padding-top:16px}
+      .top__inner{width:min(100% - 24px,1440px)}
+      .hero{padding:24px}
+      h1{font-size:clamp(2rem,8vw,2.8rem)}
+      .facts{grid-template-columns:repeat(2,1fr)}
+      .section{padding:22px}
+      .section__head,.custom__body{grid-template-columns:1fr}
+      .custom__spec{border-right:0;border-bottom:1px solid var(--line)}
+      .custom__head{grid-template-columns:70px 1fr}
+      .custom__head .status{display:none}
+      .chem-grid,.source-list{grid-template-columns:1fr}
+      .gate-grid{grid-template-columns:1fr}
+      .spec-list div{grid-template-columns:104px 1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
   </style>
 </head>
 <body>
   <header class="top">
     <div class="top__inner">
-      <a class="brand" href="/cbm/"><span class="brand__mark"></span><span>CBM G1 · Build book</span></a>
+      <a class="brand" href="/cbm/"><span class="brand__mark" aria-hidden="true"></span><span>CBM G1 · Build book</span></a>
       <div class="top__actions"><a class="top__link" href="/cbm/">Overview</a><a class="top__link" href="/cbm/viewer/">Interactive CAD</a><a class="top__link top__link--accent" href="/cbm/g1/assets/cbm-g1-bom.csv" download>Download BOM</a></div>
     </div>
   </header>
@@ -140,7 +236,6 @@
 
     <main class="content" id="top">
       <section class="hero">
-        <div class="hero__orbit" aria-hidden="true"></div>
         <div class="hero__eyebrow">Current STEP-backed mechanical reference · 2026-07-19</div>
         <h1>Every part retained. Every clearance inspectable.</h1>
         <p class="hero__lede">The CBM G1 engineering package now includes the actual populated Biocoin envelope, upstream-exact dock headers, a full guarded daughterboard, retained cartridge connector, offset battery cradle and harness, board clips, hard stops, gaskets, latches, source materials, and the gates that prevent nominal CAD from becoming a medical claim.</p>
@@ -172,14 +267,14 @@
       <section class="section" id="gates">
         <div class="section__head"><div><div class="eyebrow">Build logic</div><h2>Custom spend follows proof.</h2></div><p>A passed stage unlocks only the next engineering stage. It never automatically unlocks skin wear.</p></div>
         <div class="gate-grid">
-          <article class="gate"><div class="gate__id">Gate E</div><h3>Electrical truth</h3><p>≤0.5 mV loading error at 1 GΩ; settled cross-talk, temperature, humidity, BLE, and charge checks.</p></article>
-          <article class="gate"><div class="gate__id">Gate C</div><h3>Chemistry</h3><p>Three independent commercial arrays; ladders, residuals, interference, drift, and post-run calibration.</p></article>
-          <article class="gate"><div class="gate__id">Gate Q</div><h3>Quality behavior</h3><p>Every induced fault suppresses the intended output while retaining the labeled raw trace.</p></article>
-          <article class="gate"><div class="gate__id">Gate M / W0</div><h3>Mechanical + integrated</h3><p>Contact, ingress, insertion, fracture, isolation, and full artificial-ISF repeat on the real cartridge.</p></article>
+          <article class="gate" style="--cp:var(--steel)"><div class="gate__id">Gate E</div><h3>Electrical truth</h3><p>≤0.5 mV loading error at 1 GΩ; settled cross-talk, temperature, humidity, BLE, and charge checks.</p></article>
+          <article class="gate" style="--cp:var(--accent)"><div class="gate__id">Gate C</div><h3>Chemistry</h3><p>Three independent commercial arrays; ladders, residuals, interference, drift, and post-run calibration.</p></article>
+          <article class="gate" style="--cp:var(--amber)"><div class="gate__id">Gate Q</div><h3>Quality behavior</h3><p>Every induced fault suppresses the intended output while retaining the labeled raw trace.</p></article>
+          <article class="gate" style="--cp:var(--slate)"><div class="gate__id">Gate M / W0</div><h3>Mechanical + integrated</h3><p>Contact, ingress, insertion, fracture, isolation, and full artificial-ISF repeat on the real cartridge.</p></article>
         </div>
       </section>
 
-      <article class="custom" id="cp01" style="--accent:var(--cyan)">
+      <article class="custom" id="cp01" style="--cp:var(--steel)">
         <div class="custom__head"><div class="custom__id">CP-01</div><h3>Guarded interface daughterboard</h3><span class="status">Custom PCB</span></div>
         <div class="custom__body">
           <div class="custom__spec"><div class="mini-label">Frozen specification</div><div class="spec-list">
@@ -191,7 +286,7 @@
         </div>
       </article>
 
-      <article class="custom" id="cp02" style="--accent:var(--orange)">
+      <article class="custom" id="cp02" style="--cp:var(--amber)">
         <div class="custom__head"><div class="custom__id">CP-02</div><h3>Modular polymer microneedle tile</h3><span class="status">Microfabrication</span></div>
         <div class="custom__body">
           <div class="custom__spec"><div class="mini-label">Frozen specification</div><div class="spec-list">
@@ -203,7 +298,7 @@
         </div>
       </article>
 
-      <article class="custom" id="cp03" style="--accent:var(--rose)">
+      <article class="custom" id="cp03" style="--cp:var(--brick)">
         <div class="custom__head"><div class="custom__id">CP-03</div><h3>316L metal tile · vendor alternate</h3><span class="status">RFQ</span></div>
         <div class="custom__body">
           <div class="custom__spec"><div class="mini-label">RFQ requirements</div><div class="spec-list">
@@ -215,7 +310,7 @@
         </div>
       </article>
 
-      <article class="custom" id="cp04" style="--accent:var(--mint)">
+      <article class="custom" id="cp04" style="--cp:var(--accent)">
         <div class="custom__head"><div class="custom__id">CP-04</div><h3>Twelve-net flex and dry contact boss</h3><span class="status">Custom flex</span></div>
         <div class="custom__body">
           <div class="custom__spec"><div class="mini-label">Stack + geometry</div><div class="spec-list">
@@ -227,7 +322,7 @@
         </div>
       </article>
 
-      <article class="custom" id="cp05" style="--accent:#ffd45b">
+      <article class="custom" id="cp05" style="--cp:var(--slate)">
         <div class="custom__head"><div class="custom__id">CP-05</div><h3>Reference A, reference B, and Pt counter</h3><span class="status">Custom electrochemical</span></div>
         <div class="custom__body">
           <div class="custom__spec"><div class="mini-label">Reference architecture</div><div class="spec-list">
@@ -242,15 +337,15 @@
       <section class="section" id="chemistry">
         <div class="section__head"><div><div class="eyebrow">CP-06 · functionalization</div><h2>Starting recipes, not invented certainty.</h2></div><p>These are transfers from primary methods. Final volumes, thickness, activity, and cure lock only after the G0 area and drift DOE.</p></div>
         <div class="chem-grid">
-          <article class="chem" style="--accent:var(--orange)"><div class="chem__tag">Glucose + duplicate</div><h3>PB / GOx</h3><ol><li>PB CV: −0.2→+0.4 V, 20 mV/s, 15 cycles in fresh 2.5 mM FeCl₃ + 2.5 mM K₃Fe(CN)₆ + 0.1 M KCl in 0.1 M HCl.</li><li>GOx 10 mg/mL mixed 1:1 v/v with 1 wt% chitosan in 1% acetic acid.</li><li>Dry, then 1% PEGDE protection. Duplicate uses a separate deposition lane.</li></ol></article>
-          <article class="chem" style="--accent:var(--rose)"><div class="chem__tag">β-hydroxybutyrate</div><h3>HBD / NAD+ / poly-TBO</h3><ol><li>1 µL 0.2 mM TBO; dry 45 min; electropolymerize +0.9 V for 6 min in 400 µL 0.1 M PBS.</li><li>1 µL 0.1 mg/mL COOH-MWCNT in 0.5 wt% chitosan / 0.1 M acetic acid.</li><li>1 µL HBD 2.5 mg/mL : NAD+ 40 mM at 1:2 v/v in 0.1 M Tris-HCl; overnight 4 °C.</li><li>1 µL 0.5% chitosan then 1 µL 2.0% PVC.</li></ol></article>
-          <article class="chem" style="--accent:var(--cyan)"><div class="chem__tag">Sodium + potassium</div><h3>PEDOT:PSS / ISE</h3><ol><li>PEDOT:PSS: 0.2 wt% EDOT + 4 wt% PSS; CV 0.2→0.9 V, 50 mV/s, 10 cycles; cure 80 °C 1 h before assembly.</li><li>Na: 1 mg ionophore X + 0.55 mg Na-TFPB + 33 mg PVC + 65.45 mg DOS in 660 µL THF.</li><li>K: 2 mg valinomycin + 0.55 mg sodium tetraphenylborate + 33 mg PVC + 65.45 mg DOS in 660 µL THF.</li></ol></article>
-          <article class="chem" style="--accent:var(--violet)"><div class="chem__tag">pH + blank</div><h3>PANI / control</h3><ol><li>PANI: 0.1 M aniline in 0.1 M HCl; CV −0.2→+1.0 V, 100 mV/s, 30 cycles.</li><li>The blank matches the physical stack relevant to the validated use while omitting recognition chemistry.</li><li>No single blank is allowed to “correct” every analyte without a dedicated experiment.</li></ol></article>
+          <article class="chem" style="--cp:var(--steel)"><div class="chem__tag">Glucose + duplicate</div><h3>PB / GOx</h3><ol><li>PB CV: −0.2→+0.4 V, 20 mV/s, 15 cycles in fresh 2.5 mM FeCl₃ + 2.5 mM K₃Fe(CN)₆ + 0.1 M KCl in 0.1 M HCl.</li><li>GOx 10 mg/mL mixed 1:1 v/v with 1 wt% chitosan in 1% acetic acid.</li><li>Dry, then 1% PEGDE protection. Duplicate uses a separate deposition lane.</li></ol></article>
+          <article class="chem" style="--cp:var(--amber)"><div class="chem__tag">β-hydroxybutyrate</div><h3>HBD / NAD+ / poly-TBO</h3><ol><li>1 µL 0.2 mM TBO; dry 45 min; electropolymerize +0.9 V for 6 min in 400 µL 0.1 M PBS.</li><li>1 µL 0.1 mg/mL COOH-MWCNT in 0.5 wt% chitosan / 0.1 M acetic acid.</li><li>1 µL HBD 2.5 mg/mL : NAD+ 40 mM at 1:2 v/v in 0.1 M Tris-HCl; overnight 4 °C.</li><li>1 µL 0.5% chitosan then 1 µL 2.0% PVC.</li></ol></article>
+          <article class="chem" style="--cp:var(--accent)"><div class="chem__tag">Sodium + potassium</div><h3>PEDOT:PSS / ISE</h3><ol><li>PEDOT:PSS: 0.2 wt% EDOT + 4 wt% PSS; CV 0.2→0.9 V, 50 mV/s, 10 cycles; cure 80 °C 1 h before assembly.</li><li>Na: 1 mg ionophore X + 0.55 mg Na-TFPB + 33 mg PVC + 65.45 mg DOS in 660 µL THF.</li><li>K: 2 mg valinomycin + 0.55 mg sodium tetraphenylborate + 33 mg PVC + 65.45 mg DOS in 660 µL THF.</li></ol></article>
+          <article class="chem" style="--cp:var(--slate)"><div class="chem__tag">pH + blank</div><h3>PANI / control</h3><ol><li>PANI: 0.1 M aniline in 0.1 M HCl; CV −0.2→+1.0 V, 100 mV/s, 30 cycles.</li><li>The blank matches the physical stack relevant to the validated use while omitting recognition chemistry.</li><li>No single blank is allowed to “correct” every analyte without a dedicated experiment.</li></ol></article>
         </div>
         <div class="warning"><b>Method boundary:</b> the dopamine–hyaluronic-acid hydrogel ketone route and a P4VP patent embodiment are separate. G1 does not blend them and call the hybrid published.</div>
       </section>
 
-      <article class="custom" id="cp07" style="--accent:var(--violet)">
+      <article class="custom" id="cp07" style="--cp:var(--amber)">
         <div class="custom__head"><div class="custom__id">CP-07</div><h3>Shell, passivation, gasket, and adhesive</h3><span class="status">Print + convert</span></div>
         <div class="custom__body">
           <div class="custom__spec"><div class="mini-label">Mechanical stack</div><div class="spec-list">
@@ -281,7 +376,7 @@
       </section>
 
       <section class="section boundary" id="boundary">
-        <div class="eyebrow" style="color:var(--rose)">Non-negotiable boundary</div><h2>Exact manufacturing notes are not a self-test protocol.</h2>
+        <div class="eyebrow" style="color:var(--brick)">Non-negotiable boundary</div><h2>Exact manufacturing notes are not a self-test protocol.</h2>
         <p><strong>Bench work stops at artificial ISF, mechanical phantoms, and approved ex-vivo fixtures.</strong> A human microneedle study requires IRB review, the correct IDE/NSR or exemption determination, investigational labeling, informed consent, device-level biological evaluation, sterilization and packaging evidence, electrical and battery safety, comparators, monitoring, and adverse-event stop rules. Passing Gate W0 does not waive any of that.</p>
       </section>
       <footer>CBM G1 is a research-stage engineering reference. Not a medical device. Source snapshot: 2026-07-19.</footer>
