@@ -13,197 +13,280 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="CBM G1 is a sourced, open-hardware research platform for multi-analyte interstitial-fluid sensing, rebuilt from first principles with explicit evidence and manufacturing boundaries.">
-  <meta name="theme-color" content="#050709">
+  <meta name="theme-color" content="#eef1f1">
   <link rel="canonical" href="https://statskeybiometrics.com/cbm/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2218%22 fill=%22%23050a0d%22/%3E%3Ccircle cx=%2224%22 cy=%2234%22 r=%2211%22 fill=%22%2371f5c6%22/%3E%3Ccircle cx=%2243%22 cy=%2220%22 r=%226%22 fill=%22%237edcff%22/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%228%22 fill=%22%23eef1f1%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2215%22 fill=%22none%22 stroke=%22%23125e5c%22 stroke-width=%223%22/%3E%3Cpath d=%22M32 9v46M9 32h46%22 stroke=%22%23125e5c%22 stroke-width=%222.4%22/%3E%3C/svg%3E">
   <title>CBM G1 | Continuous Chemistry, Honestly Engineered</title>
   <style>
     :root{
-      --bg:#050709;
-      --bg2:#090d11;
-      --panel:#0d1319;
-      --ink:#f3f7f9;
-      --soft:#bbc7cc;
-      --muted:#738087;
-      --line:rgba(210,235,238,.13);
-      --mint:#71f5c6;
-      --cyan:#7edcff;
-      --orange:#ff8d55;
-      --rose:#ff537d;
-      --violet:#9d88ff;
-      --display:"Space Grotesk",sans-serif;
-      --body:"Manrope",sans-serif;
-      --mono:"DM Mono",monospace;
+      --paper:#eef1f1;
+      --panel:#f9fbfb;
+      --panel-2:#f2f5f5;
+      --ink:#0e1518;
+      --ink-2:#39454a;
+      --muted:#647177;
+      --faint:#96a1a6;
+      --line:rgba(14,21,24,.16);
+      --line-2:rgba(14,21,24,.09);
+      --accent:#125e5c;
+      --accent-ink:#0b4442;
+      --accent-dark:#5fd0c4;
+      --steel:#2b5871;
+      --slate:#5c6970;
+      --amber:#8a5a15;
+      --brick:#a23a37;
+      --plate:#0a0f10;
+      --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
     }
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth;background:var(--bg)}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-    body:before{content:"";position:fixed;inset:0;z-index:-3;background:
-      radial-gradient(ellipse 55% 35% at 72% 8%,rgba(126,220,255,.12),transparent 72%),
-      radial-gradient(ellipse 45% 32% at 18% 22%,rgba(113,245,198,.08),transparent 74%),
-      linear-gradient(180deg,#050709 0%,#06090c 58%,#030405 100%)}
-    body:after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.35;background-image:
-      linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-      background-size:64px 64px;mask-image:linear-gradient(to bottom,#000,transparent 82%)}
+    html{scroll-behavior:smooth;background:var(--paper);-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+      background-image:
+        linear-gradient(rgba(14,21,24,.038) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(14,21,24,.038) 1px,transparent 1px);
+      background-size:46px 46px;
+      mask-image:radial-gradient(ellipse 130% 92% at 50% -2%,#000 32%,transparent 80%)}
     a{color:inherit;text-decoration:none}
-    .shell{width:min(1240px,calc(100% - 40px));margin:0 auto}
-    .nav{position:fixed;inset:0 0 auto;z-index:50;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(5,7,9,.72);backdrop-filter:blur(24px) saturate(150%)}
-    .nav__inner{height:68px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-    .brand{display:inline-flex;align-items:center;gap:11px;font:600 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase}
-    .brand__mark{position:relative;width:24px;height:24px;border:1px solid rgba(113,245,198,.5);border-radius:50%;box-shadow:inset 0 0 18px rgba(113,245,198,.16),0 0 24px rgba(113,245,198,.08)}
-    .brand__mark:before,.brand__mark:after{content:"";position:absolute;border-radius:50%;background:var(--mint)}
-    .brand__mark:before{width:7px;height:7px;left:4px;top:8px}
-    .brand__mark:after{width:4px;height:4px;right:4px;top:5px;background:var(--cyan)}
-    .nav__links{display:flex;align-items:center;gap:24px;color:var(--soft);font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
-    .nav__links a{transition:color .2s ease}.nav__links a:hover{color:var(--mint)}
-    .nav__cta{padding:10px 14px;border:1px solid rgba(113,245,198,.34);border-radius:999px;color:var(--mint)!important;background:rgba(113,245,198,.06)}
-    .hero{position:relative;min-height:100svh;padding:118px 0 70px;display:grid;align-items:center}
-    .hero__grid{display:grid;grid-template-columns:minmax(0,.84fr) minmax(480px,1.16fr);gap:clamp(28px,5vw,76px);align-items:center}
-    .kicker{display:flex;align-items:center;gap:10px;color:var(--mint);font:500 10px/1.3 var(--mono);letter-spacing:.16em;text-transform:uppercase}
-    .kicker:before{content:"";width:28px;height:1px;background:currentColor;box-shadow:0 0 10px currentColor}
-    h1,h2,h3{margin:0;font-family:var(--display);letter-spacing:-.055em}
-    h1{margin-top:20px;max-width:780px;font-size:clamp(3.8rem,7.8vw,8rem);line-height:.86;font-weight:600}
-    h1 em{display:block;color:transparent;font-style:normal;-webkit-text-stroke:1px rgba(243,247,249,.45)}
-    .lede{max-width:660px;margin:28px 0 0;color:var(--soft);font-size:clamp(1.04rem,1.55vw,1.26rem);line-height:1.7}
-    .hero__proof{display:flex;flex-wrap:wrap;gap:9px;margin-top:27px}
-    .proof{padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.025);color:#9eabb1;font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .proof b{color:var(--ink);font-weight:500}
-    .actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:34px}
-    .button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 19px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04);font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:transform .2s,border-color .2s,background .2s}
-    .button:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.07)}
-    .button--primary{border-color:transparent;background:var(--mint);color:#04100d}
-    .button--primary:hover{background:#9affda;border-color:transparent}
+    img{display:block;max-width:100%}
+    .shell{width:min(1220px,calc(100% - 48px));margin:0 auto}
+    section[id]{scroll-margin-top:82px}
+
+    /* ---- nav ---- */
+    .nav{position:fixed;inset:0 0 auto;z-index:50;background:rgba(238,241,241,.85);backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--line)}
+    .nav__inner{height:60px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:inline-flex;align-items:center;gap:11px;font:600 12px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink)}
+    .brand__mark{position:relative;width:20px;height:20px;border:1px solid var(--accent);border-radius:50%}
+    .brand__mark:before,.brand__mark:after{content:"";position:absolute;background:var(--accent)}
+    .brand__mark:before{left:50%;top:3px;bottom:3px;width:1px;transform:translateX(-50%)}
+    .brand__mark:after{top:50%;left:3px;right:3px;height:1px;transform:translateY(-50%)}
+    .nav__links{display:flex;align-items:center;gap:22px;color:var(--ink-2);font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+    .nav__links a{transition:color .18s ease}
+    .nav__links a:hover{color:var(--accent)}
+    .nav__cta{padding:9px 15px;border:1px solid var(--accent);border-radius:2px;color:#fff!important;background:var(--accent)}
+    .nav__cta:hover{background:var(--accent-ink)}
+
+    /* ---- shared type ---- */
+    h1,h2,h3{margin:0;font-family:var(--sans);letter-spacing:-.02em;color:var(--ink)}
+    .kicker{display:inline-flex;align-items:center;gap:11px;color:var(--accent);font:500 11px/1.4 var(--mono);letter-spacing:.17em;text-transform:uppercase}
+    .kicker:before{content:"";width:24px;height:1px;background:currentColor}
+    .sec-index{color:var(--muted);font:500 11px/1.4 var(--mono);letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px}
+    .sec-index b{color:var(--accent);font-weight:600}
+
+    /* ---- buttons ---- */
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+    .button{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:47px;padding:0 20px;border:1px solid var(--line);border-radius:2px;background:transparent;color:var(--ink);font:500 11px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;transition:border-color .18s,background .18s,color .18s}
+    .button:hover{border-color:var(--ink);background:rgba(14,21,24,.045)}
     .button svg{width:15px;height:15px}
-    .hero__visual{position:relative;min-height:680px;display:grid;place-items:center;isolation:isolate}
-    .hero__visual:before{content:"";position:absolute;width:88%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(113,245,198,.14),rgba(126,220,255,.05) 38%,transparent 70%);filter:blur(10px);z-index:-1}
-    .hero__visual:after{content:"";position:absolute;width:76%;aspect-ratio:1;border:1px solid rgba(126,220,255,.12);border-radius:50%;z-index:-1;box-shadow:0 0 0 40px rgba(126,220,255,.018),0 0 0 96px rgba(126,220,255,.012)}
-    .hero__render{width:min(760px,115%);max-width:none;filter:drop-shadow(0 36px 64px rgba(0,0,0,.55));transform:translateX(-2%) rotate(-1deg)}
-    .mobile-product{display:none}
-    .float-card{position:absolute;max-width:210px;padding:13px 14px;border:1px solid var(--line);border-radius:16px;background:rgba(8,13,17,.82);backdrop-filter:blur(16px);box-shadow:0 16px 40px rgba(0,0,0,.24)}
-    .float-card b{display:block;color:var(--ink);font:500 10px/1.2 var(--mono);letter-spacing:.11em;text-transform:uppercase}
-    .float-card span{display:block;margin-top:6px;color:var(--muted);font-size:11px;line-height:1.45}
-    .float-card--one{right:0;top:18%}.float-card--two{left:-3%;bottom:15%}
-    .signal{position:absolute;left:9%;top:17%;width:42%;height:1px;background:linear-gradient(90deg,transparent,var(--mint),transparent);opacity:.5;transform:rotate(-18deg);box-shadow:0 0 18px var(--mint)}
-    .scroll-cue{position:absolute;left:20px;bottom:20px;writing-mode:vertical-rl;color:#66747a;font:500 9px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase}
-    .scroll-cue:after{content:"";display:inline-block;width:1px;height:56px;margin-top:12px;background:linear-gradient(var(--mint),transparent)}
-    .section{padding:clamp(88px,11vw,150px) 0}
-    .section--tight{padding-top:40px}
-    .section-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.48fr);gap:44px;align-items:end;margin-bottom:44px}
-    h2{max-width:920px;font-size:clamp(2.7rem,5.5vw,5.9rem);line-height:.93;font-weight:600}
-    h2 span{color:var(--mint)}
-    .section-head p{margin:0;color:var(--soft);font-size:15px;line-height:1.75}
-    .principles{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-    .principle{position:relative;min-height:250px;padding:25px 23px;border-right:1px solid var(--line)}
+    .button--primary{border-color:var(--accent);background:var(--accent);color:#fff}
+    .button--primary:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:#fff}
+
+    /* ---- figure plate (hosts dark renders) ---- */
+    .plate{position:relative;border:1px solid var(--line);background:var(--plate);border-radius:3px;overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.5) inset}
+    .plate__img{width:100%;aspect-ratio:1824/1400;object-fit:cover;background:var(--plate);display:block}
+    .plate__frame{position:absolute;inset:0;pointer-events:none;z-index:2}
+    .plate:before,.plate:after,.plate__frame:before,.plate__frame:after{content:"";position:absolute;width:11px;height:11px;pointer-events:none;z-index:3}
+    .plate:before{top:11px;left:11px;border-top:1px solid rgba(255,255,255,.45);border-left:1px solid rgba(255,255,255,.45)}
+    .plate:after{top:11px;right:11px;border-top:1px solid rgba(255,255,255,.45);border-right:1px solid rgba(255,255,255,.45)}
+    .plate__frame:before{bottom:11px;left:11px;border-bottom:1px solid rgba(255,255,255,.45);border-left:1px solid rgba(255,255,255,.45)}
+    .plate__frame:after{bottom:11px;right:11px;border-bottom:1px solid rgba(255,255,255,.45);border-right:1px solid rgba(255,255,255,.45)}
+    .plate__cap{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 16px;background:linear-gradient(transparent,rgba(4,8,8,.9));z-index:4}
+    .plate__cap span{color:#b9c6c6;font:500 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .plate__cap a{color:var(--accent-dark);font:600 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+    .plate__cap a:hover{text-decoration:underline}
+    .note{position:absolute;max-width:214px;padding:12px 13px;border:1px solid rgba(255,255,255,.18);border-radius:3px;background:rgba(7,12,12,.82);z-index:4}
+    .note b{display:block;color:#e9f2f1;font:600 9.5px/1.35 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .note b i{font-style:normal;color:var(--accent-dark)}
+    .note span{display:block;margin-top:6px;color:#9db0b0;font-size:11px;line-height:1.45}
+    .note--tr{top:15px;right:15px}
+    .note--bl{left:15px;bottom:64px}
+
+    /* ---- hero ---- */
+    .hero{padding:118px 0 60px}
+    .hero__grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(30px,4.6vw,66px);align-items:center}
+    h1{margin:20px 0 0;font-size:clamp(2.5rem,5.1vw,4.25rem);line-height:1.02;font-weight:600;letter-spacing:-.028em;max-width:15ch;text-wrap:balance;overflow-wrap:break-word}
+    h1 .u{display:block;color:var(--muted)}
+    .lede{max-width:560px;margin:24px 0 0;color:var(--ink-2);font-size:clamp(1rem,1.25vw,1.12rem);line-height:1.62}
+    .readout{display:grid;grid-template-columns:repeat(4,1fr);margin-top:30px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .readout>div{padding:15px 14px 15px 0;border-right:1px solid var(--line-2)}
+    .readout>div:last-child{border-right:0}
+    .readout b{display:block;font:600 23px/1 var(--sans);letter-spacing:-.03em;color:var(--ink)}
+    .readout span{display:block;margin-top:8px;color:var(--muted);font:500 9px/1.35 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+
+    /* ---- section frame ---- */
+    .section{padding:clamp(62px,8vw,108px) 0}
+    .section--tight{padding-top:46px}
+    .sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.5fr);gap:38px;align-items:end;padding-bottom:26px;margin-bottom:36px;border-bottom:1px solid var(--line)}
+    h2{font-size:clamp(1.85rem,3.3vw,2.9rem);line-height:1.06;font-weight:600;max-width:20ch;text-wrap:balance}
+    h2 .hl{color:var(--accent)}
+    .sec-head p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.66}
+
+    /* ---- principles ---- */
+    .principles{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:3px;background:var(--panel);overflow:hidden}
+    .principle{display:flex;flex-direction:column;min-height:236px;padding:24px 22px;border-right:1px solid var(--line-2)}
     .principle:last-child{border-right:0}
-    .principle__n{color:var(--mint);font:500 11px/1 var(--mono);letter-spacing:.1em}
-    .principle h3{margin-top:58px;font-size:26px;line-height:1.03}
-    .principle p{margin:13px 0 0;color:var(--muted);font-size:13px;line-height:1.65}
-    .architecture{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:16px}
-    .render-card,.spec-stack{border:1px solid var(--line);border-radius:30px;background:linear-gradient(155deg,rgba(16,27,34,.86),rgba(7,10,13,.7));overflow:hidden}
-    .render-card{position:relative;min-height:720px;display:grid;place-items:center}
-    .render-card:before{content:"";position:absolute;inset:0;background:
-      radial-gradient(circle at 50% 45%,rgba(126,220,255,.11),transparent 42%),
-      linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-      background-size:auto,48px 48px,48px 48px}
-    .render-card img{position:relative;width:112%;max-width:none;filter:drop-shadow(0 28px 54px rgba(0,0,0,.55))}
-    .render-card__bar{position:absolute;inset:auto 20px 20px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(5,8,10,.78);backdrop-filter:blur(14px)}
-    .render-card__bar span{color:var(--muted);font:500 9px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .render-card__bar a{color:var(--mint);font:500 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .spec-stack{display:flex;flex-direction:column}
-    .spec{flex:1;padding:23px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+    .principle__n{color:var(--accent);font:600 12px/1 var(--mono);letter-spacing:.06em}
+    .principle h3{margin-top:44px;font-size:20px;line-height:1.14;font-weight:600}
+    .principle p{margin:12px 0 0;color:var(--muted);font-size:13px;line-height:1.6}
+
+    /* ---- panel + verdict ---- */
+    .panel{position:relative;padding:clamp(24px,3.6vw,40px);border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+    .panel--accent{border-left:3px solid var(--accent)}
+    .panel h3{margin:14px 0 0;font-size:clamp(1.4rem,2.5vw,2.05rem);line-height:1.14;font-weight:600;letter-spacing:-.025em;max-width:30ch}
+    .panel>p{margin:16px 0 0;color:var(--ink-2);font-size:14px;line-height:1.72;max-width:74ch}
+    .truth{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+    .truth div{padding:17px;border:1px solid var(--line);border-radius:3px;background:var(--panel-2)}
+    .truth b{display:block;font:600 25px/1 var(--sans);letter-spacing:-.03em;color:var(--ink)}
+    .truth span{display:block;margin-top:10px;color:var(--muted);font-size:11.5px;line-height:1.5}
+
+    /* ---- utility tiers ---- */
+    .tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+    .tier{position:relative;display:flex;flex-direction:column;min-height:296px;padding:22px 20px;border:1px solid var(--line);border-top:2px solid var(--t);border-radius:3px;background:var(--panel)}
+    .tier__tag{color:var(--t);font:600 9px/1.35 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .tier h3{margin-top:16px;font-size:19px;line-height:1.12;font-weight:600}
+    .tier p{margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.58}
+    .tier b{color:var(--ink-2);font-weight:600}
+    .chain{display:grid;grid-template-columns:repeat(4,1fr);margin-top:24px;border:1px solid var(--line);border-radius:3px;background:var(--panel);overflow:hidden}
+    .chain div{padding:17px;border-right:1px solid var(--line-2);color:var(--muted);font-size:11.5px;line-height:1.55}
+    .chain div:last-child{border-right:0}
+    .chain b{display:block;margin-bottom:8px;color:var(--ink);font:600 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .claims{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+    .claim{padding:24px;border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+    .claim--yes{border-left:3px solid var(--accent)}
+    .claim--no{border-left:3px solid var(--brick)}
+    .claim h3{font-size:19px;line-height:1.12;font-weight:600}
+    .claim p{margin:12px 0 0;color:var(--muted);font-size:12.5px;line-height:1.62}
+    .sources{display:flex;flex-wrap:wrap;gap:9px 20px;margin-top:22px}
+    .source-link{display:inline-flex;align-items:center;color:var(--accent);font:500 10px/1.4 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+    .source-link:after{content:" \2197";margin-left:5px}
+    .source-link:hover{color:var(--accent-ink);text-decoration:underline}
+
+    /* ---- architecture ---- */
+    .arch{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px}
+    .spec-stack{display:grid;grid-template-rows:repeat(4,1fr);border:1px solid var(--line);border-radius:3px;background:var(--panel);overflow:hidden}
+    .spec{display:flex;flex-direction:column;justify-content:center;padding:20px 22px;border-bottom:1px solid var(--line-2)}
     .spec:last-child{border-bottom:0}
-    .spec__label{color:var(--muted);font:500 9px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase}
-    .spec strong{display:block;font-family:var(--display);font-size:clamp(28px,3.2vw,44px);letter-spacing:-.05em;line-height:.9}
-    .spec p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
-    .utility-verdict{padding:clamp(25px,4.5vw,48px);border:1px solid rgba(113,245,198,.24);border-radius:30px;background:radial-gradient(circle at 88% 8%,rgba(113,245,198,.12),transparent 34%),linear-gradient(145deg,rgba(14,25,28,.92),rgba(7,10,12,.86))}
-    .utility-verdict h3{max-width:980px;margin-top:18px;font-size:clamp(2rem,4vw,4.2rem);line-height:.96}
-    .utility-verdict>p{max-width:900px;margin:18px 0 0;color:var(--soft);font-size:14px;line-height:1.75}
-    .utility-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:14px}
-    .utility-card{position:relative;min-height:310px;padding:22px;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.015))}
-    .utility-card:after{content:"";position:absolute;width:150px;height:150px;right:-70px;bottom:-70px;border-radius:50%;background:var(--utility);filter:blur(54px);opacity:.18}
-    .utility-card__tag{color:var(--utility);font:500 9px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
-    .utility-card h3{position:relative;margin-top:42px;font-size:27px;line-height:1}
-    .utility-card p{position:relative;margin:13px 0 0;color:var(--muted);font-size:12px;line-height:1.62}
-    .utility-card b{color:var(--soft)}
-    .utility-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-    .utility-step{padding:17px;border-right:1px solid var(--line);color:var(--muted);font-size:11px;line-height:1.55}
-    .utility-step:last-child{border-right:0}.utility-step b{display:block;margin-bottom:7px;color:var(--ink);font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .truth-table{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:24px}
-    .truth-cell{min-height:145px;padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.18)}
-    .truth-cell b{display:block;font-family:var(--display);font-size:25px;line-height:1;letter-spacing:-.04em}
-    .truth-cell span{display:block;margin-top:9px;color:var(--muted);font-size:11px;line-height:1.55}
-    .claim-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin-top:14px}
-    .claim{padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.18)}
-    .claim h3{font-size:25px;line-height:1}.claim p{margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.65}
-    .claim--yes{border-color:rgba(113,245,198,.23);background:rgba(113,245,198,.045)}.claim--no{border-color:rgba(255,83,125,.23);background:rgba(255,83,125,.045)}
-    .source-link{display:inline-flex;margin-top:18px;color:var(--mint);font:500 9px/1.4 var(--mono);letter-spacing:.09em;text-transform:uppercase}
-    .channel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
-    .channel{position:relative;min-height:245px;padding:21px;border:1px solid var(--line);border-radius:23px;overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.015))}
-    .channel:before{content:"";position:absolute;width:160px;height:160px;right:-70px;top:-70px;border-radius:50%;background:var(--channel);filter:blur(64px);opacity:.22}
-    .channel__top{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .channel__dot{width:8px;height:8px;border-radius:50%;background:var(--channel);box-shadow:0 0 16px var(--channel)}
-    .channel h3{position:relative;margin-top:62px;font-size:30px;line-height:.96}
-    .channel p{position:relative;margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
-    .channel__evidence{position:absolute;left:21px;bottom:19px;color:var(--channel);font:500 9px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-    .build-path{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .build-card{position:relative;min-height:520px;padding:30px;border:1px solid var(--line);border-radius:30px;overflow:hidden;background:linear-gradient(155deg,rgba(18,28,35,.88),rgba(7,10,12,.74))}
-    .build-card:after{content:"";position:absolute;width:320px;height:320px;right:-150px;bottom:-160px;border-radius:50%;background:var(--glow);filter:blur(70px);opacity:.15}
-    .build-card__tag{color:var(--accent);font:500 10px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase}
-    .build-card h3{margin-top:28px;font-size:clamp(2.2rem,4vw,4rem);line-height:.93}
-    .build-card>p{max-width:580px;margin:20px 0 0;color:var(--soft);font-size:14px;line-height:1.7}
-    .build-list{position:absolute;inset:auto 30px 30px;display:grid;gap:0;border-top:1px solid var(--line)}
-    .build-list div{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);color:var(--muted);font-size:12px}
-    .build-list b{color:var(--accent);font:500 10px/1.5 var(--mono)}
-    .custom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .custom{padding:23px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.022)}
-    .custom__type{color:var(--orange);font:500 9px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
-    .custom h3{margin-top:22px;font-size:25px;line-height:1}
-    .custom p{margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
-    .custom a{display:inline-flex;margin-top:18px;color:var(--mint);font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .evidence-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:var(--line)}
-    .evidence{min-height:280px;padding:22px;background:#080c0f}
-    .evidence__level{display:inline-flex;padding:6px 8px;border:1px solid currentColor;border-radius:999px;color:var(--level);font:500 8px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .evidence h3{margin-top:46px;font-size:23px;line-height:1.02}
-    .evidence p{margin:12px 0 0;color:var(--muted);font-size:11px;line-height:1.55}
-    .evidence a{display:inline-flex;margin-top:15px;color:var(--soft);font:500 9px/1 var(--mono);text-transform:uppercase}
-    .boundary{position:relative;padding:clamp(32px,6vw,70px);border:1px solid rgba(255,83,125,.25);border-radius:34px;overflow:hidden;background:
-      radial-gradient(circle at 90% 10%,rgba(255,83,125,.12),transparent 35%),
-      linear-gradient(145deg,rgba(25,12,17,.86),rgba(8,9,11,.9))}
-    .boundary__grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(300px,.5fr);gap:52px;align-items:end}
-    .boundary h2{font-size:clamp(2.6rem,5vw,5.3rem)}
-    .boundary p{margin:20px 0 0;color:#c6adb5;max-width:760px;font-size:14px;line-height:1.75}
+    .spec__label{color:var(--muted);font:500 9.5px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase}
+    .spec strong{display:block;margin-top:11px;font:600 clamp(24px,2.6vw,35px)/.96 var(--sans);letter-spacing:-.035em;color:var(--ink)}
+    .spec p{margin:9px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+
+    /* ---- channels ---- */
+    .channels{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .channel{display:flex;flex-direction:column;min-height:206px;padding:20px;border:1px solid var(--line);border-left:2px solid var(--c);border-radius:3px;background:var(--panel)}
+    .channel__top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font:500 9.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+    .channel__dot{width:7px;height:7px;border-radius:50%;background:var(--c)}
+    .channel h3{margin-top:auto;padding-top:32px;font-size:22px;line-height:1;font-weight:600;letter-spacing:-.02em}
+    .channel p{margin:10px 0 0;color:var(--muted);font-size:12px;line-height:1.52}
+    .channel__ev{margin-top:12px;color:var(--c);font:600 9px/1.3 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+
+    /* ---- build order ---- */
+    .builds{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .build{position:relative;padding:28px;border:1px solid var(--line);border-top:2px solid var(--b);border-radius:3px;background:var(--panel)}
+    .build__tag{color:var(--b);font:600 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+    .build h3{margin-top:20px;font-size:clamp(1.4rem,2.3vw,1.95rem);line-height:1.08;font-weight:600;letter-spacing:-.025em}
+    .build>p{margin:15px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.62;max-width:52ch}
+    .build-list{margin-top:24px;border-top:1px solid var(--line-2)}
+    .build-list div{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-2);color:var(--muted);font-size:12px;line-height:1.45}
+    .build-list div:last-child{border-bottom:0}
+    .build-list b{color:var(--b);font:600 10px/1.5 var(--mono)}
+
+    /* ---- custom parts ---- */
+    .customs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .custom{padding:23px;border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+    .custom__type{color:var(--accent);font:600 9.5px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase}
+    .custom h3{margin-top:16px;font-size:19px;line-height:1.1;font-weight:600}
+    .custom p{margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.58}
+    .custom a{display:inline-flex;margin-top:17px;color:var(--accent);font:600 9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+    .custom a:hover{text-decoration:underline}
+
+    /* ---- evidence ---- */
+    .evidence-strip{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:3px;background:var(--panel);overflow:hidden}
+    .evidence{display:flex;flex-direction:column;min-height:238px;padding:20px;border-right:1px solid var(--line-2)}
+    .evidence:last-child{border-right:0}
+    .evidence__level{align-self:flex-start;padding:5px 8px;border:1px solid currentColor;border-radius:2px;color:var(--lv);font:600 8.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+    .evidence h3{margin-top:auto;padding-top:28px;font-size:18px;line-height:1.1;font-weight:600}
+    .evidence p{margin:10px 0 0;color:var(--muted);font-size:11.5px;line-height:1.5}
+    .evidence a{margin-top:13px;color:var(--accent);font:600 9px/1.3 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+    .evidence a:hover{text-decoration:underline}
+
+    /* ---- boundary ---- */
+    .boundary{position:relative;padding:clamp(28px,4.4vw,52px);border:1px solid var(--line);border-left:3px solid var(--brick);border-radius:3px;background:var(--panel)}
+    .boundary__grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.5fr);gap:44px;align-items:start}
+    .boundary .kicker{color:var(--brick)}
+    .boundary h2{margin-top:14px;max-width:none}
+    .boundary p{margin:16px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.72;max-width:70ch}
     .boundary__rules{display:grid;gap:10px}
-    .boundary__rules div{padding:13px 15px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(0,0,0,.16);color:#bdaab0;font-size:12px}
-    .boundary__rules b{color:#ff92aa;font:500 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .final{padding-bottom:80px;text-align:center}
-    .final h2{margin:0 auto;max-width:1000px}
-    .final p{max-width:670px;margin:23px auto 0;color:var(--muted)}
+    .boundary__rules div{padding:14px 15px;border:1px solid var(--line);border-radius:3px;background:var(--panel-2);color:var(--ink-2);font-size:12px;line-height:1.5}
+    .boundary__rules b{display:block;margin-bottom:5px;color:var(--brick);font:600 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+
+    /* ---- final ---- */
+    .final{text-align:center;padding-bottom:96px}
+    .final .kicker{justify-content:center}
+    .final h2{margin:16px auto 0;max-width:26ch}
+    .final p{max-width:62ch;margin:16px auto 0;color:var(--muted);font-size:14.5px;line-height:1.66}
     .final .actions{justify-content:center}
-    footer{padding:25px 0;border-top:1px solid var(--line);color:var(--muted);font-size:11px}
+
+    /* ---- footer ---- */
+    footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font:500 11px/1.6 var(--mono);letter-spacing:.04em}
     footer .shell{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     footer nav{display:flex;gap:18px;flex-wrap:wrap}
-    .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+    footer a:hover{color:var(--accent)}
+
+    /* ---- reveal ---- */
+    .reveal{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease}
     .reveal.in{opacity:1;transform:none}
-    @media(max-width:1050px){
-      .hero__grid{grid-template-columns:1fr}.hero__copy{padding-top:34px}.hero__visual{min-height:580px}.hero__render{width:min(820px,100%)}.float-card--two{left:4%}
-      .principles,.channel-grid,.utility-grid,.truth-table{grid-template-columns:repeat(2,1fr)}.principle:nth-child(2){border-right:0}.principle:nth-child(-n+2){border-bottom:1px solid var(--line)}
-      .architecture{grid-template-columns:1fr}.render-card{min-height:620px}.spec-stack{display:grid;grid-template-columns:repeat(2,1fr)}.spec{border-right:1px solid var(--line)}.spec:nth-child(even){border-right:0}
-      .evidence-strip{grid-template-columns:repeat(2,1fr)}.evidence:last-child{grid-column:1/-1}
+
+    /* ---- responsive ---- */
+    @media(max-width:1080px){
+      .hero__grid{grid-template-columns:1fr}
+      .principles,.channels,.tiers,.truth{grid-template-columns:repeat(2,1fr)}
+      .principle:nth-child(2){border-right:0}
+      .principle:nth-child(-n+2){border-bottom:1px solid var(--line-2)}
+      .channel{border-left-width:2px}
+      .arch{grid-template-columns:1fr}
+      .spec-stack{grid-template-rows:none;grid-template-columns:repeat(2,1fr)}
+      .spec{border-right:1px solid var(--line-2)}
+      .spec:nth-child(2n){border-right:0}
+      .spec:nth-child(-n+2){border-bottom:1px solid var(--line-2)}
+      .evidence-strip{grid-template-columns:repeat(2,1fr)}
+      .evidence{border-bottom:1px solid var(--line-2)}
+      .evidence:last-child{grid-column:1/-1}
+      .customs{grid-template-columns:repeat(2,1fr)}
+      .chain{grid-template-columns:repeat(2,1fr)}
+      .chain div:nth-child(2){border-right:0}
+      .chain div:nth-child(-n+2){border-bottom:1px solid var(--line-2)}
+      .sec-head,.boundary__grid{grid-template-columns:1fr}
     }
-    @media(max-width:760px){
-      .shell{width:min(100% - 28px,1240px)}.nav__links a:not(.nav__cta){display:none}.nav__inner{height:60px}
-      .hero{padding-top:96px}.hero__grid{gap:0}.hero__visual{display:none}.mobile-product{display:block;width:106%;margin:16px -3% 10px;border-radius:24px;filter:drop-shadow(0 24px 46px rgba(0,0,0,.5))}.float-card{display:none}.scroll-cue{display:none}
-      h1{font-size:clamp(3.55rem,17vw,5.8rem)}.section-head,.boundary__grid{grid-template-columns:1fr}.section-head{gap:22px}
-      .principles,.utility-grid,.truth-table,.claim-grid,.channel-grid,.build-path,.custom-grid,.evidence-strip{grid-template-columns:1fr}
-      .utility-chain{grid-template-columns:1fr}.utility-step{border-right:0;border-bottom:1px solid var(--line)}.utility-step:last-child{border-bottom:0}
-      .principle{border-right:0;border-bottom:1px solid var(--line)}.principle:last-child{border-bottom:0}.principle:nth-child(-n+2){border-bottom:1px solid var(--line)}
-      .render-card{min-height:470px}.render-card img{width:135%}.render-card__bar{inset:auto 12px 12px}.render-card__bar span{display:none}
-      .spec-stack{grid-template-columns:1fr}.spec{border-right:0}.build-card{min-height:560px}.evidence:last-child{grid-column:auto}
+    @media(max-width:720px){
+      .shell{width:min(100% - 30px,1220px)}
+      .nav__links a:not(.nav__cta){display:none}
+      .nav__inner{height:56px}
+      .hero{padding-top:94px}
+      h1{font-size:clamp(2.4rem,10vw,3.4rem)}
+      .readout{grid-template-columns:repeat(2,1fr)}
+      .readout>div{padding-right:14px}
+      .readout>div:nth-child(2){border-right:0}
+      .readout>div:nth-child(-n+2){border-bottom:1px solid var(--line-2);padding-bottom:15px}
+      .readout>div:nth-child(3),.readout>div:nth-child(4){padding-top:15px}
+      .principles,.channels,.tiers,.truth,.claims,.builds,.customs,.evidence-strip,.chain{grid-template-columns:1fr}
+      .principle{min-height:0;border-right:0;border-bottom:1px solid var(--line-2)}
+      .principle:last-child{border-bottom:0}
+      .principle h3{margin-top:26px}
+      .spec-stack{grid-template-columns:1fr}
+      .spec{border-right:0}
+      .spec:nth-child(-n+3){border-bottom:1px solid var(--line-2)}
+      .evidence{min-height:0;border-right:0;border-bottom:1px solid var(--line-2)}
+      .evidence:last-child{border-bottom:0;grid-column:auto}
+      .evidence h3{margin-top:0;padding-top:22px}
+      .chain div{border-right:0;border-bottom:1px solid var(--line-2)}
+      .chain div:last-child{border-bottom:0}
+      .channel h3{margin-top:0;padding-top:28px}
+      .note{display:none}
+      .plate__cap span{font-size:9px}
     }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}.button{transition:none}}
   </style>
@@ -228,14 +311,13 @@
       <div class="shell hero__grid">
         <div class="hero__copy">
           <div class="kicker">Continuous biochemical monitoring platform · Research stage</div>
-          <h1>Continuous chemistry.<em>Honest uncertainty.</em></h1>
-          <img class="mobile-product" src="/cbm/g1/assets/cbm_g1_assembled.webp" alt="CBM G1 product rendering">
+          <h1>Continuous chemistry.<span class="u">Honest uncertainty.</span></h1>
           <p class="lede">CBM G1 is a sourced, open-hardware research platform for interstitial-fluid sensing: six target chemistries, two quality-control channels, and a system designed to stop reporting when the measurement stops earning trust.</p>
-          <div class="hero__proof">
-            <span class="proof"><b>8</b> modular sensor tiles</span>
-            <span class="proof"><b>12</b> dry contacts</span>
-            <span class="proof"><b>2×3</b> needles per tile</span>
-            <span class="proof"><b>0</b> treatment claims</span>
+          <div class="readout">
+            <div><b>8</b><span>Modular sensor tiles</span></div>
+            <div><b>12</b><span>Dry contacts</span></div>
+            <div><b>2&times;3</b><span>Needles per tile</span></div>
+            <div><b>0</b><span>Treatment claims</span></div>
           </div>
           <div class="actions">
             <a class="button button--primary" href="/cbm/viewer/">Explore product + cutaway
@@ -244,20 +326,22 @@
             <a class="button" href="/cbm/procurement/">Source and build it</a>
           </div>
         </div>
-        <div class="hero__visual" aria-label="CBM G1 product rendering">
-          <div class="signal"></div>
-          <img class="hero__render" src="/cbm/g1/assets/cbm_g1_assembled.webp" alt="Lifelike studio rendering of the closed CBM G1 reader and disposable adhesive cartridge">
-          <div class="float-card float-card--one"><b>Nominal mechanical fit · pass</b><span>The actual Biocoin STEP drives twelve clearance and connector-stack checks.</span></div>
-          <div class="float-card float-card--two"><b>Product outside. Engineering inside.</b><span>Open the cutaway to see every board, retainer, harness, gasket, and contact.</span></div>
+        <div class="hero__visual">
+          <figure class="plate" aria-label="CBM G1 assembled product rendering">
+            <img class="plate__img" src="/cbm/g1/assets/cbm_g1_assembled.webp" alt="Studio rendering of the closed CBM G1 reader and disposable adhesive cartridge">
+            <div class="plate__frame" aria-hidden="true"></div>
+            <div class="note note--tr"><b>Nominal mechanical fit · <i>Pass</i></b><span>The actual Biocoin STEP drives twelve clearance and connector-stack checks.</span></div>
+            <div class="note note--bl"><b>Product outside · Engineering inside</b><span>Open the cutaway to see every board, retainer, harness, gasket, and contact.</span></div>
+            <figcaption class="plate__cap"><span>Fig. 01 — Assembled envelope · Ø44 × 19.0 mm</span><a href="/cbm/viewer/">Open CAD →</a></figcaption>
+          </figure>
         </div>
       </div>
-      <div class="scroll-cue">Derived from physics</div>
     </section>
 
     <section class="section section--tight" id="principles">
       <div class="shell">
-        <div class="section-head reveal">
-          <div><div class="kicker">The governing idea</div><h2>Measure less. <span>Know more.</span></h2></div>
+        <div class="section-head sec-head reveal">
+          <div><div class="sec-index"><b>01</b> — Governing principles</div><h2>Measure less. <span class="hl">Know more.</span></h2></div>
           <p>CBM starts with the errors that can fabricate a plausible number, then designs the hardware, controls, and public claims around exposing them.</p>
         </div>
         <div class="principles reveal">
@@ -271,67 +355,70 @@
 
     <section class="section" id="why">
       <div class="shell">
-        <div class="section-head reveal">
-          <div><div class="kicker">Why build it</div><h2>The case is not more data. <span>It is fewer blind intervals.</span></h2></div>
+        <div class="section-head sec-head reveal">
+          <div><div class="sec-index"><b>02</b> — Why build it</div><h2>The case is not more data. <span class="hl">It is fewer blind intervals.</span></h2></div>
           <p>No patient needs to rely on this unvalidated device today. The public-interest case is conditional: a trustworthy trend must trigger earlier confirmation, that confirmation must change care, and the changed care must improve an outcome that matters.</p>
         </div>
 
-        <article class="utility-verdict reveal">
+        <article class="panel panel--accent reveal">
           <div class="kicker">Utilitarian verdict</div>
           <h3>Build the shared measurement platform and narrow clinical programs—not a universal wellness patch.</h3>
           <p>Its clearest near-term contribution to human flourishing is as open translational infrastructure: one reusable instrument that lets research and clinical teams test several chemistries without designing a new reader for each one. Its largest potential patient benefit comes later, in high-risk populations where chemistry changes faster than scheduled testing and a trend has a predefined confirmatory action.</p>
-          <div class="truth-table">
-            <div class="truth-cell"><b>~47%</b><span>Estimated share of the world without access to essential diagnostic testing. CBM cannot close this alone; it must fit a tiered diagnostic network.</span></div>
-            <div class="truth-cell"><b>46.5%</b><span>Eligible HFrEF patients without a serum potassium check within 7 days after MRA initiation in a multicenter cohort.</span></div>
-            <div class="truth-cell"><b>5 min</b><span>Resolution in a six-person 2026 human vancomycin microneedle pilot; degradation limited the primary analysis to the first 12 hours.</span></div>
-            <div class="truth-cell"><b>0</b><span>Populations who should use the present research device for diagnosis, dosing, or emergency decisions.</span></div>
+          <div class="truth">
+            <div><b>~47%</b><span>Estimated share of the world without access to essential diagnostic testing. CBM cannot close this alone; it must fit a tiered diagnostic network.</span></div>
+            <div><b>46.5%</b><span>Eligible HFrEF patients without a serum potassium check within 7 days after MRA initiation in a multicenter cohort.</span></div>
+            <div><b>5 min</b><span>Resolution in a six-person 2026 human vancomycin microneedle pilot; degradation limited the primary analysis to the first 12 hours.</span></div>
+            <div><b>0</b><span>Populations who should use the present research device for diagnosis, dosing, or emergency decisions.</span></div>
           </div>
         </article>
 
-        <div class="utility-grid reveal">
-          <article class="utility-card" style="--utility:var(--mint)"><div class="utility-card__tag">Highest present utility · Build now</div><h3>Translational research teams.</h3><p><b>Who needs it:</b> university, hospital, and public-interest biosensor groups that otherwise duplicate reader electronics before testing chemistry. Open hardware, raw traces, interchangeable tiles, and shared validation methods can make this a scientific public good.</p></article>
-          <article class="utility-card" style="--utility:var(--cyan)"><div class="utility-card__tag">High conditional utility · Validate</div><h3>Time-sensitive, high-risk care.</h3><p><b>Who may benefit:</b> diabetes/DKA, CKD or heart-failure medication titration, dialysis, acute-care lactate surveillance, and narrow-therapeutic-window drug dosing. Glucose+ketone already has a commercial incumbent; added value must come from validated additional channels or a better workflow—not novelty alone.</p></article>
-          <article class="utility-card" style="--utility:var(--violet)"><div class="utility-card__tag">Distribution utility · Integrate</div><h3>Clinic and bedside networks.</h3><p><b>Best distributed form:</b> reusable readers in clinics, step-down units, research hospitals, and regional programs with local cartridges, trained operators, quality control, and referral labs. WHO guidance is explicit: decentralized tests create value only inside financed, quality-assured diagnostic networks.</p></article>
-          <article class="utility-card" style="--utility:var(--rose)"><div class="utility-card__tag">Low or negative utility · Do not target</div><h3>Continuous testing for everyone.</h3><p><b>Who does not need it:</b> healthy people without a defined action for each result. Broad deployment would add false alarms, false reassurance, surveillance, medicalization, cost, and disposable waste. Existing CGM use already generates large packaging and electronic-waste streams.</p></article>
+        <div class="tiers reveal">
+          <article class="tier" style="--t:var(--accent)"><div class="tier__tag">Highest present utility · Build now</div><h3>Translational research teams.</h3><p><b>Who needs it:</b> university, hospital, and public-interest biosensor groups that otherwise duplicate reader electronics before testing chemistry. Open hardware, raw traces, interchangeable tiles, and shared validation methods can make this a scientific public good.</p></article>
+          <article class="tier" style="--t:var(--steel)"><div class="tier__tag">High conditional utility · Validate</div><h3>Time-sensitive, high-risk care.</h3><p><b>Who may benefit:</b> diabetes/DKA, CKD or heart-failure medication titration, dialysis, acute-care lactate surveillance, and narrow-therapeutic-window drug dosing. Glucose+ketone already has a commercial incumbent; added value must come from validated additional channels or a better workflow—not novelty alone.</p></article>
+          <article class="tier" style="--t:var(--slate)"><div class="tier__tag">Distribution utility · Integrate</div><h3>Clinic and bedside networks.</h3><p><b>Best distributed form:</b> reusable readers in clinics, step-down units, research hospitals, and regional programs with local cartridges, trained operators, quality control, and referral labs. WHO guidance is explicit: decentralized tests create value only inside financed, quality-assured diagnostic networks.</p></article>
+          <article class="tier" style="--t:var(--brick)"><div class="tier__tag">Low or negative utility · Do not target</div><h3>Continuous testing for everyone.</h3><p><b>Who does not need it:</b> healthy people without a defined action for each result. Broad deployment would add false alarms, false reassurance, surveillance, medicalization, cost, and disposable waste. Existing CGM use already generates large packaging and electronic-waste streams.</p></article>
         </div>
 
-        <div class="utility-chain reveal" aria-label="Required utility chain">
-          <div class="utility-step"><b>01 · Valid signal</b>Analytical accuracy, wear stability, reference control, and an honest null state.</div>
-          <div class="utility-step"><b>02 · Earlier confirmation</b>The trend advances a laboratory check or clinician review rather than replacing it.</div>
-          <div class="utility-step"><b>03 · Changed care</b>A clinician adjusts monitoring, medication, fluids, dialysis, or dosing sooner.</div>
-          <div class="utility-step"><b>04 · Human outcome</b>Less harm, fewer burdensome draws or trips, preserved effective therapy, or better survival and function.</div>
+        <div class="chain reveal" aria-label="Required utility chain">
+          <div><b>01 · Valid signal</b>Analytical accuracy, wear stability, reference control, and an honest null state.</div>
+          <div><b>02 · Earlier confirmation</b>The trend advances a laboratory check or clinician review rather than replacing it.</div>
+          <div><b>03 · Changed care</b>A clinician adjusts monitoring, medication, fluids, dialysis, or dosing sooner.</div>
+          <div><b>04 · Human outcome</b>Less harm, fewer burdensome draws or trips, preserved effective therapy, or better survival and function.</div>
         </div>
 
-        <div class="claim-grid reveal">
+        <div class="claims reveal">
           <div class="claim claim--yes"><h3>How it could promote flourishing</h3><p>Earlier detection for fragile patients; fewer avoidable venipunctures and trips; more autonomy between visits; preservation of beneficial therapy; and wider research capacity through open, reusable instrumentation.</p></div>
           <div class="claim claim--no"><h3>How it could reduce flourishing</h3><p>Bad signals can provoke overtreatment or false reassurance. Continuous biochemical surveillance can erode privacy and turn normal variation into illness. Disposable cartridges consume materials and clinical attention that may produce more benefit elsewhere.</p></div>
         </div>
 
-        <a class="source-link" href="https://doi.org/10.1016/S2214-109X(23)00568-5" target="_blank" rel="noopener">WHO essential diagnostics</a>
-        <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCHEARTFAILURE.113.000709" target="_blank" rel="noopener" style="margin-left:16px">MRA monitoring gap</a>
-        <a class="source-link" href="https://doi.org/10.1038/s41587-026-03010-w" target="_blank" rel="noopener" style="margin-left:16px">Human vancomycin pilot</a>
-        <a class="source-link" href="https://doi.org/10.1038/s44328-026-00103-z" target="_blank" rel="noopener" style="margin-left:16px">Open Biocoin platform</a>
-        <a class="source-link" href="https://doi.org/10.2196/85548" target="_blank" rel="noopener" style="margin-left:16px">Ketone drift warning</a>
-        <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11662339/" target="_blank" rel="noopener" style="margin-left:16px">Disposable-sensor waste</a>
+        <div class="sources reveal">
+          <a class="source-link" href="https://doi.org/10.1016/S2214-109X(23)00568-5" target="_blank" rel="noopener">WHO essential diagnostics</a>
+          <a class="source-link" href="https://www.ahajournals.org/doi/10.1161/CIRCHEARTFAILURE.113.000709" target="_blank" rel="noopener">MRA monitoring gap</a>
+          <a class="source-link" href="https://doi.org/10.1038/s41587-026-03010-w" target="_blank" rel="noopener">Human vancomycin pilot</a>
+          <a class="source-link" href="https://doi.org/10.1038/s44328-026-00103-z" target="_blank" rel="noopener">Open Biocoin platform</a>
+          <a class="source-link" href="https://doi.org/10.2196/85548" target="_blank" rel="noopener">Ketone drift warning</a>
+          <a class="source-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11662339/" target="_blank" rel="noopener">Disposable-sensor waste</a>
+        </div>
       </div>
     </section>
 
     <section class="section" id="architecture">
       <div class="shell">
-        <div class="section-head reveal">
-          <div><div class="kicker">Assembled at real scale</div><h2>One reader. <span>Eight wet laboratories.</span></h2></div>
+        <div class="section-head sec-head reveal">
+          <div><div class="sec-index"><b>03</b> — System architecture · assembled at real scale</div><h2>One reader. <span class="hl">Eight wet laboratories.</span></h2></div>
           <p>The reusable puck owns measurement modes and data integrity. The disposable cartridge owns every tissue-contact material, sensing chemistry, reference, counter, lot, and calibration.</p>
         </div>
-        <div class="architecture reveal">
-          <article class="render-card">
-            <img src="/cbm/g1/assets/cbm_g1_cutaway.webp" alt="Lifelike cutaway rendering of the CBM cartridge, low-profile connector, guarded daughterboard, Biocoin board, offset battery, harness, retainers, and shell">
-            <div class="render-card__bar"><span>Actual STEP + connector working heights · units in millimetres</span><a href="/cbm/viewer/?view=cutaway">Open cutaway →</a></div>
-          </article>
+        <div class="arch reveal">
+          <figure class="plate">
+            <img class="plate__img" src="/cbm/g1/assets/cbm_g1_cutaway.webp" alt="Cutaway rendering of the CBM cartridge, low-profile connector, guarded daughterboard, Biocoin board, offset battery, harness, retainers, and shell">
+            <div class="plate__frame" aria-hidden="true"></div>
+            <figcaption class="plate__cap"><span>Fig. 02 — Cutaway · actual STEP + connector working heights, units in mm</span><a href="/cbm/viewer/?view=cutaway">Open cutaway →</a></figcaption>
+          </figure>
           <div class="spec-stack">
-            <article class="spec"><div class="spec__label">Reusable envelope</div><div><strong>Ø44 × 19.0</strong><p>Actual populated Biocoin, 38 mm daughterboard, cradle, harness, and retainers.</p></div></article>
-            <article class="spec"><div class="spec__label">Disposable field</div><div><strong>8 × 6 needles</strong><p>Eight isolated tiles on a 32 mm open sensing field.</p></div></article>
-            <article class="spec"><div class="spec__label">Dry interface</div><div><strong>12 @ 2.54</strong><p>One retained Mill-Max 817 connector at 2.24 mm working height.</p></div></article>
-            <article class="spec"><div class="spec__label">Fit status</div><div><strong>12 / 12 pass</strong><p>Nominal STEP-backed clearance checks; unresolved tests stay named.</p></div></article>
+            <article class="spec"><div class="spec__label">Reusable envelope</div><strong>Ø44 × 19.0</strong><p>Actual populated Biocoin, 38 mm daughterboard, cradle, harness, and retainers.</p></article>
+            <article class="spec"><div class="spec__label">Disposable field</div><strong>8 × 6 needles</strong><p>Eight isolated tiles on a 32 mm open sensing field.</p></article>
+            <article class="spec"><div class="spec__label">Dry interface</div><strong>12 @ 2.54</strong><p>One retained Mill-Max 817 connector at 2.24 mm working height.</p></article>
+            <article class="spec"><div class="spec__label">Fit status</div><strong>12 / 12 pass</strong><p>Nominal STEP-backed clearance checks; unresolved tests stay named.</p></article>
           </div>
         </div>
       </div>
@@ -339,36 +426,36 @@
 
     <section class="section" id="channels">
       <div class="shell">
-        <div class="section-head reveal">
-          <div><div class="kicker">G1 cartridge</div><h2>Six targets. <span>Two witnesses.</span></h2></div>
+        <div class="section-head sec-head reveal">
+          <div><div class="sec-index"><b>04</b> — G1 cartridge</div><h2>Six targets. <span class="hl">Two witnesses.</span></h2></div>
           <p>The panel spans mediated enzyme and ion-selective sensing without pretending every channel has the same maturity.</p>
         </div>
-        <div class="channel-grid reveal">
-          <article class="channel" style="--channel:var(--orange)"><div class="channel__top"><span>WE1 · enzyme</span><i class="channel__dot"></i></div><h3>Glucose</h3><p>Prussian Blue + GOx. Commercial anchor and system sanity reference.</p><div class="channel__evidence">Commercial precedent</div></article>
-          <article class="channel" style="--channel:var(--rose)"><div class="channel__top"><span>WE2 · enzyme</span><i class="channel__dot"></i></div><h3>β-hydroxybutyrate</h3><p>HBD/NAD+/poly-TBO stack. The strongest reason to measure beyond glucose.</p><div class="channel__evidence">CE product + human pilots</div></article>
-          <article class="channel" style="--channel:#ffb36a"><div class="channel__top"><span>WE3 · enzyme</span><i class="channel__dot"></i></div><h3>Lactate</h3><p>LOx-mediated research lane with human microneedle precedent and analyte-specific lag.</p><div class="channel__evidence">Human pilot</div></article>
-          <article class="channel" style="--channel:#94a3aa"><div class="channel__top"><span>WE4 · control</span><i class="channel__dot"></i></div><h3>Glucose duplicate</h3><p>Separate deposition lane exposes missed insertion and lane-specific coating failure.</p><div class="channel__evidence">Quality control</div></article>
-          <article class="channel" style="--channel:#62b1ff"><div class="channel__top"><span>WE5 · ISE</span><i class="channel__dot"></i></div><h3>Sodium</h3><p>PEDOT:PSS + ionophore X. Electrolyte context and common-mode reference witness.</p><div class="channel__evidence">Animal multi-panel</div></article>
-          <article class="channel" style="--channel:#32d7ff"><div class="channel__top"><span>WE6 · ISE</span><i class="channel__dot"></i></div><h3>Potassium</h3><p>Valinomycin membrane. Highest-value and least-forgiving quantitative research lane.</p><div class="channel__evidence">Bench + usability evidence</div></article>
-          <article class="channel" style="--channel:var(--violet)"><div class="channel__top"><span>WE7 · ISE</span><i class="channel__dot"></i></div><h3>pH</h3><p>Polyaniline starting route. Context for chemistry, junction behavior, and drift.</p><div class="channel__evidence">Animal multi-panel</div></article>
-          <article class="channel" style="--channel:#839099"><div class="channel__top"><span>WE8 · control</span><i class="channel__dot"></i></div><h3>Background blank</h3><p>A nonspecific electrochemical sentinel—not a magical universal correction.</p><div class="channel__evidence">Quality control</div></article>
+        <div class="channels reveal">
+          <article class="channel" style="--c:var(--accent)"><div class="channel__top"><span>WE1 · enzyme</span><i class="channel__dot"></i></div><h3>Glucose</h3><p>Prussian Blue + GOx. Commercial anchor and system sanity reference.</p><div class="channel__ev">Commercial precedent</div></article>
+          <article class="channel" style="--c:var(--accent)"><div class="channel__top"><span>WE2 · enzyme</span><i class="channel__dot"></i></div><h3>β-hydroxybutyrate</h3><p>HBD/NAD+/poly-TBO stack. The strongest reason to measure beyond glucose.</p><div class="channel__ev">CE product + human pilots</div></article>
+          <article class="channel" style="--c:var(--accent)"><div class="channel__top"><span>WE3 · enzyme</span><i class="channel__dot"></i></div><h3>Lactate</h3><p>LOx-mediated research lane with human microneedle precedent and analyte-specific lag.</p><div class="channel__ev">Human pilot</div></article>
+          <article class="channel" style="--c:var(--slate)"><div class="channel__top"><span>WE4 · control</span><i class="channel__dot"></i></div><h3>Glucose duplicate</h3><p>Separate deposition lane exposes missed insertion and lane-specific coating failure.</p><div class="channel__ev">Quality control</div></article>
+          <article class="channel" style="--c:var(--steel)"><div class="channel__top"><span>WE5 · ISE</span><i class="channel__dot"></i></div><h3>Sodium</h3><p>PEDOT:PSS + ionophore X. Electrolyte context and common-mode reference witness.</p><div class="channel__ev">Animal multi-panel</div></article>
+          <article class="channel" style="--c:var(--steel)"><div class="channel__top"><span>WE6 · ISE</span><i class="channel__dot"></i></div><h3>Potassium</h3><p>Valinomycin membrane. Highest-value and least-forgiving quantitative research lane.</p><div class="channel__ev">Bench + usability evidence</div></article>
+          <article class="channel" style="--c:var(--steel)"><div class="channel__top"><span>WE7 · ISE</span><i class="channel__dot"></i></div><h3>pH</h3><p>Polyaniline starting route. Context for chemistry, junction behavior, and drift.</p><div class="channel__ev">Animal multi-panel</div></article>
+          <article class="channel" style="--c:var(--slate)"><div class="channel__top"><span>WE8 · control</span><i class="channel__dot"></i></div><h3>Background blank</h3><p>A nonspecific electrochemical sentinel—not a magical universal correction.</p><div class="channel__ev">Quality control</div></article>
         </div>
       </div>
     </section>
 
     <section class="section" id="build">
       <div class="shell">
-        <div class="section-head reveal">
-          <div><div class="kicker">The build order</div><h2>Prove the chemistry. <span>Then buy the needles.</span></h2></div>
+        <div class="section-head sec-head reveal">
+          <div><div class="sec-index"><b>05</b> — The build order</div><h2>Prove the chemistry. <span class="hl">Then buy the needles.</span></h2></div>
           <p>G0 and G1 are separate so a coating mistake cannot hide inside a custom wearable, and an enclosure cannot be mistaken for a sensor.</p>
         </div>
-        <div class="build-path reveal">
-          <article class="build-card" style="--accent:var(--cyan);--glow:var(--cyan)">
-            <div class="build-card__tag">G0 · catalog bench</div><h3>Eight independent gold cells.</h3><p>PalmSens drives amperometry and deposition. A guarded electrometer path owns high-impedance truth. Every chemistry earns its own ladder, interference matrix, drift record, and induced-fault result.</p>
+        <div class="builds reveal">
+          <article class="build" style="--b:var(--steel)">
+            <div class="build__tag">G0 · catalog bench</div><h3>Eight independent gold cells.</h3><p>PalmSens drives amperometry and deposition. A guarded electrometer path owns high-impedance truth. Every chemistry earns its own ladder, interference matrix, drift record, and induced-fault result.</p>
             <div class="build-list"><div><b>01</b><span>Electrical loading fixture: 10 MΩ → 1 GΩ</span></div><div><b>02</b><span>DRP-8X220AT: eight complete 3-electrode cells</span></div><div><b>03</b><span>Three independent arrays before reproducibility claims</span></div></div>
           </article>
-          <article class="build-card" style="--accent:var(--mint);--glow:var(--mint)">
-            <div class="build-card__tag">G1 · custom research wearable</div><h3>Open reader. Integrated wet end.</h3><p>The published Biocoin PCB survives intact and mates through its own docking pads. Custom work is limited to the guarded interface board, retained cartridge, sensor tiles, seals, and enclosure.</p>
+          <article class="build" style="--b:var(--accent)">
+            <div class="build__tag">G1 · custom research wearable</div><h3>Open reader. Integrated wet end.</h3><p>The published Biocoin PCB survives intact and mates through its own docking pads. Custom work is limited to the guarded interface board, retained cartridge, sensor tiles, seals, and enclosure.</p>
             <div class="build-list"><div><b>01</b><span>RFQ only after electrical, chemistry, and quality gates pass</span></div><div><b>02</b><span>Inert mechanical cartridge before functional coatings</span></div><div><b>03</b><span>No on-body step without approved governance</span></div></div>
           </article>
         </div>
@@ -377,11 +464,11 @@
 
     <section class="section" id="custom">
       <div class="shell">
-        <div class="section-head reveal">
-          <div><div class="kicker">What must be custom</div><h2>Six systems. <span>Every interface named.</span></h2></div>
+        <div class="section-head sec-head reveal">
+          <div><div class="sec-index"><b>06</b> — What must be custom</div><h2>Six systems. <span class="hl">Every interface named.</span></h2></div>
           <p>The build book carries the dimensions, materials, process windows, source method, and acceptance test for each custom item.</p>
         </div>
-        <div class="custom-grid reveal">
+        <div class="customs reveal">
           <article class="custom"><div class="custom__type">CP-01 · PCB</div><h3>Guarded interface board</h3><p>38 mm full disc with six LMP7721 islands, ADS124S08, four upstream-exact dock headers, and the retained 12-contact connector.</p><a href="/cbm/procurement/#cp01">Open specification →</a></article>
           <article class="custom"><div class="custom__type">CP-02 · Microfabrication</div><h3>2×3 sensor tiles</h3><p>Published PS/PDMS mold route: 1.0 mm needles, 10 nm Cr, 150 nm Au, plus dimensional, insertion, and coating QC.</p><a href="/cbm/procurement/#cp02">Open specification →</a></article>
           <article class="custom"><div class="custom__type">CP-03 · RFQ alternate</div><h3>316L metal tiles</h3><p>Nickel-free gold-coated 30–36G vendor route with isolation, pinhole, corrosion, coating, and traceability requirements.</p><a href="/cbm/procurement/#cp03">Open specification →</a></article>
@@ -394,16 +481,16 @@
 
     <section class="section" id="evidence">
       <div class="shell">
-        <div class="section-head reveal">
-          <div><div class="kicker">Frontier, correctly labeled</div><h2>The latest work is real. <span>Its limits are too.</span></h2></div>
+        <div class="section-head sec-head reveal">
+          <div><div class="sec-index"><b>07</b> — Frontier, correctly labeled</div><h2>The latest work is real. <span class="hl">Its limits are too.</span></h2></div>
           <p>Commercial, human, animal, and engineering evidence answer different questions. G1 keeps those labels attached.</p>
         </div>
         <div class="evidence-strip reveal">
-          <article class="evidence" style="--level:var(--mint)"><span class="evidence__level">CE Mark · Europe</span><h3>Libre Duo</h3><p>Glucose + ketone every minute; up to 15 days. Not cleared in the United States.</p><a href="https://abbott.mediaroom.com/2026-05-27-Abbott-secures-CE-Mark-for-worlds-first-dual-glucose-ketone-sensing-technology-for-people-with-diabetes" target="_blank" rel="noopener">Abbott · May 2026 ↗</a></article>
-          <article class="evidence" style="--level:var(--cyan)"><span class="evidence__level">Open hardware</span><h3>Biocoin</h3><p>26 mm multimodal AD5940+nRF52840 platform with published hardware, firmware, software, and STEP.</p><a href="https://doi.org/10.1038/s44328-026-00103-z" target="_blank" rel="noopener">npj Biosensing · 2026 ↗</a></article>
-          <article class="evidence" style="--level:var(--orange)"><span class="evidence__level">Animal</span><h3>eMPatch</h3><p>Six simultaneous analytes in rats; modular 2×3 tiles. Continuous stability: 120 minutes in artificial ISF.</p><a href="https://doi.org/10.1007/s40820-026-02095-x" target="_blank" rel="noopener">Nano-Micro Letters · 2026 ↗</a></article>
-          <article class="evidence" style="--level:var(--violet)"><span class="evidence__level">Human pilot</span><h3>Adaptyx cortisol</h3><p>Eight target + eight control channels; n=3 challenge and n=3 overnight. Promising, not cleared.</p><a href="https://doi.org/10.2337/db26-2893-lb" target="_blank" rel="noopener">Diabetes · 2026 ↗</a></article>
-          <article class="evidence" style="--level:var(--rose)"><span class="evidence__level">Human drift warning</span><h3>Ketone RCT</h3><p>Seven people over 14 days; dynamics captured, progressive decline consistent with sensor drift.</p><a href="https://doi.org/10.2196/85548" target="_blank" rel="noopener">JMIR Diabetes · 2026 ↗</a></article>
+          <article class="evidence" style="--lv:var(--accent)"><span class="evidence__level">CE Mark · Europe</span><h3>Libre Duo</h3><p>Glucose + ketone every minute; up to 15 days. Not cleared in the United States.</p><a href="https://abbott.mediaroom.com/2026-05-27-Abbott-secures-CE-Mark-for-worlds-first-dual-glucose-ketone-sensing-technology-for-people-with-diabetes" target="_blank" rel="noopener">Abbott · May 2026 ↗</a></article>
+          <article class="evidence" style="--lv:var(--steel)"><span class="evidence__level">Open hardware</span><h3>Biocoin</h3><p>26 mm multimodal AD5940+nRF52840 platform with published hardware, firmware, software, and STEP.</p><a href="https://doi.org/10.1038/s44328-026-00103-z" target="_blank" rel="noopener">npj Biosensing · 2026 ↗</a></article>
+          <article class="evidence" style="--lv:var(--amber)"><span class="evidence__level">Animal</span><h3>eMPatch</h3><p>Six simultaneous analytes in rats; modular 2×3 tiles. Continuous stability: 120 minutes in artificial ISF.</p><a href="https://doi.org/10.1007/s40820-026-02095-x" target="_blank" rel="noopener">Nano-Micro Letters · 2026 ↗</a></article>
+          <article class="evidence" style="--lv:var(--steel)"><span class="evidence__level">Human pilot</span><h3>Adaptyx cortisol</h3><p>Eight target + eight control channels; n=3 challenge and n=3 overnight. Promising, not cleared.</p><a href="https://doi.org/10.2337/db26-2893-lb" target="_blank" rel="noopener">Diabetes · 2026 ↗</a></article>
+          <article class="evidence" style="--lv:var(--brick)"><span class="evidence__level">Human drift warning</span><h3>Ketone RCT</h3><p>Seven people over 14 days; dynamics captured, progressive decline consistent with sensor drift.</p><a href="https://doi.org/10.2196/85548" target="_blank" rel="noopener">JMIR Diabetes · 2026 ↗</a></article>
         </div>
       </div>
     </section>
@@ -412,11 +499,11 @@
       <div class="shell">
         <article class="boundary reveal">
           <div class="boundary__grid">
-            <div><div class="kicker" style="color:#ff92aa">Hard boundary</div><h2>CAD is not clearance.</h2><p>A functional microneedle cartridge does not go from artificial ISF to a self-test. Human research requires IRB review, the appropriate IDE or nonsignificant-risk determination, informed consent, final-assembly biological evaluation, sterilization and packaging evidence, electrical safety, comparators, and stop rules.</p></div>
+            <div><div class="kicker">Hard boundary</div><h2>CAD is not clearance.</h2><p>A functional microneedle cartridge does not go from artificial ISF to a self-test. Human research requires IRB review, the appropriate IDE or nonsignificant-risk determination, informed consent, final-assembly biological evaluation, sterilization and packaging evidence, electrical safety, comparators, and stop rules.</p></div>
             <div class="boundary__rules">
-              <div><b>Not claimed</b><br>Diagnosis, dosing, emergency alerts, serum equivalence.</div>
-              <div><b>Not inherited</b><br>One supplier's biocompatibility statement is not device safety.</div>
-              <div><b>Not automatic</b><br>A passed bench gate never authorizes skin wear.</div>
+              <div><b>Not claimed</b>Diagnosis, dosing, emergency alerts, serum equivalence.</div>
+              <div><b>Not inherited</b>One supplier's biocompatibility statement is not device safety.</div>
+              <div><b>Not automatic</b>A passed bench gate never authorizes skin wear.</div>
             </div>
           </div>
         </article>
@@ -425,7 +512,7 @@
 
     <section class="section final">
       <div class="shell reveal">
-        <div class="kicker" style="justify-content:center">Everything inspectable</div>
+        <div class="kicker">Everything inspectable</div>
         <h2>Rotate the assembly. Audit the sources. Build only what the evidence unlocks.</h2>
         <p>The interactive model exposes each sourced and custom part. The build book carries the BOM, custom-part process, material sources, validation gates, and downloadable CAD.</p>
         <div class="actions"><a class="button button--primary" href="/cbm/viewer/">Open interactive CAD</a><a class="button" href="/cbm/procurement/">Open build book</a></div>

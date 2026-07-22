@@ -157,7 +157,7 @@
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050709);
     scene.fog = new THREE.FogExp2(0x050709,.006);
-    const camera = new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,500);
+    const camera = new THREE.PerspectiveCamera(38,innerWidth/innerHeight,2,400);
     const renderer = new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));
     renderer.setSize(innerWidth,innerHeight);
@@ -181,9 +181,9 @@
 
     const root=new THREE.Group();scene.add(root);
     const objectById=new Map(),layerGroups={},mats=new Map();
-    const material=(hex,{metal=.12,rough=.42,opacity=1,transmission=0,clearcoat=0,clearcoatRough=.2}={})=>{
-      const cacheKey=`${hex}-${metal}-${rough}-${opacity}-${transmission}-${clearcoat}-${clearcoatRough}`;
-      if(!mats.has(cacheKey))mats.set(cacheKey,new THREE.MeshPhysicalMaterial({color:new THREE.Color(hex),metalness:metal,roughness:rough,transparent:opacity<1,opacity,transmission,thickness:1.5,clearcoat,clearcoatRoughness:clearcoatRough,side:THREE.DoubleSide}));
+    const material=(hex,{metal=.12,rough=.42,opacity=1,transmission=0,clearcoat=0,clearcoatRough=.2,side=THREE.FrontSide,polyOffset=0}={})=>{
+      const cacheKey=`${hex}-${metal}-${rough}-${opacity}-${transmission}-${clearcoat}-${clearcoatRough}-${side}-${polyOffset}`;
+      if(!mats.has(cacheKey))mats.set(cacheKey,new THREE.MeshPhysicalMaterial({color:new THREE.Color(hex),metalness:metal,roughness:rough,transparent:opacity<1,opacity,transmission,thickness:1.5,clearcoat,clearcoatRoughness:clearcoatRough,side,polygonOffset:polyOffset!==0,polygonOffsetFactor:polyOffset,polygonOffsetUnits:polyOffset}));
       return mats.get(cacheKey).clone();
     };
     const remember=(id,obj,layer)=>{obj.userData.partId=id;obj.castShadow=true;obj.receiveShadow=true;if(!objectById.has(id))objectById.set(id,[]);objectById.get(id).push(obj);if(layer){if(!layerGroups[layer]){layerGroups[layer]=new THREE.Group();root.add(layerGroups[layer])}layerGroups[layer].add(obj)}else root.add(obj);return obj};
@@ -195,30 +195,30 @@
     function roundedPlate(id,w,d,h,r,pos,hex,layer,opts={}){const g=new THREE.ExtrudeGeometry(roundedRectPath(w,d,r),{depth:h,bevelEnabled:false,curveSegments:20});g.rotateX(-Math.PI/2);g.translate(0,-h/2,0);const m=remember(id,new THREE.Mesh(g,material(hex,opts)),layer);m.position.set(...pos);return m}
     function roundedRing(id,ow,od,iw,idp,h,pos,hex,layer,opts={}){const s=roundedRectPath(ow,od,Math.min(ow,od)*.18);const hole=roundedRectPath(iw,idp,Math.min(iw,idp)*.16);s.holes.push(hole);const g=new THREE.ExtrudeGeometry(s,{depth:h,bevelEnabled:false,curveSegments:20});g.rotateX(-Math.PI/2);g.translate(0,-h/2,0);const m=remember(id,new THREE.Mesh(g,material(hex,opts)),layer);m.position.set(...pos);return m}
     function tubeCurve(id,pts,r,hex,layer){const curve=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));return remember(id,new THREE.Mesh(new THREE.TubeGeometry(curve,48,r,10,false),material(hex,{metal:.08,rough:.4})),layer)}
-    function addTile(id,index){const p=byId.get(id),a=index*Math.PI/4,r=12,x=Math.sin(a)*r,z=Math.cos(a)*r;const g=new THREE.Group();g.userData.partId=id;const tile=new THREE.Mesh(new THREE.BoxGeometry(3.5,.45,5),material(0x151b20,{rough:.42}));g.add(tile);const cap=new THREE.Mesh(new THREE.BoxGeometry(3.15,.10,4.65),material(p.color,{metal:.28,rough:.24,clearcoat:.25}));cap.position.y=-.275;g.add(cap);for(const dx of [-.62,.62])for(const dz of [-1.2,0,1.2]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.045,.15,1,20),material(p.color,{metal:.5,rough:.16}));n.position.set(dx,-.725,dz);g.add(n)}g.position.set(x,-.425,z);g.rotation.y=a;remember(id,g,"tiles")}
-    function header855(center,contacts,rotation=0){const cols=contacts/2,g=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry((cols-1)*1.27+1.45,.7,2.7),material(0x11161a,{rough:.4}));body.position.y=3.39;g.add(body);for(const rz of [-.635,.635])for(let c=0;c<cols;c++){const x=(c-(cols-1)/2)*1.27;const pin=new THREE.Mesh(new THREE.CylinderGeometry(.12,.24,6.08,16),material(0xe2ad32,{metal:.78,rough:.14}));pin.position.set(x,6.08,rz);g.add(pin)}g.position.set(center[0],0,center[1]);g.rotation.y=rotation;remember("headers",g,"headers")}
+    function addTile(id,index){const p=byId.get(id),a=index*Math.PI/4,r=12,x=Math.sin(a)*r,z=Math.cos(a)*r;const g=new THREE.Group();g.userData.partId=id;const tile=new THREE.Mesh(new THREE.BoxGeometry(3.5,.45,5),material(0x151b20,{rough:.42}));g.add(tile);const cap=new THREE.Mesh(new THREE.BoxGeometry(3.15,.10,4.65),material(p.color,{metal:.28,rough:.24,clearcoat:.25}));cap.position.y=-.305;g.add(cap);for(const dx of [-.62,.62])for(const dz of [-1.2,0,1.2]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.045,.15,1,20),material(p.color,{metal:.5,rough:.16}));n.position.set(dx,-.70,dz);g.add(n)}g.position.set(x,-.455,z);g.rotation.y=a;remember(id,g,"tiles")}
+    function header855(center,contacts,rotation=0){const cols=contacts/2,g=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry((cols-1)*1.27+1.45,.7,2.7),material(0x11161a,{rough:.4}));body.position.y=3.39;g.add(body);for(const rz of [-.635,.635])for(let c=0;c<cols;c++){const x=(c-(cols-1)/2)*1.27;const pin=new THREE.Mesh(new THREE.CylinderGeometry(.12,.24,6.08,16),material(0xe2ad32,{metal:.78,rough:.14}));pin.position.set(x,6.08,rz);g.add(pin)}g.position.set(center[0],0.02,center[1]);g.rotation.y=rotation;remember("headers",g,"headers")}
     // Disposable cartridge: open frame, flex, tiles, pads and seal.
     ring("adhesive",27,17,.32,[0,-.71,0],0xe3d9c7,"adhesive",{rough:.86,opacity:.92});
     ring("carrier",20,17,.70,[0,-.15,0],0xc6d0d4,"carrier",{metal:.04,rough:.38});
-    ring("latch",20,18.8,.42,[0,.22,0],0x26343a,"interface",{metal:.12,rough:.34});
+    ring("latch",20.15,18.8,.42,[0,.22,0],0x26343a,"interface",{metal:.12,rough:.34});
     for(const a of [0,Math.PI*2/3,Math.PI*4/3]){const land=box("latch",[2.0,.7,4.4],[Math.sin(a)*18.9,.25,Math.cos(a)*18.9],0x26343a,"interface",{rough:.34});land.rotation.y=a}
-    cyl("flex",18,.20,[0,-.10,0],0xc98928,"flex",{metal:.24,rough:.32,opacity:.94});
+    cyl("flex",18,.20,[0,-.08,0],0xc98928,"flex",{metal:.24,rough:.32,opacity:.94});
     [["glc"],["bhb"],["lac"],["dup"],["na"],["k"],["ph"],["blank"]].forEach((d,i)=>addTile(d[0],i));
     const ceGroup=new THREE.Group();for(const dx of [-.62,.62])for(const dz of [-1.2,0,1.2]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.045,.15,1.1,20),material(0xc7d0d5,{metal:.72,rough:.14}));n.position.set(dx,-1.0,dz);ceGroup.add(n)}remember("ce",ceGroup,"tiles");
     const refsGroup=new THREE.Group();for(const x of [-3.4,3.4])for(const z of [-.75,.75]){const n=new THREE.Mesh(new THREE.CylinderGeometry(.05,.15,1.05,20),material(0xffd45b,{metal:.58,rough:.18}));n.position.set(x,-.975,z);refsGroup.add(n)}remember("refs",refsGroup,"tiles");
-    roundedPlate("connector",18.5,8.7,.34,1.4,[0,.17,0],0x151e23,"interface",{rough:.4});
+    roundedPlate("connector",18.5,8.7,.34,1.4,[0,.21,0],0x151e23,"interface",{rough:.4});
     for(let row=0;row<2;row++)for(let col=0;col<6;col++){const x=(col-2.5)*2.54,z=(row-.5)*2.54;roundedPlate("connector",1.55,1.8,.08,.45,[x,.39,z],0xe7b53a,"interface",{metal:.82,rough:.12})}
-    roundedRing("gasket",22.5,12,19,8.2,.40,[0,.58,0],0x3adca9,"interface",{rough:.58,opacity:.78});
+    roundedRing("gasket",22.5,12,19,8.2,.40,[0,.60,0],0x3adca9,"interface",{rough:.58,opacity:.78});
     // One retained low-profile Mill-Max 817 connector.
-    roundedPlate("connector",15.7,4.15,.64,.45,[0,1.92,0],0x10161a,"connector",{rough:.42});
-    for(let row=0;row<2;row++)for(let col=0;col<6;col++){const x=(col-2.5)*2.54,z=(row-.5)*2.54;cyl("connector",.26,2.24,[x,1.12,z],0xe6b13a,"connector",{metal:.82,rough:.12})}
+    roundedPlate("connector",15.7,4.15,.64,.45,[0,1.88,0],0x10161a,"connector",{rough:.42});
+    for(let row=0;row<2;row++)for(let col=0;col<6;col++){const x=(col-2.5)*2.54,z=(row-.5)*2.54;cyl("connector",.26,2.16,[x,1.14,z],0xe6b13a,"connector",{metal:.82,rough:.12})}
     // 38 mm guarded daughterboard, buffers and ADC.
     cyl("daughter",19,.80,[0,2.64,0],0x087557,"daughter",{metal:.08,rough:.34});
-    for(let i=0;i<6;i++){const a=i*Math.PI/3;const chip=box("daughter",[3.9,1.5,4.9],[Math.sin(a)*15.8,3.79,Math.cos(a)*15.8],0x10171b,"daughter",{metal:.18,rough:.28});chip.rotation.y=a}
-    box("daughter",[5,1,5],[0,3.54,0],0x0d1418,"daughter",{metal:.18,rough:.26});
+    for(let i=0;i<6;i++){const a=i*Math.PI/3;const chip=box("daughter",[3.9,1.5,4.9],[Math.sin(a)*15.8,3.81,Math.cos(a)*15.8],0x10171b,"daughter",{metal:.18,rough:.28});chip.rotation.y=a}
+    box("daughter",[5,1,5],[0,3.56,0],0x0d1418,"daughter",{metal:.18,rough:.26});
     header855([-4.88,7.15],8,Math.PI/2);header855([-.51,7.15],8,Math.PI/2);header855([1.01,-9.79],10,0);header855([1.01,-4.49],10,0);
     // Four shell-supported board clips and three cartridge hooks.
-    for(const a of [Math.PI/4,3*Math.PI/4,5*Math.PI/4,7*Math.PI/4]){const x=Math.sin(a)*15.15,z=Math.cos(a)*15.15;box("fasteners",[1.5,7.65,3.4],[x,6.87,z],0x1b282e,"hardware",{rough:.34}).rotation.y=a}
+    for(const a of [Math.PI/4,3*Math.PI/4,5*Math.PI/4,7*Math.PI/4]){const x=Math.sin(a)*15.15,z=Math.cos(a)*15.15;box("fasteners",[1.5,7.65,3.4],[x,6.90,z],0x1b282e,"hardware",{rough:.34}).rotation.y=a}
     for(const a of [0,Math.PI*2/3,Math.PI*4/3]){const h=box("latch",[1.2,2.65,3],[Math.sin(a)*20.1,1.38,Math.cos(a)*20.1],0x1b282e,"hardware",{rough:.34});h.rotation.y=a}
     // Actual populated Biocoin mesh loads at its measured stack center.
     const loader=new STLLoader();
@@ -232,12 +232,12 @@
     box("harness",[2.8,1.2,2.1],[5.33,10.5,-8.2],0xf0eee6,"harness",{rough:.42});
     // Lifelike closed shell with satin seam, PEEK screws and top mark.
     const profile=[[0,.2],[19.8,.2],[21.4,1],[22,3],[22,16],[21.6,17.1],[20.2,18.3],[17,19],[0,19]].map(p=>new THREE.Vector2(...p));
-    const shellMaterial=material(0x101820,{metal:.16,rough:.21,clearcoat:.72,clearcoatRough:.16});
+    const shellMaterial=material(0x101820,{metal:.16,rough:.21,clearcoat:.72,clearcoatRough:.16,side:THREE.DoubleSide});
     const shell=remember("shell",new THREE.Mesh(new THREE.LatheGeometry(profile,128),shellMaterial),"shell");
-    const seam=ring("shell",22.04,21.55,.5,[0,9.35,0],0x46e7bd,"shell",{metal:.35,rough:.18});seam.material.emissive.set(0x164f43);seam.material.emissiveIntensity=.45;
+    const seam=ring("shell",22.14,21.7,.5,[0,9.35,0],0x46e7bd,"shell",{metal:.35,rough:.18,polyOffset:-1});seam.material.emissive.set(0x164f43);seam.material.emissiveIntensity=.45;
     for(const a of [Math.PI/6,5*Math.PI/6,3*Math.PI/2]){const x=Math.sin(a)*19,z=Math.cos(a)*19;cyl("fasteners",1.2,.45,[x,18.65,z],0x303a3f,"shell",{metal:.22,rough:.24})}
     // Top logo plate.
-    const logoCanvas=document.createElement("canvas");logoCanvas.width=640;logoCanvas.height=200;const lctx=logoCanvas.getContext("2d");lctx.clearRect(0,0,640,200);lctx.fillStyle="#83ffd0";lctx.font="600 112px Space Grotesk, Arial";lctx.textAlign="center";lctx.textBaseline="middle";lctx.fillText("CBM",320,100);const logoTex=new THREE.CanvasTexture(logoCanvas);logoTex.colorSpace=THREE.SRGBColorSpace;const logo=remember("shell",new THREE.Mesh(new THREE.PlaneGeometry(10,3.1),new THREE.MeshBasicMaterial({map:logoTex,transparent:true,depthWrite:false,toneMapped:false})),"shell");logo.rotation.x=-Math.PI/2;logo.position.y=19.04;
+    const logoCanvas=document.createElement("canvas");logoCanvas.width=640;logoCanvas.height=200;const lctx=logoCanvas.getContext("2d");lctx.clearRect(0,0,640,200);lctx.fillStyle="#83ffd0";lctx.font="600 112px Space Grotesk, Arial";lctx.textAlign="center";lctx.textBaseline="middle";lctx.fillText("CBM",320,100);const logoTex=new THREE.CanvasTexture(logoCanvas);logoTex.colorSpace=THREE.SRGBColorSpace;const logo=remember("shell",new THREE.Mesh(new THREE.PlaneGeometry(10,3.1),new THREE.MeshBasicMaterial({map:logoTex,transparent:true,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4})),"shell");logo.rotation.x=-Math.PI/2;logo.position.y=19.1;
 
     const baseY={adhesive:0,tiles:0,carrier:0,flex:0,interface:0,connector:0,daughter:0,headers:0,board:0,battery:0,harness:0,hardware:0,shell:0};
     const explodeY={adhesive:-4,tiles:0,carrier:3,flex:6,interface:9,connector:13,daughter:18,headers:24,board:31,battery:42,harness:42,hardware:18,shell:65};
