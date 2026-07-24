@@ -61,6 +61,11 @@ export function confidenceRank(c: NutrientConfidence): number {
   return CONFIDENCE_RANK[c]
 }
 
+/** Weight used when rolling a nutrient's confidence up across many foods. */
+export function confidenceWeight(c: NutrientConfidence): number {
+  return CONFIDENCE_WEIGHT[c]
+}
+
 export function confidenceColor(c: NutrientConfidence): string {
   return CONFIDENCE_COLOR[c]
 }
@@ -86,7 +91,11 @@ export function confidenceFromScore(score: number): NutrientConfidence {
 
 export type NutrientSource =
   | 'usda'
+  | 'usdaBranded'
+  | 'usdaAnalog'
   | 'label'
+  | 'productClaim'
+  | 'ingredientEstimate'
   | 'webMicro'
   | 'webPer100'
   | 'aiGrounded'
@@ -103,8 +112,16 @@ export function sourceFromFillRaw(raw: string): NutrientSource {
   switch (raw) {
     case 'usda':
       return 'usda'
+    case 'usda_branded':
+      return 'usdaBranded'
+    case 'usda_analog':
+      return 'usdaAnalog'
     case 'web':
       return 'label'
+    case 'product_claim':
+      return 'productClaim'
+    case 'ingredient_estimate':
+      return 'ingredientEstimate'
     case 'web_micro':
       return 'webMicro'
     case 'web_per100':
@@ -139,13 +156,17 @@ export function sourceFromRecorded(source: FoodSource): NutrientSource {
 export function sourceConfidence(source: NutrientSource): NutrientConfidence {
   switch (source) {
     case 'usda':
+    case 'usdaBranded':
     case 'barcodeDatabase':
     case 'nutritionLabel':
     case 'userEntered':
       return 'full'
     case 'label':
+    case 'productClaim':
     case 'savedLibrary':
       return 'high'
+    case 'usdaAnalog':
+    case 'ingredientEstimate':
     case 'webMicro':
     case 'webPer100':
     case 'aiGrounded':
@@ -161,6 +182,8 @@ export function sourceConfidence(source: NutrientSource): NutrientConfidence {
 export function sourceIsEstimated(source: NutrientSource): boolean {
   switch (source) {
     case 'usda':
+    case 'usdaBranded':
+    case 'productClaim':
     case 'barcodeDatabase':
     case 'nutritionLabel':
     case 'userEntered':
@@ -171,18 +194,45 @@ export function sourceIsEstimated(source: NutrientSource): boolean {
   }
 }
 
+/** Whether this value came from the enrichment cascade or backfill (vs. the
+ *  food's original capture). Mirrors NutrientSource.isFilledByStatsKey. */
+export function sourceIsFilledByStatsKey(source: NutrientSource): boolean {
+  switch (source) {
+    case 'usda':
+    case 'usdaBranded':
+    case 'usdaAnalog':
+    case 'label':
+    case 'productClaim':
+    case 'ingredientEstimate':
+    case 'webMicro':
+    case 'webPer100':
+    case 'aiGrounded':
+      return true
+    default:
+      return false
+  }
+}
+
 export function sourceDisplayName(source: NutrientSource): string {
   switch (source) {
     case 'usda':
       return 'USDA FoodData Central'
+    case 'usdaBranded':
+      return 'USDA branded product record'
+    case 'usdaAnalog':
+      return 'USDA comparable food'
     case 'label':
       return 'Product label'
+    case 'productClaim':
+      return 'Product label'
+    case 'ingredientEstimate':
+      return 'Ingredient-constrained estimate'
     case 'webMicro':
       return 'Web nutrition source'
     case 'webPer100':
       return 'Web reference (per 100g)'
     case 'aiGrounded':
-      return 'AI estimate (grounded)'
+      return 'Grounded nutrition estimate'
     case 'barcodeDatabase':
       return 'Barcode database'
     case 'nutritionLabel':
@@ -192,7 +242,7 @@ export function sourceDisplayName(source: NutrientSource): string {
     case 'userEntered':
       return 'You entered'
     case 'aiSearch':
-      return 'AI search match'
+      return 'Intelligence search match'
     case 'photoEstimate':
       return 'Photo estimate'
     case 'unknown':
@@ -200,16 +250,33 @@ export function sourceDisplayName(source: NutrientSource): string {
   }
 }
 
+/** Typical estimated error when the source didn't persist a specific value.
+ *  Mirrors NutrientSource.defaultErrPct on iOS. */
 function sourceDefaultErrPct(source: NutrientSource): number | undefined {
   switch (source) {
     case 'usda':
       return 0
+    case 'usdaBranded':
+      return 7
+    case 'usdaAnalog':
+      return 25
     case 'label':
       return 7
+    case 'productClaim':
+      return 0
+    case 'ingredientEstimate':
+      return 30
     case 'webPer100':
       return 8
     case 'webMicro':
       return 12
+    // Grounded estimates carry real composition uncertainty even when no
+    // per-key margin was persisted, so every estimated source shows a ±.
+    case 'aiGrounded':
+    case 'aiSearch':
+      return 12
+    case 'photoEstimate':
+      return 15
     default:
       return undefined
   }

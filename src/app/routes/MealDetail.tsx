@@ -7,6 +7,7 @@ import { mealDisplayName, mealTotal } from '../lib/aggregates'
 import { deleteMeal, setMealFavorite } from '../lib/writers'
 import { NUTRIENT_KEYS, type FoodItem } from '../lib/types'
 import { TrustBadge } from '../components/TrustBadge'
+import { NutritionFactsPanel } from '../components/NutritionFacts'
 
 export function MealDetail() {
   const { user } = useAuth()
@@ -131,6 +132,8 @@ export function MealDetail() {
         <Stat label="Fat" value={`${fat}g`} />
         <Stat label="Fiber" value={`${fiber}g`} />
       </div>
+
+      <NutritionFactsPanel meal={meal} />
 
       {meal.aiExplanation && (
         <div className="panel">
