@@ -716,6 +716,45 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.72;
 }
 
+.exercise-note__details {
+  margin-top: 12px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 8px;
+}
+
+.exercise-note__details summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+
+.exercise-note__details summary::-webkit-details-marker {
+  display: none;
+}
+
+.exercise-note__details summary::after {
+  content: "+";
+  font-size: 20px;
+  font-weight: 400;
+  transition: transform 0.2s ease;
+}
+
+.exercise-note__details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.exercise-note__details p {
+  margin-top: 2px;
+  padding-bottom: 4px;
+}
+
 /* ===== App media — real screen recordings / screenshots in a phone frame ===== */
 .app-visual {
   display: flex;
@@ -955,8 +994,14 @@ a { color: inherit; text-decoration: none; }
 
 .lab-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+}
+
+@media (min-width: 721px) and (max-width: 860px) {
+  .lab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .lab-card {
@@ -1046,9 +1091,9 @@ a { color: inherit; text-decoration: none; }
 
 html.reveal-motion .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(16px);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html.reveal-motion .reveal.visible {
@@ -1056,15 +1101,15 @@ html.reveal-motion .reveal.visible {
   transform: translateY(0);
 }
 
-.reveal-stagger-1 { transition-delay: 0.06s; }
-.reveal-stagger-2 { transition-delay: 0.12s; }
-.reveal-stagger-3 { transition-delay: 0.18s; }
-.reveal-stagger-4 { transition-delay: 0.24s; }
-.reveal-stagger-5 { transition-delay: 0.30s; }
-.reveal-stagger-6 { transition-delay: 0.36s; }
-.d1 { transition-delay: 0.1s; }
-.d2 { transition-delay: 0.2s; }
-.d3 { transition-delay: 0.3s; }
+.reveal-stagger-1 { transition-delay: 0.04s; }
+.reveal-stagger-2 { transition-delay: 0.08s; }
+.reveal-stagger-3 { transition-delay: 0.12s; }
+.reveal-stagger-4 { transition-delay: 0.16s; }
+.reveal-stagger-5 { transition-delay: 0.20s; }
+.reveal-stagger-6 { transition-delay: 0.24s; }
+.d1 { transition-delay: 0.06s; }
+.d2 { transition-delay: 0.12s; }
+.d3 { transition-delay: 0.18s; }
 
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -2417,6 +2462,8 @@ body.marketing-light .site-nav__cta:hover {
 }
 
 body.marketing-light .site-menu-btn {
+  width: 44px;
+  height: 44px;
   border-color: var(--line);
   background: rgba(255, 255, 255, 0.88);
   color: var(--ink);
@@ -2527,6 +2574,19 @@ body.marketing-light .feature-card--violet {
   background:
     radial-gradient(circle at 86% 8%, rgba(48, 105, 198, 0.17), transparent 40%),
     linear-gradient(180deg, rgba(234, 241, 255, 0.96), rgba(248, 251, 255, 0.92));
+}
+
+body.marketing-light .lab-card--secondary {
+  background: rgba(248, 251, 255, 0.72);
+  box-shadow: 0 12px 36px rgba(37, 89, 151, 0.06);
+}
+
+body.marketing-light .lab-card--secondary::after {
+  opacity: 0.42;
+}
+
+body.marketing-light .lab-card--secondary > span {
+  color: var(--muted);
 }
 
 body.marketing-light .exercise-note {
@@ -2735,6 +2795,10 @@ body.marketing-light .glucose-lab__toggle button.on {
   background: linear-gradient(135deg, rgba(43, 154, 226, 0.2), rgba(20, 111, 232, 0.22));
 }
 
+body.marketing-light .glucose-lab__toggle button {
+  min-height: 44px;
+}
+
 body.marketing-light #gl-base {
   stroke: rgba(27, 84, 151, 0.2);
 }
@@ -2862,9 +2926,67 @@ body.marketing-light .nav-progress {
 }
 
 @media (max-width: 720px) {
+  body.marketing-light .page-shell {
+    width: min(100% - 40px, 1160px);
+  }
+
   body.marketing-light .hero-title {
     letter-spacing: -0.055em;
     line-height: 0.92;
+  }
+
+  body.marketing-light :is(.eyebrow, .kicker) {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  body.marketing-light :is(
+    .panel-label,
+    .spec span,
+    .axis span,
+    .prov-demo__row em,
+    .prov-chip span,
+    .glucose-lab__axis,
+    .glucose-lab__stats span,
+    .glucose-lab__stats em,
+    .fusion-node em,
+    .fusion-delta,
+    .fusion-macros b,
+    .src-note
+  ) {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  body.marketing-light .cmp-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(86%, 420px);
+    align-items: stretch;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 2px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 2px 2px 14px;
+  }
+
+  body.marketing-light .cmp-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  body.marketing-light .cmp-col {
+    scroll-snap-align: start;
+  }
+
+  body.marketing-light .lab-card {
+    min-height: 0;
+  }
+
+  body.marketing-light .site-footer a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
   }
 
   body.marketing-light .site-mobile-menu {
