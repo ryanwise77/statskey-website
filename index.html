@@ -37,12 +37,12 @@
           <a href="/app/login">Sign in</a>
         </div>
         <a class="site-nav__cta" href="/app/signup">Sign up</a>
-        <button id="mobile-menu-btn" class="site-menu-btn" aria-label="Open menu" aria-expanded="false">
+        <button id="mobile-menu-btn" class="site-menu-btn" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
           <span></span>
           <span></span>
         </button>
       </div>
-      <div id="mobile-menu" class="site-mobile-menu hidden">
+      <div id="mobile-menu" class="site-mobile-menu hidden" role="navigation" aria-label="Mobile navigation" aria-hidden="true">
         <a href="#platform">Platform</a>
         <a href="#positioning">Why StatsKey</a>
         <a href="#intelligence">Intelligence</a>
@@ -80,10 +80,11 @@
               poster="/statskey-app/hero-preview-poster.jpg"
               width="660"
               height="1430"
-              autoplay
               loop
               muted
               playsinline
+              preload="metadata"
+              data-viewport-video
               aria-label="StatsKey app preview: nutrition facts for every meal, GPS runs with splits and heart rate, your metabolic day, and Intelligence — actual screen recording"
             ></video>
           </div>
@@ -161,7 +162,7 @@
           <div class="app-visual reveal d2">
             <div>
               <div class="app-device">
-                <video src="/statskey-app/app-demo.mp4" autoplay loop muted playsinline poster="/statskey-app/app-demo-poster.jpg"></video>
+                <video src="/statskey-app/app-demo.mp4" loop muted playsinline preload="metadata" data-viewport-video poster="/statskey-app/app-demo-poster.jpg"></video>
               </div>
               <div class="app-cap">The live app — macros, glucose response, the full nutrient panel with deficit flags, and Intelligence insights. Actual screen recording.</div>
             </div>
@@ -231,7 +232,7 @@
           <div class="app-visual reveal d2">
             <div>
               <div class="app-device">
-                <video src="/statskey-app/app-recording.mp4" autoplay loop muted playsinline poster="/statskey-app/app-recording-poster.jpg"></video>
+                <video src="/statskey-app/app-recording.mp4" loop muted playsinline preload="metadata" data-viewport-video poster="/statskey-app/app-recording-poster.jpg"></video>
               </div>
               <div class="app-cap">Record by photo, barcode, label, or text — and watch it resolve into a full, sourced Nutrition Facts panel. Actual screen recording.</div>
             </div>
@@ -274,7 +275,7 @@
           <div class="app-visual reveal d2">
             <div>
               <div class="app-device">
-                <video src="/statskey-app/app-glucose.mp4" autoplay loop muted playsinline poster="/statskey-app/app-glucose-poster.jpg"></video>
+                <video src="/statskey-app/app-glucose.mp4" loop muted playsinline preload="metadata" data-viewport-video poster="/statskey-app/app-glucose-poster.jpg"></video>
               </div>
               <div class="app-cap">A metabolic day, and food ⇄ glucose analysis Intelligence can read back to you. Actual screen recording.</div>
             </div>

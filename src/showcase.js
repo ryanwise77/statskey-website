@@ -27,6 +27,57 @@ function formatNumber(value, decimals) {
   return frac ? `${grouped}.${frac}` : grouped
 }
 
+/* ---------- Viewport-aware media and ambient motion ---------- */
+function initViewportVideos() {
+  const videos = Array.from(document.querySelectorAll('video[data-viewport-video]'))
+  if (!videos.length) return
+
+  const visibleVideos = new Set()
+  const pause = (video) => video.pause()
+  const play = (video) => {
+    if (document.hidden || reducedMotion) return
+    const promise = video.play()
+    promise?.catch(() => {})
+  }
+
+  videos.forEach(pause)
+  if (reducedMotion || !('IntersectionObserver' in window)) return
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          visibleVideos.add(entry.target)
+          play(entry.target)
+        } else {
+          visibleVideos.delete(entry.target)
+          pause(entry.target)
+        }
+      })
+    },
+    { threshold: 0.18, rootMargin: '100px 0px' }
+  )
+
+  videos.forEach((video) => io.observe(video))
+  document.addEventListener('visibilitychange', () => {
+    videos.forEach(pause)
+    if (!document.hidden) visibleVideos.forEach(play)
+  })
+}
+
+function initViewportMotion() {
+  const targets = document.querySelectorAll('.hero-section, .fusion-panel, .dd-strip, .cta-card--aurora')
+  if (!targets.length || reducedMotion || !('IntersectionObserver' in window)) return
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => entry.target.classList.toggle('motion-active', entry.isIntersecting))
+    },
+    { threshold: 0.08, rootMargin: '120px 0px' }
+  )
+  targets.forEach((target) => io.observe(target))
+}
+
 /* ---------- Count-up numbers ---------- */
 function initCountUps() {
   const els = document.querySelectorAll('[data-count-to]')
@@ -79,11 +130,27 @@ function initRotators() {
     const items = Array.from(rot.querySelectorAll('.rot-item'))
     if (items.length < 2 || reducedMotion) return
     let idx = 0
-    setInterval(() => {
-      items[idx].classList.remove('on')
-      idx = (idx + 1) % items.length
-      items[idx].classList.add('on')
-    }, 5200)
+    let timer = null
+    const stop = () => {
+      if (timer) clearInterval(timer)
+      timer = null
+    }
+    const start = () => {
+      if (timer) return
+      timer = setInterval(() => {
+        items[idx].classList.remove('on')
+        idx = (idx + 1) % items.length
+        items[idx].classList.add('on')
+      }, 5200)
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) start()
+        else stop()
+      },
+      { threshold: 0.2 }
+    )
+    io.observe(rot)
   })
 }
 
@@ -136,80 +203,51 @@ function initTimeline() {
   if (!panel || reducedMotion) return
   const rows = Array.from(panel.querySelectorAll('.timeline-row'))
   if (rows.length < 2) return
+  const durations = rows.map((_, i) => (i === rows.length - 1 ? 0 : 2100))
+  let idx = -1
+  let timer = null
+  let started = false
+  let finished = false
+
+  const stop = () => {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+
+  const advance = () => {
+    timer = null
+    if (idx >= 0) rows[idx].classList.remove('is-on')
+    idx += 1
+    if (idx >= rows.length) {
+      finished = true
+      return
+    }
+    rows[idx].classList.add('is-on')
+    if (idx === rows.length - 1) {
+      finished = true
+      return
+    }
+    timer = setTimeout(advance, durations[idx])
+  }
+
   const io = new IntersectionObserver(
-    (entries) => {
-      if (!entries.some((e) => e.isIntersecting)) return
-      io.disconnect()
-      panel.classList.add('is-live')
-      rows.forEach((r) => r.classList.remove('timeline-row--active'))
-      const durations = rows.map((_, i) => (i === rows.length - 1 ? 3800 : 2100))
-      let idx = -1
-      const step = () => {
-        if (idx >= 0) rows[idx].classList.remove('is-on')
-        idx = (idx + 1) % rows.length
-        rows[idx].classList.add('is-on')
-        setTimeout(step, durations[idx])
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        if (!started) {
+          started = true
+          panel.classList.add('is-live')
+          rows.forEach((row) => row.classList.remove('timeline-row--active'))
+          advance()
+        } else if (!finished && !timer) {
+          timer = setTimeout(advance, 300)
+        }
+      } else {
+        stop()
       }
-      step()
     },
     { threshold: 0.35 }
   )
   io.observe(panel)
-}
-
-/* ---------- Agent console script ---------- */
-function initAgentConsole() {
-  const consoleEl = document.getElementById('agent-console')
-  if (!consoleEl || reducedMotion) return
-  const body = document.getElementById('ac-body')
-  const modelEl = document.getElementById('ac-model')
-  const steps = Array.from(body.children)
-  const tools = steps.filter((el) => el.classList.contains('ac-tool'))
-  const models = ['Auto · frontier routing', 'Claude Opus', 'Gemini', 'OpenAI', 'Grok']
-  let modelIdx = 0
-
-  consoleEl.classList.add('is-scripted')
-  steps.forEach((el) => el.classList.add('ac-step'))
-
-  const timers = new Set()
-  const after = (ms, fn) => {
-    const id = setTimeout(() => { timers.delete(id); fn() }, ms)
-    timers.add(id)
-  }
-
-  const play = () => {
-    steps.forEach((el) => el.classList.remove('is-in'))
-    tools.forEach((el) => el.classList.remove('is-running', 'is-done'))
-    if (modelEl) modelEl.textContent = models[modelIdx % models.length]
-    modelIdx += 1
-
-    let t = 350
-    steps.forEach((el) => {
-      if (el.classList.contains('ac-tool')) {
-        const showAt = t
-        after(showAt, () => { el.classList.add('is-in', 'is-running') })
-        after(showAt + 850, () => {
-          el.classList.remove('is-running')
-          el.classList.add('is-done')
-        })
-        t += 1000
-      } else {
-        after(t, () => el.classList.add('is-in'))
-        t += el.classList.contains('ac-msg--ai') ? 900 : 750
-      }
-    })
-    after(t + 4600, play)
-  }
-
-  const io = new IntersectionObserver(
-    (entries) => {
-      if (!entries.some((e) => e.isIntersecting)) return
-      io.disconnect()
-      play()
-    },
-    { threshold: 0.3 }
-  )
-  io.observe(consoleEl)
 }
 
 /* ---------- Adaptive Intelligence fusion panel ---------- */
@@ -241,36 +279,51 @@ function initFusion() {
     { kcal: 2872, delta: 'weight trend reconciles: −6 kcal', tier: 3, label: 'High confidence — cross-validated by your weight trend', node: 2 },
   ]
 
-  let stageIdx = 0
-  let currentKcal = stages[stages.length - 1].kcal
+  let stageIdx = -1
+  let timer = null
+  let started = false
+  let finished = false
 
   const applyStage = (stage) => {
     nodes.forEach((n, i) => n.classList.toggle('is-hot', i === stage.node))
     if (confEl) confEl.dataset.tier = String(stage.tier)
     if (confLabel) confLabel.textContent = stage.label
-    if (deltaEl) {
-      deltaEl.classList.add('is-swap')
-      setTimeout(() => {
-        deltaEl.textContent = stage.delta
-        deltaEl.classList.remove('is-swap')
-      }, 300)
+    if (deltaEl) deltaEl.textContent = stage.delta
+    if (kcalEl) kcalEl.textContent = formatNumber(stage.kcal, 0)
+  }
+
+  const stop = () => {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+
+  const advance = () => {
+    timer = null
+    stageIdx += 1
+    if (stageIdx >= stages.length) {
+      finished = true
+      return
     }
-    const from = currentKcal
-    tween(800, (t) => {
-      if (kcalEl) kcalEl.textContent = formatNumber(from + (stage.kcal - from) * t, 0)
-    })
-    currentKcal = stage.kcal
+    applyStage(stages[stageIdx])
+    if (stageIdx === stages.length - 1) {
+      finished = true
+      return
+    }
+    timer = setTimeout(advance, 3400)
   }
 
   const io = new IntersectionObserver(
-    (entries) => {
-      if (!entries.some((e) => e.isIntersecting)) return
-      io.disconnect()
-      applyStage(stages[0])
-      setInterval(() => {
-        stageIdx = (stageIdx + 1) % stages.length
-        applyStage(stages[stageIdx])
-      }, 3400)
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        if (!started) {
+          started = true
+          advance()
+        } else if (!finished && !timer) {
+          timer = setTimeout(advance, 300)
+        }
+      } else {
+        stop()
+      }
     },
     { threshold: 0.35 }
   )
@@ -370,21 +423,33 @@ function initGlucoseLab() {
   }
 
   let userLocked = false
+  let autoComplete = false
+  let autoTimer = null
+  const stopAuto = () => {
+    if (autoTimer) clearTimeout(autoTimer)
+    autoTimer = null
+  }
+
   buttons.forEach((b) => {
     b.addEventListener('click', () => {
       userLocked = true
+      stopAuto()
       setMeal(parseInt(b.dataset.meal, 10))
     })
   })
 
   if (!reducedMotion) {
     const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return
-        io.disconnect()
-        setInterval(() => {
-          if (!userLocked) setMeal((current + 1) % meals.length)
-        }, 5600)
+      ([entry]) => {
+        if (entry.isIntersecting && !userLocked && !autoComplete && !autoTimer) {
+          autoTimer = setTimeout(() => {
+            autoTimer = null
+            autoComplete = true
+            if (!userLocked) setMeal(1)
+          }, 4200)
+        } else if (!entry.isIntersecting) {
+          stopAuto()
+        }
       },
       { threshold: 0.35 }
     )
@@ -425,15 +490,26 @@ function initNavProgress() {
 }
 
 export function initShowcase() {
-  initCountUps()
-  initHeroRing()
-  initRotators()
-  initTilt()
-  initStatementSweep()
-  initTimeline()
-  initAgentConsole()
-  initFusion()
-  initGlucoseLab()
-  initSpotlight()
-  initNavProgress()
+  const initializers = [
+    initViewportVideos,
+    initViewportMotion,
+    initCountUps,
+    initHeroRing,
+    initRotators,
+    initTilt,
+    initStatementSweep,
+    initTimeline,
+    initFusion,
+    initGlucoseLab,
+    initSpotlight,
+    initNavProgress,
+  ]
+
+  initializers.forEach((initialize) => {
+    try {
+      initialize()
+    } catch (error) {
+      console.error(`StatsKey showcase widget failed: ${initialize.name}`, error)
+    }
+  })
 }

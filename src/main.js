@@ -6,57 +6,106 @@ import { initShowcase } from './showcase.js'
 // while the Play listing is unset, keeping those buttons hidden site-wide).
 applyStoreLinks()
 
-// Live showcase widgets (agent console, fusion panel, glucose lab, count-ups,
-// spotlight). Every init is null-guarded, so pages without the markup no-op.
-initShowcase()
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+const revealEls = Array.from(document.querySelectorAll('.reveal'))
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible')
-        revealObserver.unobserve(entry.target)
-      }
-    })
-  },
-  { threshold: 0.05, rootMargin: '0px 0px -10px 0px' }
-)
+// Reveals are progressive enhancement: content is visible by default and is
+// hidden only after the observer has been constructed successfully.
+if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible')
+          revealObserver.unobserve(entry.target)
+        }
+      })
+    },
+    { threshold: 0.05, rootMargin: '0px 0px -10px 0px' }
+  )
 
-document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el))
+  document.documentElement.classList.add('reveal-motion')
+  revealEls.forEach((el) => revealObserver.observe(el))
+}
+
+// Showcase failures must never prevent navigation or leave page content hidden.
+try {
+  initShowcase()
+} catch (error) {
+  console.error('StatsKey showcase initialization failed', error)
+}
 
 const nav = document.getElementById('nav')
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 40) {
-    nav.style.borderColor = 'var(--line-soft)'
-  } else {
-    nav.style.borderColor = 'transparent'
-  }
-}, { passive: true })
+if (nav) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 40) {
+      nav.style.borderColor = 'var(--line-soft)'
+    } else {
+      nav.style.borderColor = 'transparent'
+    }
+  }, { passive: true })
+}
 
 const menuBtn = document.getElementById('mobile-menu-btn')
 const mobileMenu = document.getElementById('mobile-menu')
+const menuLinks = Array.from(mobileMenu?.querySelectorAll('a') || [])
+const pageRegions = [document.querySelector('main'), document.querySelector('.site-footer')].filter(Boolean)
+
+if (menuBtn && mobileMenu) {
+  menuBtn.setAttribute('aria-controls', mobileMenu.id)
+  mobileMenu.setAttribute('role', 'navigation')
+  mobileMenu.setAttribute('aria-label', 'Mobile navigation')
+  mobileMenu.setAttribute('aria-hidden', String(mobileMenu.classList.contains('hidden')))
+}
 
 const setMobileMenuOpen = (isOpen) => {
   mobileMenu?.classList.toggle('hidden', !isOpen)
+  mobileMenu?.setAttribute('aria-hidden', String(!isOpen))
   menuBtn?.setAttribute('aria-expanded', String(isOpen))
   menuBtn?.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu')
   document.body.classList.toggle('menu-open', isOpen)
+  pageRegions.forEach((region) => { region.inert = isOpen })
+
+  if (isOpen) {
+    nav?.setAttribute('role', 'dialog')
+    nav?.setAttribute('aria-modal', 'true')
+    nav?.setAttribute('aria-label', 'Navigation menu')
+    requestAnimationFrame(() => menuLinks[0]?.focus())
+  } else {
+    nav?.removeAttribute('role')
+    nav?.removeAttribute('aria-modal')
+    nav?.removeAttribute('aria-label')
+  }
 }
 
 menuBtn?.addEventListener('click', () => {
   setMobileMenuOpen(menuBtn.getAttribute('aria-expanded') !== 'true')
 })
 
-mobileMenu?.querySelectorAll('a').forEach((link) => {
+menuLinks.forEach((link) => {
   link.addEventListener('click', () => {
     setMobileMenuOpen(false)
   })
 })
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && menuBtn?.getAttribute('aria-expanded') === 'true') {
+  const menuOpen = menuBtn?.getAttribute('aria-expanded') === 'true'
+  if (event.key === 'Escape' && menuOpen) {
     setMobileMenuOpen(false)
     menuBtn.focus()
+  }
+
+  if (event.key === 'Tab' && menuOpen) {
+    const focusables = [menuBtn, ...menuLinks].filter(Boolean)
+    const first = focusables[0]
+    const last = focusables[focusables.length - 1]
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault()
+      last?.focus()
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
+      first?.focus()
+    }
   }
 })
 
@@ -73,7 +122,7 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     const target = document.querySelector(href)
     if (target) {
       e.preventDefault()
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' })
     }
   })
 })
@@ -87,7 +136,7 @@ if (hardwareSection) {
   document.querySelectorAll('a[href="/hardware"]').forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault()
-      hardwareSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      hardwareSection.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' })
       history.pushState(null, '', '/hardware')
     })
   })
