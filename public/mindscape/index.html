@@ -16,15 +16,10 @@
   <meta name="description" content="Your body is a non-equilibrium steady state. StatsKey is an instrument for entropy management in alignment with your goals." />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#07090f" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-  <script>
-    window.va = window.va || function () {
-      (window.vaq = window.vaq || []).push(arguments);
-    };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -571,7 +566,11 @@
       const preview = document.getElementById("mindscape-preview");
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       const device = isIOS ? "ios" : /Macintosh|Mac OS X/i.test(navigator.userAgent) ? "mac" : "other";
-      const track = (name, properties = {}) => window.va("event", name, { device, ...properties });
+      const track = (name, properties = {}) => {
+        if (typeof window.gtag === "function") {
+          window.gtag("event", name, { device, ...properties });
+        }
+      };
 
       track("mindscape_landing_view");
 
