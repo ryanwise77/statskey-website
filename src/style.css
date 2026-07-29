@@ -2325,3 +2325,529 @@ main { counter-reset: chapter; }
     display: none;
   }
 }
+
+/* =========================================================================
+   StatsKey marketing theme — light surfaces and a blue-first brand palette
+   ========================================================================= */
+
+body.marketing-light {
+  color-scheme: light;
+  --color-void: #f4f8ff;
+  --color-surface: #ffffff;
+  --color-border: #d9e6f6;
+  --color-text-primary: #0b1f3a;
+  --color-text-secondary: #3f5875;
+  --color-text-muted: #5f748c;
+  --color-accent: #146fe8;
+  --color-data: #0b88dd;
+  --page-bg: #f4f8ff;
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-strong: rgba(255, 255, 255, 0.96);
+  --line: rgba(28, 91, 169, 0.16);
+  --line-soft: rgba(28, 91, 169, 0.1);
+  --line-strong: rgba(28, 91, 169, 0.26);
+  --ink: #0b1f3a;
+  --ink-2: #3f5875;
+  --muted: #576d87;
+  --muted-2: #5f748c;
+  --blue: #146fe8;
+  --cyan: #0b88dd;
+  --violet: #315fbd;
+  --green: #137a55;
+  --amber: #9a6100;
+  --shadow: 0 24px 72px rgba(37, 89, 151, 0.13);
+  background:
+    radial-gradient(circle at 12% 6%, rgba(73, 154, 244, 0.2), transparent 34rem),
+    radial-gradient(circle at 88% 16%, rgba(89, 190, 255, 0.14), transparent 28rem),
+    radial-gradient(circle at 50% 76%, rgba(56, 120, 220, 0.1), transparent 34rem),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8ff 48%, #edf5ff 100%);
+}
+
+body.marketing-light::before {
+  background-image:
+    linear-gradient(rgba(26, 103, 193, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 103, 193, 0.028) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+
+body.marketing-light::after {
+  background: radial-gradient(ellipse at center, transparent 32%, rgba(70, 134, 211, 0.07) 100%);
+}
+
+body.marketing-light .site-nav {
+  border-color: transparent;
+  background: rgba(248, 251, 255, 0.84);
+  box-shadow: 0 10px 34px rgba(36, 88, 151, 0.06);
+}
+
+body.marketing-light .site-brand {
+  color: var(--ink);
+}
+
+body.marketing-light .site-brand__mark {
+  background:
+    radial-gradient(circle at 68% 32%, #fff 0 8%, transparent 9%),
+    linear-gradient(135deg, #7cc8ff, var(--blue) 54%, #0d4fa9);
+  box-shadow: 0 8px 24px rgba(20, 111, 232, 0.3);
+}
+
+body.marketing-light .site-nav__links {
+  color: #516983;
+}
+
+body.marketing-light :is(.site-nav__links a, .site-footer a, .site-mobile-menu a):hover {
+  color: var(--blue);
+}
+
+body.marketing-light .site-nav__cta {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(20, 111, 232, 0.2);
+}
+
+body.marketing-light .site-nav__cta:hover {
+  border-color: #0d5fc9;
+  background: #0d5fc9;
+}
+
+body.marketing-light .site-menu-btn {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--ink);
+}
+
+body.marketing-light .site-mobile-menu {
+  border-color: var(--line-soft);
+  background: rgba(248, 251, 255, 0.98);
+  box-shadow: 0 18px 40px rgba(36, 88, 151, 0.12);
+}
+
+body.marketing-light .site-mobile-menu a {
+  color: var(--ink-2);
+}
+
+body.marketing-light .button--primary {
+  border-color: rgba(20, 111, 232, 0.78);
+  background: linear-gradient(135deg, #0f66d7, #2e8df0);
+  color: #fff;
+  box-shadow: 0 16px 42px rgba(20, 111, 232, 0.24);
+}
+
+body.marketing-light .button--secondary {
+  border-color: rgba(20, 111, 232, 0.24);
+  background: rgba(255, 255, 255, 0.82);
+  color: #145bbd;
+  box-shadow: 0 8px 24px rgba(36, 88, 151, 0.06);
+}
+
+body.marketing-light .button--secondary:hover {
+  border-color: rgba(20, 111, 232, 0.42);
+  background: #fff;
+}
+
+body.marketing-light .hero-orb--blue {
+  background: radial-gradient(circle, rgba(20, 111, 232, 0.24), transparent 68%);
+}
+
+body.marketing-light .hero-orb--data {
+  background: radial-gradient(circle, rgba(43, 164, 238, 0.2), transparent 70%);
+}
+
+body.marketing-light :is(
+  .command-card,
+  .feature-card,
+  .timeline-panel,
+  .flow-card--premium,
+  .lab-card,
+  .cta-card,
+  .fusion-panel,
+  .glucose-lab,
+  .tools-strip,
+  .prov-demo
+) {
+  border-color: var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 255, 0.88));
+  box-shadow: var(--shadow);
+}
+
+body.marketing-light :is(.feature-card, .lab-card):hover {
+  border-color: rgba(20, 111, 232, 0.32);
+}
+
+body.marketing-light .command-card::before {
+  background:
+    radial-gradient(circle at 72% 12%, rgba(59, 169, 240, 0.18), transparent 34%),
+    radial-gradient(circle at 18% 86%, rgba(20, 111, 232, 0.16), transparent 32%);
+}
+
+body.marketing-light :is(.feature-card, .lab-card, .cmp-col)::before {
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(20, 111, 232, 0.09),
+    transparent 62%
+  );
+}
+
+body.marketing-light .feature-card--accent {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(55, 163, 235, 0.18), transparent 38%),
+    linear-gradient(180deg, rgba(232, 246, 255, 0.96), rgba(248, 252, 255, 0.92));
+}
+
+body.marketing-light .feature-card--violet {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(48, 105, 198, 0.17), transparent 40%),
+    linear-gradient(180deg, rgba(234, 241, 255, 0.96), rgba(248, 251, 255, 0.92));
+}
+
+body.marketing-light .exercise-note {
+  border-color: rgba(11, 136, 221, 0.2);
+  background:
+    radial-gradient(circle at 94% 0%, rgba(71, 178, 241, 0.14), transparent 30%),
+    rgba(231, 246, 255, 0.72);
+}
+
+body.marketing-light :is(.signal-card, .compare > div, .chat-tools span) {
+  border-color: var(--line-soft);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+body.marketing-light .insight-strip {
+  border-color: rgba(11, 136, 221, 0.2);
+  background: rgba(222, 242, 255, 0.7);
+}
+
+body.marketing-light .statement-text {
+  background: linear-gradient(180deg, #0a2450 0%, #315a89 72%, #7189a4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+body.marketing-light .section-block--split {
+  background: linear-gradient(180deg, transparent, rgba(72, 145, 227, 0.055), transparent);
+}
+
+body.marketing-light .compare > div.compare--us {
+  border-color: rgba(20, 111, 232, 0.3);
+  background: linear-gradient(180deg, rgba(220, 237, 255, 0.9), rgba(243, 248, 255, 0.8));
+}
+
+body.marketing-light .timeline-row--active,
+body.marketing-light .timeline-panel.is-live .timeline-row.is-on {
+  border-color: rgba(20, 111, 232, 0.2);
+  background: rgba(220, 237, 255, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(20, 111, 232, 0.12);
+}
+
+body.marketing-light .timeline-panel.is-live .timeline-row {
+  opacity: 0.8;
+}
+
+body.marketing-light .timeline-panel.is-live .timeline-row.is-on {
+  opacity: 1;
+}
+
+body.marketing-light .chat-message--user {
+  background: rgba(218, 233, 252, 0.84);
+}
+
+body.marketing-light .chat-message--ai {
+  border-color: rgba(11, 136, 221, 0.18);
+  background: rgba(225, 244, 255, 0.8);
+}
+
+body.marketing-light .spec-strip {
+  border-color: var(--line);
+  background: var(--line);
+}
+
+body.marketing-light .spec {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+body.marketing-light .kicker::before {
+  border-color: var(--line);
+  background: rgba(224, 239, 255, 0.72);
+}
+
+body.marketing-light .cmp-col {
+  border-color: var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 249, 255, 0.86));
+  box-shadow: 0 14px 40px rgba(37, 89, 151, 0.07);
+}
+
+body.marketing-light .cmp-col--us {
+  border-color: rgba(20, 111, 232, 0.38);
+  background: linear-gradient(180deg, rgba(218, 237, 255, 0.95), rgba(241, 247, 255, 0.9));
+}
+
+body.marketing-light .axis {
+  border-color: var(--line-strong);
+}
+
+body.marketing-light .agent-console {
+  border-color: var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(237, 245, 255, 0.94));
+  box-shadow: var(--shadow);
+}
+
+body.marketing-light .agent-console__bar {
+  border-color: var(--line-soft);
+  background: rgba(225, 238, 253, 0.66);
+}
+
+body.marketing-light .ac-dot {
+  background: rgba(26, 79, 142, 0.18);
+}
+
+body.marketing-light .agent-console__model {
+  border-color: rgba(20, 111, 232, 0.24);
+  background: rgba(218, 235, 255, 0.74);
+  color: var(--blue);
+}
+
+body.marketing-light .ac-msg--user {
+  background: rgba(215, 231, 251, 0.86);
+  color: var(--ink);
+}
+
+body.marketing-light .ac-msg--ai {
+  border-color: rgba(20, 111, 232, 0.18);
+  background: linear-gradient(180deg, rgba(222, 238, 255, 0.88), rgba(238, 246, 255, 0.86));
+  color: var(--ink-2);
+}
+
+body.marketing-light .ac-msg--ai strong {
+  color: var(--blue);
+}
+
+body.marketing-light :is(.ac-tool, .ac-chips span) {
+  border-color: var(--line-soft);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+body.marketing-light .ac-tool code {
+  color: var(--blue);
+}
+
+body.marketing-light .agent-console__foot {
+  border-color: var(--line-soft);
+}
+
+body.marketing-light .fusion-node {
+  border-color: var(--line-soft);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+body.marketing-light .fusion-node.is-hot {
+  border-color: rgba(11, 136, 221, 0.34);
+  background: rgba(218, 241, 255, 0.78);
+}
+
+body.marketing-light .fusion-wires path {
+  stroke: rgba(37, 87, 146, 0.2);
+}
+
+body.marketing-light .fusion-wires .wire-pulse {
+  filter: drop-shadow(0 0 5px rgba(20, 111, 232, 0.42));
+}
+
+body.marketing-light .fusion-out {
+  border-color: rgba(20, 111, 232, 0.24);
+  background:
+    radial-gradient(circle at 80% 0%, rgba(74, 143, 229, 0.13), transparent 60%),
+    rgba(226, 239, 255, 0.76);
+}
+
+body.marketing-light :is(.fusion-macros i, .fusion-conf__bars span, .prov-chip i) {
+  background: rgba(34, 91, 158, 0.11);
+}
+
+body.marketing-light .marquee__track span {
+  border-color: var(--line-soft);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+body.marketing-light .feature-card--violet .feature-icon {
+  color: var(--blue);
+}
+
+body.marketing-light .dd-strip span {
+  border-color: rgba(20, 111, 232, 0.16);
+  background: rgba(20, 111, 232, 0.1);
+  animation-name: dd-cell-blue;
+}
+
+@keyframes dd-cell-blue {
+  0%, 4% { background: rgba(20, 111, 232, 0.1); box-shadow: none; }
+  9%, 46% { background: rgba(20, 111, 232, 0.46); box-shadow: 0 0 14px rgba(20, 111, 232, 0.24); }
+  60%, 100% { background: rgba(20, 111, 232, 0.1); box-shadow: none; }
+}
+
+body.marketing-light .prov-demo {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 247, 255, 0.86));
+}
+
+body.marketing-light .prov-chip {
+  border-color: var(--line-soft);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+body.marketing-light .prov-chip i::after {
+  background: linear-gradient(90deg, #1f8cd8, var(--blue));
+}
+
+body.marketing-light .glucose-lab__toggle {
+  border-color: var(--line);
+  background: rgba(226, 239, 255, 0.7);
+}
+
+body.marketing-light .glucose-lab__toggle button.on {
+  background: linear-gradient(135deg, rgba(43, 154, 226, 0.2), rgba(20, 111, 232, 0.22));
+}
+
+body.marketing-light #gl-base {
+  stroke: rgba(27, 84, 151, 0.2);
+}
+
+body.marketing-light #gl-fill stop:first-child {
+  stop-color: rgba(20, 111, 232, 0.26);
+}
+
+body.marketing-light #gl-fill stop:last-child {
+  stop-color: rgba(20, 111, 232, 0);
+}
+
+body.marketing-light .glucose-lab__stats > div {
+  border-color: var(--line-soft);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+body.marketing-light .cta-card--aurora {
+  background:
+    radial-gradient(circle at 14% 18%, rgba(59, 173, 239, 0.18), transparent 34%),
+    radial-gradient(circle at 90% 20%, rgba(20, 111, 232, 0.18), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(232, 243, 255, 0.88));
+  background-size: 180% 180%, 180% 180%, 100% 100%;
+}
+
+body.marketing-light .site-footer {
+  border-color: var(--line-soft);
+}
+
+/* Final polish: a calmer desktop hero and a true mobile navigation layer. */
+body.marketing-light.menu-open {
+  overflow: hidden;
+}
+
+body.marketing-light :is(a, button):focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+body.marketing-light .site-menu-btn span {
+  transform-origin: center;
+  transition: transform 0.22s ease;
+}
+
+body.marketing-light .site-menu-btn[aria-expanded="true"] span:first-child {
+  transform: translateY(3px) rotate(45deg);
+}
+
+body.marketing-light .site-menu-btn[aria-expanded="true"] span:last-child {
+  transform: translateY(-3px) rotate(-45deg);
+}
+
+body.marketing-light .nav-progress {
+  position: fixed;
+  top: 57px;
+  bottom: auto;
+  z-index: 51;
+  height: 1px;
+  background: var(--blue);
+  opacity: 0.72;
+}
+
+@media (min-width: 1121px) {
+  body.marketing-light .hero-grid {
+    grid-template-columns: minmax(0, 1.22fr) minmax(300px, 0.58fr);
+    gap: clamp(40px, 5vw, 68px);
+  }
+
+  body.marketing-light .hero-copy,
+  body.marketing-light .hero-title {
+    max-width: 760px;
+  }
+
+  body.marketing-light .hero-title {
+    font-size: clamp(4.9rem, 6.7vw, 6.2rem);
+    letter-spacing: -0.058em;
+    line-height: 0.92;
+  }
+
+  body.marketing-light .hero-lede {
+    max-width: 640px;
+    font-size: clamp(1.12rem, 1.45vw, 1.32rem);
+  }
+}
+
+@media (max-width: 1120px) {
+  body.marketing-light .site-mobile-menu {
+    position: fixed;
+    inset: 58px 0 auto;
+    height: calc(100dvh - 58px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 28px max(24px, calc((100vw - 560px) / 2)) 48px;
+    background: #f8fbff;
+    box-shadow: none;
+    animation: marketing-menu-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  body.marketing-light .site-mobile-menu a {
+    border-bottom: 1px solid var(--line-soft);
+    padding: 14px 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.32rem, 3vw, 1.7rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  body.marketing-light .site-mobile-menu a:last-child {
+    border-bottom: 0;
+  }
+
+  body.marketing-light .site-mobile-menu a[href="/app/signup"] {
+    color: var(--blue);
+  }
+
+  body.marketing-light .site-mobile-menu a:hover {
+    transform: translateX(4px);
+  }
+}
+
+@media (max-width: 720px) {
+  body.marketing-light .site-mobile-menu {
+    inset-block-start: 54px;
+    height: calc(100dvh - 54px);
+    padding-inline: 24px;
+  }
+
+  body.marketing-light .nav-progress {
+    top: 53px;
+  }
+}
+
+@keyframes marketing-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

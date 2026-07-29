@@ -27,7 +27,7 @@ document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el))
 const nav = document.getElementById('nav')
 window.addEventListener('scroll', () => {
   if (window.scrollY > 40) {
-    nav.style.borderColor = 'rgba(255,255,255,0.04)'
+    nav.style.borderColor = 'var(--line-soft)'
   } else {
     nav.style.borderColor = 'transparent'
   }
@@ -35,15 +35,35 @@ window.addEventListener('scroll', () => {
 
 const menuBtn = document.getElementById('mobile-menu-btn')
 const mobileMenu = document.getElementById('mobile-menu')
+
+const setMobileMenuOpen = (isOpen) => {
+  mobileMenu?.classList.toggle('hidden', !isOpen)
+  menuBtn?.setAttribute('aria-expanded', String(isOpen))
+  menuBtn?.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu')
+  document.body.classList.toggle('menu-open', isOpen)
+}
+
 menuBtn?.addEventListener('click', () => {
-  mobileMenu.classList.toggle('hidden')
-  menuBtn.setAttribute('aria-expanded', String(!mobileMenu.classList.contains('hidden')))
+  setMobileMenuOpen(menuBtn.getAttribute('aria-expanded') !== 'true')
 })
+
 mobileMenu?.querySelectorAll('a').forEach((link) => {
   link.addEventListener('click', () => {
-    mobileMenu.classList.add('hidden')
-    menuBtn?.setAttribute('aria-expanded', 'false')
+    setMobileMenuOpen(false)
   })
+})
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && menuBtn?.getAttribute('aria-expanded') === 'true') {
+    setMobileMenuOpen(false)
+    menuBtn.focus()
+  }
+})
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 1120 && menuBtn?.getAttribute('aria-expanded') === 'true') {
+    setMobileMenuOpen(false)
+  }
 })
 
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
