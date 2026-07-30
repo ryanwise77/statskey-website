@@ -260,15 +260,19 @@
     }
     .dialog-close:hover { color: var(--ink); border-color: var(--line-strong); }
     .mobile-sticky { display: none; }
+    .mobile-sticky [hidden] { display: none !important; }
 
     /* ── close line ── */
     .close-line { padding: 30px 0 90px; }
-    .close-line .big {
+    .close-line__statement {
       font-family: var(--display); font-weight: 700;
-      font-size: clamp(26px, 3.6vw, 44px); letter-spacing: -.03em; line-height: 1.1;
-      color: var(--ink); max-width: 900px; margin: 0;
+      font-size: clamp(26px, 3.2vw, 40px); letter-spacing: -.025em; line-height: 1.15;
+      color: var(--ink); max-width: 920px; margin: 0;
     }
-    .close-line .big em { color: var(--cyan); font-style: normal; }
+    .close-line__detail {
+      color: var(--muted); font-size: clamp(16px, 1.7vw, 20px); line-height: 1.55;
+      max-width: 820px; margin: 18px 0 0;
+    }
 
     /* ── footer ── */
     footer {
@@ -340,14 +344,15 @@
           mile by mile, night by night.
         </p>
         <div class="cta-row">
-          <a class="btn primary" data-claim data-surface="hero" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Get StatsKey + 1 month Pro free</a>
+          <a class="btn primary" data-claim data-surface="hero" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iPhone: Get 1 month Pro free</a>
+          <a class="btn ghost" data-play data-surface="hero" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener">Android: Get it on Google Play</a>
         </div>
         <p class="offer-terms">
-          <b>New and returning subscribers.</b> One month free, then $4.99/month unless canceled.
-          The core app remains free either way.
+          <b>iPhone offer for new and returning subscribers.</b> One month free, then $4.99/month
+          unless canceled. Android is available now on Google Play. The core app remains free.
         </p>
         <p class="code-note">
-          Code <b>MINDSCAPE</b>. The button applies it and installs the app if needed.
+          On iPhone, code <b>MINDSCAPE</b>. The button applies it and installs the app if needed.
           You can also enter it in StatsKey under Settings → Redeem an offer code.
         </p>
         <p class="hero-proof">
@@ -449,7 +454,8 @@
           Every field became a science when measurement replaced introspection — and the strongest
           constraints come from <b>combining</b> datasets. Cosmology needs the CMB, supernovae, and
           lensing together; a human needs meals, training, sleep, and gut signals on
-          <b>one timeline</b> — plus glucose, the day you decide a sensor sounds interesting.
+          <b>one timeline</b> — including detailed bowel-movement recording of Bristol form,
+          timing, urgency, symptoms, and context — plus glucose, the day you decide a sensor sounds interesting.
           Today those live in five apps
           that have never met. StatsKey is the joint fit: one private, connected model of you,
           with 50+ nutrients per meal and workout import built in.
@@ -553,22 +559,23 @@
           vibes.</b>
         </p>
         <p>
-          StatsKey is an iOS + Apple Watch app (with a full web app) built by a solo
+          StatsKey is available on iPhone, Apple Watch, Android, and the web, built by a solo
           founder-engineer who needed the instrument to exist. The core app is <b>free</b> —
           recording, nutrients, workouts, biometrics. Pro ($4.99/mo) and Pro+ ($19.99/mo) add
           more Intelligence on top. Set the state you intend to hold, and steer toward it with
           evidence.
         </p>
         <p>
-          It connects Apple Health out of the box — and Dexcom, should glucose curiosity ever
-          win — records meals faster than you can weigh a skeptical thought, and never asks you
-          to trust a number it can't explain.
+          It connects Apple Health on iPhone and Health Connect on Android — and Dexcom, should
+          glucose curiosity ever win — records meals faster than you can weigh a skeptical
+          thought, and never asks you to trust a number it can't explain.
         </p>
       </div>
       <div class="cta-card">
         <p class="t">Take the data.</p>
-        <p class="s">Code MINDSCAPE · one month free, then $4.99/month unless canceled.</p>
-        <a class="btn primary" data-claim data-surface="offer" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Get StatsKey + 1 month Pro free</a>
+        <p class="s">iPhone: code MINDSCAPE · one month free, then $4.99/month unless canceled.</p>
+        <a class="btn primary" data-claim data-surface="offer" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iPhone: Get 1 month Pro free</a>
+        <a class="btn ghost" data-play data-surface="offer" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener">Android: Get it on Google Play</a>
         <p class="fine">
           StatsKey is a wellness tool, not a medical device. It doesn't diagnose or treat
           anything — it makes your own evidence legible. Subscription auto-renews unless canceled.
@@ -578,9 +585,13 @@
   </section>
 
   <section class="wrap close-line">
-    <p class="big">
-      The flows run through you either way.
-      <em>Entropy management is deciding where they take you.</em>
+    <p class="close-line__statement">
+      Human physiology is a regulated, non-equilibrium system sustained by continuous exchanges
+      of energy and matter.
+    </p>
+    <p class="close-line__detail">
+      Longitudinal records of intake, training, sleep, glucose, and symptoms provide observable
+      evidence of how that system changes over time.
     </p>
   </section>
 
@@ -589,7 +600,7 @@
       <div class="row">
         <div>© 2026 StatsKey · Dallas, TX</div>
         <div>
-          <a href="/">statskeybiometrics.com</a> &nbsp;·&nbsp;
+          <a href="/">statskey.ai</a> &nbsp;·&nbsp;
           <a href="/privacy">Privacy</a> &nbsp;·&nbsp;
           <a href="/terms">Terms</a>
         </div>
@@ -604,7 +615,8 @@
   </footer>
 
   <div class="mobile-sticky" aria-label="Mindscape listener offer">
-    <a class="btn primary" data-claim data-surface="sticky" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">Get StatsKey + 1 month free</a>
+    <a class="btn primary" data-claim data-ios-sticky data-surface="sticky" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iPhone: Get 1 month free</a>
+    <a class="btn primary" data-play data-android-sticky data-surface="sticky" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" hidden>Android: Get StatsKey</a>
   </div>
 
   <dialog id="claim-dialog" aria-labelledby="claim-dialog-title">
@@ -622,7 +634,8 @@
     (() => {
       const dialog = document.getElementById("claim-dialog");
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const device = isIOS ? "ios" : /Macintosh|Mac OS X/i.test(navigator.userAgent) ? "mac" : "other";
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const device = isIOS ? "ios" : isAndroid ? "android" : /Macintosh|Mac OS X/i.test(navigator.userAgent) ? "mac" : "other";
       const track = (name, properties = {}) => {
         if (typeof window.gtag === "function") {
           window.gtag("event", name, { device, ...properties });
@@ -630,6 +643,17 @@
       };
 
       track("mindscape_landing_view");
+
+      if (isAndroid) {
+        document.querySelector("[data-ios-sticky]")?.setAttribute("hidden", "");
+        document.querySelector("[data-android-sticky]")?.removeAttribute("hidden");
+      }
+
+      document.querySelectorAll("[data-play]").forEach((link) => {
+        link.addEventListener("click", () => {
+          track("mindscape_play_click", { surface: link.dataset.surface || "unknown" });
+        });
+      });
 
       document.querySelectorAll("[data-claim]").forEach((link) => {
         link.addEventListener("click", (event) => {
