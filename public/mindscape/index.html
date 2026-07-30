@@ -12,29 +12,30 @@
 </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StatsKey | For Mindscape Listeners</title>
+  <title>StatsKey | Energy Intelligence</title>
   <meta name="description" content="Your body is a non-equilibrium steady state. StatsKey is an instrument for entropy management in alignment with your goals." />
   <meta name="robots" content="noindex, nofollow" />
-  <meta name="theme-color" content="#07090f" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="theme-color" content="#f4f8ff" />
+  <link rel="icon" type="image/png" sizes="1024x1024" href="/statskey-logo-white-blue.png?v=5" />
+  <link rel="apple-touch-icon" href="/statskey-logo-white-blue.png?v=5" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #07090f;
-      --panel: #0f141f;
-      --panel-2: #131a28;
-      --ink: #f6f7fb;
-      --muted: #a8b1c5;
-      --quiet: #68748e;
-      --line: rgba(255, 255, 255, .1);
-      --line-strong: rgba(255, 255, 255, .22);
-      --cyan: #40d9c8;
-      --blue: #78a6ff;
-      --red: #ff7a7a;
-      --green: #9ee493;
+      color-scheme: light;
+      --bg: #f4f8ff;
+      --panel: #ffffff;
+      --panel-2: #edf5ff;
+      --ink: #0b1f3a;
+      --muted: #3f5875;
+      --quiet: #5f748c;
+      --line: rgba(28, 91, 169, .14);
+      --line-strong: rgba(28, 91, 169, .24);
+      --cyan: #0066cc;
+      --blue: #3187e2;
+      --red: #b42318;
+      --green: #137a55;
       --max: 1060px;
       --display: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
       --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -45,9 +46,9 @@
     body {
       margin: 0;
       background:
-        radial-gradient(circle at 16% 8%, rgba(120, 166, 255, .13), transparent 36%),
-        radial-gradient(circle at 88% 30%, rgba(64, 217, 200, .09), transparent 34%),
-        linear-gradient(160deg, #06080d 0%, #0a0f18 55%, #07090f 100%);
+        radial-gradient(circle at 14% 7%, rgba(73, 154, 244, .18), transparent 34rem),
+        radial-gradient(circle at 88% 25%, rgba(89, 190, 255, .12), transparent 30rem),
+        linear-gradient(180deg, #fbfdff 0%, #f4f8ff 52%, #edf5ff 100%);
       color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.5;
@@ -65,7 +66,7 @@
       font-family: var(--display); font-weight: 700; font-size: 15px;
       letter-spacing: .05em; color: var(--ink); text-decoration: none;
     }
-    .brand span { color: var(--quiet); font-weight: 500; }
+    .brand span { color: var(--muted); font-weight: 500; }
     .unlisted {
       font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em;
       text-transform: uppercase; color: var(--quiet);
@@ -190,11 +191,11 @@
     .experiment-actions .btn { display: inline-block; min-width: 200px; margin: 0; }
     .experiment-video {
       overflow: hidden; border: 1px solid var(--line-strong); border-radius: 28px;
-      padding: 7px; background: var(--panel); box-shadow: 0 28px 80px rgba(0, 0, 0, .35);
+      padding: 7px; background: var(--panel); box-shadow: 0 24px 70px rgba(37, 89, 151, .14);
     }
     .experiment-video video {
       display: block; width: 100%; height: auto; aspect-ratio: 9 / 16;
-      object-fit: cover; border-radius: 21px; background: #03060a;
+      object-fit: cover; border-radius: 21px; background: #eaf2fc;
     }
 
     /* ── instrument (screenshots) ── */
@@ -234,17 +235,17 @@
       transition: transform .12s ease, opacity .12s ease;
     }
     .btn:hover { transform: translateY(-1px); opacity: .92; }
-    .btn.primary { background: var(--cyan); color: #04211d; }
-    .btn.ghost { border: 1px solid var(--line-strong); color: var(--ink); }
+    .btn.primary { background: var(--cyan); color: #fff; box-shadow: 0 10px 28px rgba(0, 102, 204, .18); }
+    .btn.ghost { border: 1px solid var(--line-strong); color: #145bbd; background: rgba(255, 255, 255, .72); }
     .fine { color: var(--quiet); font-size: 12.5px; line-height: 1.5; margin: 14px 0 0; }
 
     /* ── cross-device claim path ── */
     dialog {
       width: min(420px, calc(100% - 32px)); padding: 0; border: 1px solid var(--line-strong);
       border-radius: 24px; color: var(--ink); background: var(--panel);
-      box-shadow: 0 28px 90px rgba(0, 0, 0, .65);
+      box-shadow: 0 28px 90px rgba(37, 89, 151, .24);
     }
-    dialog::backdrop { background: rgba(2, 5, 10, .8); backdrop-filter: blur(5px); }
+    dialog::backdrop { background: rgba(11, 31, 58, .46); backdrop-filter: blur(5px); }
     .claim-dialog { padding: 28px; text-align: center; position: relative; }
     .claim-dialog h2 { font-size: 26px; margin: 0 28px 8px; }
     .claim-dialog p { color: var(--muted); font-size: 14.5px; line-height: 1.55; margin: 0 0 18px; }
@@ -312,8 +313,8 @@
         display: block; position: fixed; z-index: 20;
         left: 12px; right: 12px; bottom: max(10px, env(safe-area-inset-bottom));
         padding: 8px; border: 1px solid var(--line-strong); border-radius: 18px;
-        background: rgba(7, 9, 15, .92); backdrop-filter: blur(16px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+        background: rgba(248, 251, 255, .94); backdrop-filter: blur(16px);
+        box-shadow: 0 12px 40px rgba(37, 89, 151, .18);
       }
       .mobile-sticky .btn { margin: 0; padding: 13px 16px; }
     }
@@ -322,7 +323,7 @@
 <body>
 
   <div class="wrap top">
-    <a class="brand" href="/">STATSKEY <span>· Nutrition, Biometrics, and Metabolic Intelligence</span></a>
+    <a class="brand" href="/">STATSKEY <span>· Energy Intelligence</span></a>
     <div class="unlisted">Unlisted · For Mindscape listeners</div>
   </div>
 
