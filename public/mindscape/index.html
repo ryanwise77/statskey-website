@@ -176,6 +176,27 @@
     .ms.red .v { color: var(--red); }
     .ms.green .v { color: var(--green); }
 
+    /* ── experiment 001 ── */
+    .experiment { padding: 88px 0 20px; }
+    .experiment-grid {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 390px);
+      gap: clamp(36px, 7vw, 88px); align-items: center;
+    }
+    .experiment .intro {
+      color: var(--muted); font-size: 18px; line-height: 1.62;
+      max-width: 620px; margin: 16px 0 0;
+    }
+    .experiment-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .experiment-actions .btn { display: inline-block; min-width: 200px; margin: 0; }
+    .experiment-video {
+      overflow: hidden; border: 1px solid var(--line-strong); border-radius: 28px;
+      padding: 7px; background: var(--panel); box-shadow: 0 28px 80px rgba(0, 0, 0, .35);
+    }
+    .experiment-video video {
+      display: block; width: 100%; height: auto; aspect-ratio: 9 / 16;
+      object-fit: cover; border-radius: 21px; background: #03060a;
+    }
+
     /* ── instrument (screenshots) ── */
     .instrument { padding: 88px 0 20px; }
     .instrument .intro { color: var(--muted); font-size: 18px; max-width: 760px; margin: 14px 0 0; }
@@ -281,6 +302,10 @@
       .principle { grid-template-columns: 1fr; gap: 10px; padding: 36px 0; }
       .pnum { display: flex; align-items: baseline; gap: 10px; padding-top: 0; }
       .pnum b { font-size: 20px; }
+      .experiment-grid { grid-template-columns: 1fr; }
+      .experiment-actions .btn { display: block; width: 100%; }
+      .experiment-video { width: min(100%, 370px); justify-self: center; border-radius: 24px; padding: 6px; }
+      .experiment-video video { border-radius: 18px; }
       .offer-grid { grid-template-columns: 1fr; }
       .eqs { gap: 12px 28px; }
       .mobile-sticky {
@@ -331,7 +356,7 @@
         </p>
       </div>
       <div class="hero-phone">
-        <video id="mindscape-preview" src="/mindscape/preview.mp4" poster="/mindscape/preview-poster.jpg" muted loop playsinline preload="none" aria-label="StatsKey app preview: recording a meal, full nutrition facts, workout tracking, and Intelligence"></video>
+        <video id="mindscape-preview" src="/mindscape/preview.mp4" poster="/mindscape/preview-poster.jpg" muted loop playsinline preload="none" data-power-video data-power-poster data-poster-time="0" aria-label="StatsKey app preview: recording a meal, full nutrition facts, workout tracking, and Intelligence"></video>
       </div>
     </div>
 
@@ -464,6 +489,38 @@
     </div>
   </section>
 
+  <section class="wrap experiment">
+    <div class="experiment-grid">
+      <div>
+        <p class="sect-kicker">Experiment 001</p>
+        <h2>Can I run an Olympic marathon?</h2>
+        <p class="intro">One athlete, one unresolved question, and a protocol built around recording, investigation, projection, and testing. The experiment stays open until the evidence can answer it.</p>
+        <div class="experiment-actions">
+          <a class="btn primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
+          <a class="btn ghost" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
+        </div>
+      </div>
+      <div class="experiment-video">
+        <video
+          src="/statskey-app/olympic-marathon-experiment-001.mp4"
+          poster="/statskey-app/olympic-marathon-experiment-001-poster.jpg"
+          width="720"
+          height="1280"
+          controls
+          muted
+          playsinline
+          preload="metadata"
+          data-power-video
+          data-power-poster
+          data-poster-time="1"
+          aria-label="StatsKey Experiment 001: Can I run an Olympic marathon?"
+        >
+          <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the StatsKey Experiment 001 video</a>
+        </video>
+      </div>
+    </div>
+  </section>
+
   <section class="wrap instrument">
     <p class="sect-kicker">The instrument itself</p>
     <h2>What the joint fit looks like in your pocket.</h2>
@@ -563,7 +620,6 @@
   <script>
     (() => {
       const dialog = document.getElementById("claim-dialog");
-      const preview = document.getElementById("mindscape-preview");
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       const device = isIOS ? "ios" : /Macintosh|Mac OS X/i.test(navigator.userAgent) ? "mac" : "other";
       const track = (name, properties = {}) => {
@@ -594,13 +650,75 @@
         if (event.target === dialog) dialog.close();
       });
 
-      if (preview) {
+      const videos = Array.from(document.querySelectorAll("video[data-power-video]"));
+      const visibleVideos = new Set();
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let saveData = Boolean(connection?.saveData);
+      let lowBattery = false;
+      let batteryReady = typeof navigator.getBattery !== "function";
+
+      const powerConstrained = () => reducedMotion || saveData || lowBattery;
+      const pause = (video, showPoster = false) => {
+        video.pause();
+        if (!showPoster || !video.hasAttribute("data-power-poster")) return;
+        const posterTime = Number(video.dataset.posterTime || 0);
+        const seek = () => {
+          if (Number.isFinite(posterTime)) video.currentTime = posterTime;
+        };
+        if (video.readyState >= 1) seek();
+        else video.addEventListener("loadedmetadata", seek, { once: true });
+      };
+      const play = (video) => {
+        if (document.hidden || !batteryReady || powerConstrained()) return;
+        video.play().catch(() => {});
+      };
+      const syncVisibleVideos = () => {
+        visibleVideos.forEach((video) => {
+          if (powerConstrained()) pause(video, true);
+          else play(video);
+        });
+      };
+
+      videos.forEach((video) => pause(video));
+      if (!reducedMotion && "IntersectionObserver" in window) {
         const observer = new IntersectionObserver((entries) => {
-          if (!entries.some((entry) => entry.isIntersecting)) return;
-          preview.play().catch(() => {});
-          observer.disconnect();
-        }, { rootMargin: "180px" });
-        observer.observe(preview);
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              visibleVideos.add(entry.target);
+              if (powerConstrained()) pause(entry.target, true);
+              else play(entry.target);
+            } else {
+              visibleVideos.delete(entry.target);
+              pause(entry.target);
+            }
+          });
+        }, { threshold: .18, rootMargin: "140px 0px" });
+        videos.forEach((video) => observer.observe(video));
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        videos.forEach((video) => pause(video));
+        if (!document.hidden) syncVisibleVideos();
+      });
+      connection?.addEventListener?.("change", () => {
+        saveData = Boolean(connection.saveData);
+        syncVisibleVideos();
+      });
+      if (typeof navigator.getBattery === "function") {
+        navigator.getBattery().then((battery) => {
+          const updateBattery = () => {
+            lowBattery = !battery.charging && battery.level <= .2;
+            batteryReady = true;
+            syncVisibleVideos();
+          };
+          battery.addEventListener("chargingchange", updateBattery);
+          battery.addEventListener("levelchange", updateBattery);
+          updateBattery();
+        }).catch(() => {
+          batteryReady = true;
+          syncVisibleVideos();
+        });
       }
     })();
   </script>

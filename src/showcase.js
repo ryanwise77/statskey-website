@@ -33,14 +33,38 @@ function initViewportVideos() {
   if (!videos.length) return
 
   const visibleVideos = new Set()
-  const pause = (video) => video.pause()
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
+  let saveData = Boolean(connection?.saveData)
+  let lowBattery = false
+  let batteryReady = typeof navigator.getBattery !== 'function'
+
+  const powerConstrained = () => reducedMotion || saveData || lowBattery
+  const showPowerPoster = (video) => {
+    if (!video.hasAttribute('data-power-poster')) return
+    const posterTime = Number(video.dataset.posterTime || 0)
+    const seek = () => {
+      if (Number.isFinite(posterTime)) video.currentTime = posterTime
+    }
+    if (video.readyState >= 1) seek()
+    else video.addEventListener('loadedmetadata', seek, { once: true })
+  }
+  const pause = (video, showPoster = false) => {
+    video.pause()
+    if (showPoster) showPowerPoster(video)
+  }
   const play = (video) => {
-    if (document.hidden || reducedMotion) return
+    if (document.hidden || !batteryReady || powerConstrained()) return
     const promise = video.play()
     promise?.catch(() => {})
   }
+  const syncVisibleVideos = () => {
+    visibleVideos.forEach((video) => {
+      if (powerConstrained()) pause(video, true)
+      else play(video)
+    })
+  }
 
-  videos.forEach(pause)
+  videos.forEach((video) => pause(video))
   if (reducedMotion || !('IntersectionObserver' in window)) return
 
   const io = new IntersectionObserver(
@@ -48,7 +72,8 @@ function initViewportVideos() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           visibleVideos.add(entry.target)
-          play(entry.target)
+          if (powerConstrained()) pause(entry.target, true)
+          else play(entry.target)
         } else {
           visibleVideos.delete(entry.target)
           pause(entry.target)
@@ -60,9 +85,32 @@ function initViewportVideos() {
 
   videos.forEach((video) => io.observe(video))
   document.addEventListener('visibilitychange', () => {
-    videos.forEach(pause)
-    if (!document.hidden) visibleVideos.forEach(play)
+    videos.forEach((video) => pause(video))
+    if (!document.hidden) syncVisibleVideos()
   })
+
+  connection?.addEventListener?.('change', () => {
+    saveData = Boolean(connection.saveData)
+    syncVisibleVideos()
+  })
+
+  if (typeof navigator.getBattery === 'function') {
+    navigator.getBattery()
+      .then((battery) => {
+        const updateBattery = () => {
+          lowBattery = !battery.charging && battery.level <= 0.2
+          batteryReady = true
+          syncVisibleVideos()
+        }
+        battery.addEventListener('chargingchange', updateBattery)
+        battery.addEventListener('levelchange', updateBattery)
+        updateBattery()
+      })
+      .catch(() => {
+        batteryReady = true
+        syncVisibleVideos()
+      })
+  }
 }
 
 function initViewportMotion() {
