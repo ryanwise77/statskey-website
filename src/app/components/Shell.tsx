@@ -45,7 +45,10 @@ export function Shell() {
       <nav className="app-nav">
         <div className="max-w-[1080px] mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-3">
           <div className="flex items-center gap-6 min-w-0">
-            <a href="/" className="font-display font-semibold text-[14px] tracking-[-0.01em] text-text-primary/80 hover:text-text-primary transition-colors">StatsKey</a>
+            <a href="/" className="app-brand">
+              <span className="site-brand__mark" aria-hidden="true" />
+              <span>StatsKey</span>
+            </a>
             {/* Desktop: inline links, unchanged look */}
             <div className="hidden md:flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px] text-text-muted">
               {NAV_ITEMS.map((item) => (

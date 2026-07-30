@@ -14,7 +14,7 @@ import {
   type SavedRoute,
 } from '../lib/types'
 
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+const TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
 const TILE_ATTR =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
 const DEFAULT_CENTER: [number, number] = [40.73061, -73.935242]
@@ -284,7 +284,7 @@ function RouteBuilderMap({
     <MapContainer
       center={requestedCenter ?? DEFAULT_CENTER}
       zoom={12}
-      style={{ height: 'min(68vh, 620px)', minHeight: 440, width: '100%', background: '#0c0c0e' }}
+      style={{ height: 'min(68vh, 620px)', minHeight: 440, width: '100%', background: 'var(--app-map-bg, #0c0c0e)' }}
       scrollWheelZoom
     >
       <TileLayer url={TILE_URL} attribution={TILE_ATTR} />
@@ -297,9 +297,9 @@ function RouteBuilderMap({
           center={position}
           radius={idx === 0 || idx === positions.length - 1 ? 6 : 4}
           pathOptions={{
-            color: '#fff',
+            color: '#0b1f3a',
             weight: 1.5,
-            fillColor: idx === 0 ? '#51CF66' : idx === positions.length - 1 ? color : '#fff',
+            fillColor: idx === 0 ? '#51CF66' : idx === positions.length - 1 ? color : '#0b1f3a',
             fillOpacity: 1,
           }}
         />

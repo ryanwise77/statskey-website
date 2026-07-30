@@ -13,7 +13,7 @@ interface RouteMapProps {
   preview?: boolean
 }
 
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+const TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
 const TILE_ATTR =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
 
@@ -57,7 +57,7 @@ export function RouteMap({ route, color, height, preview = false }: RouteMapProp
     <div className="rounded-lg overflow-hidden border border-white/[0.06]" style={{ height }}>
       <MapContainer
         bounds={bounds ?? undefined}
-        style={{ height: '100%', width: '100%', background: '#0c0c0e' }}
+        style={{ height: '100%', width: '100%', background: 'var(--app-map-bg, #0c0c0e)' }}
         zoomControl={!preview}
         scrollWheelZoom={!preview}
         dragging={!preview}
@@ -70,12 +70,12 @@ export function RouteMap({ route, color, height, preview = false }: RouteMapProp
         <CircleMarker
           center={start}
           radius={5}
-          pathOptions={{ color: '#fff', weight: 1.5, fillColor: '#51CF66', fillOpacity: 1 }}
+          pathOptions={{ color: '#0b1f3a', weight: 1.5, fillColor: '#51CF66', fillOpacity: 1 }}
         />
         <CircleMarker
           center={end}
           radius={5}
-          pathOptions={{ color: '#fff', weight: 1.5, fillColor: color, fillOpacity: 1 }}
+          pathOptions={{ color: '#0b1f3a', weight: 1.5, fillColor: color, fillOpacity: 1 }}
         />
         <FitToBounds bounds={bounds} />
       </MapContainer>

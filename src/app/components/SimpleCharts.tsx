@@ -5,7 +5,7 @@ export interface BarDatum {
   value: number
 }
 
-/** Minimal dependency-free bar chart tuned for the app's dark panels. */
+/** Minimal dependency-free bar chart tuned for app panels. */
 export function BarChart({
   data,
   height = 140,
@@ -44,7 +44,7 @@ export function BarChart({
             x2={width}
             y1={chartH - (target / max) * chartH}
             y2={chartH - (target / max) * chartH}
-            stroke="rgba(255,255,255,0.25)"
+            stroke="var(--app-chart-grid, rgba(255,255,255,0.25))"
             strokeDasharray="4 4"
             strokeWidth={1}
           />
@@ -67,10 +67,10 @@ export function BarChart({
             />
           )
         })}
-        <text x={0} y={height - 6} fontSize={10} fill="rgba(255,255,255,0.4)">
+        <text x={0} y={height - 6} fontSize={10} fill="var(--app-chart-muted, rgba(255,255,255,0.4))">
           {data[0].label}
         </text>
-        <text x={width} y={height - 6} fontSize={10} fill="rgba(255,255,255,0.4)" textAnchor="end">
+        <text x={width} y={height - 6} fontSize={10} fill="var(--app-chart-muted, rgba(255,255,255,0.4))" textAnchor="end">
           {data[data.length - 1].label}
         </text>
       </svg>
@@ -140,7 +140,7 @@ export function LineChart({
             width={width}
             y={yFor(bandHigh)}
             height={Math.max(0, yFor(bandLow) - yFor(bandHigh))}
-            fill="rgba(48,213,200,0.07)"
+            fill="var(--app-chart-band, rgba(48,213,200,0.07))"
           />
         )}
         <path d={path} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" />

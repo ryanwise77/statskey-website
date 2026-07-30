@@ -93,11 +93,11 @@ export function HeartRateChart({ samples, averageBPM, maxBPM, color }: HeartRate
         const y = yFor(bpm)
         return (
           <g key={bpm}>
-            <text x={PADDING_L - 4} y={y + 3} textAnchor="end" fontSize="9" fill="#666"
+            <text x={PADDING_L - 4} y={y + 3} textAnchor="end" fontSize="9" fill="var(--app-chart-muted, #666)"
                   style={{ fontFamily: 'monospace' }}>
               {bpm}
             </text>
-            <line x1={PADDING_L} y1={y} x2={W - PADDING_R} y2={y} stroke="#333" strokeWidth="0.5" />
+            <line x1={PADDING_L} y1={y} x2={W - PADDING_R} y2={y} stroke="var(--app-chart-grid, #333)" strokeWidth="0.5" />
           </g>
         )
       })}
@@ -150,7 +150,7 @@ export function HeartRateChart({ samples, averageBPM, maxBPM, color }: HeartRate
           y={H - 4}
           textAnchor={i === 0 ? 'start' : i === timeLabels.length - 1 ? 'end' : 'middle'}
           fontSize="9"
-          fill="#666"
+          fill="var(--app-chart-muted, #666)"
         >
           {label}
         </text>

@@ -80,10 +80,10 @@ export function ElevationChart({ route, color, elevationGain, elevationLoss }: E
         <span className="card-title">Elevation</span>
         <div className="flex items-center gap-3 text-[12px]">
           <span className="text-text-secondary">
-            <span style={{ color: '#51CF66' }}>↑</span> {Math.round(elevationGain)} ft
+            <span style={{ color: '#137a55' }}>↑</span> {Math.round(elevationGain)} ft
           </span>
           <span className="text-text-secondary">
-            <span style={{ color: '#FF6B6B' }}>↓</span> {Math.round(elevationLoss)} ft
+            <span style={{ color: '#b42318' }}>↓</span> {Math.round(elevationLoss)} ft
           </span>
         </div>
       </div>
@@ -93,11 +93,11 @@ export function ElevationChart({ route, color, elevationGain, elevationLoss }: E
           const y = yFor(elev)
           return (
             <g key={elev}>
-              <text x={PADDING_L - 4} y={y + 3} textAnchor="end" fontSize="9" fill="#666"
+              <text x={PADDING_L - 4} y={y + 3} textAnchor="end" fontSize="9" fill="var(--app-chart-muted, #666)"
                     style={{ fontFamily: 'monospace' }}>
                 {elev}
               </text>
-              <line x1={PADDING_L} y1={y} x2={W - PADDING_R} y2={y} stroke="#333" strokeWidth="0.5" />
+              <line x1={PADDING_L} y1={y} x2={W - PADDING_R} y2={y} stroke="var(--app-chart-grid, #333)" strokeWidth="0.5" />
             </g>
           )
         })}
@@ -112,13 +112,13 @@ export function ElevationChart({ route, color, elevationGain, elevationLoss }: E
         <path d={areaPath} fill="url(#elevAreaGradient)" />
         <path d={linePath} fill="none" stroke={color} strokeWidth="1.5" />
 
-        <text x={PADDING_L} y={H - 4} fontSize="9" fill="#666" textAnchor="start">0</text>
+        <text x={PADDING_L} y={H - 4} fontSize="9" fill="var(--app-chart-muted, #666)" textAnchor="start">0</text>
         {maxDist > 2 && (
-          <text x={PADDING_L + chartW / 2} y={H - 4} fontSize="9" fill="#666" textAnchor="middle">
+          <text x={PADDING_L + chartW / 2} y={H - 4} fontSize="9" fill="var(--app-chart-muted, #666)" textAnchor="middle">
             {(maxDist / 2).toFixed(1)}
           </text>
         )}
-        <text x={W - PADDING_R} y={H - 4} fontSize="9" fill="#666" textAnchor="end">
+        <text x={W - PADDING_R} y={H - 4} fontSize="9" fill="var(--app-chart-muted, #666)" textAnchor="end">
           {maxDist.toFixed(1)} mi
         </text>
       </svg>

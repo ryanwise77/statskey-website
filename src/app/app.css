@@ -817,3 +817,359 @@ body {
   color: #a78bfa;
   font-size: 11px;
 }
+
+/* =========================================================================
+   Light blue application theme — aligned with the StatsKey marketing site
+   ========================================================================= */
+
+body.app-light {
+  color-scheme: light;
+  --color-void: #f4f8ff;
+  --color-surface: #ffffff;
+  --color-border: #d9e6f6;
+  --color-text-primary: #0b1f3a;
+  --color-text-secondary: #3f5875;
+  --color-text-muted: #5f748c;
+  --color-accent: #0066cc;
+  --color-data: #0066cc;
+  --app-surface: rgba(255, 255, 255, 0.94);
+  --app-surface-soft: rgba(246, 250, 255, 0.9);
+  --app-line: rgba(28, 91, 169, 0.14);
+  --app-line-strong: rgba(28, 91, 169, 0.24);
+  --app-shadow: 0 16px 48px rgba(37, 89, 151, 0.09);
+  --app-chart-grid: rgba(28, 91, 169, 0.18);
+  --app-chart-muted: #667b93;
+  --app-chart-band: rgba(0, 102, 204, 0.07);
+  --app-map-bg: #eaf2fc;
+  background:
+    radial-gradient(circle at 12% 4%, rgba(73, 154, 244, 0.17), transparent 30rem),
+    radial-gradient(circle at 90% 18%, rgba(89, 190, 255, 0.11), transparent 28rem),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8ff 52%, #edf5ff 100%);
+  color: var(--color-text-primary);
+}
+
+body.app-light::before {
+  background-image:
+    linear-gradient(rgba(26, 103, 193, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 103, 193, 0.022) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+
+body.app-light::after {
+  background: radial-gradient(ellipse at center, transparent 36%, rgba(70, 134, 211, 0.055) 100%);
+}
+
+body.app-light .app-shell {
+  background: transparent;
+}
+
+body.app-light .app-nav {
+  border-color: var(--app-line);
+  background: rgba(248, 251, 255, 0.88);
+  box-shadow: 0 10px 34px rgba(36, 88, 151, 0.055);
+}
+
+body.app-light .app-nav > div:first-child,
+body.app-light .app-main {
+  max-width: 1160px !important;
+}
+
+body.app-light .app-nav > div:first-child {
+  height: 58px !important;
+}
+
+body.app-light .app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+body.app-light .app-brand .site-brand__mark {
+  flex: 0 0 auto;
+}
+
+body.app-light .app-nav-pill:active {
+  background: rgba(0, 102, 204, 0.07);
+}
+
+body.app-light .app-nav-pill.active {
+  border-color: rgba(0, 102, 204, 0.15);
+  background: rgba(0, 102, 204, 0.09);
+  color: #0057b8;
+}
+
+body.app-light .panel,
+body.app-light .token-pack-card {
+  border-color: var(--app-line);
+  background: linear-gradient(180deg, var(--app-surface), var(--app-surface-soft));
+  box-shadow: var(--app-shadow);
+}
+
+body.app-light .input {
+  border-color: var(--app-line);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--color-text-primary);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+body.app-light .input::placeholder,
+body.app-light textarea::placeholder {
+  color: #7a8ea6;
+}
+
+body.app-light .input:focus {
+  border-color: var(--color-accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+body.app-light :is(input, select, textarea) {
+  color-scheme: light;
+}
+
+body.app-light .btn-primary,
+body.app-light .btn-intel {
+  border-color: #0066cc;
+  background: #0066cc;
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(0, 102, 204, 0.2);
+}
+
+body.app-light .btn-primary:hover:not(:disabled),
+body.app-light .btn-intel:hover:not(:disabled) {
+  border-color: #0057b8;
+  background: #0057b8;
+}
+
+body.app-light .btn-secondary {
+  border-color: var(--app-line-strong);
+  background: rgba(255, 255, 255, 0.82);
+  color: #145bbd;
+}
+
+body.app-light .btn-secondary:hover:not(:disabled) {
+  border-color: rgba(0, 102, 204, 0.32);
+  background: #fff;
+}
+
+body.app-light .btn-ghost {
+  color: #526b87;
+}
+
+body.app-light .btn-ghost:hover:not(:disabled) {
+  color: #0057b8;
+}
+
+body.app-light .error-banner {
+  border-color: rgba(180, 35, 24, 0.22);
+  background: rgba(254, 226, 226, 0.82);
+  color: #9f1c14;
+}
+
+body.app-light .success-banner {
+  border-color: rgba(19, 122, 85, 0.22);
+  background: rgba(220, 252, 231, 0.76);
+  color: #0f6849;
+}
+
+body.app-light .token-pack-card--featured {
+  border-color: rgba(0, 102, 204, 0.3);
+  background: linear-gradient(180deg, rgba(223, 239, 255, 0.94), rgba(244, 249, 255, 0.9));
+}
+
+body.app-light .token-pack-badge,
+body.app-light .timeline-badge {
+  background: rgba(0, 102, 204, 0.1);
+  color: #0057b8;
+}
+
+body.app-light .progress,
+body.app-light :is(.fusion-macros i, .fusion-conf__bars span) {
+  background: rgba(28, 91, 169, 0.1);
+}
+
+body.app-light :is(.timeline-row, .workout-row) {
+  border-color: rgba(28, 91, 169, 0.09);
+}
+
+body.app-light .tab-strip {
+  border-color: var(--app-line);
+  background: rgba(236, 244, 255, 0.7);
+}
+
+body.app-light .tab-strip button.active {
+  background: #fff;
+  color: #0057b8;
+  box-shadow: 0 4px 14px rgba(37, 89, 151, 0.08);
+}
+
+/* Tailwind-authored translucent dark-theme utility classes. */
+body.app-light [class*="border-white"] {
+  border-color: var(--app-line) !important;
+}
+
+body.app-light [class*="divide-white"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--app-line) !important;
+}
+
+body.app-light [class*="bg-white/"] {
+  background-color: rgba(0, 102, 204, 0.045) !important;
+}
+
+body.app-light [class*="hover:bg-white"]:hover {
+  background-color: rgba(0, 102, 204, 0.075) !important;
+}
+
+body.app-light [class*="hover:border-white"]:hover {
+  border-color: rgba(0, 102, 204, 0.24) !important;
+}
+
+body.app-light [class*="bg-[#0d0d0d]"] {
+  background: #fff !important;
+}
+
+body.app-light .text-amber-300 {
+  color: #8a5b00 !important;
+}
+
+/* Intelligence keeps its identity, expressed through the shared blue system. */
+body.app-light .intel-page::before {
+  background:
+    radial-gradient(560px circle at 82% -6%, rgba(0, 102, 204, 0.12), transparent 62%),
+    radial-gradient(640px circle at 8% 108%, rgba(49, 135, 226, 0.09), transparent 64%);
+}
+
+body.app-light .intel-mark {
+  background: linear-gradient(135deg, #0057b8, #3187e2);
+  box-shadow: 0 6px 24px rgba(0, 102, 204, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+body.app-light .intel-mark::after {
+  border-color: rgba(0, 102, 204, 0.28);
+}
+
+body.app-light .intel-panel {
+  border-color: rgba(0, 102, 204, 0.14);
+  background:
+    radial-gradient(420px circle at 88% 0%, rgba(0, 102, 204, 0.07), transparent 60%),
+    rgba(255, 255, 255, 0.84);
+  box-shadow: var(--app-shadow);
+}
+
+body.app-light .intel-bubble-user {
+  border-color: rgba(0, 102, 204, 0.2);
+  background: linear-gradient(135deg, rgba(205, 229, 255, 0.9), rgba(229, 241, 255, 0.9));
+}
+
+body.app-light .intel-bubble-ai {
+  border-color: var(--app-line);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+body.app-light :is(.intel-steps, .intel-retrieval) {
+  border-color: rgba(0, 102, 204, 0.15);
+  background: rgba(245, 249, 255, 0.9);
+}
+
+body.app-light :is(.intel-step, .intel-retrieval__row) {
+  border-color: rgba(0, 102, 204, 0.08);
+}
+
+body.app-light .intel-step--running {
+  background: linear-gradient(90deg, transparent, rgba(0, 102, 204, 0.08), transparent);
+}
+
+body.app-light :is(.intel-step__code, .intel-provider-pill, .intel-model-trigger__chev, .intel-menu__check) {
+  color: #0066cc;
+}
+
+body.app-light .intel-dot {
+  background: rgba(0, 102, 204, 0.18);
+}
+
+body.app-light .intel-dot::after {
+  background: #0066cc;
+}
+
+body.app-light .intel-dot--running {
+  border-color: rgba(0, 102, 204, 0.2);
+  border-top-color: #0066cc;
+}
+
+body.app-light .intel-caret {
+  background: #0066cc;
+}
+
+body.app-light .intel-status {
+  background: linear-gradient(90deg, #0066cc, #0b1f3a, #0066cc);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+body.app-light .intel-suggestion {
+  border-color: rgba(0, 102, 204, 0.15);
+  background: rgba(225, 239, 255, 0.64);
+}
+
+body.app-light .intel-suggestion:hover:not(:disabled) {
+  border-color: rgba(0, 102, 204, 0.3);
+  background: rgba(210, 231, 255, 0.8);
+}
+
+body.app-light .intel-composer {
+  border-color: rgba(0, 102, 204, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 36px rgba(37, 89, 151, 0.08);
+}
+
+body.app-light .intel-composer:focus-within {
+  border-color: rgba(0, 102, 204, 0.42);
+  box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.08), 0 12px 36px rgba(37, 89, 151, 0.1);
+}
+
+body.app-light :is(.intel-provider-pill, .intel-model-trigger) {
+  border-color: rgba(0, 102, 204, 0.2);
+  background: rgba(222, 238, 255, 0.74);
+}
+
+body.app-light .intel-model-trigger:hover {
+  border-color: rgba(0, 102, 204, 0.36);
+  background: rgba(210, 231, 255, 0.82);
+}
+
+body.app-light .intel-menu {
+  border-color: var(--app-line-strong);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 18px 54px rgba(37, 89, 151, 0.16);
+}
+
+body.app-light .intel-menu button:hover {
+  background: rgba(0, 102, 204, 0.07);
+}
+
+body.app-light .intel-menu button.active {
+  background: rgba(0, 102, 204, 0.11);
+}
+
+@media (max-width: 767px) {
+  body.app-light .app-main {
+    padding-inline: 20px !important;
+  }
+
+  body.app-light .app-nav-pill {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  body.app-light .panel {
+    border-radius: 20px;
+    padding: 1.2rem;
+  }
+}

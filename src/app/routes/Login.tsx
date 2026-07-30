@@ -108,7 +108,10 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-[400px]">
         <div className="text-center mb-10">
-          <a href="/" className="font-display font-semibold text-[14px] text-text-secondary hover:text-text-primary transition-colors">StatsKey</a>
+          <a href="/" className="app-brand justify-center">
+            <span className="site-brand__mark" aria-hidden="true" />
+            <span>StatsKey</span>
+          </a>
           <h1 className="font-display text-[32px] font-bold tracking-[-0.02em] mt-6 mb-2">
             {resetMode ? 'Reset password' : 'Sign in'}
           </h1>

@@ -42,8 +42,7 @@ export function HeartRateZones({ zones }: { zones: HeartRateZoneDistribution }) 
                 />
               </div>
               <div
-                className="w-9 text-right font-mono text-[11px]"
-                style={{ color: pct > 0.1 ? HR_ZONE_COLORS[i] : '#666' }}
+                className="w-9 text-right font-mono text-[11px] text-text-secondary"
               >
                 {Math.round(pct * 100)}%
               </div>
@@ -87,8 +86,7 @@ export function PaceZones({ zones }: { zones: PaceZoneDistribution }) {
                 />
               </div>
               <div
-                className="w-9 text-right font-mono text-[11px]"
-                style={{ color: pct > 0.1 ? zone.color : '#666' }}
+                className="w-9 text-right font-mono text-[11px] text-text-secondary"
               >
                 {Math.round(pct * 100)}%
               </div>

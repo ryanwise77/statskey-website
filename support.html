@@ -19,11 +19,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
-  <body class="antialiased">
+  <body class="antialiased marketing-light">
 
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-white/[0.04]" style="background:rgba(0,0,0,0.6)">
       <div class="max-w-[1080px] mx-auto px-8 h-11 flex items-center justify-between">
-        <a href="/" class="font-display font-semibold text-[14px] tracking-[-0.01em] text-text-primary/80 hover:text-text-primary transition-colors">StatsKey</a>
+        <a href="/" class="site-brand" aria-label="StatsKey home">
+          <span class="site-brand__mark" aria-hidden="true"></span>
+          <span>StatsKey</span>
+        </a>
         <div class="flex items-center gap-4">
           <div class="hidden md:flex items-center gap-8 text-[12px] text-text-muted">
             <a href="/#platform" class="hover:text-text-primary transition-colors">Features</a>

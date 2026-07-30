@@ -925,7 +925,7 @@
       }
     </style>
   </head>
-  <body class="antialiased">
+  <body class="antialiased marketing-light">
     <nav id="nav" class="site-nav">
       <div class="site-nav__inner">
         <a href="/" class="site-brand" aria-label="StatsKey home">
@@ -1771,7 +1771,7 @@
               els.score.textContent = String(Math.round(val));
               var pct = (val / 10) * 100;
               els.dial.style.background =
-                'conic-gradient(from 220deg, ' + color + ' ' + pct + '%, rgba(255,255,255,0.08) ' + pct + '%), rgba(255,255,255,0.03)';
+                'conic-gradient(from 220deg, ' + color + ' ' + pct + '%, rgba(28,91,169,0.12) ' + pct + '%), rgba(28,91,169,0.05)';
               els.score.style.color = color;
               if (t < 1) requestAnimationFrame(frame);
             };
