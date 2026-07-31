@@ -10,6 +10,29 @@
 
   gtag('config', 'AW-18341057139');
 </script>
+<!-- Podscribe campaign attribution -->
+<script>
+  (function (w, d) {
+    var id = 'podscribe-capture';
+    if (d.getElementById(id)) return;
+
+    var script = d.createElement('script');
+    script.id = id;
+    script.async = true;
+    script.src = 'https://d34r8q7sht0t9k.cloudfront.net/tag.js';
+    script.addEventListener('load', function () {
+      w.podscribe('init', {
+        user_id: 'a43874b8-e001-70ff-b79f-83e00ea89eb2',
+        advertiser: 'statskey'
+      });
+      w.podscribe('view');
+    });
+
+    var firstScript = d.getElementsByTagName('script')[0];
+    firstScript.parentNode.insertBefore(script, firstScript);
+  })(window, document);
+</script>
+<!-- /Podscribe campaign attribution -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>StatsKey for Mindscape Listeners | Energy Intelligence</title>
@@ -371,6 +394,41 @@
     </div>
   </header>
 
+  <section class="wrap experiment">
+    <div class="experiment-grid">
+      <div>
+        <p class="sect-kicker">How I'm using it</p>
+        <h2>Can I run an Olympic marathon?</h2>
+        <p class="intro">
+          I build StatsKey as I attempt to answer a real question in public: how far can disciplined
+          recording, investigation, projection, and testing take me?
+        </p>
+        <div class="experiment-actions">
+          <a class="btn primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
+          <a class="btn ghost" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
+        </div>
+      </div>
+      <div class="experiment-video">
+        <video
+          src="/statskey-app/olympic-marathon-experiment-001.mp4"
+          poster="/statskey-app/olympic-marathon-experiment-001-poster.jpg"
+          width="720"
+          height="1280"
+          controls
+          muted
+          playsinline
+          preload="metadata"
+          data-power-video
+          data-power-poster
+          data-poster-time="1"
+          aria-label="How I use StatsKey: Can I run an Olympic marathon?"
+        >
+          <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the Olympic marathon experiment video</a>
+        </video>
+      </div>
+    </div>
+  </section>
+
   <section class="wrap principles">
     <p class="sect-kicker">The argument, from first principles</p>
     <h2>Seven things physics already told you about your body.</h2>
@@ -488,41 +546,6 @@
           <b>It's a high sampling rate.</b>
         </p>
         <div class="pquote">Pick your observables. Keep the sampling rate honest. Service the only machine you were issued.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap experiment">
-    <div class="experiment-grid">
-      <div>
-        <p class="sect-kicker">How I'm using it</p>
-        <h2>Can I run an Olympic marathon?</h2>
-        <p class="intro">
-          I build StatsKey as I attempt to answer a real question in public: how far can disciplined
-          recording, investigation, projection, and testing take me?
-        </p>
-        <div class="experiment-actions">
-          <a class="btn primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
-          <a class="btn ghost" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
-        </div>
-      </div>
-      <div class="experiment-video">
-        <video
-          src="/statskey-app/olympic-marathon-experiment-001.mp4"
-          poster="/statskey-app/olympic-marathon-experiment-001-poster.jpg"
-          width="720"
-          height="1280"
-          controls
-          muted
-          playsinline
-          preload="metadata"
-          data-power-video
-          data-power-poster
-          data-poster-time="1"
-          aria-label="How I use StatsKey: Can I run an Olympic marathon?"
-        >
-          <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the Olympic marathon experiment video</a>
-        </video>
       </div>
     </div>
   </section>
