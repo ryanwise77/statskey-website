@@ -12,9 +12,8 @@
 </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StatsKey | Energy Intelligence</title>
+  <title>StatsKey for Mindscape Listeners | Energy Intelligence</title>
   <meta name="description" content="Your body is a non-equilibrium steady state. StatsKey is an instrument for entropy management in alignment with your goals." />
-  <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#f4f8ff" />
   <link rel="icon" type="image/png" sizes="1024x1024" href="/statskey-logo-white-blue.png?v=5" />
   <link rel="apple-touch-icon" href="/statskey-logo-white-blue.png?v=5" />
@@ -67,7 +66,7 @@
       letter-spacing: .05em; color: var(--ink); text-decoration: none;
     }
     .brand span { color: var(--muted); font-weight: 500; }
-    .unlisted {
+    .partner-label {
       font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em;
       text-transform: uppercase; color: var(--quiet);
       border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px;
@@ -222,6 +221,7 @@
     }
     .offer p { color: var(--muted); font-size: 17.5px; line-height: 1.6; margin: 0 0 14px; max-width: 640px; }
     .offer p b { color: var(--ink); font-weight: 600; }
+    .offer h2 em { color: var(--cyan); font-style: normal; }
     .cta-card {
       background: var(--panel); border: 1px solid var(--line);
       border-radius: 24px; padding: 28px;
@@ -269,10 +269,7 @@
       font-size: clamp(26px, 3.2vw, 40px); letter-spacing: -.025em; line-height: 1.15;
       color: var(--ink); max-width: 920px; margin: 0;
     }
-    .close-line__detail {
-      color: var(--muted); font-size: clamp(16px, 1.7vw, 20px); line-height: 1.55;
-      max-width: 820px; margin: 18px 0 0;
-    }
+    .close-line__statement em { color: var(--cyan); font-style: normal; }
 
     /* ── footer ── */
     footer {
@@ -291,7 +288,7 @@
       .top { padding-top: 16px; gap: 16px; align-items: center; }
       .brand { font-size: 14px; white-space: nowrap; }
       .brand span { display: none; }
-      .unlisted {
+      .partner-label {
         padding: 6px 9px; font-size: 9px; line-height: 1.25;
         letter-spacing: .09em; text-align: center;
       }
@@ -328,32 +325,32 @@
 
   <div class="wrap top">
     <a class="brand" href="/">STATSKEY <span>· Energy Intelligence</span></a>
-    <div class="unlisted">Unlisted · For Mindscape listeners</div>
+    <div class="partner-label">Mindscape · Listener offer</div>
   </div>
 
   <header class="wrap hero">
     <div class="hero-grid">
       <div class="hero-copy">
         <p class="eyebrow">You came here from a physics podcast. Good.</p>
-        <h1>Know <em>thyself.</em></h1>
+        <h1>Become a <em>quantum mechanic.</em></h1>
         <p class="lede">
-          You are a <b>non-equilibrium steady state</b>: a pattern held together by the free energy
-          flowing through it. Let the flow stop and you settle to equilibrium — which, for an open
-          system, is simply decomposition. Staying alive is <b>entropy management</b>: keeping that
-          balance of flows steady, and steering it toward the state you actually want — meal by meal,
-          mile by mile, night by night.
+          Your body is a <b>regulated, non-equilibrium system</b>: always changing, yet actively
+          maintaining a stable state. StatsKey makes that regulation measurable — nutrition,
+          fitness, sleep, and wellness on one timeline — so you can test what changes,
+          update your model, and steer toward the state you actually want.
         </p>
         <div class="cta-row">
-          <a class="btn primary" data-claim data-surface="hero" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iPhone: Get 1 month Pro free</a>
-          <a class="btn ghost" data-play data-surface="hero" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener">Android: Get it on Google Play</a>
+          <a class="btn primary" data-claim data-surface="hero" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iOS · Get 1 month Pro free</a>
+          <a class="btn ghost" data-play data-surface="hero" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics&amp;referrer=utm_source%3Dmindscape%26utm_medium%3Dpodcast%26utm_campaign%3Dmindscape_android" target="_blank" rel="noopener">Android · Get 1 month Pro free</a>
         </div>
         <p class="offer-terms">
-          <b>iPhone offer for new and returning subscribers.</b> One month free, then $4.99/month
-          unless canceled. Android is available now on Google Play. The core app remains free.
+          <b>iOS: new and returning subscribers. Android: new subscribers.</b>
+          One month free, then $4.99/month unless canceled. The core app remains free.
         </p>
         <p class="code-note">
-          On iPhone, code <b>MINDSCAPE</b>. The button applies it and installs the app if needed.
-          You can also enter it in StatsKey under Settings → Redeem an offer code.
+          On iOS, code <b>MINDSCAPE</b> is applied automatically. On Android, install or open
+          StatsKey and choose Pro monthly; eligible new subscribers see the one-month Google Play
+          trial automatically.
         </p>
         <p class="hero-proof">
           StatsKey is the instrument: record a meal in seconds and it builds one connected model —
@@ -384,10 +381,9 @@
         <h3>Life is a steady state, not a resting state.</h3>
         <p>
           There are two ways to hold a value steady. One is thermodynamic equilibrium — the
-          dead kind, where nothing flows because everything has already run down. The other is
-          a <b>steady state</b>: a value held constant precisely because large flows run through
-          it and stay matched — free energy in, entropy out. A living body is entirely the
-          second kind. Its stability is a rate of turnover, not an absence of change.
+          dead kind, where change has run down. The other is a <b>steady state</b>: a value
+          maintained by continuous regulation and turnover. A living body is entirely the
+          second kind. Its stability is active, not an absence of change.
         </p>
         <p>
           That's why "balance" is the wrong picture and <b>regulation</b> is the right one. The
@@ -396,7 +392,7 @@
           behaves, steadier energy through the day, a body composition you're after. StatsKey
           exists to make that steady state visible and steerable, with evidence.
         </p>
-        <div class="pquote">Homeostasis isn't rest. It's a balance of flows, actively held.</div>
+        <div class="pquote">Homeostasis isn't rest. It's stability actively maintained.</div>
       </div>
     </div>
 
@@ -499,9 +495,12 @@
   <section class="wrap experiment">
     <div class="experiment-grid">
       <div>
-        <p class="sect-kicker">Experiment 001</p>
+        <p class="sect-kicker">How I'm using it</p>
         <h2>Can I run an Olympic marathon?</h2>
-        <p class="intro">One athlete, one unresolved question, and a protocol built around recording, investigation, projection, and testing. The experiment stays open until the evidence can answer it.</p>
+        <p class="intro">
+          I build StatsKey as I attempt to answer a real question in public: how far can disciplined
+          recording, investigation, projection, and testing take me?
+        </p>
         <div class="experiment-actions">
           <a class="btn primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
           <a class="btn ghost" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
@@ -520,29 +519,10 @@
           data-power-video
           data-power-poster
           data-poster-time="1"
-          aria-label="StatsKey Experiment 001: Can I run an Olympic marathon?"
+          aria-label="How I use StatsKey: Can I run an Olympic marathon?"
         >
-          <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the StatsKey Experiment 001 video</a>
+          <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the Olympic marathon experiment video</a>
         </video>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap instrument">
-    <p class="sect-kicker">The instrument itself</p>
-    <h2>What the joint fit looks like in your pocket.</h2>
-    <p class="intro">
-      Live screens from the shipping app — the day's intake recorded in seconds, and every
-      nutrient measured against its reference intake.
-    </p>
-    <div class="shots">
-      <div class="shot">
-        <img src="/mindscape/record-today.png" alt="StatsKey Record screen with the day's calories, protein, carbs, fat, fiber, water, and meals recorded" loading="lazy" />
-        <div class="cap"><b>The day, recorded.</b> Meals by photo, text, barcode, or label — seconds each, streak intact.</div>
-      </div>
-      <div class="shot">
-        <img src="/mindscape/nutrients-all.png" alt="StatsKey Insights grid measuring 64 nutrients against reference daily intakes" loading="lazy" />
-        <div class="cap"><b>64 nutrients, all measured.</b> Everything scored against reference intake — deficits surface instead of hiding.</div>
       </div>
     </div>
   </section>
@@ -550,13 +530,15 @@
   <section class="wrap offer">
     <div class="offer-grid">
       <div>
-        <p class="sect-kicker">The offer</p>
-        <h2>Know your own numbers, not the population's.</h2>
+        <p class="sect-kicker">Entropy management</p>
+        <h2>
+          A living body does not <em>defeat entropy.</em> It continually manages it.
+        </h2>
         <p style="margin-top:16px">
-          No theorem says the average of a thousand people describes <b>you</b>. The same meal
-          lands differently in different bodies — so StatsKey measures your response instead of
-          borrowing a mean. Change one thing, see what it did, update. <b>Your evidence, not
-          vibes.</b>
+          You stay organized by taking in usable energy and matter, exporting heat and waste, and
+          continually repairing yourself. Food, fitness, sleep, and recovery are part of that
+          thermodynamic work. StatsKey makes the system legible so you can see what destabilizes
+          it, test a change, and decide which state to sustain.
         </p>
         <p>
           StatsKey is available on iPhone, Apple Watch, Android, and the web, built by a solo
@@ -573,26 +555,15 @@
       </div>
       <div class="cta-card">
         <p class="t">Take the data.</p>
-        <p class="s">iPhone: code MINDSCAPE · one month free, then $4.99/month unless canceled.</p>
-        <a class="btn primary" data-claim data-surface="offer" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iPhone: Get 1 month Pro free</a>
-        <a class="btn ghost" data-play data-surface="offer" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener">Android: Get it on Google Play</a>
+        <p class="s">One month free · then $4.99/month unless canceled.</p>
+        <a class="btn primary" data-claim data-surface="offer" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iOS · Get 1 month Pro free</a>
+        <a class="btn ghost" data-play data-surface="offer" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics&amp;referrer=utm_source%3Dmindscape%26utm_medium%3Dpodcast%26utm_campaign%3Dmindscape_android" target="_blank" rel="noopener">Android · Get 1 month Pro free</a>
         <p class="fine">
           StatsKey is a wellness tool, not a medical device. It doesn't diagnose or treat
           anything — it makes your own evidence legible. Subscription auto-renews unless canceled.
         </p>
       </div>
     </div>
-  </section>
-
-  <section class="wrap close-line">
-    <p class="close-line__statement">
-      Human physiology is a regulated, non-equilibrium system sustained by continuous exchanges
-      of energy and matter.
-    </p>
-    <p class="close-line__detail">
-      Longitudinal records of intake, training, sleep, glucose, and symptoms provide observable
-      evidence of how that system changes over time.
-    </p>
   </section>
 
   <footer>
@@ -606,17 +577,17 @@
         </div>
       </div>
       <p class="disclaimer">
-        This page is unlisted — a quiet corner for Mindscape listeners. StatsKey provides
-        general wellness insights and is not intended to diagnose, treat, cure, or prevent any
-        disease. Sponsorship of independent media does not imply the host's scientific
-        endorsement of any specific claim.
+        This page is for Mindscape listeners while StatsKey sponsors the podcast. StatsKey
+        provides general wellness insights and is not intended to diagnose, treat, cure, or
+        prevent any disease. Sponsorship of independent media does not imply the host's
+        scientific endorsement of any specific claim.
       </p>
     </div>
   </footer>
 
   <div class="mobile-sticky" aria-label="Mindscape listener offer">
-    <a class="btn primary" data-claim data-ios-sticky data-surface="sticky" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iPhone: Get 1 month free</a>
-    <a class="btn primary" data-play data-android-sticky data-surface="sticky" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" hidden>Android: Get StatsKey</a>
+    <a class="btn primary" data-claim data-ios-sticky data-surface="sticky" href="https://apps.apple.com/redeem?ctx=offercodes&id=6751132823&code=MINDSCAPE">iOS · Get 1 month free</a>
+    <a class="btn primary" data-play data-android-sticky data-surface="sticky" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics&amp;referrer=utm_source%3Dmindscape%26utm_medium%3Dpodcast%26utm_campaign%3Dmindscape_android" hidden>Android · Get 1 month free</a>
   </div>
 
   <dialog id="claim-dialog" aria-labelledby="claim-dialog-title">
