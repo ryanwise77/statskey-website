@@ -147,3 +147,85 @@ if (hardwareSection) {
     window.addEventListener('load', jumpToHardware)
   }
 }
+
+// The research section uses one lightweight live browser frame rather than six
+// simultaneous embeds. Hover, focus, click, or arrow through the concept list
+// to swap the actual destination page shown in the preview.
+const conceptFrame = document.getElementById('concept-preview-frame')
+const conceptViewport = document.getElementById('concept-preview-viewport')
+const conceptOpen = document.getElementById('concept-open')
+const conceptStatus = document.getElementById('concept-preview-status')
+const conceptTitle = document.getElementById('concept-preview-title')
+const conceptSummary = document.getElementById('concept-preview-summary')
+const conceptOptions = Array.from(document.querySelectorAll('.concept-option'))
+
+if (conceptFrame && conceptViewport && conceptOpen && conceptStatus && conceptTitle && conceptSummary && conceptOptions.length) {
+  let previewTimer
+
+  const selectConcept = (option) => {
+    const previewUrl = option.dataset.preview
+    const title = option.dataset.title
+    if (!previewUrl || !title) return
+
+    conceptOptions.forEach((candidate) => {
+      const selected = candidate === option
+      candidate.classList.toggle('is-active', selected)
+      candidate.setAttribute('aria-selected', String(selected))
+      candidate.tabIndex = selected ? 0 : -1
+    })
+
+    conceptOpen.href = option.dataset.href || previewUrl
+    conceptStatus.textContent = option.dataset.status || 'Research concept'
+    conceptTitle.textContent = title
+    conceptSummary.textContent = option.dataset.summary || ''
+    conceptFrame.title = `Live preview of the ${title} concept`
+
+    const nextUrl = new URL(previewUrl, window.location.origin).href
+    if (conceptFrame.src !== nextUrl) {
+      conceptViewport.classList.add('is-loading')
+      conceptFrame.src = previewUrl
+    }
+  }
+
+  const queueConcept = (option, delay = 0) => {
+    window.clearTimeout(previewTimer)
+    previewTimer = window.setTimeout(() => selectConcept(option), delay)
+  }
+
+  const markConceptLoaded = () => {
+    conceptViewport.classList.remove('is-loading')
+  }
+
+  conceptFrame.addEventListener('load', markConceptLoaded)
+  if (conceptFrame.contentDocument?.readyState === 'complete') {
+    window.requestAnimationFrame(markConceptLoaded)
+  }
+
+  conceptOptions.forEach((option, index) => {
+    option.tabIndex = option.classList.contains('is-active') ? 0 : -1
+    option.addEventListener('pointerenter', () => queueConcept(option, 90))
+    option.addEventListener('focus', () => queueConcept(option))
+    option.addEventListener('click', () => {
+      queueConcept(option)
+      if (window.matchMedia('(max-width: 1020px)').matches) {
+        window.setTimeout(() => {
+          conceptViewport.closest('.concept-live')?.scrollIntoView({
+            behavior: prefersReducedMotion ? 'auto' : 'smooth',
+            block: 'start'
+          })
+        }, 0)
+      }
+    })
+    option.addEventListener('keydown', (event) => {
+      if (!['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return
+      event.preventDefault()
+
+      let nextIndex = index
+      if (event.key === 'ArrowDown' || event.key === 'ArrowRight') nextIndex = (index + 1) % conceptOptions.length
+      if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') nextIndex = (index - 1 + conceptOptions.length) % conceptOptions.length
+      if (event.key === 'Home') nextIndex = 0
+      if (event.key === 'End') nextIndex = conceptOptions.length - 1
+      conceptOptions[nextIndex].focus()
+    })
+  })
+}
