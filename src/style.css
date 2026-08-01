@@ -230,8 +230,8 @@ a { color: inherit; text-decoration: none; }
 
 .hero-section {
   position: relative;
-  min-height: 100svh;
-  padding: 136px 0 88px;
+  min-height: auto;
+  padding: clamp(112px, 9vw, 136px) 0 clamp(48px, 5vw, 72px);
   overflow: hidden;
 }
 
@@ -808,14 +808,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 .app-device--compact {
-  width: clamp(252px, 22vw, 286px);
-  border-radius: 38px;
-  padding: 8px;
+  width: clamp(300px, 29vw, 420px);
+  border-radius: 46px;
+  padding: 10px;
 }
 
 .app-device--compact > video,
 .app-device--compact > img {
-  border-radius: 31px;
+  border-radius: 37px;
 }
 
 .app-cap {
@@ -921,6 +921,10 @@ a { color: inherit; text-decoration: none; }
   grid-template-columns: minmax(0, 1fr) minmax(326px, 460px);
   gap: clamp(36px, 7vw, 92px);
   align-items: center;
+}
+
+.experiment-section {
+  padding-top: clamp(56px, 7vw, 84px);
 }
 
 .experiment-copy {
@@ -1990,14 +1994,15 @@ html.reveal-motion .reveal.visible {
 /* --- Adaptive Intelligence signal fusion --- */
 .fusion-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 0.68fr) minmax(650px, 1.32fr);
+  width: min(1320px, calc(100% - 40px));
+  grid-template-columns: minmax(300px, 0.56fr) minmax(0, 1.44fr);
   gap: clamp(28px, 6vw, 80px);
   align-items: center;
 }
 
 .adaptive-media {
   display: grid;
-  grid-template-columns: clamp(252px, 22vw, 286px) minmax(380px, 1fr);
+  grid-template-columns: clamp(300px, 29vw, 420px) minmax(0, 1fr);
   gap: clamp(16px, 2.2vw, 26px);
   align-items: center;
   min-width: 0;
@@ -2008,7 +2013,7 @@ html.reveal-motion .reveal.visible {
 }
 
 .adaptive-demo .app-cap {
-  max-width: 276px;
+  max-width: 400px;
   margin-inline: auto;
   font-size: 13px;
 }
