@@ -192,6 +192,11 @@ if (conceptFrame && conceptViewport && conceptOpen && conceptStatus && conceptTi
     previewTimer = window.setTimeout(() => selectConcept(option), delay)
   }
 
+  const activateConcept = (option) => {
+    window.clearTimeout(previewTimer)
+    selectConcept(option)
+  }
+
   const markConceptLoaded = () => {
     conceptViewport.classList.remove('is-loading')
   }
@@ -203,10 +208,14 @@ if (conceptFrame && conceptViewport && conceptOpen && conceptStatus && conceptTi
 
   conceptOptions.forEach((option, index) => {
     option.tabIndex = option.classList.contains('is-active') ? 0 : -1
-    option.addEventListener('pointerenter', () => queueConcept(option, 90))
-    option.addEventListener('focus', () => queueConcept(option))
+    option.addEventListener('pointerenter', () => {
+      if (window.matchMedia('(min-width: 1021px) and (hover: hover) and (pointer: fine)').matches) {
+        queueConcept(option, 90)
+      }
+    })
+    option.addEventListener('focus', () => activateConcept(option))
     option.addEventListener('click', () => {
-      queueConcept(option)
+      activateConcept(option)
       if (window.matchMedia('(max-width: 1020px)').matches) {
         window.setTimeout(() => {
           conceptViewport.closest('.concept-live')?.scrollIntoView({
@@ -217,6 +226,12 @@ if (conceptFrame && conceptViewport && conceptOpen && conceptStatus && conceptTi
       }
     })
     option.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        activateConcept(option)
+        return
+      }
+
       if (!['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return
       event.preventDefault()
 
