@@ -808,7 +808,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .app-device--compact {
-  width: clamp(300px, 29vw, 420px);
+  width: clamp(380px, 26vw, 420px);
   border-radius: 46px;
   padding: 10px;
 }
@@ -1994,15 +1994,15 @@ html.reveal-motion .reveal.visible {
 /* --- Adaptive Intelligence signal fusion --- */
 .fusion-layout {
   display: grid;
-  width: min(1320px, calc(100% - 40px));
-  grid-template-columns: minmax(300px, 0.56fr) minmax(0, 1.44fr);
-  gap: clamp(28px, 6vw, 80px);
+  width: min(1520px, calc(100% - 40px));
+  grid-template-columns: minmax(420px, 460px) minmax(0, 1fr);
+  gap: clamp(36px, 3.2vw, 56px);
   align-items: center;
 }
 
 .adaptive-media {
   display: grid;
-  grid-template-columns: clamp(300px, 29vw, 420px) minmax(0, 1fr);
+  grid-template-columns: clamp(380px, 26vw, 420px) minmax(0, 1fr);
   gap: clamp(16px, 2.2vw, 26px);
   align-items: center;
   min-width: 0;
@@ -2016,6 +2016,14 @@ html.reveal-motion .reveal.visible {
   max-width: 400px;
   margin-inline: auto;
   font-size: 13px;
+}
+
+@media (min-width: 861px) {
+  .fusion-layout .flow-copy h2 {
+    max-width: 460px;
+    font-size: clamp(3.4rem, 4.4vw, 4.8rem);
+    line-height: 0.96;
+  }
 }
 
 .fusion-panel {
@@ -2620,7 +2628,7 @@ html.reveal-motion .reveal.visible {
 }
 
 /* --- Showcase responsive --- */
-@media (max-width: 1120px) {
+@media (max-width: 1320px) {
   .fusion-layout {
     grid-template-columns: 1fr;
   }
