@@ -2683,13 +2683,13 @@ html.reveal-motion .reveal.visible {
   }
 
   .concept-live__viewport {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1;
   }
 
   .concept-live__viewport iframe {
-    width: 133.333%;
-    height: 133.333%;
-    transform: scale(0.75);
+    width: 100%;
+    height: 100%;
+    transform: none;
   }
 
   .concept-live__footer {
@@ -2697,8 +2697,18 @@ html.reveal-motion .reveal.visible {
     gap: 11px;
   }
 
+  .concept-live__footer span,
+  .concept-option > span {
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+  }
+
   .concept-live__footer p {
     font-size: 14px;
+  }
+
+  .concept-option em {
+    font-size: 13px;
   }
 
   .prov-chips {
