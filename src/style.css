@@ -2627,6 +2627,12 @@ html.reveal-motion .reveal.visible {
 }
 
 @media (max-width: 860px) {
+  html.reveal-motion .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   .adaptive-media {
     grid-template-columns: 1fr;
     gap: 30px;
@@ -3267,8 +3273,32 @@ body.marketing-light .nav-progress {
   }
 
   body.marketing-light .hero-title {
+    font-size: clamp(3.1rem, 14vw, 3.55rem);
     letter-spacing: -0.055em;
     line-height: 0.92;
+  }
+
+  body.marketing-light .hero-film {
+    width: min(300px, 100%);
+  }
+
+  body.marketing-light .app-visual > div {
+    max-width: 100%;
+  }
+
+  body.marketing-light .app-device {
+    width: min(100%, 340px);
+  }
+
+  body.marketing-light .app-device--compact {
+    width: min(100%, 350px);
+    border-radius: 40px;
+    padding: 8px;
+  }
+
+  body.marketing-light .app-device--compact > video,
+  body.marketing-light .app-device--compact > img {
+    border-radius: 33px;
   }
 
   body.marketing-light :is(.eyebrow, .kicker) {
