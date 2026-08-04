@@ -32,7 +32,21 @@
           <a href="/wellness">Wellness</a>
           <a href="/hardware">Hardware</a>
           <a href="/app/tokens">Store</a>
-          <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">iOS app</a>
+          <span class="site-nav__apps" aria-label="Download StatsKey">
+            <a class="site-nav__app-link" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" aria-label="Download StatsKey on the App Store">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.25.07 2.12.69 2.86.74 1.1-.22 2.15-.85 3.32-.77 1.4.11 2.45.67 3.15 1.68-2.89 1.73-2.2 5.53.45 6.6-.53 1.39-1.21 2.77-1.78 4.72ZM12.03 7.25C11.88 5.18 13.57 3.47 15.5 3.3c.27 2.39-2.17 4.17-3.47 3.95Z"/></svg>
+              <span>iOS</span>
+            </a>
+            <a class="site-nav__app-link" data-store="play" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener" aria-label="Get StatsKey on Google Play">
+              <svg viewBox="0 0 24 26" aria-hidden="true">
+                <path fill="#34A853" d="M1.5 1.4v23.2L14.8 13 1.5 1.4Z"/>
+                <path fill="#4285F4" d="m1.5 1.4 15.3 8.5-2 3.1L1.5 1.4Z"/>
+                <path fill="#EA4335" d="m1.5 24.6 15.3-8.5-2-3.1L1.5 24.6Z"/>
+                <path fill="#FBBC04" d="m16.8 9.9 5.4 3.1-5.4 3.1-2-3.1 2-3.1Z"/>
+              </svg>
+              <span>Android</span>
+            </a>
+          </span>
           <a href="/mindscape">Mindscape</a>
           <a href="/app/login">Sign in</a>
         </div>
@@ -47,7 +61,8 @@
         <a href="/wellness">Wellness</a>
         <a href="/hardware">Hardware</a>
         <a href="/app/tokens">Store</a>
-        <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+        <a data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+        <a data-store="play" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener">Get the Android app</a>
         <a href="/mindscape">Mindscape</a>
         <a href="/app/login">Sign in</a>
         <a href="/app/signup">Sign up</a>
@@ -67,10 +82,21 @@
             </p>
             <div class="hero-actions reveal d3">
               <a class="button button--primary" href="/app/signup">Sign up free</a>
-              <a class="button button--secondary" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
-              <a class="button button--secondary" data-store="play" href="#" target="_blank" rel="noopener" hidden>Get it on Google Play</a>
+              <a class="button button--store button--store-apple" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" aria-label="Download StatsKey on the App Store">
+                <svg class="store-button__icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.25.07 2.12.69 2.86.74 1.1-.22 2.15-.85 3.32-.77 1.4.11 2.45.67 3.15 1.68-2.89 1.73-2.2 5.53.45 6.6-.53 1.39-1.21 2.77-1.78 4.72ZM12.03 7.25C11.88 5.18 13.57 3.47 15.5 3.3c.27 2.39-2.17 4.17-3.47 3.95Z"/></svg>
+                <span class="store-button__copy"><span>Download on the</span><strong>App Store</strong></span>
+              </a>
+              <a class="button button--store button--store-play" data-store="play" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener" aria-label="Get StatsKey on Google Play">
+                <svg class="store-button__icon store-button__icon--play" viewBox="0 0 24 26" aria-hidden="true">
+                  <path fill="#34A853" d="M1.5 1.4v23.2L14.8 13 1.5 1.4Z"/>
+                  <path fill="#4285F4" d="m1.5 1.4 15.3 8.5-2 3.1L1.5 1.4Z"/>
+                  <path fill="#EA4335" d="m1.5 24.6 15.3-8.5-2-3.1L1.5 24.6Z"/>
+                  <path fill="#FBBC04" d="m16.8 9.9 5.4 3.1-5.4 3.1-2-3.1 2-3.1Z"/>
+                </svg>
+                <span class="store-button__copy"><span>Get it on</span><strong>Google Play</strong></span>
+              </a>
             </div>
-            <div class="hero-note reveal d3">Free today, with optional Pro ($4.99/mo) and Pro+ ($19.99/mo) — annual plans for less, with the same pricing on the web and the App Store. Free access is introductory and may move to paid pricing as StatsKey grows.</div>
+            <div class="hero-note reveal d3">Free today, with optional Pro ($4.99/mo) and Pro+ ($19.99/mo) — annual plans for less, with the same pricing on the web, App Store, and Google Play. Free access is introductory and may move to paid pricing as StatsKey grows.</div>
           </div>
 
           <div class="hero-film tilt-card reveal d2" id="hero-card" aria-label="Mahi-mahi catch">
@@ -465,13 +491,24 @@
           <div>
             <div class="eyebrow">Start measuring what matters</div>
             <h2>Build the model your body has been asking for.</h2>
-            <p>Start free today, then add optional Pro ($4.99/mo) or Pro+ ($19.99/mo) when you want more — annual plans save more, and pricing is the same on the web and the App Store. Free access is introductory, and pricing may change as StatsKey grows.</p>
+            <p>Start free today, then add optional Pro ($4.99/mo) or Pro+ ($19.99/mo) when you want more — annual plans save more, and pricing is the same on the web, App Store, and Google Play. Free access is introductory, and pricing may change as StatsKey grows.</p>
             <p style="margin-top: 14px; color: var(--muted); font-size: 14px">Now available in English, Spanish, German, Japanese, and Brazilian Portuguese.</p>
           </div>
           <div class="cta-card__actions">
             <a class="button button--primary" href="/app/signup">Sign up free</a>
-            <a class="button button--secondary" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
-            <a class="button button--secondary" data-store="play" href="#" target="_blank" rel="noopener" hidden>Get it on Google Play</a>
+            <a class="button button--store button--store-apple" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" aria-label="Download StatsKey on the App Store">
+              <svg class="store-button__icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.25.07 2.12.69 2.86.74 1.1-.22 2.15-.85 3.32-.77 1.4.11 2.45.67 3.15 1.68-2.89 1.73-2.2 5.53.45 6.6-.53 1.39-1.21 2.77-1.78 4.72ZM12.03 7.25C11.88 5.18 13.57 3.47 15.5 3.3c.27 2.39-2.17 4.17-3.47 3.95Z"/></svg>
+              <span class="store-button__copy"><span>Download on the</span><strong>App Store</strong></span>
+            </a>
+            <a class="button button--store button--store-play" data-store="play" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener" aria-label="Get StatsKey on Google Play">
+              <svg class="store-button__icon store-button__icon--play" viewBox="0 0 24 26" aria-hidden="true">
+                <path fill="#34A853" d="M1.5 1.4v23.2L14.8 13 1.5 1.4Z"/>
+                <path fill="#4285F4" d="m1.5 1.4 15.3 8.5-2 3.1L1.5 1.4Z"/>
+                <path fill="#EA4335" d="m1.5 24.6 15.3-8.5-2-3.1L1.5 24.6Z"/>
+                <path fill="#FBBC04" d="m16.8 9.9 5.4 3.1-5.4 3.1-2-3.1 2-3.1Z"/>
+              </svg>
+              <span class="store-button__copy"><span>Get it on</span><strong>Google Play</strong></span>
+            </a>
           </div>
         </div>
       </section>

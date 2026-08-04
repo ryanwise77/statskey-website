@@ -10,8 +10,7 @@
 //   https://play.google.com/store/apps/details?id=<your.package.id>
 export const APP_STORE_URL = 'https://apps.apple.com/us/app/statskey/id6751132823'
 
-// e.g. 'https://play.google.com/store/apps/details?id=com.statskey.app'
-export const GOOGLE_PLAY_URL = ''
+export const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.statskey.biometrics'
 
 // Wire any opted-in store buttons. iOS buttons keep their hard-coded href as a
 // no-JS fallback and are only re-asserted when a node opts in with

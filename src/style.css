@@ -169,6 +169,41 @@ a { color: inherit; text-decoration: none; }
   color: var(--ink);
 }
 
+.site-nav__apps {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: -8px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.site-nav__app-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.site-nav__app-link:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.site-nav__app-link svg {
+  width: 13px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
 .site-nav__cta {
   display: inline-flex;
   align-items: center;
@@ -378,6 +413,80 @@ a { color: inherit; text-decoration: none; }
 .button--secondary:hover {
   border-color: rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.075);
+}
+
+.button--store {
+  min-height: 52px;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 7px 16px 7px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+}
+
+.button--store-apple {
+  background: linear-gradient(145deg, #111722, #030507);
+  color: #fff;
+  box-shadow:
+    0 14px 34px rgba(4, 12, 24, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.button--store-play {
+  border-color: rgba(20, 111, 232, 0.2);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(238, 246, 255, 0.94));
+  color: #102a46;
+  box-shadow:
+    0 14px 34px rgba(36, 88, 151, 0.11),
+    inset 0 1px 0 #fff;
+}
+
+.button--store-apple:hover {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: linear-gradient(145deg, #192230, #070a0f);
+  box-shadow:
+    0 18px 42px rgba(4, 12, 24, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.17);
+}
+
+.button--store-play:hover {
+  border-color: rgba(20, 111, 232, 0.38);
+  background: #fff;
+  box-shadow:
+    0 18px 42px rgba(36, 88, 151, 0.16),
+    inset 0 1px 0 #fff;
+}
+
+.store-button__icon {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 auto;
+}
+
+.store-button__icon--play {
+  width: 24px;
+  height: 26px;
+}
+
+.store-button__copy {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  line-height: 1;
+}
+
+.store-button__copy span {
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.68;
+}
+
+.store-button__copy strong {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
 }
 
 .hero-note {
@@ -2803,6 +2912,18 @@ body.marketing-light .site-brand__mark {
 
 body.marketing-light .site-nav__links {
   color: #516983;
+}
+
+body.marketing-light .site-nav__apps {
+  border-color: rgba(20, 111, 232, 0.16);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    0 5px 16px rgba(36, 88, 151, 0.07),
+    inset 0 1px 0 #fff;
+}
+
+body.marketing-light .site-nav__app-link:hover {
+  background: rgba(20, 111, 232, 0.09);
 }
 
 body.marketing-light :is(.site-nav__links a, .site-footer a, .site-mobile-menu a):hover {
