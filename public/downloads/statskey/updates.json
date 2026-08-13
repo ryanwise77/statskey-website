@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "latest": "0.19.0",
+  "releases": [
+    {
+      "version": "0.19.0",
+      "date": "2026-08-13",
+      "platforms": ["macOS"],
+      "title": "Proof you can inspect",
+      "summary": "StatsKey can now exercise mobile work directly and only calls implementation complete when the saved result and its verification agree.",
+      "highlights": [
+        "Simulator Lab can discover, start, inspect, and interact with iOS Simulators and Android emulators.",
+        "Completed workspace changes include persisted-change and verification evidence you can review.",
+        "Files, search, browser tabs, and workspace navigation are easier to find and use.",
+        "Long-running work settles reliably in the background and keeps its final verification visible."
+      ]
+    },
+    {
+      "version": "0.18.34",
+      "date": "2026-08-07",
+      "platforms": ["macOS", "Windows"],
+      "title": "Desktop preview",
+      "summary": "The first public StatsKey workspace preview.",
+      "highlights": [
+        "Project workspaces, local tools, model choices, and update delivery.",
+        "A conversational work log with review preferences and resumable sessions."
+      ]
+    }
+  ]
+}
