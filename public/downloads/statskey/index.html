@@ -491,7 +491,7 @@
           </a>
           <a class="button" href="#why">Why StatsKey</a>
         </div>
-        <p class="hero__note">macOS 12+ · Signed and Apple notarized · 0.19.0</p>
+        <p class="hero__note">Mac 0.19.0 · signed and Apple notarized · Windows 0.19.1 preview</p>
       </header>
 
       <section class="shell product-wrap" aria-label="StatsKey in action">
@@ -609,14 +609,14 @@
           </div>
           <div class="release-list" id="release-list" aria-live="polite">
             <article class="release-card">
-              <div class="release-card__meta">Version 0.19.0 · macOS<time datetime="2026-08-13">August 13, 2026</time></div>
+              <div class="release-card__meta">Version 0.19.1 · Windows<time datetime="2026-08-13">August 13, 2026</time></div>
               <div>
-                <h3>Proof you can inspect</h3>
-                <p>StatsKey can exercise mobile work directly and show the saved result with its verification.</p>
+                <h3>Windows, tested where it runs</h3>
+                <p>The Windows preview now has to pass native install, restart, workspace, terminal, browser, and update-readiness checks before release.</p>
                 <ul>
-                  <li>Simulator Lab for iOS and Android app testing.</li>
-                  <li>Persisted-change proof before implementation is called complete.</li>
-                  <li>Clearer workspaces, files, browser tabs, and long-running handoffs.</li>
+                  <li>Workspace changes remain available after restarting the app.</li>
+                  <li>Commands and installed tools follow the Windows environment.</li>
+                  <li>The public installer is tied to native Windows proof.</li>
                 </ul>
               </div>
             </article>
@@ -627,7 +627,7 @@
       <section class="download" id="download">
         <div class="shell">
           <div class="section-heading">
-            <span class="kicker" id="release-status">Desktop preview 0.19.0</span>
+            <span class="kicker" id="release-status">Mac 0.19.0 · Windows 0.19.1</span>
             <h2>Start with the outcome.</h2>
             <p>Bring a project. Tell StatsKey what finished looks like. Stay in the conversation.</p>
           </div>
@@ -645,7 +645,7 @@
             >Intel Mac</a>
             <a
               data-target="win-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.18.34/StatsKey-0.18.34-win-x64.exe"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.1/StatsKey-0.19.1-win-x64.exe"
             >Windows</a>
             <a href="#updates">What’s new</a>
             <a href="/privacy">Privacy</a>
@@ -670,7 +670,7 @@
 
     <script>
       const macVersion = "0.19.0";
-      const windowsVersion = "0.18.34";
+      const windowsVersion = "0.19.1";
       const releaseRoot = (version) =>
         `https://storage.googleapis.com/statskey-workbench-downloads/releases/${version}`;
       const targets = {
