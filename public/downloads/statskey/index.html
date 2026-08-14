@@ -487,9 +487,18 @@
           without starting over, then review the files, checks, and final handoff.
         </p>
         <div class="hero__actions">
-          <a class="button button--primary" id="primary-download" href="#download">
+          <a
+            class="button button--primary"
+            data-target="mac-arm64"
+            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.0/StatsKey-0.19.0-mac-arm64.dmg"
+          >
             Download for Apple Silicon <span aria-hidden="true">↓</span>
           </a>
+          <a
+            class="button"
+            data-target="win-x64"
+            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.1/StatsKey-0.19.1-win-x64.exe"
+          >Download for Windows <span aria-hidden="true">↓</span></a>
           <a class="button" href="#why">Why StatsKey</a>
         </div>
         <p class="hero__note">Mac 0.19.0 · signed and Apple notarized · Windows 0.19.1 preview</p>
@@ -638,16 +647,17 @@
               data-target="mac-arm64"
               href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.0/StatsKey-0.19.0-mac-arm64.dmg"
             >Download for Apple Silicon ↓</a>
+            <a
+              class="button"
+              data-target="win-x64"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.1/StatsKey-0.19.1-win-x64.exe"
+            >Download for Windows ↓</a>
           </div>
           <div class="download__links">
             <a
               data-target="mac-x64"
               href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.0/StatsKey-0.19.0-mac-x64.dmg"
             >Intel Mac</a>
-            <a
-              data-target="win-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.1/StatsKey-0.19.1-win-x64.exe"
-            >Windows</a>
             <a href="#updates">What’s new</a>
             <a href="/privacy">Privacy</a>
           </div>
@@ -684,11 +694,9 @@
       const preferredTarget = userAgent.includes("windows") ? "win-x64" : "mac-arm64";
       const preferred = targets[preferredTarget];
 
-      for (const id of ["primary-download", "nav-download"]) {
-        const link = document.getElementById(id);
-        if (!link) continue;
-        link.href = `${releaseRoot(preferred.version)}/${preferred.file}`;
-        link.textContent = id === "nav-download" ? "Download" : `${preferred.label} ↓`;
+      const navDownload = document.getElementById("nav-download");
+      if (navDownload) {
+        navDownload.href = `${releaseRoot(preferred.version)}/${preferred.file}`;
       }
 
       for (const version of new Set([macVersion, windowsVersion])) {
