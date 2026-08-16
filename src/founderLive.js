@@ -75,6 +75,7 @@ const state = {
   range: 'week',
   nutritionRangeDays: 7,
   includeToday: false,
+  nutritionView: 'home',
   selectedNutrient: null,
   selectedWorkout: null,
   route: null,
@@ -596,6 +597,48 @@ function workoutRows(workouts, maximum = 5) {
   `).join('')
 }
 
+function activityWorkoutCards(workouts, maximum = 10) {
+  const visible = workouts.slice(0, maximum)
+  if (!visible.length) return '<div class="ios-empty">No public workout summaries yet.</div>'
+  return visible.map((workout) => {
+    const run = isRun(workout)
+    const sportColor = run
+      ? '#fc5200'
+      : workout.sport === 'swimming'
+        ? '#0a84ff'
+        : workout.sport === 'cycling'
+          ? '#30b0c7'
+          : '#5856d6'
+    const pace = run && number(workout.averagePaceSecondsPerMile) > 0
+      ? `${formatPace(workout.averagePaceSecondsPerMile)} /mi`
+      : number(workout.distanceMiles) > 0
+        ? `${number(workout.distanceMiles).toFixed(2)} mi`
+        : 'Recorded'
+    const thirdMetric = number(workout.averageHeartRateBpm) > 0
+      ? `<span><i style="color:#ff453a">♥</i><strong>${integer(workout.averageHeartRateBpm)} bpm</strong></span>`
+      : number(workout.calories) > 0
+        ? `<span><i style="color:#ff9f0a">◆</i><strong>${integer(workout.calories)} kcal</strong></span>`
+        : `<span><i style="color:${sportColor}">↗</i><strong>${integer(workout.elevationGainFeet)} ft</strong></span>`
+    return `
+      <button class="ios-activity-workout" style="--sport-color:${sportColor}" type="button" data-live-workout="${escapeHTML(workout.workoutId)}">
+        <span class="ios-activity-workout__head">
+          <span class="ios-activity-workout__icon" aria-hidden="true">${run ? '↗' : workout.sport === 'swimming' ? '≈' : workout.sport === 'cycling' ? '◇' : '•'}</span>
+          <span class="ios-activity-workout__identity">
+            <strong>${escapeHTML(sportLabel(workout.sport))}</strong>
+            <small>${escapeHTML(dateLabel(workout.day, { short: true }))}${workout.routePublished ? ' · ⌖ GPS' : ''}</small>
+          </span>
+          <strong class="ios-activity-workout__distance">${number(workout.distanceMiles).toFixed(2)} mi</strong>
+        </span>
+        <span class="ios-activity-workout__metrics">
+          <span><i style="color:${sportColor}">⌁</i><strong>${pace}</strong></span>
+          <span><i style="color:#1676d2">◷</i><strong>${formatClock(workout.movingTimeSeconds || workout.durationSeconds)}</strong></span>
+          ${thirdMetric}
+        </span>
+      </button>
+    `
+  }).join('')
+}
+
 function startWorkoutCard() {
   return `
     <button class="ios-start-workout" type="button" data-live-action="start-workout">
@@ -638,16 +681,30 @@ function fitnessPlannerCard() {
 }
 
 function fitnessDashboard() {
+  const year = calendarYearSummary()
+  const recent = state.root?.training?.periods?.last7Days ?? {}
   return `
-    ${fitnessPlannerCard()}
-    ${summaryCard()}
-    ${pulseCard()}
-    ${historicalCard()}
+    <div class="ios-card ios-card--orange ios-running-year">
+      <div class="ios-card-head">
+        <span>
+          <span class="ios-card-icon ios-card-icon--run">↗</span>
+          <span><small class="ios-card-kicker">${escapeHTML(year.year)} running</small><span class="ios-card-title">Fitness Summary</span></span>
+        </span>
+        <span class="ios-planner-status">Live</span>
+      </div>
+      <div class="ios-pulse-value"><strong>${number(year.averageMilesPerWeek).toFixed(1)}</strong><span>mi / week this year</span></div>
+      <div class="ios-stat-grid">
+        <div><small>Year distance</small><strong>${number(year.runningMiles).toFixed(1)} mi</strong></div>
+        <div><small>Last 7 days</small><strong>${number(recent.runningMiles).toFixed(1)} mi</strong></div>
+        <div><small>Runs</small><strong>${integer(year.runningActivities)}</strong></div>
+      </div>
+    </div>
     <div class="ios-section-label">
-      <span>Recent Workouts</span>
+      <span>Recent Activity</span>
       <button type="button" data-live-action="history">See All</button>
     </div>
-    <div class="ios-workout-list">${workoutRows(state.workouts, 6)}</div>
+    <div class="ios-activity-stack">${activityWorkoutCards(state.workouts, 12)}</div>
+    ${historicalCard()}
   `
 }
 
@@ -676,7 +733,7 @@ function todayDashboard() {
       </div>
     </div>
     <div class="ios-section-label"><span>Workouts</span></div>
-    <div class="ios-workout-list">${workoutRows(dayWorkouts, 10)}</div>
+    <div class="ios-activity-stack">${activityWorkoutCards(dayWorkouts, 10)}</div>
   `
 }
 
@@ -955,9 +1012,9 @@ function historyHome() {
       ${historyBars(training.monthlyMileage, 30)}
       <p class="ios-card-copy" style="margin-top:9px">The chart covers every projected month. Opening History loads the complete day-level public record on demand.</p>
     </div>
-    <div class="ios-section-label"><span>Workout History</span></div>
+    <div class="ios-section-label"><span>Recent Activity</span></div>
     ${listStatus}
-    <div class="ios-workout-list">${workoutRows(history, history.length)}</div>
+    <div class="ios-activity-stack">${activityWorkoutCards(history, history.length)}</div>
   `
 }
 
@@ -1093,34 +1150,24 @@ function renderScreen() {
     elements.screen.innerHTML = historyHome()
     return
   }
-  if (state.view === 'nutrient') {
+  elements.back.hidden = true
+  elements.title.textContent = 'Activity'
+  elements.screen.innerHTML = activityHome()
+}
+
+function renderNutritionScreen() {
+  if (!state.root) return
+  if (state.nutritionView === 'nutrient') {
     const nutrient = nutritionSnapshot()?.micronutrients
       ?.find((item) => item.key === state.selectedNutrient)
-    elements.title.textContent = nutrient?.label || 'Nutrition'
-    elements.back.hidden = false
-    elements.screen.innerHTML = nutrientDetailHome()
+    elements.nutritionTitle.textContent = nutrient?.label || 'Nutrition'
+    elements.nutritionBack.hidden = false
+    elements.nutritionScreen.innerHTML = nutrientDetailHome()
     return
   }
-  elements.back.hidden = true
-  if (state.selectedTab === 'record') {
-    elements.title.textContent = 'Record'
-    elements.screen.innerHTML = recordHome()
-  } else if (state.selectedTab === 'activity') {
-    elements.title.textContent = 'Activity'
-    elements.screen.innerHTML = activityHome()
-  } else if (state.selectedTab === 'insights') {
-    elements.title.textContent = 'Insights'
-    elements.screen.innerHTML = nutritionHome()
-  } else if (state.selectedTab === 'intelligence') {
-    elements.title.textContent = 'Running Intelligence'
-    elements.screen.innerHTML = intelligenceHome()
-  } else if (state.selectedTab === 'friends') {
-    elements.title.textContent = 'Friends'
-    elements.screen.innerHTML = friendsHome()
-  } else {
-    elements.title.textContent = 'Activity'
-    elements.screen.innerHTML = activityHome()
-  }
+  elements.nutritionTitle.textContent = 'Insights'
+  elements.nutritionBack.hidden = true
+  elements.nutritionScreen.innerHTML = nutritionHome()
 }
 
 function renderTrainingRecord() {
@@ -1160,12 +1207,12 @@ function renderTrainingRecord() {
 
 function render() {
   renderScreen()
-  renderTrainingRecord()
+  renderNutritionScreen()
 }
 
-function keepPhoneNavigationVisible() {
+function keepPhoneNavigationVisible(deviceName = 'running') {
   if (!window.matchMedia('(max-width: 760px)').matches) return
-  const device = elements.stage.querySelector('.ios-device')
+  const device = elements.stage.querySelector(`[data-live-device="${deviceName}"]`)
   if (!device) return
   const siteNavHeight = document.getElementById('nav')?.offsetHeight || 58
   const safeTop = siteNavHeight + 8
@@ -1214,26 +1261,6 @@ function openWorkout(workoutId) {
   keepPhoneNavigationVisible()
 }
 
-function setTab(tab) {
-  stopRouteListener()
-  state.selectedTab = tab
-  state.view = 'home'
-  state.selectedWorkout = null
-  state.selectedNutrient = null
-  elements.tabs.forEach((button) => {
-    const active = button.dataset.founderTab === tab
-    button.classList.toggle('is-active', active)
-    if (active) {
-      button.setAttribute('aria-current', 'page')
-    } else {
-      button.removeAttribute('aria-current')
-    }
-  })
-  elements.screen.scrollTop = 0
-  renderScreen()
-  if (tab === 'history') void loadCompleteWorkoutHistory()
-}
-
 function handleScreenClick(event) {
   const workoutButton = event.target.closest('[data-live-workout]')
   if (workoutButton) {
@@ -1253,26 +1280,6 @@ function handleScreenClick(event) {
     renderScreen()
     return
   }
-  const nutritionRangeButton = event.target.closest('[data-live-nutrition-range]')
-  if (nutritionRangeButton && !nutritionRangeButton.disabled) {
-    state.nutritionRangeDays = number(nutritionRangeButton.dataset.liveNutritionRange, 7)
-    renderScreen()
-    return
-  }
-  const nutrientButton = event.target.closest('[data-live-nutrient]')
-  if (nutrientButton) {
-    state.selectedNutrient = nutrientButton.dataset.liveNutrient
-    state.view = 'nutrient'
-    elements.screen.scrollTop = 0
-    renderScreen()
-    keepPhoneNavigationVisible()
-    return
-  }
-  const switchTab = event.target.closest('[data-live-switch-tab]')
-  if (switchTab) {
-    setTab(switchTab.dataset.liveSwitchTab)
-    return
-  }
   const action = event.target.closest('[data-live-action]')?.dataset.liveAction
   if (action === 'history') {
     state.view = 'history'
@@ -1280,16 +1287,32 @@ function handleScreenClick(event) {
     renderScreen()
     keepPhoneNavigationVisible()
     void loadCompleteWorkoutHistory()
-  } else if (action === 'intelligence') {
-    setTab('intelligence')
-  } else if (action === 'nutrition') {
-    setTab('insights')
-  } else if (action === 'toggle-today') {
-    state.includeToday = !state.includeToday
-    renderScreen()
   } else if (action === 'start-workout') {
     const button = event.target.closest('[data-live-action="start-workout"]')
     button?.classList.add('is-explaining')
+  }
+}
+
+function handleNutritionClick(event) {
+  const rangeButton = event.target.closest('[data-live-nutrition-range]')
+  if (rangeButton && !rangeButton.disabled) {
+    state.nutritionRangeDays = number(rangeButton.dataset.liveNutritionRange, 7)
+    renderNutritionScreen()
+    return
+  }
+  const nutrientButton = event.target.closest('[data-live-nutrient]')
+  if (nutrientButton) {
+    state.selectedNutrient = nutrientButton.dataset.liveNutrient
+    state.nutritionView = 'nutrient'
+    elements.nutritionScreen.scrollTop = 0
+    renderNutritionScreen()
+    keepPhoneNavigationVisible('nutrition')
+    return
+  }
+  const action = event.target.closest('[data-live-action]')?.dataset.liveAction
+  if (action === 'toggle-today') {
+    state.includeToday = !state.includeToday
+    renderNutritionScreen()
   }
 }
 
@@ -1301,43 +1324,47 @@ export function initFounderLive() {
     screen: document.getElementById('founder-live-screen'),
     title: document.getElementById('founder-live-title'),
     back: document.getElementById('founder-live-back'),
+    nutritionScreen: document.getElementById('founder-nutrition-screen'),
+    nutritionTitle: document.getElementById('founder-nutrition-title'),
+    nutritionBack: document.getElementById('founder-nutrition-back'),
     status: document.getElementById('founder-live-status'),
     updated: document.getElementById('founder-live-updated'),
-    tabs: Array.from(document.querySelectorAll('[data-founder-tab]')),
-    yearLabel: document.getElementById('founder-year-label'),
-    yearAverage: document.getElementById('founder-year-average'),
-    yearMiles: document.getElementById('founder-year-miles'),
-    last7: document.getElementById('founder-last7-miles'),
-    yearRuns: document.getElementById('founder-year-runs'),
-    weekWindow: document.getElementById('founder-week-window'),
-    weekWorkouts: document.getElementById('founder-week-workouts'),
     reset: document.getElementById('founder-live-reset'),
   }
   if (Object.values(elements).some((element) => element == null)) return
 
-  elements.tabs.forEach((button) => {
-    button.addEventListener('click', () => setTab(button.dataset.founderTab))
-  })
   elements.back.addEventListener('click', () => {
     stopRouteListener()
     state.view = 'home'
     state.selectedWorkout = null
-    state.selectedNutrient = null
     elements.screen.scrollTop = 0
     renderScreen()
   })
+  elements.nutritionBack.addEventListener('click', () => {
+    state.nutritionView = 'home'
+    state.selectedNutrient = null
+    elements.nutritionScreen.scrollTop = 0
+    renderNutritionScreen()
+  })
   elements.reset.addEventListener('click', (event) => {
     event.preventDefault()
+    stopRouteListener()
     state.activityView = 'fitness'
-    setTab('activity')
-    stage.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    state.view = 'home'
+    state.selectedWorkout = null
+    elements.screen.scrollTop = 0
+    renderScreen()
+    document.getElementById('founder-running-app')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   })
   elements.screen.addEventListener('click', handleScreenClick)
-  elements.weekWorkouts.addEventListener('click', (event) => {
-    const workoutButton = event.target.closest('[data-live-workout]')
-    if (!workoutButton) return
-    openWorkout(workoutButton.dataset.liveWorkout)
-    stage.querySelector('.ios-device')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  elements.nutritionScreen.addEventListener('click', handleNutritionClick)
+  stage.addEventListener('click', (event) => {
+    const jump = event.target.closest('[data-live-jump]')?.dataset.liveJump
+    if (!jump) return
+    document.getElementById(`founder-${jump}-app`)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
   })
   connectLiveRecord()
 }

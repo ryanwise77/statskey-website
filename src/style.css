@@ -1047,7 +1047,111 @@ a { color: inherit; text-decoration: none; }
 
 .experiment-live-shell {
   display: grid;
-  gap: clamp(30px, 4vw, 52px);
+  gap: 0;
+}
+
+.founder-experiment-original .experiment-copy {
+  position: static;
+  max-width: none;
+}
+
+.founder-live-suite {
+  min-width: 0;
+  margin-top: clamp(72px, 10vw, 132px);
+  border-top: 1px solid var(--line);
+  padding-top: clamp(34px, 5vw, 58px);
+}
+
+.founder-live-suite__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  max-width: 920px;
+  margin: 0 auto clamp(28px, 4vw, 46px);
+}
+
+.founder-live-suite__head h3 {
+  max-width: 720px;
+  margin-top: 12px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4.6vw, 52px);
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.founder-live-suite__head p {
+  max-width: 620px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: clamp(14px, 1.6vw, 17px);
+  line-height: 1.6;
+}
+
+.founder-live-suite__head > span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.founder-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.founder-live-badge i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #34c759;
+  box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.12);
+  animation: founder-live-pulse 2.4s ease-in-out infinite;
+}
+
+.founder-app-screens {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(32px, 6vw, 76px);
+  align-items: start;
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.founder-app-screen {
+  min-width: 0;
+}
+
+.founder-app-screen .founder-panel-head {
+  width: min(100%, 410px);
+  margin-inline: auto;
+  padding-inline: 6px;
+  font-size: 9px;
+}
+
+.founder-app-screen .ios-device {
+  margin-inline: auto;
+}
+
+.founder-live-suite > .founder-route-privacy {
+  max-width: 760px;
+  margin: clamp(34px, 5vw, 58px) auto 0;
+}
+
+.founder-live-suite.is-fallback .founder-live-badge i,
+.founder-live-suite.is-error .founder-live-badge i {
+  background: #ff9f0a;
+  box-shadow: 0 0 0 4px rgba(255, 159, 10, 0.13);
 }
 
 .experiment-copy--live {
@@ -1533,7 +1637,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .founder-live-stage.is-fallback .ios-live-dot,
-.founder-live-stage.is-error .ios-live-dot {
+.founder-live-stage.is-error .ios-live-dot,
+.founder-live-suite.is-fallback .ios-live-dot,
+.founder-live-suite.is-error .ios-live-dot {
   background: #ff9f0a;
   box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.13);
 }
@@ -1579,6 +1685,10 @@ a { color: inherit; text-decoration: none; }
 
 .ios-tab-bar button.is-active {
   color: #1676d2;
+}
+
+.ios-tab-bar button:disabled {
+  cursor: default;
 }
 
 .ios-tab-icon {
@@ -2186,6 +2296,130 @@ button.ios-card:focus-visible,
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 4px 16px rgba(22, 38, 62, 0.05);
+}
+
+.ios-activity-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.ios-activity-workout {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(60, 60, 67, 0.055);
+  border-radius: 16px;
+  padding: 0;
+  background: #fff;
+  color: #111113;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(22, 38, 62, 0.055);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.ios-activity-workout:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 20px rgba(22, 38, 62, 0.085);
+}
+
+.ios-activity-workout:focus-visible {
+  outline: 2px solid #1676d2;
+  outline-offset: 2px;
+}
+
+.ios-activity-workout__head {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+}
+
+.ios-activity-workout__icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sport-color) 12%, #fff);
+  color: var(--sport-color);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.ios-activity-workout__identity {
+  min-width: 0;
+}
+
+.ios-activity-workout__identity strong,
+.ios-activity-workout__identity small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-activity-workout__identity strong {
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.ios-activity-workout__identity small {
+  margin-top: 2px;
+  color: #8e8e93;
+  font-size: 8px;
+}
+
+.ios-activity-workout__distance {
+  font-size: 13px;
+  font-weight: 770;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ios-activity-workout__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid rgba(60, 60, 67, 0.07);
+  background: #fafafd;
+}
+
+.ios-activity-workout__metrics > span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-right: 1px solid rgba(60, 60, 67, 0.07);
+  padding: 8px 4px;
+}
+
+.ios-activity-workout__metrics > span:last-child {
+  border-right: 0;
+}
+
+.ios-activity-workout__metrics i {
+  flex: 0 0 auto;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.ios-activity-workout__metrics strong {
+  overflow: hidden;
+  font-size: 8px;
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-running-year .ios-pulse-value {
+  margin-top: 4px;
 }
 
 .ios-workout-row {
@@ -3193,6 +3427,16 @@ button.ios-card:focus-visible,
     max-width: 420px;
     justify-self: center;
   }
+
+  .founder-app-screens {
+    grid-template-columns: 1fr;
+    gap: clamp(54px, 11vw, 84px);
+  }
+
+  .founder-app-screen {
+    width: min(100%, 440px);
+    justify-self: center;
+  }
 }
 
 @media (max-width: 1120px) {
@@ -3217,6 +3461,21 @@ button.ios-card:focus-visible,
 }
 
 @media (max-width: 760px) {
+  .founder-live-suite {
+    margin-top: 72px;
+    padding-top: 32px;
+  }
+
+  .founder-live-suite__head {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .founder-live-suite__head > span {
+    white-space: normal;
+  }
+
   .founder-live-stage {
     grid-template-columns: 1fr;
   }
@@ -3239,6 +3498,11 @@ button.ios-card:focus-visible,
 }
 
 @media (max-width: 420px) {
+  .founder-app-screen .founder-panel-head {
+    padding-inline: 3px;
+    font-size: 8px;
+  }
+
   .ios-device {
     border-radius: 44px;
     padding: 7px;
