@@ -35,6 +35,20 @@ describe('independent implementation continuation', () => {
     })
   })
 
+  it('does not restart an autonomous pass after a provider deadline', () => {
+    expect(
+      independentImplementationContinuationDecision({
+        ...base,
+        providerUnavailable: true,
+        content:
+          'The provider stopped reporting activity. Completed workspace work remains saved.',
+      })
+    ).toEqual({
+      shouldContinue: false,
+      reason: 'provider_unavailable',
+    })
+  })
+
   it('reserves a fourth direct-action pass after three evidence-only passes', () => {
     expect(MAX_INDEPENDENT_IMPLEMENTATION_PASSES).toBe(4)
     expect(

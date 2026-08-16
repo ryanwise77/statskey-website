@@ -19,6 +19,7 @@ export const MAX_INDEPENDENT_IMPLEMENTATION_PASSES = 4
 export type IndependentContinuationReason =
   | 'ineligible'
   | 'stopped'
+  | 'provider_unavailable'
   | 'global_cap'
   | 'required_verification_cap'
   | 'genuine_blocker'
@@ -55,6 +56,8 @@ export function independentImplementationContinuationDecision(input: {
   content: string
   steps: PersistenceStep[]
   stopped: boolean
+  /** A provider deadline already produced the terminal saved-work handoff. */
+  providerUnavailable?: boolean
   completedPasses: number
   maxPasses?: number
   /** A prior pass admitted a remaining mutation; only a later persisted write clears it. */
@@ -71,6 +74,9 @@ export function independentImplementationContinuationDecision(input: {
     return { shouldContinue: false, reason: 'ineligible' }
   }
   if (input.stopped) return { shouldContinue: false, reason: 'stopped' }
+  if (input.providerUnavailable) {
+    return { shouldContinue: false, reason: 'provider_unavailable' }
+  }
 
   const maxPasses = Math.max(
     1,

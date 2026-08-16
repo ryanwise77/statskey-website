@@ -121,6 +121,8 @@ export interface AgentTurnResult {
   monthlyUsage?: AnthropicMonthlyUsage
   citations: string[]
   rounds: number
+  /** Prevents an infrastructure timeout handoff from starting another pass. */
+  terminalReason?: 'provider_timeout'
 }
 
 export interface AgentTurnParams {
@@ -907,6 +909,7 @@ export async function runAgentTurn(params: AgentTurnParams): Promise<AgentTurnRe
         content: result.content,
         steps: result.steps,
         stopped: params.shouldStop?.() === true,
+        providerUnavailable: result.terminalReason === 'provider_timeout',
         completedPasses,
         correctiveMutationRequired:
           passParams.automaticContinuation?.correctiveMutationRequired,
@@ -1469,6 +1472,7 @@ async function runDirectProviderTurn(
           creditsCharged: 0,
           citations: [...citations],
           rounds: round + 1,
+          terminalReason: 'provider_timeout',
         }
       }
       throw error
@@ -1783,6 +1787,9 @@ async function runDirectProviderTurn(
       creditsCharged: 0,
       citations: [...citations],
       rounds: roundLimit + 1,
+      ...(isProviderRoundTimeout(error)
+        ? { terminalReason: 'provider_timeout' as const }
+        : {}),
     }
   } finally {
     acceptProviderEvents = false
@@ -1947,6 +1954,7 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
           monthlyUsage,
           citations: [...citations],
           rounds: round + 1,
+          terminalReason: 'provider_timeout',
         }
       }
       if (!isLegacyManagedClaudeEmptyError(error)) throw error
@@ -2235,7 +2243,7 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
       citations: [...citations],
       rounds: roundLimit + 1,
     }
-  } catch {
+  } catch (error) {
     log.close(synthesisId, 'final synthesis failed; local handoff used', true)
     const content = params.shouldStop?.()
       ? fallbackStoppedHandoff(completionModeForTurn(params), log.steps)
@@ -2252,6 +2260,9 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
       monthlyUsage,
       citations: [...citations],
       rounds: roundLimit + 1,
+      ...(isProviderRoundTimeout(error)
+        ? { terminalReason: 'provider_timeout' as const }
+        : {}),
     }
   }
 }
@@ -2449,6 +2460,7 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
         monthlyUsage,
         citations: [...citations],
         rounds: round + 1,
+        terminalReason: 'provider_timeout',
       }
     }
     creditsCharged += data.creditsCharged ?? 0
@@ -2734,7 +2746,7 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
       citations: [...citations],
       rounds: roundLimit + 1,
     }
-  } catch {
+  } catch (error) {
     log.close(synthesisId, 'final synthesis failed; local handoff used', true)
     const content = params.shouldStop?.()
       ? fallbackStoppedHandoff(completionModeForTurn(params), log.steps)
@@ -2751,6 +2763,9 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
       monthlyUsage,
       citations: [...citations],
       rounds: roundLimit + 1,
+      ...(isProviderRoundTimeout(error)
+        ? { terminalReason: 'provider_timeout' as const }
+        : {}),
     }
   }
 }

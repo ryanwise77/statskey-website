@@ -1,7 +1,20 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.2",
+  "latest": "0.21.3",
   "releases": [
+    {
+      "version": "0.21.3",
+      "date": "2026-08-16",
+      "platforms": ["macOS"],
+      "title": "Clean recovery when a provider pauses",
+      "summary": "StatsKey now preserves completed workspace work and ends the active pass cleanly when a model provider reaches its response deadline.",
+      "highlights": [
+        "A provider deadline no longer restarts the same failed autonomous pass.",
+        "Completed files, checkpoints, and verification remain saved for a clean continuation.",
+        "Managed Kimi now uses bounded requests, provider timeouts, and server-authoritative credit reservations.",
+        "Stripe billing and third-party connector authorization now use the hardened live backend."
+      ]
+    },
     {
       "version": "0.21.2",
       "date": "2026-08-15",
