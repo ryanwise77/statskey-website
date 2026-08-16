@@ -1,6 +1,6 @@
 {
   "name": "statskey-desktop",
-  "version": "0.21.3",
+  "version": "0.21.4",
   "private": true,
   "author": "StatsKey",
   "license": "UNLICENSED",
@@ -13,7 +13,7 @@
     "pack": "npm run build:web && electron-builder --dir",
     "dist": "npm run build:web && electron-builder",
     "test:updates": "node --test update-runtime.test.cjs",
-    "test:desktop": "node --test update-runtime.test.cjs release-notes-runtime.test.cjs publish-recovery-runtime.test.cjs release-integrity-runtime.test.cjs windows-release-runtime.test.cjs release-assets-runtime.test.cjs provider-runtime.test.cjs provider-run-guard.test.cjs provider-vault-runtime.test.cjs provider-vault-crypto.test.cjs integration-vault-runtime.test.cjs mcp-oauth-runtime.test.cjs safe-storage-runtime.test.cjs workspace-binding-runtime.test.cjs workspace-cache-key-runtime.test.cjs workspace-checkpoint-runtime.test.cjs workspace-index-worker.test.cjs workspace-file-search-worker.test.cjs workspace-search-runtime.test.cjs window-reveal-runtime.test.cjs control-runtime.test.cjs terminal-runtime.test.cjs child-process-runtime.test.cjs founder-runtime.test.cjs device-control-runtime.test.cjs preload-device-control.test.cjs preload-founder.test.cjs git-runtime.test.cjs approval-policy.test.cjs preferences-runtime.test.cjs self-edit-runtime.test.cjs calendar-feed-runtime.test.cjs workspace-runtime.test.cjs",
+    "test:desktop": "node --test update-runtime.test.cjs release-notes-runtime.test.cjs publish-recovery-runtime.test.cjs release-integrity-runtime.test.cjs windows-release-runtime.test.cjs release-assets-runtime.test.cjs consent-gate-runtime.test.cjs provider-runtime.test.cjs provider-run-guard.test.cjs provider-vault-runtime.test.cjs provider-vault-crypto.test.cjs integration-vault-runtime.test.cjs mcp-oauth-runtime.test.cjs safe-storage-runtime.test.cjs workspace-binding-runtime.test.cjs workspace-cache-key-runtime.test.cjs workspace-checkpoint-runtime.test.cjs workspace-index-worker.test.cjs workspace-file-search-worker.test.cjs workspace-search-runtime.test.cjs window-reveal-runtime.test.cjs control-runtime.test.cjs terminal-runtime.test.cjs child-process-runtime.test.cjs founder-runtime.test.cjs device-control-runtime.test.cjs preload-device-control.test.cjs preload-founder.test.cjs git-runtime.test.cjs approval-policy.test.cjs preferences-runtime.test.cjs self-edit-runtime.test.cjs calendar-feed-runtime.test.cjs workspace-runtime.test.cjs",
     "publish:update": "node publish-update.cjs --confirm-publish",
     "publish:update:mac": "APPLE_KEYCHAIN_PROFILE=StatsKeyNotary node publish-update.cjs --confirm-publish --mac-only",
     "release:finalize:windows": "node publish-update.cjs --prepare-only --windows-only --finalize-native",

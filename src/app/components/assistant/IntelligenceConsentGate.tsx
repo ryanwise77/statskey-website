@@ -49,14 +49,20 @@ const ASSISTANT_ACTION_CATEGORY =
 export function IntelligenceConsentGate({
   children,
   requireAssistantActions = true,
+  onDismiss,
 }: {
   children: ReactNode
   requireAssistantActions?: boolean
+  onDismiss?: () => void
 }) {
   const { user } = useAuth()
   const consent = useIntelligenceConsent(user?.uid)
   const [accepting, setAccepting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const dismissTo =
+    typeof window !== 'undefined' && 'statsKeyDesktop' in window
+      ? '/workspace'
+      : '/'
 
   if (consent.loading) {
     return (
@@ -101,64 +107,79 @@ export function IntelligenceConsentGate({
         </div>
       </header>
 
-      <div className="intel-consent__summary">
-        StatsKey uses Intelligence services from outside companies to answer
-        questions, search your enabled record, and generate Deep Dive reports.
-        {requireAssistantActions
-          ? ' The Assistant can also prepare reviewed external actions.'
-          : ''}{' '}
-        Relevant content is sent only when you use one of these features.
+      <div className="intel-consent__body">
+        <div className="intel-consent__summary">
+          StatsKey uses Intelligence services from outside companies to answer
+          questions, search your enabled record, and generate Deep Dive reports.
+          {requireAssistantActions
+            ? ' The Assistant can also prepare reviewed external actions.'
+            : ''}{' '}
+          Relevant content is sent only when you use one of these features.
+        </div>
+
+        <ConsentSection title="What may be sent">
+          <ul>
+            {[
+              ...BASE_DATA_CATEGORIES,
+              ...(requireAssistantActions ? [ASSISTANT_ACTION_CATEGORY] : []),
+            ].map((category) => (
+              <li key={category}>{category}</li>
+            ))}
+          </ul>
+        </ConsentSection>
+
+        <ConsentSection title="Who may receive it">
+          <div className="intel-consent__providers">
+            {PROVIDERS.map((provider) => (
+              <a
+                key={provider.name}
+                href={provider.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>{provider.name}</span>
+                <small>{provider.company} · Privacy policy</small>
+              </a>
+            ))}
+          </div>
+        </ConsentSection>
+
+        <p className="intel-consent__fine-print">
+          Providers process transmitted content under their own privacy
+          policies. Raw connected-account read results are not copied into saved
+          chat history, but reviewed action payloads and their audit history are
+          saved. Disabling Intelligence requests deletion of StatsKey’s derived
+          private search index. Manual recording and your saved data continue to
+          work.
+        </p>
+        <a
+          className="link text-sm"
+          href="https://statskey.ai/privacy.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read the StatsKey Privacy Policy
+        </a>
+
+        {(error || consent.error) && (
+          <div className="error-banner">{error || consent.error}</div>
+        )}
       </div>
 
-      <ConsentSection title="What may be sent">
-        <ul>
-          {[
-            ...BASE_DATA_CATEGORIES,
-            ...(requireAssistantActions ? [ASSISTANT_ACTION_CATEGORY] : []),
-          ].map((category) => (
-            <li key={category}>{category}</li>
-          ))}
-        </ul>
-      </ConsentSection>
-
-      <ConsentSection title="Who may receive it">
-        <div className="intel-consent__providers">
-          {PROVIDERS.map((provider) => (
-            <a
-              key={provider.name}
-              href={provider.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span>{provider.name}</span>
-              <small>{provider.company} · Privacy policy</small>
-            </a>
-          ))}
-        </div>
-      </ConsentSection>
-
-      <p className="intel-consent__fine-print">
-        Providers process transmitted content under their own privacy policies.
-        Raw connected-account read results are not copied into saved chat
-        history, but reviewed action payloads and their audit history are saved.
-        Disabling Intelligence requests deletion of StatsKey’s derived private
-        search index. Manual recording and your saved data continue to work.
-      </p>
-      <a
-        className="link text-sm"
-        href="https://statskey.ai/privacy.html"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Read the StatsKey Privacy Policy
-      </a>
-
-      {(error || consent.error) && (
-        <div className="error-banner">{error || consent.error}</div>
-      )}
-
       <div className="intel-consent__actions">
-        <Link className="btn btn-secondary" to="/">Not now</Link>
+        {onDismiss ? (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onDismiss}
+          >
+            Not now
+          </button>
+        ) : (
+          <Link className="btn btn-secondary" to={dismissTo}>
+            Not now
+          </Link>
+        )}
         <button className="btn btn-intel" onClick={accept} disabled={accepting || !!consent.error}>
           {accepting
             ? 'Enabling…'

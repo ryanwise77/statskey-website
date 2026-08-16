@@ -1,7 +1,20 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.3",
+  "latest": "0.21.4",
   "releases": [
+    {
+      "version": "0.21.4",
+      "date": "2026-08-16",
+      "platforms": ["macOS"],
+      "title": "Consent controls that stay reachable",
+      "summary": "The Intelligence disclosure now fits every supported desktop window without trapping the workspace or hiding its controls.",
+      "highlights": [
+        "Disclosure details scroll independently when the window is compact.",
+        "Not now and Enable remain visible while you review the disclosure.",
+        "Not now exits the full-page disclosure or closes the workspace panel instead of redirecting back into it.",
+        "An accepted choice remains saved and unlocks Intelligence across tabs."
+      ]
+    },
     {
       "version": "0.21.3",
       "date": "2026-08-16",

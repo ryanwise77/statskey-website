@@ -108,7 +108,9 @@ export function WorkspaceAgentRail({
         ×
       </button>
       {user ? (
-        <IntelligenceConsentGate>{agent}</IntelligenceConsentGate>
+        <IntelligenceConsentGate onDismiss={onClose}>
+          {agent}
+        </IntelligenceConsentGate>
       ) : (
         <LocalWorkIntelligenceGate>{agent}</LocalWorkIntelligenceGate>
       )}
