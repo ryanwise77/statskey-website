@@ -40,6 +40,8 @@ const RANGE_LABELS = {
   all: 'All',
 }
 
+const NUTRITION_RANGE_DAYS = [7, 14, 30, 90]
+
 const NUTRIENT_COLORS = {
   strong: '#34c759',
   within: '#34c759',
@@ -67,9 +69,13 @@ const state = {
   historyLoading: false,
   historyError: null,
   source: 'connecting',
-  selectedTab: 'fitness',
+  selectedTab: 'activity',
+  activityView: 'fitness',
   view: 'home',
   range: 'week',
+  nutritionRangeDays: 7,
+  includeToday: false,
+  selectedNutrient: null,
   selectedWorkout: null,
   route: null,
   routeLoading: false,
@@ -160,6 +166,22 @@ const sportLabel = (sport) => SPORT_LABELS[sport] || 'Activity'
 const isRun = (workout) => ['running', 'trailRunning'].includes(workout?.sport)
 
 const latestDay = () => state.workouts[0]?.day
+
+const isoDay = (date) => date.toISOString().slice(0, 10)
+
+function shiftISODate(day, amount) {
+  const parsed = new Date(`${day}T12:00:00Z`)
+  if (!Number.isFinite(parsed.getTime())) return day
+  parsed.setUTCDate(parsed.getUTCDate() + amount)
+  return isoDay(parsed)
+}
+
+function nutritionSnapshot() {
+  const nutrition = state.root?.nutrition
+  if (!nutrition) return null
+  const mode = state.includeToday ? 'includingToday' : 'complete'
+  return nutrition.ranges?.[mode]?.[String(state.nutritionRangeDays)] ?? nutrition
+}
 
 function initializeFirebase() {
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
@@ -333,6 +355,50 @@ function rangeStats(range = state.range) {
   return state.root?.training?.periods?.[key] ?? {}
 }
 
+function calendarYearSummary() {
+  const day = latestDay() || state.root?.snapshotDay || isoDay(new Date())
+  const year = day.slice(0, 4)
+  const months = (state.root?.training?.monthlyMileage ?? [])
+    .filter((month) => String(month.month || '').startsWith(`${year}-`))
+
+  let runningMiles = months.reduce((sum, month) => sum + number(month.runningMiles), 0)
+  let runningActivities = months.reduce((sum, month) => sum + number(month.activities), 0)
+
+  if (months.length === 0) {
+    const running = state.workouts.filter((workout) => (
+      isRun(workout) && String(workout.day || '').startsWith(`${year}-`)
+    ))
+    runningMiles = running.reduce((sum, workout) => sum + number(workout.distanceMiles), 0)
+    runningActivities = running.length
+  }
+
+  const start = new Date(`${year}-01-01T12:00:00Z`)
+  const end = new Date(`${day}T12:00:00Z`)
+  const elapsedDays = Math.max(1, Math.floor((end - start) / 86400000) + 1)
+
+  return {
+    year,
+    throughDay: day,
+    runningMiles,
+    runningActivities,
+    averageMilesPerWeek: runningMiles / (elapsedDays / 7),
+  }
+}
+
+function previousCalendarWeek() {
+  const anchorDay = latestDay() || state.root?.snapshotDay || isoDay(new Date())
+  const anchor = new Date(`${anchorDay}T12:00:00Z`)
+  const mondayOffset = (anchor.getUTCDay() + 6) % 7
+  const currentWeekStart = shiftISODate(anchorDay, -mondayOffset)
+  const startDay = shiftISODate(currentWeekStart, -7)
+  const endDay = shiftISODate(currentWeekStart, -1)
+  const workouts = state.workouts
+    .filter((workout) => workout.day >= startDay && workout.day <= endDay)
+    .sort((left, right) => right.day.localeCompare(left.day))
+
+  return { startDay, endDay, workouts }
+}
+
 function rangeButtons() {
   return `
     <div class="ios-chip-row" role="group" aria-label="Fitness summary range">
@@ -461,13 +527,13 @@ function summaryCard() {
 }
 
 function nutritionCard() {
-  const nutrition = state.root?.nutrition
+  const nutrition = nutritionSnapshot()
   const average = nutrition?.dailyAverage ?? {}
   if (!state.root?.nutritionPublished || !nutrition) {
     return `
       <button class="ios-card" type="button" data-live-action="nutrition">
         <div class="ios-card-head">
-          <span><span class="ios-card-icon">◉</span><span class="ios-card-title">Recent Nutrition</span></span>
+          <span><span class="ios-card-icon">◉</span><span class="ios-card-title">Nutrition Intelligence</span></span>
           <span class="ios-card-chevron" aria-hidden="true">›</span>
         </div>
         <p class="ios-card-copy">No public nutrition window is available.</p>
@@ -477,10 +543,10 @@ function nutritionCard() {
   return `
     <button class="ios-card" type="button" data-live-action="nutrition">
       <div class="ios-card-head">
-        <span><span class="ios-card-icon">◉</span><span class="ios-card-title">Recent Nutrition</span></span>
+        <span><span class="ios-card-icon">◉</span><span class="ios-card-title">Nutrition Intelligence</span></span>
         <span class="ios-card-chevron" aria-hidden="true">›</span>
       </div>
-      <p class="ios-card-copy">${integer(nutrition.recordedDays)} of ${integer(nutrition.possibleDays)} complete days · recorded food only</p>
+      <p class="ios-card-copy">${integer(nutrition.recordedDays)} of ${integer(nutrition.possibleDays)} days with recorded food</p>
       <div class="ios-stat-grid">
         <div><small>Calories</small><strong>${integer(average.calories)}</strong></div>
         <div><small>Carbs</small><strong>${integer(average.carbohydrateGrams)}g</strong></div>
@@ -530,47 +596,133 @@ function workoutRows(workouts, maximum = 5) {
   `).join('')
 }
 
-function fitnessHome() {
+function startWorkoutCard() {
   return `
-    <div class="ios-screen-heading">
-      <div><small>Ryan Sullivan</small><h3>Fitness</h3></div>
-      <time>${escapeHTML(dateLabel(latestDay(), { short: true, year: false }))}</time>
+    <button class="ios-start-workout" type="button" data-live-action="start-workout">
+      <span class="ios-start-workout__icon" aria-hidden="true">▶</span>
+      <span><strong>Start Workout</strong><small>Record with StatsKey on iPhone or Apple Watch</small></span>
+      <span class="ios-readonly-pill">Read only</span>
+    </button>
+  `
+}
+
+function activitySelector() {
+  return `
+    <div class="ios-segmented ios-segmented--activity" style="--segments:2" role="group" aria-label="Activity dashboard">
+      <button class="${state.activityView === 'today' ? 'is-active' : ''}" type="button" data-live-activity-view="today" aria-pressed="${state.activityView === 'today'}">Today</button>
+      <button class="${state.activityView === 'fitness' ? 'is-active' : ''}" type="button" data-live-activity-view="fitness" aria-pressed="${state.activityView === 'fitness'}">Fitness</button>
     </div>
-    ${pulseCard()}
+  `
+}
+
+function fitnessPlannerCard() {
+  const recent = state.root?.training?.periods?.last7Days ?? {}
+  const activeDays = Math.min(7, Math.max(0, number(recent.activeDays)))
+  return `
+    <div class="ios-card ios-planner-card">
+      <div class="ios-card-head">
+        <span>
+          <span class="ios-card-icon ios-card-icon--run">⌁</span>
+          <span><small class="ios-card-kicker">Fitness Planner</small><span class="ios-card-title">Development block</span></span>
+        </span>
+        <span class="ios-planner-status">Active</span>
+      </div>
+      <p class="ios-card-copy">Building the aerobic volume, durability, and fueling record behind the marathon experiment.</p>
+      <div class="ios-planner-days" aria-label="${integer(activeDays)} active days in the last seven days">
+        ${['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((label, index) => `
+          <span class="${index < activeDays ? 'is-complete' : ''}"><i>${index < activeDays ? '✓' : ''}</i><small>${label}</small></span>
+        `).join('')}
+      </div>
+    </div>
+  `
+}
+
+function fitnessDashboard() {
+  return `
+    ${fitnessPlannerCard()}
     ${summaryCard()}
-    ${nutritionCard()}
+    ${pulseCard()}
     ${historicalCard()}
     <div class="ios-section-label">
       <span>Recent Workouts</span>
       <button type="button" data-live-action="history">See All</button>
     </div>
     <div class="ios-workout-list">${workoutRows(state.workouts, 6)}</div>
-    <p class="ios-card-copy" style="padding:14px 6px 4px;text-align:center">This public view contains day-level summaries. Private Health data, meal details, and unpublished routes never load here.</p>
+  `
+}
+
+function todayDashboard() {
+  const day = latestDay()
+  const dayWorkouts = state.workouts.filter((workout) => workout.day === day)
+  const totalTime = dayWorkouts.reduce(
+    (sum, workout) => sum + number(workout.movingTimeSeconds || workout.durationSeconds),
+    0
+  )
+  const totalDistance = dayWorkouts.reduce(
+    (sum, workout) => sum + number(workout.distanceMiles),
+    0
+  )
+  return `
+    <div class="ios-card ios-card--orange">
+      <div class="ios-card-head">
+        <span><span class="ios-card-icon ios-card-icon--run">✓</span><span class="ios-card-title">Daily Activity</span></span>
+        <span class="ios-card-kicker">${escapeHTML(dateLabel(day, { short: true, year: false }))}</span>
+      </div>
+      <div class="ios-summary-grid">
+        <div class="ios-summary-tile"><small>Workouts</small><strong>${integer(dayWorkouts.length)}</strong></div>
+        <div class="ios-summary-tile"><small>Distance</small><strong>${number(totalDistance).toFixed(1)} mi</strong></div>
+        <div class="ios-summary-tile"><small>Active time</small><strong>${formatDuration(totalTime)}</strong></div>
+        <div class="ios-summary-tile"><small>Recorded</small><strong>${dayWorkouts.length ? 'Complete' : '—'}</strong></div>
+      </div>
+    </div>
+    <div class="ios-section-label"><span>Workouts</span></div>
+    <div class="ios-workout-list">${workoutRows(dayWorkouts, 10)}</div>
   `
 }
 
 function activityHome() {
-  const day = latestDay()
-  const dayWorkouts = state.workouts.filter((workout) => workout.day === day)
   return `
     <div class="ios-screen-heading">
       <div><small>Ryan Sullivan</small><h3>Activity</h3></div>
-      <time>${escapeHTML(dateLabel(day, { short: true, year: false }))}</time>
+      <time>${escapeHTML(dateLabel(latestDay(), { short: true, year: false }))}</time>
     </div>
-    <div class="ios-segmented" style="--segments:2">
-      <button class="is-active" type="button" aria-pressed="true">Today</button>
-      <button type="button" data-live-switch-tab="fitness" aria-pressed="false">Fitness</button>
+    ${startWorkoutCard()}
+    ${activitySelector()}
+    ${state.activityView === 'fitness' ? fitnessDashboard() : todayDashboard()}
+    <p class="ios-card-copy" style="padding:14px 6px 4px;text-align:center">This public view contains day-level summaries. Private Health data, meal details, and unpublished routes never load here.</p>
+  `
+}
+
+function recordHome() {
+  const nutrition = nutritionSnapshot()
+  const average = nutrition?.dailyAverage ?? {}
+  return `
+    <div class="ios-screen-heading">
+      <div><small>${escapeHTML(dateLabel(latestDay(), { short: true, year: false }))}</small><h3>Record</h3></div>
+      <time>Read only</time>
     </div>
-    <div class="ios-card ios-card--orange">
+    <div class="ios-record-actions" aria-label="Recording actions">
+      <div><span>⌕</span><strong>Food</strong></div>
+      <div><span>◫</span><strong>Photo</strong></div>
+      <div><span>▤</span><strong>Label</strong></div>
+      <div><span>＋</span><strong>Water</strong></div>
+    </div>
+    <div class="ios-card ios-card--tinted">
       <div class="ios-card-head">
-        <span><span class="ios-card-icon ios-card-icon--run">✓</span><span class="ios-card-title">Movement is recorded</span></span>
+        <span><span class="ios-card-icon">◉</span><span class="ios-card-title">Latest Shared Nutrition</span></span>
+        <span class="ios-card-kicker">${integer(nutrition?.recordedDays)} days</span>
       </div>
-      <p class="ios-card-copy">The newest completed day in the public projection is shown below. Exact workout start times stay private.</p>
+      <div class="ios-summary-grid">
+        <div class="ios-summary-tile"><small>Energy</small><strong>${integer(average.calories)}</strong></div>
+        <div class="ios-summary-tile"><small>Protein</small><strong>${integer(average.proteinGrams)}g</strong></div>
+        <div class="ios-summary-tile"><small>Carbs</small><strong>${integer(average.carbohydrateGrams)}g</strong></div>
+        <div class="ios-summary-tile"><small>Fat</small><strong>${integer(average.fatGrams)}g</strong></div>
+      </div>
     </div>
-    <div class="ios-section-label"><span>Workouts</span></div>
-    <div class="ios-workout-list">${workoutRows(dayWorkouts, 10)}</div>
-    <div style="height:11px"></div>
     ${nutritionCard()}
+    <div class="ios-public-note">
+      <div><span aria-hidden="true">⌁</span><strong>Public replica</strong><p>Recording controls stay inside StatsKey. The website receives only the aggregate fields enabled for this record.</p></div>
+    </div>
   `
 }
 
@@ -610,43 +762,145 @@ function nutritionRows(items) {
   return items.map((item) => {
     const color = NUTRIENT_COLORS[item.status] || NUTRIENT_COLORS.limited
     const width = Math.max(0, Math.min(number(item.percent), 100))
+    const status = item.status === 'strong'
+      ? 'Optimal'
+      : item.status === 'within'
+        ? 'Within limit'
+        : item.status === 'near'
+          ? 'Near target'
+          : item.status === 'watch' && item.direction === 'limit'
+            ? 'Over limit'
+            : item.status === 'watch'
+              ? 'Below target'
+              : 'Coverage incomplete'
+    const completeCoverage = number(item.coverageDays) >= number(nutritionSnapshot()?.recordedDays)
     return `
-      <div class="ios-micro-row">
-        <strong>${escapeHTML(item.label)}</strong>
-        <span class="ios-micro-track"><i style="--micro-width:${width}%;--micro-color:${color}"></i></span>
-        <span>${number(item.average).toLocaleString()} ${escapeHTML(item.unit)}</span>
-      </div>
+      <button class="ios-nutrient-row" type="button" data-live-nutrient="${escapeHTML(item.key)}">
+        <span class="ios-nutrient-row__icon" style="--nutrient-color:${color}" aria-hidden="true">●</span>
+        <span class="ios-nutrient-row__body">
+          <span><strong>${escapeHTML(item.label)}</strong><small>${completeCoverage ? '✓' : '◔'} ${integer(item.coverageDays)}d source coverage</small></span>
+          <span class="ios-micro-track"><i style="--micro-width:${width}%;--micro-color:${color}"></i></span>
+        </span>
+        <span class="ios-nutrient-row__value">
+          <strong>${number(item.average).toLocaleString()} ${escapeHTML(item.unit)}</strong>
+          <small style="color:${color}">${status}</small>
+        </span>
+        <span class="ios-card-chevron" aria-hidden="true">›</span>
+      </button>
     `
   }).join('')
 }
 
-function nutritionHome() {
+function nutritionRangeControls() {
   const nutrition = state.root?.nutrition
+  const mode = state.includeToday ? 'includingToday' : 'complete'
+  const available = nutrition?.ranges?.[mode]
+  const todayAvailable = Boolean(nutrition?.ranges?.includingToday)
+  return `
+    <div class="ios-nutrition-controls">
+      <div class="ios-nutrition-ranges" role="group" aria-label="Nutrition date range">
+        ${NUTRITION_RANGE_DAYS.map((days) => {
+          const enabled = Boolean(available?.[String(days)]) || (days === 7 && !nutrition?.ranges)
+          return `
+            <button class="${state.nutritionRangeDays === days ? 'is-active' : ''}" type="button" data-live-nutrition-range="${days}" aria-pressed="${state.nutritionRangeDays === days}" ${enabled ? '' : 'disabled'}>
+              ${days}d
+            </button>
+          `
+        }).join('')}
+      </div>
+      <button class="ios-today-toggle ${state.includeToday ? 'is-on' : ''}" type="button" data-live-action="toggle-today" role="switch" aria-checked="${state.includeToday}" ${todayAvailable ? '' : 'disabled'}>
+        <span>Include Today</span><i aria-hidden="true"></i>
+      </button>
+    </div>
+  `
+}
+
+function macroInsightCard(label, value, unit, tone) {
+  return `
+    <div class="ios-macro-insight" style="--macro-tone:${tone}">
+      <span aria-hidden="true"></span>
+      <small>${escapeHTML(label)}</small>
+      <strong>${escapeHTML(value)}</strong>
+      <em>${escapeHTML(unit)}</em>
+    </div>
+  `
+}
+
+function nutritionHome() {
+  const nutrition = nutritionSnapshot()
   const average = nutrition?.dailyAverage ?? {}
   return `
-    <div class="ios-screen-heading">
-      <div><small>${escapeHTML(nutrition?.startDay ?? '')} — ${escapeHTML(nutrition?.endDay ?? '')}</small><h3>Nutrition</h3></div>
-      <time>${integer(nutrition?.recordedDays)} days</time>
-    </div>
-    <div class="ios-card ios-card--tinted">
-      <div class="ios-card-head">
-        <span><span class="ios-card-icon">◉</span><span class="ios-card-title">Recorded Food Intake</span></span>
-      </div>
-      <div class="ios-summary-grid">
-        <div class="ios-summary-tile"><small>Calories</small><strong>${integer(average.calories)}</strong></div>
-        <div class="ios-summary-tile"><small>Carbs</small><strong>${integer(average.carbohydrateGrams)}g</strong></div>
-        <div class="ios-summary-tile"><small>Protein</small><strong>${integer(average.proteinGrams)}g</strong></div>
-        <div class="ios-summary-tile"><small>Fiber</small><strong>${number(average.fiberGrams).toFixed(1)}g</strong></div>
+    <div class="ios-insights-hero">
+      <span class="ios-insights-hero__mark" aria-hidden="true">◉</span>
+      <div>
+        <h3>Nutrition Intelligence</h3>
+        <p>Personal, evidence-aware analysis of recorded patterns</p>
       </div>
     </div>
-    <div class="ios-card">
+    ${nutritionRangeControls()}
+    <div class="ios-insights-window">
+      <span>${escapeHTML(dateLabel(nutrition?.startDay, { short: true }))} – ${escapeHTML(dateLabel(nutrition?.endDay, { short: true }))}</span>
+      <strong>${integer(nutrition?.recordedDays)} of ${integer(nutrition?.possibleDays)} days recorded</strong>
+    </div>
+    <div class="ios-section-label ios-section-label--insights"><span>Daily Average</span><small>Recorded food</small></div>
+    <div class="ios-macro-insights">
+      ${macroInsightCard('Energy', integer(average.calories), 'kcal', '#ff9f0a')}
+      ${macroInsightCard('Protein', integer(average.proteinGrams), 'g', '#ff453a')}
+      ${macroInsightCard('Carbohydrates', integer(average.carbohydrateGrams), 'g', '#30d158')}
+      ${macroInsightCard('Fat', integer(average.fatGrams), 'g', '#bf5af2')}
+    </div>
+    <div class="ios-card ios-water-private">
       <div class="ios-card-head">
-        <span><span class="ios-card-icon">◎</span><span class="ios-card-title">Recent Micronutrition</span></span>
+        <span><span class="ios-card-icon">◌</span><span class="ios-card-title">Average Water</span></span>
+        <strong>Private</strong>
       </div>
-      <p class="ios-card-copy">Compared with standard daily references. Limited label coverage is labeled instead of treated as a deficiency.</p>
-      <div style="margin-top:8px">${nutritionRows(nutrition?.micronutrients)}</div>
+      <p class="ios-card-copy">Hydration entries are not part of this public projection.</p>
+    </div>
+    <div class="ios-section-label ios-section-label--insights">
+      <span>Micronutrients</span>
+      <small>Tap for details</small>
+    </div>
+    <div class="ios-card ios-nutrient-list">${nutritionRows(nutrition?.micronutrients)}</div>
+    <div class="ios-insights-guidance">
+      <strong>How to read this</strong>
+      <p>Color reflects the public reference status. ✓ marks complete source coverage; ◔ marks partial nutrient-label coverage.</p>
     </div>
     <p class="ios-card-copy" style="padding:0 5px 8px">${escapeHTML(nutrition?.disclaimer || 'Recorded intake estimate; not a diagnosis or a predictor of athletic potential.')}</p>
+  `
+}
+
+function nutrientDetailHome() {
+  const nutrition = nutritionSnapshot()
+  const nutrient = nutrition?.micronutrients?.find((item) => item.key === state.selectedNutrient)
+  if (!nutrient) return nutritionHome()
+  const color = NUTRIENT_COLORS[nutrient.status] || NUTRIENT_COLORS.limited
+  const percent = Math.max(0, number(nutrient.percent))
+  const direction = nutrient.direction === 'limit' ? 'daily limit' : 'daily reference'
+  return `
+    <div class="ios-nutrient-detail">
+      <div class="ios-nutrient-detail__hero" style="--nutrient-color:${color}">
+        <span aria-hidden="true">●</span>
+        <small>Daily average · ${integer(nutrition.possibleDays)} days</small>
+        <h3>${escapeHTML(nutrient.label)}</h3>
+        <strong>${number(nutrient.average).toLocaleString()} <em>${escapeHTML(nutrient.unit)}</em></strong>
+        <p>${integer(percent)}% of the ${escapeHTML(direction)}</p>
+      </div>
+      <div class="ios-card">
+        <div class="ios-nutrient-meter" style="--micro-width:${Math.min(percent, 100)}%;--micro-color:${color}">
+          <span><i></i></span>
+          <div><small>Reference</small><strong>${number(nutrient.reference).toLocaleString()} ${escapeHTML(nutrient.unit)}</strong></div>
+        </div>
+        <p class="ios-card-copy">${escapeHTML(nutrient.summary)}</p>
+      </div>
+      <div class="ios-card">
+        <div class="ios-card-head"><span><span class="ios-card-icon">◔</span><span class="ios-card-title">Source confidence</span></span></div>
+        <p class="ios-card-copy">This aggregate has nutrient values on ${integer(nutrient.coverageDays)} of ${integer(nutrition.recordedDays)} recorded days. Individual foods and meals stay private.</p>
+      </div>
+      <div class="ios-insights-guidance">
+        <strong>Interpretation</strong>
+        <p>This is a descriptive intake estimate from recorded food, not a diagnosis. Missing label values are not counted as zero-quality food.</p>
+      </div>
+    </div>
   `
 }
 
@@ -753,7 +1007,7 @@ function privateRouteCard(workout) {
 
 function workoutDetail() {
   const workout = state.selectedWorkout
-  if (!workout) return fitnessHome()
+  if (!workout) return activityHome()
   const splits = workout.splits || []
   const paces = splits.map((split) => number(split.paceSecondsPerMile)).filter((pace) => pace > 0)
   const fastest = paces.length ? Math.min(...paces) : 0
@@ -839,13 +1093,24 @@ function renderScreen() {
     elements.screen.innerHTML = historyHome()
     return
   }
+  if (state.view === 'nutrient') {
+    const nutrient = nutritionSnapshot()?.micronutrients
+      ?.find((item) => item.key === state.selectedNutrient)
+    elements.title.textContent = nutrient?.label || 'Nutrition'
+    elements.back.hidden = false
+    elements.screen.innerHTML = nutrientDetailHome()
+    return
+  }
   elements.back.hidden = true
-  if (state.selectedTab === 'activity') {
+  if (state.selectedTab === 'record') {
+    elements.title.textContent = 'Record'
+    elements.screen.innerHTML = recordHome()
+  } else if (state.selectedTab === 'activity') {
     elements.title.textContent = 'Activity'
     elements.screen.innerHTML = activityHome()
-  } else if (state.selectedTab === 'fitness') {
-    elements.title.textContent = 'Fitness'
-    elements.screen.innerHTML = fitnessHome()
+  } else if (state.selectedTab === 'insights') {
+    elements.title.textContent = 'Insights'
+    elements.screen.innerHTML = nutritionHome()
   } else if (state.selectedTab === 'intelligence') {
     elements.title.textContent = 'Running Intelligence'
     elements.screen.innerHTML = intelligenceHome()
@@ -853,47 +1118,61 @@ function renderScreen() {
     elements.title.textContent = 'Friends'
     elements.screen.innerHTML = friendsHome()
   } else {
-    elements.title.textContent = 'Fuel'
-    elements.screen.innerHTML = nutritionHome()
+    elements.title.textContent = 'Activity'
+    elements.screen.innerHTML = activityHome()
   }
 }
 
-function renderRail() {
-  const nutrition = state.root?.nutrition
-  const average = nutrition?.dailyAverage ?? {}
-  const macros = [
-    ['Calories', integer(average.calories), 'daily avg'],
-    ['Carbs', integer(average.carbohydrateGrams), 'g / day'],
-    ['Protein', integer(average.proteinGrams), 'g / day'],
-  ]
-  elements.macros.innerHTML = macros.map(([label, value, unit]) => `
-    <div><span>${label}</span><strong>${value}</strong><small>${unit}</small></div>
-  `).join('')
+function renderTrainingRecord() {
+  const year = calendarYearSummary()
+  const recent = state.root?.training?.periods?.last7Days ?? {}
+  const week = previousCalendarWeek()
 
-  const micronutrients = nutrition?.micronutrients || []
-  const strong = micronutrients.filter((item) => ['strong', 'within'].includes(item.status)).length
-  const watch = micronutrients.filter((item) => item.status === 'watch').length
-  const limited = micronutrients.filter((item) => item.status === 'limited').length
-  elements.microHeadline.textContent = micronutrients.length
-    ? `${strong} strong · ${watch} to watch${limited ? ` · ${limited} limited` : ''}`
-    : 'No public nutrition window'
-  elements.microList.innerHTML = micronutrients.map((item) => {
-    const color = NUTRIENT_COLORS[item.status] || NUTRIENT_COLORS.limited
-    return `
-      <div class="founder-micro-item" title="${escapeHTML(item.summary)}">
-        <strong>${escapeHTML(item.label)}</strong>
-        <span class="founder-micro-item__track"><i style="--micro-width:${Math.min(number(item.percent), 100)}%;--micro-color:${color}"></i></span>
-        <span>${number(item.average).toLocaleString()} ${escapeHTML(item.unit)}</span>
-      </div>
-    `
-  }).join('')
-  elements.microNote.textContent = nutrition?.disclaimer ||
-    'Recorded food only. Supplements, medications, meal names, and food names are not published.'
+  elements.yearLabel.textContent = `${year.year} through ${dateLabel(year.throughDay, {
+    short: true,
+    year: false,
+  })}`
+  elements.yearAverage.textContent = number(year.averageMilesPerWeek).toFixed(1)
+  elements.yearMiles.textContent = number(year.runningMiles).toFixed(1)
+  elements.last7.textContent = number(recent.runningMiles).toFixed(1)
+  elements.yearRuns.textContent = integer(year.runningActivities)
+  elements.weekWindow.textContent = `${dateLabel(week.startDay, {
+    short: true,
+    year: false,
+  })} – ${dateLabel(week.endDay, { short: true, year: false })}`
+
+  elements.weekWorkouts.innerHTML = week.workouts.length
+    ? week.workouts.map((workout) => `
+      <button class="founder-week-workout" type="button" data-live-workout="${escapeHTML(workout.workoutId)}">
+        <span class="founder-week-workout__icon" aria-hidden="true">${isRun(workout) ? '↗' : '•'}</span>
+        <span class="founder-week-workout__body">
+          <strong>${escapeHTML(sportLabel(workout.sport))}</strong>
+          <span>${escapeHTML(dateLabel(workout.day, { short: true, year: false }))} · ${formatDuration(workout.movingTimeSeconds || workout.durationSeconds)}</span>
+        </span>
+        <span class="founder-week-workout__metric">
+          <strong>${number(workout.distanceMiles).toFixed(2)} mi</strong>
+          <small>${isRun(workout) ? `${formatPace(workout.averagePaceSecondsPerMile)} /mi` : 'Open'}</small>
+        </span>
+      </button>
+    `).join('')
+    : '<div class="founder-week-empty">No public workouts in this calendar week.</div>'
 }
 
 function render() {
   renderScreen()
-  renderRail()
+  renderTrainingRecord()
+}
+
+function keepPhoneNavigationVisible() {
+  if (!window.matchMedia('(max-width: 760px)').matches) return
+  const device = elements.stage.querySelector('.ios-device')
+  if (!device) return
+  const siteNavHeight = document.getElementById('nav')?.offsetHeight || 58
+  const safeTop = siteNavHeight + 8
+  const deviceTop = device.getBoundingClientRect().top
+  if (deviceTop < safeTop) {
+    window.scrollBy({ top: deviceTop - safeTop, behavior: 'auto' })
+  }
 }
 
 function stopRouteListener() {
@@ -932,6 +1211,7 @@ function openWorkout(workoutId) {
     )
   }
   renderScreen()
+  keepPhoneNavigationVisible()
 }
 
 function setTab(tab) {
@@ -939,6 +1219,7 @@ function setTab(tab) {
   state.selectedTab = tab
   state.view = 'home'
   state.selectedWorkout = null
+  state.selectedNutrient = null
   elements.tabs.forEach((button) => {
     const active = button.dataset.founderTab === tab
     button.classList.toggle('is-active', active)
@@ -965,6 +1246,28 @@ function handleScreenClick(event) {
     renderScreen()
     return
   }
+  const activityButton = event.target.closest('[data-live-activity-view]')
+  if (activityButton) {
+    state.activityView = activityButton.dataset.liveActivityView
+    elements.screen.scrollTop = 0
+    renderScreen()
+    return
+  }
+  const nutritionRangeButton = event.target.closest('[data-live-nutrition-range]')
+  if (nutritionRangeButton && !nutritionRangeButton.disabled) {
+    state.nutritionRangeDays = number(nutritionRangeButton.dataset.liveNutritionRange, 7)
+    renderScreen()
+    return
+  }
+  const nutrientButton = event.target.closest('[data-live-nutrient]')
+  if (nutrientButton) {
+    state.selectedNutrient = nutrientButton.dataset.liveNutrient
+    state.view = 'nutrient'
+    elements.screen.scrollTop = 0
+    renderScreen()
+    keepPhoneNavigationVisible()
+    return
+  }
   const switchTab = event.target.closest('[data-live-switch-tab]')
   if (switchTab) {
     setTab(switchTab.dataset.liveSwitchTab)
@@ -975,11 +1278,18 @@ function handleScreenClick(event) {
     state.view = 'history'
     elements.screen.scrollTop = 0
     renderScreen()
+    keepPhoneNavigationVisible()
     void loadCompleteWorkoutHistory()
   } else if (action === 'intelligence') {
     setTab('intelligence')
   } else if (action === 'nutrition') {
-    setTab('fuel')
+    setTab('insights')
+  } else if (action === 'toggle-today') {
+    state.includeToday = !state.includeToday
+    renderScreen()
+  } else if (action === 'start-workout') {
+    const button = event.target.closest('[data-live-action="start-workout"]')
+    button?.classList.add('is-explaining')
   }
 }
 
@@ -994,10 +1304,13 @@ export function initFounderLive() {
     status: document.getElementById('founder-live-status'),
     updated: document.getElementById('founder-live-updated'),
     tabs: Array.from(document.querySelectorAll('[data-founder-tab]')),
-    macros: document.getElementById('founder-live-macros'),
-    microHeadline: document.getElementById('founder-micro-headline'),
-    microList: document.getElementById('founder-micro-list'),
-    microNote: document.getElementById('founder-micro-note'),
+    yearLabel: document.getElementById('founder-year-label'),
+    yearAverage: document.getElementById('founder-year-average'),
+    yearMiles: document.getElementById('founder-year-miles'),
+    last7: document.getElementById('founder-last7-miles'),
+    yearRuns: document.getElementById('founder-year-runs'),
+    weekWindow: document.getElementById('founder-week-window'),
+    weekWorkouts: document.getElementById('founder-week-workouts'),
     reset: document.getElementById('founder-live-reset'),
   }
   if (Object.values(elements).some((element) => element == null)) return
@@ -1009,14 +1322,22 @@ export function initFounderLive() {
     stopRouteListener()
     state.view = 'home'
     state.selectedWorkout = null
+    state.selectedNutrient = null
     elements.screen.scrollTop = 0
     renderScreen()
   })
   elements.reset.addEventListener('click', (event) => {
     event.preventDefault()
-    setTab('fitness')
+    state.activityView = 'fitness'
+    setTab('activity')
     stage.scrollIntoView({ behavior: 'smooth', block: 'center' })
   })
   elements.screen.addEventListener('click', handleScreenClick)
+  elements.weekWorkouts.addEventListener('click', (event) => {
+    const workoutButton = event.target.closest('[data-live-workout]')
+    if (!workoutButton) return
+    openWorkout(workoutButton.dataset.liveWorkout)
+    stage.querySelector('.ios-device')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  })
   connectLiveRecord()
 }
