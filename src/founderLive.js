@@ -150,8 +150,9 @@ const formatClock = (seconds) => {
 const formatPace = (seconds) => {
   const pace = number(seconds)
   if (pace <= 0) return '—'
-  const minutes = Math.floor(pace / 60)
-  const remainder = Math.round(pace % 60)
+  const total = Math.round(pace)
+  const minutes = Math.floor(total / 60)
+  const remainder = total % 60
   return `${minutes}:${String(remainder).padStart(2, '0')}`
 }
 
