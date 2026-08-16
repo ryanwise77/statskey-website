@@ -1,7 +1,61 @@
 {
   "schemaVersion": 1,
-  "latest": "0.19.1",
+  "latest": "0.21.5",
   "releases": [
+    {
+      "version": "0.21.5",
+      "date": "2026-08-16",
+      "platforms": ["macOS"],
+      "title": "A clearer workspace with a hard public boundary",
+      "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages exclude internal infrastructure controls.",
+      "highlights": [
+        "The mode chooser stays inside the window, scrolls on compact screens, and has a clear Close control.",
+        "Automatic is clearly recommended, while Ask, Plan, Fix, and Execute explain their outcomes in plain language.",
+        "Model, context, and action controls remain under Advanced settings, while change permission appears only for an explicit Fix or Execute choice.",
+        "Settings can open a reviewable StatsKey source workspace so you can describe the changes you want to Intelligence.",
+        "Public packages exclude the internal console, privileged bridge, infrastructure runtime, and private-machine setup, and legacy switches cannot restore them.",
+        "Release verification now fails closed if an internal route, command, or artifact is bundled."
+      ]
+    },
+    {
+      "version": "0.21.4",
+      "date": "2026-08-16",
+      "platforms": ["macOS"],
+      "title": "Consent controls that stay reachable",
+      "summary": "The Intelligence disclosure now fits every supported desktop window without trapping the workspace or hiding its controls.",
+      "highlights": [
+        "Disclosure details scroll independently when the window is compact.",
+        "Not now and Enable remain visible while you review the disclosure.",
+        "Not now exits the full-page disclosure or closes the workspace panel instead of redirecting back into it.",
+        "An accepted choice remains saved and unlocks Intelligence across tabs."
+      ]
+    },
+    {
+      "version": "0.21.3",
+      "date": "2026-08-16",
+      "platforms": ["macOS"],
+      "title": "Clean recovery when a provider pauses",
+      "summary": "StatsKey now preserves completed workspace work and ends the active pass cleanly when a model provider reaches its response deadline.",
+      "highlights": [
+        "A provider deadline no longer restarts the same failed autonomous pass.",
+        "Completed files, checkpoints, and verification remain saved for a clean continuation.",
+        "Managed Kimi now uses bounded requests, provider timeouts, and server-authoritative credit reservations.",
+        "Stripe billing and third-party connector authorization now use the hardened live backend."
+      ]
+    },
+    {
+      "version": "0.21.2",
+      "date": "2026-08-15",
+      "platforms": ["macOS"],
+      "title": "Work that stays with its workspace",
+      "summary": "StatsKey now keeps active tasks bound to the workspace where they started, while bringing billing, provider access, and third-party tools into one clearer setup.",
+      "highlights": [
+        "Active tasks continue against their original workspace when you switch tabs, folders, or projects.",
+        "Execute mode can run independent work concurrently while serializing only conflicting edits.",
+        "Connections & billing centralizes Stripe, Google, GitHub, model providers, and OAuth or MCP tools.",
+        "Model selection explains pricing, adds ChatGPT Fast and Kimi, and accepts any model returned by a connected provider."
+      ]
+    },
     {
       "version": "0.19.1",
       "date": "2026-08-13",
