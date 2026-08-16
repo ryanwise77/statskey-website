@@ -408,6 +408,9 @@ function rangeButtons() {
           ${label}
         </button>
       `).join('')}
+      <button class="ios-chip ios-chip--custom" type="button" disabled>
+        <span aria-hidden="true">▦</span> Custom
+      </button>
     </div>
   `
 }
@@ -507,22 +510,44 @@ function pulseCard() {
 
 function summaryCard() {
   const stats = rangeStats()
+  const activityCount = number(stats.activities)
+  const rangeDays = {
+    week: 7,
+    month: 30,
+    quarter: 90,
+    year: 365,
+  }[state.range]
+  const anchor = latestDay() || state.root?.snapshotDay
+  const firstDay = rangeDays && anchor ? shiftISODate(anchor, -(rangeDays - 1)) : null
+  const visibleWorkouts = state.workouts.filter((workout) => (
+    !firstDay || workout.day >= firstDay
+  ))
+  const calories = visibleWorkouts.reduce((sum, workout) => sum + number(workout.calories), 0)
   return `
-    <div class="ios-card">
-      <div class="ios-card-head">
-        <span>
-          <span class="ios-card-icon">▥</span>
-          <span class="ios-card-title">Fitness Summary</span>
-        </span>
-        <span class="ios-card-kicker">${escapeHTML(RANGE_LABELS[state.range])}</span>
+    <div class="ios-card ios-fitness-summary">
+      <div class="ios-fitness-summary__head">
+        <strong>Fitness Summary</strong>
+        <span>${integer(activityCount)} ${activityCount === 1 ? 'activity' : 'activities'}</span>
       </div>
-      ${rangeButtons()}
-      <div class="ios-summary-grid">
-        <div class="ios-summary-tile"><small>Running</small><strong>${number(stats.runningMiles).toFixed(1)} mi</strong></div>
-        <div class="ios-summary-tile"><small>Activities</small><strong>${integer(stats.activities)}</strong></div>
-        <div class="ios-summary-tile"><small>Time</small><strong>${formatDuration(number(stats.activeHours) * 3600)}</strong></div>
-        <div class="ios-summary-tile"><small>Elevation</small><strong>${integer(stats.elevationGainFeet)} ft</strong></div>
+      <div class="ios-overview-grid">
+        <div class="ios-overview-stat ios-overview-stat--distance">
+          <span aria-hidden="true">⌁</span>
+          <div><strong>${number(stats.runningMiles).toFixed(1)} mi</strong><small>Distance</small></div>
+        </div>
+        <div class="ios-overview-stat ios-overview-stat--time">
+          <span aria-hidden="true">◷</span>
+          <div><strong>${formatDuration(number(stats.activeHours) * 3600)}</strong><small>Time</small></div>
+        </div>
+        <div class="ios-overview-stat ios-overview-stat--calories">
+          <span aria-hidden="true">◆</span>
+          <div><strong>${integer(calories)}</strong><small>Calories</small></div>
+        </div>
+        <div class="ios-overview-stat ios-overview-stat--elevation">
+          <span aria-hidden="true">↗</span>
+          <div><strong>${integer(stats.elevationGainFeet)} ft</strong><small>Elevation</small></div>
+        </div>
       </div>
+      ${activityCount ? '' : '<div class="ios-fitness-summary__empty"><span aria-hidden="true">▥</span>No activities in this range.</div>'}
     </div>
   `
 }
@@ -643,8 +668,11 @@ function startWorkoutCard() {
   return `
     <button class="ios-start-workout" type="button" data-live-action="start-workout">
       <span class="ios-start-workout__icon" aria-hidden="true">▶</span>
-      <span><strong>Start Workout</strong><small>Record with StatsKey on iPhone or Apple Watch</small></span>
-      <span class="ios-readonly-pill">Read only</span>
+      <span>
+        <strong>Start where you are</strong>
+        <small>Any movement is worth recording — choose GPS, timer, or quick entry.</small>
+      </span>
+      <span class="ios-card-chevron" aria-hidden="true">›</span>
     </button>
   `
 }
@@ -659,23 +687,14 @@ function activitySelector() {
 }
 
 function fitnessPlannerCard() {
-  const recent = state.root?.training?.periods?.last7Days ?? {}
-  const activeDays = Math.min(7, Math.max(0, number(recent.activeDays)))
   return `
-    <div class="ios-card ios-planner-card">
-      <div class="ios-card-head">
-        <span>
-          <span class="ios-card-icon ios-card-icon--run">⌁</span>
-          <span><small class="ios-card-kicker">Fitness Planner</small><span class="ios-card-title">Development block</span></span>
-        </span>
-        <span class="ios-planner-status">Active</span>
-      </div>
-      <p class="ios-card-copy">Building the aerobic volume, durability, and fueling record behind the marathon experiment.</p>
-      <div class="ios-planner-days" aria-label="${integer(activeDays)} active days in the last seven days">
-        ${['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((label, index) => `
-          <span class="${index < activeDays ? 'is-complete' : ''}"><i>${index < activeDays ? '✓' : ''}</i><small>${label}</small></span>
-        `).join('')}
-      </div>
+    <div class="ios-native-entry ios-planner-card">
+      <span class="ios-native-entry__icon ios-native-entry__icon--planner" aria-hidden="true">▦</span>
+      <span class="ios-native-entry__copy">
+        <span><strong>Fitness Planner</strong><em>PRO</em></span>
+        <small>Dated workouts, actual activity, block reviews, and plan notes</small>
+      </span>
+      <span class="ios-card-chevron" aria-hidden="true">›</span>
     </div>
   `
 }
@@ -684,27 +703,37 @@ function fitnessDashboard() {
   const year = calendarYearSummary()
   const recent = state.root?.training?.periods?.last7Days ?? {}
   return `
-    <div class="ios-card ios-card--orange ios-running-year">
-      <div class="ios-card-head">
-        <span>
-          <span class="ios-card-icon ios-card-icon--run">↗</span>
-          <span><small class="ios-card-kicker">${escapeHTML(year.year)} running</small><span class="ios-card-title">Fitness Summary</span></span>
-        </span>
-        <span class="ios-planner-status">Live</span>
+    ${fitnessPlannerCard()}
+    <div class="ios-native-entry ios-customize-entry">
+      <span class="ios-native-entry__icon ios-native-entry__icon--customize" aria-hidden="true">✣</span>
+      <span class="ios-native-entry__copy">
+        <strong>Make this dashboard yours</strong>
+        <small>Reorder and show or hide modules to match how you train.</small>
+      </span>
+      <span class="ios-customize-entry__dismiss" aria-hidden="true">×</span>
+    </div>
+    ${rangeButtons()}
+    ${summaryCard()}
+    <div class="ios-card ios-running-year">
+      <div class="ios-running-year__head">
+        <span><i aria-hidden="true">↗</i><strong>Running This Year</strong></span>
+        <small>Live through ${escapeHTML(dateLabel(year.throughDay, { short: true, year: false }))}</small>
       </div>
-      <div class="ios-pulse-value"><strong>${number(year.averageMilesPerWeek).toFixed(1)}</strong><span>mi / week this year</span></div>
-      <div class="ios-stat-grid">
-        <div><small>Year distance</small><strong>${number(year.runningMiles).toFixed(1)} mi</strong></div>
-        <div><small>Last 7 days</small><strong>${number(recent.runningMiles).toFixed(1)} mi</strong></div>
-        <div><small>Runs</small><strong>${integer(year.runningActivities)}</strong></div>
+      <div class="ios-running-year__primary">
+        <strong>${number(year.averageMilesPerWeek).toFixed(1)}</strong>
+        <span>mi / week</span>
+      </div>
+      <div class="ios-running-year__stats">
+        <span><small>Distance</small><strong>${number(year.runningMiles).toFixed(1)} mi</strong></span>
+        <span><small>Last 7 days</small><strong>${number(recent.runningMiles).toFixed(1)} mi</strong></span>
+        <span><small>Runs</small><strong>${integer(year.runningActivities)}</strong></span>
       </div>
     </div>
     <div class="ios-section-label">
-      <span>Recent Activity</span>
+      <span>Recent Workouts</span>
       <button type="button" data-live-action="history">See All</button>
     </div>
-    <div class="ios-activity-stack">${activityWorkoutCards(state.workouts, 12)}</div>
-    ${historicalCard()}
+    <div class="ios-activity-stack">${activityWorkoutCards(state.workouts, 8)}</div>
   `
 }
 
@@ -739,14 +768,10 @@ function todayDashboard() {
 
 function activityHome() {
   return `
-    <div class="ios-screen-heading">
-      <div><small>Ryan Sullivan</small><h3>Activity</h3></div>
-      <time>${escapeHTML(dateLabel(latestDay(), { short: true, year: false }))}</time>
-    </div>
+    <h3 class="ios-large-title">Activity</h3>
     ${startWorkoutCard()}
     ${activitySelector()}
     ${state.activityView === 'fitness' ? fitnessDashboard() : todayDashboard()}
-    <p class="ios-card-copy" style="padding:14px 6px 4px;text-align:center">This public view contains day-level summaries. Private Health data, meal details, and unpublished routes never load here.</p>
   `
 }
 
@@ -816,9 +841,13 @@ function intelligenceHome() {
 
 function nutritionRows(items) {
   if (!items?.length) return '<div class="ios-empty">No micronutrient window is available.</div>'
-  return items.map((item) => {
+  const preferred = ['vitamin_c', 'dietary_fiber', 'vitamin_d', 'calcium', 'iron', 'potassium']
+  const ordered = [
+    ...preferred.map((key) => items.find((item) => item.key === key)).filter(Boolean),
+    ...items.filter((item) => !preferred.includes(item.key)),
+  ].slice(0, 6)
+  return ordered.map((item) => {
     const color = NUTRIENT_COLORS[item.status] || NUTRIENT_COLORS.limited
-    const width = Math.max(0, Math.min(number(item.percent), 100))
     const status = item.status === 'strong'
       ? 'Optimal'
       : item.status === 'within'
@@ -830,19 +859,17 @@ function nutritionRows(items) {
             : item.status === 'watch'
               ? 'Below target'
               : 'Coverage incomplete'
-    const completeCoverage = number(item.coverageDays) >= number(nutritionSnapshot()?.recordedDays)
     return `
-      <button class="ios-nutrient-row" type="button" data-live-nutrient="${escapeHTML(item.key)}">
-        <span class="ios-nutrient-row__icon" style="--nutrient-color:${color}" aria-hidden="true">●</span>
-        <span class="ios-nutrient-row__body">
-          <span><strong>${escapeHTML(item.label)}</strong><small>${completeCoverage ? '✓' : '◔'} ${integer(item.coverageDays)}d source coverage</small></span>
-          <span class="ios-micro-track"><i style="--micro-width:${width}%;--micro-color:${color}"></i></span>
+      <button class="ios-micronutrient-card" style="--nutrient-color:${color}" type="button" data-live-nutrient="${escapeHTML(item.key)}">
+        <span class="ios-micronutrient-card__title">
+          <i aria-hidden="true"></i>
+          <strong>${escapeHTML(item.label === 'Fiber' ? 'Dietary Fiber' : item.label)}</strong>
         </span>
-        <span class="ios-nutrient-row__value">
-          <strong>${number(item.average).toLocaleString()} ${escapeHTML(item.unit)}</strong>
-          <small style="color:${color}">${status}</small>
+        <span class="ios-micronutrient-card__value">${number(item.average).toLocaleString()} ${escapeHTML(item.unit)}</span>
+        <span class="ios-micronutrient-card__status">
+          <b>${integer(item.percent)}% of target</b>
+          <small>— ${status}</small>
         </span>
-        <span class="ios-card-chevron" aria-hidden="true">›</span>
       </button>
     `
   }).join('')
@@ -860,25 +887,28 @@ function nutritionRangeControls() {
           const enabled = Boolean(available?.[String(days)]) || (days === 7 && !nutrition?.ranges)
           return `
             <button class="${state.nutritionRangeDays === days ? 'is-active' : ''}" type="button" data-live-nutrition-range="${days}" aria-pressed="${state.nutritionRangeDays === days}" ${enabled ? '' : 'disabled'}>
-              ${days}d
+              ${days} Days
             </button>
           `
         }).join('')}
       </div>
       <button class="ios-today-toggle ${state.includeToday ? 'is-on' : ''}" type="button" data-live-action="toggle-today" role="switch" aria-checked="${state.includeToday}" ${todayAvailable ? '' : 'disabled'}>
-        <span>Include Today</span><i aria-hidden="true"></i>
+        <span class="ios-today-toggle__calendar" aria-hidden="true">▦</span>
+        <span><strong>Include Today</strong><small>${state.includeToday ? `Past ${state.nutritionRangeDays - 1} days + today` : `Past ${state.nutritionRangeDays} complete days`}</small></span>
+        <i aria-hidden="true"></i>
       </button>
     </div>
   `
 }
 
-function macroInsightCard(label, value, unit, tone) {
+function macroInsightCard(label, value, unit, tone, icon, coverage) {
   return `
     <div class="ios-macro-insight" style="--macro-tone:${tone}">
-      <span aria-hidden="true"></span>
+      <span class="ios-macro-insight__icon" aria-hidden="true">${icon}</span>
       <small>${escapeHTML(label)}</small>
-      <strong>${escapeHTML(value)}</strong>
-      <em>${escapeHTML(unit)}</em>
+      <span class="ios-macro-insight__value"><strong>${escapeHTML(value)}</strong><em>${escapeHTML(unit)}</em></span>
+      <span class="ios-macro-insight__caption">recorded daily average</span>
+      <i class="ios-macro-insight__track"><b style="width:${coverage}%"></b></i>
     </div>
   `
 }
@@ -886,41 +916,83 @@ function macroInsightCard(label, value, unit, tone) {
 function nutritionHome() {
   const nutrition = nutritionSnapshot()
   const average = nutrition?.dailyAverage ?? {}
+  const possibleDays = Math.max(1, number(nutrition?.possibleDays, state.nutritionRangeDays))
+  const recordedDays = number(nutrition?.recordedDays)
+  const coverage = Math.max(0, Math.min(100, (recordedDays / possibleDays) * 100)).toFixed(1)
+  const fiber = nutrition?.micronutrients?.find((item) => item.key === 'dietary_fiber')
+  const activeHours = number(state.root?.training?.periods?.last7Days?.activeHours)
+  const signal = recordedDays >= possibleDays
+    ? 'Strong record'
+    : recordedDays > 0
+      ? 'Developing'
+      : 'Needs data'
+  const recordedNutrients = nutrition?.micronutrients?.filter((item) => number(item.average) > 0).length ?? 0
   return `
+    <h3 class="ios-large-title">Insights</h3>
     <div class="ios-insights-hero">
-      <span class="ios-insights-hero__mark" aria-hidden="true">◉</span>
       <div>
         <h3>Nutrition Intelligence</h3>
         <p>Personal, evidence-aware analysis of recorded patterns</p>
       </div>
     </div>
     ${nutritionRangeControls()}
-    <div class="ios-insights-window">
-      <span>${escapeHTML(dateLabel(nutrition?.startDay, { short: true }))} – ${escapeHTML(dateLabel(nutrition?.endDay, { short: true }))}</span>
-      <strong>${integer(nutrition?.recordedDays)} of ${integer(nutrition?.possibleDays)} days recorded</strong>
+    <div class="ios-context-strip">
+      <p><span aria-hidden="true">▧</span><strong>Signal</strong><b>${signal}</b><small>· Nutrition baseline</small></p>
+      <p><span aria-hidden="true">▥</span><strong>Context</strong><small>${integer(activeHours * 60)} min training and ${integer(recordedDays)} recorded nutrition days</small></p>
     </div>
-    <div class="ios-section-label ios-section-label--insights"><span>Daily Average</span><small>Recorded food</small></div>
+    <div class="ios-native-section-head"><strong>Daily Average Macronutrients</strong><small>${integer(recordedDays)} complete days</small></div>
     <div class="ios-macro-insights">
-      ${macroInsightCard('Energy', integer(average.calories), 'kcal', '#ff9f0a')}
-      ${macroInsightCard('Protein', integer(average.proteinGrams), 'g', '#ff453a')}
-      ${macroInsightCard('Carbohydrates', integer(average.carbohydrateGrams), 'g', '#30d158')}
-      ${macroInsightCard('Fat', integer(average.fatGrams), 'g', '#bf5af2')}
+      ${macroInsightCard('Energy', integer(average.calories), 'kcal', '#ec8d7c', '◆', coverage)}
+      ${macroInsightCard('Protein', integer(average.proteinGrams), 'g', '#82b9d7', '♟', coverage)}
+      ${macroInsightCard('Carbs', integer(average.carbohydrateGrams), 'g', '#77c893', '⌁', coverage)}
+      ${macroInsightCard('Fat', integer(average.fatGrams), 'g', '#ae8ce7', '●', coverage)}
     </div>
-    <div class="ios-card ios-water-private">
-      <div class="ios-card-head">
-        <span><span class="ios-card-icon">◌</span><span class="ios-card-title">Average Water</span></span>
-        <strong>Private</strong>
+    <div class="ios-card ios-average-water">
+      <div class="ios-average-water__head">
+        <span><i aria-hidden="true">●</i>Average Water</span>
+        <small>Not shared</small>
       </div>
-      <p class="ios-card-copy">Hydration entries are not part of this public projection.</p>
+      <div><strong>—</strong><span>fl oz</span></div>
+      <p>Hydration entries stay private.</p>
+      <i class="ios-average-water__track"></i>
     </div>
-    <div class="ios-section-label ios-section-label--insights">
-      <span>Micronutrients</span>
-      <small>Tap for details</small>
+    ${fiber ? `
+      <div class="ios-fiber-progress">
+        <span>Fiber</span>
+        <strong>${number(fiber.average).toFixed(1)}${escapeHTML(fiber.unit)} / ${number(fiber.reference).toFixed(0)}${escapeHTML(fiber.unit)}</strong>
+        <i><b style="width:${Math.max(0, Math.min(100, number(fiber.percent)))}%"></b></i>
+      </div>
+    ` : ''}
+    <div class="ios-glucose-card">
+      <div class="ios-glucose-card__head">
+        <span aria-hidden="true">⌁</span>
+        <div><strong>Historical Glucose Intelligence</strong><small>Personal sensor patterns · source-aware</small></div>
+        <em>NOT PUBLIC</em>
+      </div>
+      <div class="ios-glucose-card__empty">
+        <span aria-hidden="true">〽</span>
+        <strong>No public glucose in this range</strong>
+        <p>Glucose records are not part of this public projection.</p>
+      </div>
     </div>
-    <div class="ios-card ios-nutrient-list">${nutritionRows(nutrition?.micronutrients)}</div>
-    <div class="ios-insights-guidance">
-      <strong>How to read this</strong>
-      <p>Color reflects the public reference status. ✓ marks complete source coverage; ◔ marks partial nutrient-label coverage.</p>
+    <div class="ios-micronutrient-heading">
+      <strong>MICRONUTRIENT STATUS</strong>
+      <p>Targets are individualized in StatsKey. Each average includes the available nutrient evidence in this public window.</p>
+    </div>
+    <div class="ios-micronutrient-grid">${nutritionRows(nutrition?.micronutrients)}</div>
+    <div class="ios-micronutrient-note">
+      <span>Vendors often omit vitamins and minerals, so some may read low.</span>
+      <strong>Estimate missing</strong>
+    </div>
+    <button class="ios-all-nutrients" type="button" disabled>
+      <strong>All Recorded Nutrients <span>⇅ Default</span></strong>
+      <small>${integer(recordedNutrients)} nutrients</small>
+    </button>
+    <div class="ios-actionable-label">ACTIONABLE INSIGHTS</div>
+    <div class="ios-card ios-local-insights">
+      <span aria-hidden="true">✓</span>
+      <strong>Local Insights</strong>
+      <p>Rule-based checks from the nutrition record appear here.</p>
     </div>
     <p class="ios-card-copy" style="padding:0 5px 8px">${escapeHTML(nutrition?.disclaimer || 'Recorded intake estimate; not a diagnosis or a predictor of athletic potential.')}</p>
   `
@@ -1054,7 +1126,7 @@ function privateRouteCard(workout) {
   }
   const explanation = workout.routePublished
     ? 'The publication is unavailable right now. No private-route fallback is attempted.'
-    : 'This page never requests coordinates unless this run is explicitly published in StatsKey.'
+    : 'This page never requests coordinates unless this workout is explicitly published in StatsKey.'
   return `
     <div class="ios-private-route">
       <div><span aria-hidden="true">♙</span><strong>Route private</strong><p>${explanation}</p></div>
@@ -1138,35 +1210,49 @@ function workoutDetail() {
 
 function renderScreen() {
   if (!state.root) return
+  const toolbar = elements.back.closest('.ios-app-toolbar')
+  const device = elements.stage.querySelector('[data-live-device="running"]')
+  if (device) device.dataset.activityView = state.activityView
   if (state.view === 'workout') {
     elements.title.textContent = sportLabel(state.selectedWorkout?.sport)
+    elements.title.hidden = false
     elements.back.hidden = false
+    toolbar?.classList.add('is-detail')
     elements.screen.innerHTML = workoutDetail()
     return
   }
   if (state.view === 'history') {
     elements.title.textContent = 'Fitness Record'
+    elements.title.hidden = false
     elements.back.hidden = false
+    toolbar?.classList.add('is-detail')
     elements.screen.innerHTML = historyHome()
     return
   }
   elements.back.hidden = true
+  elements.title.hidden = true
+  toolbar?.classList.remove('is-detail')
   elements.title.textContent = 'Activity'
   elements.screen.innerHTML = activityHome()
 }
 
 function renderNutritionScreen() {
   if (!state.root) return
+  const toolbar = elements.nutritionBack.closest('.ios-app-toolbar')
   if (state.nutritionView === 'nutrient') {
     const nutrient = nutritionSnapshot()?.micronutrients
       ?.find((item) => item.key === state.selectedNutrient)
     elements.nutritionTitle.textContent = nutrient?.label || 'Nutrition'
+    elements.nutritionTitle.hidden = false
     elements.nutritionBack.hidden = false
+    toolbar?.classList.add('is-detail')
     elements.nutritionScreen.innerHTML = nutrientDetailHome()
     return
   }
   elements.nutritionTitle.textContent = 'Insights'
   elements.nutritionBack.hidden = true
+  elements.nutritionTitle.hidden = true
+  toolbar?.classList.remove('is-detail')
   elements.nutritionScreen.innerHTML = nutritionHome()
 }
 
@@ -1329,7 +1415,6 @@ export function initFounderLive() {
     nutritionBack: document.getElementById('founder-nutrition-back'),
     status: document.getElementById('founder-live-status'),
     updated: document.getElementById('founder-live-updated'),
-    reset: document.getElementById('founder-live-reset'),
   }
   if (Object.values(elements).some((element) => element == null)) return
 
@@ -1345,16 +1430,6 @@ export function initFounderLive() {
     state.selectedNutrient = null
     elements.nutritionScreen.scrollTop = 0
     renderNutritionScreen()
-  })
-  elements.reset.addEventListener('click', (event) => {
-    event.preventDefault()
-    stopRouteListener()
-    state.activityView = 'fitness'
-    state.view = 'home'
-    state.selectedWorkout = null
-    elements.screen.scrollTop = 0
-    renderScreen()
-    document.getElementById('founder-running-app')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   })
   elements.screen.addEventListener('click', handleScreenClick)
   elements.nutritionScreen.addEventListener('click', handleNutritionClick)

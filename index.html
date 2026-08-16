@@ -130,7 +130,7 @@
             <div class="section-heading experiment-copy reveal">
               <div class="kicker">How I'm using it</div>
               <h2>Can I run an Olympic marathon?</h2>
-              <p>I build StatsKey as I attempt to answer a real question: how far can disciplined recording, investigation, projection, and testing take me?</p>
+              <p>I build StatsKey to answer a real question: how far can training principle take me?</p>
               <div class="hero-actions">
                 <a class="button button--primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
                 <a class="button button--secondary" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
@@ -170,7 +170,6 @@
               <article class="founder-app-screen" id="founder-running-app">
                 <div class="founder-panel-head">
                   <span>Activity · Recent workouts</span>
-                  <a href="#founder-running-app" id="founder-live-reset">Open Activity home</a>
                 </div>
                 <div class="ios-device" data-live-device="running" aria-label="Live replica of recent activity in the StatsKey iOS app">
                   <div class="ios-device__island" aria-hidden="true"></div>
@@ -183,17 +182,18 @@
                         <i class="ios-battery"></i>
                       </span>
                     </div>
-                    <header class="ios-nav-bar">
+                    <header class="ios-app-toolbar ios-app-toolbar--activity">
                       <button class="ios-nav-back" id="founder-live-back" type="button" aria-label="Go back" hidden>
                         <span aria-hidden="true">‹</span>
                       </button>
-                      <strong id="founder-live-title">Activity</strong>
-                      <span class="ios-nav-action" aria-hidden="true">⚙︎</span>
+                      <strong class="ios-toolbar-title" id="founder-live-title" hidden>Activity</strong>
+                      <span class="ios-app-toolbar__actions" aria-hidden="true">
+                        <i class="ios-toolbar-button ios-toolbar-button--refresh"></i>
+                        <i class="ios-toolbar-button ios-toolbar-button--sliders"></i>
+                        <i class="ios-toolbar-button ios-toolbar-button--grid"></i>
+                      </span>
                     </header>
-                    <div class="ios-live-strip" role="status">
-                      <span class="ios-live-dot"></span>
-                      <span id="founder-live-status">Connecting to Ryan's record…</span>
-                    </div>
+                    <span class="sr-only" id="founder-live-status" role="status">Connecting to Ryan's record…</span>
                     <div class="ios-screen-scroll" id="founder-live-screen" tabindex="0" aria-live="polite">
                       <div class="ios-skeleton-card ios-skeleton-card--hero"></div>
                       <div class="ios-skeleton-card"></div>
@@ -201,23 +201,23 @@
                     </div>
                     <nav class="ios-tab-bar" aria-label="StatsKey Activity preview">
                       <button type="button" aria-label="Record" disabled>
-                        <span class="ios-tab-icon" aria-hidden="true">●</span>
+                        <span class="ios-tab-icon ios-tab-icon--record" aria-hidden="true"></span>
                         <small>Record</small>
                       </button>
                       <button class="is-active" type="button" aria-label="Activity" aria-current="page">
-                        <span class="ios-tab-icon" aria-hidden="true">◴</span>
+                        <span class="ios-tab-icon ios-tab-icon--activity" aria-hidden="true"></span>
                         <small>Activity</small>
                       </button>
                       <button type="button" data-live-jump="nutrition" aria-label="Open Nutrition Insights">
-                        <span class="ios-tab-icon" aria-hidden="true">▥</span>
+                        <span class="ios-tab-icon ios-tab-icon--insights" aria-hidden="true"></span>
                         <small>Insights</small>
                       </button>
                       <button type="button" aria-label="Intelligence" disabled>
-                        <span class="ios-tab-icon" aria-hidden="true">✦</span>
+                        <span class="ios-tab-icon ios-tab-icon--intelligence" aria-hidden="true"></span>
                         <small>Intelligence</small>
                       </button>
                       <button type="button" aria-label="Friends" disabled>
-                        <span class="ios-tab-icon" aria-hidden="true">♙</span>
+                        <span class="ios-tab-icon ios-tab-icon--friends" aria-hidden="true"></span>
                         <small>Friends</small>
                       </button>
                     </nav>
@@ -228,7 +228,6 @@
               <article class="founder-app-screen" id="founder-nutrition-app">
                 <div class="founder-panel-head">
                   <span>Insights · Nutrition record</span>
-                  <span>7 / 14 / 30 / 90 days</span>
                 </div>
                 <div class="ios-device" data-live-device="nutrition" aria-label="Live replica of Nutrition Insights in the StatsKey iOS app">
                   <div class="ios-device__island" aria-hidden="true"></div>
@@ -241,17 +240,18 @@
                         <i class="ios-battery"></i>
                       </span>
                     </div>
-                    <header class="ios-nav-bar">
+                    <header class="ios-app-toolbar ios-app-toolbar--insights">
+                      <span class="ios-toolbar-button ios-toolbar-button--settings" aria-hidden="true"></span>
                       <button class="ios-nav-back" id="founder-nutrition-back" type="button" aria-label="Go back" hidden>
                         <span aria-hidden="true">‹</span>
                       </button>
-                      <strong id="founder-nutrition-title">Insights</strong>
-                      <span class="ios-nav-action" aria-hidden="true">⚙︎</span>
+                      <strong class="ios-toolbar-title" id="founder-nutrition-title" hidden>Insights</strong>
+                      <span class="ios-app-toolbar__actions" aria-hidden="true">
+                        <i class="ios-toolbar-button ios-toolbar-button--calendar"></i>
+                        <i class="ios-toolbar-button ios-toolbar-button--sliders"></i>
+                        <i class="ios-toolbar-button ios-toolbar-button--refresh"></i>
+                      </span>
                     </header>
-                    <div class="ios-live-strip">
-                      <span class="ios-live-dot"></span>
-                      <span>Live nutrition record</span>
-                    </div>
                     <div class="ios-screen-scroll" id="founder-nutrition-screen" tabindex="0" aria-live="polite">
                       <div class="ios-skeleton-card ios-skeleton-card--hero"></div>
                       <div class="ios-skeleton-card"></div>
@@ -259,23 +259,23 @@
                     </div>
                     <nav class="ios-tab-bar" aria-label="StatsKey Nutrition Insights preview">
                       <button type="button" aria-label="Record" disabled>
-                        <span class="ios-tab-icon" aria-hidden="true">●</span>
+                        <span class="ios-tab-icon ios-tab-icon--record" aria-hidden="true"></span>
                         <small>Record</small>
                       </button>
                       <button type="button" data-live-jump="running" aria-label="Open Activity">
-                        <span class="ios-tab-icon" aria-hidden="true">◴</span>
+                        <span class="ios-tab-icon ios-tab-icon--activity" aria-hidden="true"></span>
                         <small>Activity</small>
                       </button>
                       <button class="is-active" type="button" aria-label="Insights" aria-current="page">
-                        <span class="ios-tab-icon" aria-hidden="true">▥</span>
+                        <span class="ios-tab-icon ios-tab-icon--insights" aria-hidden="true"></span>
                         <small>Insights</small>
                       </button>
                       <button type="button" aria-label="Intelligence" disabled>
-                        <span class="ios-tab-icon" aria-hidden="true">✦</span>
+                        <span class="ios-tab-icon ios-tab-icon--intelligence" aria-hidden="true"></span>
                         <small>Intelligence</small>
                       </button>
                       <button type="button" aria-label="Friends" disabled>
-                        <span class="ios-tab-icon" aria-hidden="true">♙</span>
+                        <span class="ios-tab-icon ios-tab-icon--friends" aria-hidden="true"></span>
                         <small>Friends</small>
                       </button>
                     </nav>

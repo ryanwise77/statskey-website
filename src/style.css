@@ -6127,3 +6127,1640 @@ body.marketing-light :is(.ci-progress i, .rp-dist i, .rp-ready i) {
     padding-inline: 20px !important;
   }
 }
+
+/* Founder record — calibrated against the native iPhone simulator. */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+
+.founder-app-screens {
+  max-width: 1030px;
+  grid-template-columns: repeat(2, minmax(0, 430px));
+  justify-content: center;
+  gap: clamp(34px, 7vw, 92px);
+}
+
+.founder-app-screen .founder-panel-head {
+  width: min(100%, 410px);
+  justify-content: flex-start;
+  margin-bottom: 13px;
+  padding-inline: 9px;
+}
+
+.ios-device {
+  width: min(100%, 410px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 59px;
+  padding: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.42), transparent 17%),
+    linear-gradient(145deg, #34363b, #08090b 24%, #191b1f 77%, #010102);
+  box-shadow:
+    0 44px 92px rgba(28, 54, 93, 0.23),
+    0 9px 28px rgba(13, 31, 57, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.88);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+}
+
+.ios-device__screen {
+  height: min(840px, 82vh);
+  min-height: 730px;
+  border-radius: 51px;
+  background: #f4f3f9;
+  color: #09090b;
+}
+
+.ios-device__island {
+  top: 17px;
+  width: 126px;
+  height: 35px;
+}
+
+.ios-status-bar {
+  min-height: 50px;
+  padding: 9px 25px 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ios-status-bar__signals {
+  gap: 7px;
+}
+
+.ios-signal {
+  width: 20px;
+  height: 8px;
+  background:
+    radial-gradient(circle, #a9a9ae 0 2px, transparent 2.4px) 0 50% / 5px 5px repeat-x;
+}
+
+.ios-wifi {
+  width: 17px;
+  height: 12px;
+  border-top-width: 2.5px;
+}
+
+.ios-battery {
+  width: 24px;
+  height: 11px;
+}
+
+.ios-app-toolbar {
+  position: relative;
+  z-index: 6;
+  display: grid;
+  min-height: 62px;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 3px 14px 5px;
+  background: rgba(244, 243, 249, 0.82);
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+}
+
+.ios-app-toolbar--activity:not(.is-detail) {
+  grid-template-columns: 1fr auto;
+}
+
+.ios-app-toolbar--insights:not(.is-detail) {
+  grid-template-columns: auto 1fr auto;
+}
+
+.ios-toolbar-title {
+  overflow: hidden;
+  padding-inline: 8px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-app-toolbar__actions {
+  display: inline-flex;
+  grid-column: 3;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 24px rgba(38, 53, 76, 0.08);
+}
+
+.ios-app-toolbar--activity:not(.is-detail) .ios-app-toolbar__actions {
+  grid-column: 2;
+}
+
+.ios-app-toolbar.is-detail .ios-app-toolbar__actions,
+.ios-app-toolbar.is-detail > .ios-toolbar-button--settings {
+  visibility: hidden;
+}
+
+.ios-toolbar-button {
+  position: relative;
+  display: block;
+  width: 43px;
+  height: 43px;
+  flex: 0 0 auto;
+  color: #2496f3;
+  font-style: normal;
+}
+
+.ios-app-toolbar__actions .ios-toolbar-button + .ios-toolbar-button {
+  border-left: 1px solid rgba(60, 60, 67, 0.08);
+}
+
+.ios-toolbar-button--refresh::before {
+  content: "↻";
+  position: absolute;
+  inset: 1px 0 0;
+  font-size: 31px;
+  font-weight: 300;
+  line-height: 40px;
+  text-align: center;
+}
+
+.ios-toolbar-button--sliders::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  width: 23px;
+  height: 19px;
+  background:
+    radial-gradient(circle at 7px 3px, #2496f3 0 2px, #fff 2.3px 3.2px, transparent 3.5px),
+    radial-gradient(circle at 16px 9px, #2496f3 0 2px, #fff 2.3px 3.2px, transparent 3.5px),
+    radial-gradient(circle at 10px 16px, #2496f3 0 2px, #fff 2.3px 3.2px, transparent 3.5px),
+    linear-gradient(#2496f3, #2496f3) 0 2px / 23px 1.5px no-repeat,
+    linear-gradient(#2496f3, #2496f3) 0 8px / 23px 1.5px no-repeat,
+    linear-gradient(#2496f3, #2496f3) 0 15px / 23px 1.5px no-repeat;
+}
+
+.ios-toolbar-button--grid::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 11px;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: #2496f3;
+  box-shadow: 12px 0 #2496f3, 0 12px #2496f3, 12px 12px #2496f3;
+}
+
+.ios-toolbar-button--calendar::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: 10px;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #2496f3;
+  border-radius: 4px;
+  box-shadow: inset 0 5px 0 -3px #2496f3;
+}
+
+.ios-toolbar-button--calendar::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 15px;
+  width: 12px;
+  height: 5px;
+  border-top: 2px solid #2496f3;
+  border-bottom: 2px solid #2496f3;
+}
+
+.ios-toolbar-button--settings {
+  grid-column: 1;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(38, 53, 76, 0.08);
+}
+
+.ios-toolbar-button--settings::before {
+  content: "⚙";
+  position: absolute;
+  inset: 0;
+  color: #0b0b0d;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 42px;
+  text-align: center;
+}
+
+.ios-nav-back {
+  z-index: 2;
+  grid-column: 1;
+  width: 43px;
+  height: 43px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 24px rgba(38, 53, 76, 0.08);
+  color: #2496f3;
+}
+
+.ios-nav-back span {
+  margin-top: -5px;
+  margin-left: -2px;
+  font-size: 36px;
+}
+
+.ios-screen-scroll {
+  padding: 0 16px 112px;
+}
+
+.ios-large-title {
+  margin: 2px 0 17px;
+  color: #060608;
+  font-size: 34px;
+  font-weight: 780;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.ios-start-workout {
+  min-height: 78px;
+  gap: 12px;
+  margin-bottom: 17px;
+  border: 1px solid rgba(60, 60, 67, 0.035);
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: #fff;
+  color: #0b0b0d;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.055);
+}
+
+.ios-start-workout__icon {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(145deg, #ff752d, #ff4f00);
+  color: #fff;
+  font-size: 15px;
+}
+
+.ios-start-workout > span:nth-child(2) {
+  flex: 1;
+}
+
+.ios-start-workout strong {
+  color: #0a0a0c;
+  font-size: 17px;
+  font-weight: 740;
+  letter-spacing: -0.02em;
+}
+
+.ios-start-workout small {
+  max-width: 245px;
+  margin-top: 2px;
+  color: #8e8e93;
+  font-size: 12px;
+  line-height: 1.2;
+  opacity: 1;
+  white-space: normal;
+}
+
+.ios-start-workout > .ios-card-chevron {
+  flex: 0 0 auto;
+  color: #c7c7cc;
+  font-size: 28px;
+}
+
+.ios-segmented--activity {
+  width: 204px;
+  margin: 0 auto 5px;
+  gap: 4px;
+  padding: 3px;
+  background: transparent;
+}
+
+.ios-segmented--activity button {
+  min-height: 38px;
+  border-radius: 999px;
+  color: #8e8e93;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.ios-segmented--activity button.is-active {
+  background: #319df0;
+  color: #fff;
+  box-shadow: none;
+}
+
+.ios-native-entry {
+  display: flex;
+  min-height: 86px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(60, 60, 67, 0.035);
+  border-radius: 18px;
+  padding: 13px 14px;
+  background: #fff;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.05);
+}
+
+.ios-native-entry__icon {
+  display: grid;
+  width: 45px;
+  height: 45px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.ios-native-entry__icon--planner {
+  background: #dff3ff;
+  color: #2496f3;
+}
+
+.ios-native-entry__icon--customize {
+  background: #e7f5ff;
+  color: #2496f3;
+}
+
+.ios-native-entry__copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.ios-native-entry__copy > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ios-native-entry__copy strong {
+  display: block;
+  color: #111113;
+  font-size: 15px;
+  font-weight: 740;
+  letter-spacing: -0.015em;
+}
+
+.ios-native-entry__copy em {
+  border-radius: 5px;
+  padding: 2px 5px;
+  background: #349ff0;
+  color: #fff;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.ios-native-entry__copy small {
+  display: block;
+  margin-top: 3px;
+  color: #8e8e93;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.ios-customize-entry {
+  min-height: 80px;
+  background: linear-gradient(105deg, #f9fdff, #fff);
+}
+
+.ios-customize-entry__dismiss {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: #f1f0f6;
+  color: #c4c3cb;
+  font-size: 21px;
+  font-weight: 300;
+}
+
+.ios-chip-row {
+  display: flex;
+  width: calc(100% + 32px);
+  gap: 4px;
+  margin: 4px -16px 16px;
+  overflow-x: auto;
+  padding: 0 3px;
+  scrollbar-width: none;
+}
+
+.ios-chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+.ios-chip {
+  min-width: max-content;
+  min-height: 35px;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: #8e8e93;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.ios-chip.is-active {
+  background: #319df0;
+  color: #fff;
+  box-shadow: none;
+}
+
+.ios-chip--custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.8;
+}
+
+.ios-fitness-summary {
+  margin-bottom: 15px;
+  border: 0;
+  border-radius: 19px;
+  padding: 16px;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.055);
+}
+
+.ios-fitness-summary__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.ios-fitness-summary__head strong {
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.ios-fitness-summary__head span {
+  color: #8e8e93;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ios-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ios-overview-stat {
+  display: flex;
+  min-width: 0;
+  min-height: 64px;
+  align-items: center;
+  gap: 9px;
+  border-radius: 12px;
+  padding: 10px 11px;
+  background: #f1f0f6;
+}
+
+.ios-overview-stat > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ios-overview-stat div {
+  min-width: 0;
+}
+
+.ios-overview-stat strong,
+.ios-overview-stat small {
+  display: block;
+}
+
+.ios-overview-stat strong {
+  overflow: hidden;
+  color: #09090b;
+  font-size: 15px;
+  font-weight: 740;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-overview-stat small {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ios-overview-stat--distance > span,
+.ios-overview-stat--distance small {
+  background: #fde4de;
+  color: #ff613b;
+}
+
+.ios-overview-stat--distance small {
+  background: transparent;
+}
+
+.ios-overview-stat--time > span,
+.ios-overview-stat--time small {
+  background: #dbedff;
+  color: #2f9cf2;
+}
+
+.ios-overview-stat--time small {
+  background: transparent;
+}
+
+.ios-overview-stat--calories > span,
+.ios-overview-stat--calories small {
+  background: #f9dfe5;
+  color: #ff6470;
+}
+
+.ios-overview-stat--calories small {
+  background: transparent;
+}
+
+.ios-overview-stat--elevation > span,
+.ios-overview-stat--elevation small {
+  background: #dff2e8;
+  color: #42bc69;
+}
+
+.ios-overview-stat--elevation small {
+  background: transparent;
+}
+
+.ios-fitness-summary__empty {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  border-radius: 11px;
+  padding: 0 13px;
+  background: #f1f0f6;
+  color: #8e8e93;
+  font-size: 12px;
+}
+
+.ios-fitness-summary__empty span {
+  color: #c2c1c9;
+  font-size: 20px;
+}
+
+.ios-running-year {
+  border: 0;
+  border-radius: 19px;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.055);
+}
+
+.ios-running-year__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ios-running-year__head > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ios-running-year__head i {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 999px;
+  background: #ffe7dc;
+  color: #ff5b18;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.ios-running-year__head strong {
+  font-size: 16px;
+  font-weight: 740;
+}
+
+.ios-running-year__head small {
+  color: #8e8e93;
+  font-size: 10px;
+}
+
+.ios-running-year__primary {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.ios-running-year__primary strong {
+  font-size: 34px;
+  font-weight: 780;
+  letter-spacing: -0.05em;
+}
+
+.ios-running-year__primary span {
+  color: #8e8e93;
+  font-size: 13px;
+}
+
+.ios-running-year__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 13px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #dfdee5;
+}
+
+.ios-running-year__stats > span {
+  min-width: 0;
+  padding: 10px 7px;
+  background: #f4f3f8;
+  text-align: center;
+}
+
+.ios-running-year__stats small,
+.ios-running-year__stats strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-running-year__stats small {
+  color: #8e8e93;
+  font-size: 9px;
+}
+
+.ios-running-year__stats strong {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 740;
+}
+
+.ios-section-label {
+  margin: 19px 1px 11px;
+  padding: 0;
+}
+
+.ios-section-label > span {
+  color: #111113;
+  font-size: 17px;
+  font-weight: 740;
+  letter-spacing: -0.02em;
+}
+
+.ios-section-label button {
+  color: #319df0;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.ios-activity-stack {
+  gap: 12px;
+}
+
+.ios-activity-workout {
+  overflow: hidden;
+  border: 0;
+  border-radius: 18px;
+  padding: 0;
+  background: #fff;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.055);
+}
+
+.ios-activity-workout__head {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 13px 14px 11px;
+}
+
+.ios-activity-workout__icon {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sport-color) 12%, white);
+  color: var(--sport-color);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.ios-activity-workout__identity strong {
+  color: #111113;
+  font-size: 15px;
+  font-weight: 680;
+}
+
+.ios-activity-workout__identity small {
+  margin-top: 2px;
+  color: #8e8e93;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.ios-activity-workout__distance {
+  color: #111113;
+  font-size: 16px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+
+.ios-activity-workout__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid #ecebf1;
+}
+
+.ios-activity-workout__metrics > span {
+  min-width: 0;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px;
+}
+
+.ios-activity-workout__metrics > span + span {
+  border-left: 1px solid #ecebf1;
+}
+
+.ios-activity-workout__metrics i {
+  font-size: 10px;
+}
+
+.ios-activity-workout__metrics strong {
+  overflow: hidden;
+  color: #333338;
+  font-size: 11px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-tab-bar {
+  position: absolute;
+  z-index: 12;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  min-height: 68px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 36px;
+  padding: 5px 8px 6px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 10px 32px rgba(31, 43, 66, 0.13);
+  backdrop-filter: blur(28px) saturate(175%);
+  -webkit-backdrop-filter: blur(28px) saturate(175%);
+}
+
+.ios-tab-bar button {
+  position: relative;
+  z-index: 1;
+  min-height: 55px;
+  gap: 1px;
+  color: #151519;
+}
+
+.ios-tab-bar button.is-active {
+  color: #2496f3;
+}
+
+.ios-tab-bar button.is-active::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -1px;
+  left: 50%;
+  width: 53px;
+  height: 53px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background: rgba(45, 156, 240, 0.1);
+}
+
+.ios-tab-icon {
+  display: block;
+  width: 25px;
+  height: 25px;
+  background: currentColor;
+}
+
+.ios-tab-icon--record {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M4 4h9v2H6v12h12v-7h2v9H4V4Zm12.7-.7 4 4L10 18H6v-4L16.7 3.3Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M4 4h9v2H6v12h12v-7h2v9H4V4Zm12.7-.7 4 4L10 18H6v-4L16.7 3.3Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.ios-tab-icon--activity {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M15.5 5.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4ZM12 6.1 8.7 9.4 5 10.2l.5 2 4.2-.9 1.5-1.4-1.1 4.3-3 2.5 1.3 1.6 3.6-3 1-2.8 1.9 2.1 1.3 5.1 2.1-.5-1.4-5.7-2.5-2.8 1.1-2.6 2 1.9 3.8.8.5-2-3.1-.7L15 7.1 12 6.1Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M15.5 5.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4ZM12 6.1 8.7 9.4 5 10.2l.5 2 4.2-.9 1.5-1.4-1.1 4.3-3 2.5 1.3 1.6 3.6-3 1-2.8 1.9 2.1 1.3 5.1 2.1-.5-1.4-5.7-2.5-2.8 1.1-2.6 2 1.9 3.8.8.5-2-3.1-.7L15 7.1 12 6.1Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.ios-tab-icon--insights {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M3 20h3V9H3v11Zm5 0h3V3H8v17Zm5 0h3V6h-3v14Zm5 0h3V11h-3v9Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M3 20h3V9H3v11Zm5 0h3V3H8v17Zm5 0h3V6h-3v14Zm5 0h3V11h-3v9Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.ios-tab-icon--intelligence {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M9 2a4 4 0 0 0-3.8 5.3A4.5 4.5 0 0 0 4 15.8 4 4 0 0 0 9 22h2V2H9Zm6 0h-2v20h2a4 4 0 0 0 5-6.2 4.5 4.5 0 0 0-1.2-8.5A4 4 0 0 0 15 2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M9 2a4 4 0 0 0-3.8 5.3A4.5 4.5 0 0 0 4 15.8 4 4 0 0 0 9 22h2V2H9Zm6 0h-2v20h2a4 4 0 0 0 5-6.2 4.5 4.5 0 0 0-1.2-8.5A4 4 0 0 0 15 2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.ios-tab-icon--friends {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7.5 11A3.5 3.5 0 1 0 7.5 4a3.5 3.5 0 0 0 0 7Zm9 0A3.5 3.5 0 1 0 16.5 4a3.5 3.5 0 0 0 0 7ZM1 21h12v-2c0-4-2.7-6-5.5-6S1 15 1 19v2Zm12 0h10v-2c0-4-2.4-6-5.5-6-1.2 0-2.3.3-3.2.9 1.1 1.3 1.7 3 1.7 5.1v2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7.5 11A3.5 3.5 0 1 0 7.5 4a3.5 3.5 0 0 0 0 7Zm9 0A3.5 3.5 0 1 0 16.5 4a3.5 3.5 0 0 0 0 7ZM1 21h12v-2c0-4-2.7-6-5.5-6S1 15 1 19v2Zm12 0h10v-2c0-4-2.4-6-5.5-6-1.2 0-2.3.3-3.2.9 1.1 1.3 1.7 3 1.7 5.1v2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.ios-tab-bar small {
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.ios-insights-hero {
+  display: block;
+  gap: 0;
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+.ios-insights-hero h3 {
+  font-size: 20px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.ios-insights-hero p {
+  max-width: 330px;
+  margin-top: 5px;
+  color: #8e8e93;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.ios-nutrition-controls {
+  margin-bottom: 14px;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.ios-nutrition-ranges {
+  display: flex;
+  gap: 8px;
+}
+
+.ios-nutrition-ranges button {
+  min-width: 0;
+  min-height: 37px;
+  flex: 1;
+  border-radius: 999px;
+  padding: 0 9px;
+  background: #e7e6ec;
+  color: #111113;
+  font-size: 13px;
+  font-weight: 560;
+}
+
+.ios-nutrition-ranges button.is-active {
+  background: #08bca8;
+  color: #fff;
+  box-shadow: none;
+}
+
+.ios-today-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 55px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 1px;
+  background: transparent;
+  color: #111113;
+  text-align: left;
+}
+
+.ios-today-toggle__calendar {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1.5px solid #08bca8;
+  border-radius: 999px;
+  color: #08bca8;
+  font-size: 10px;
+}
+
+.ios-today-toggle > span:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+
+.ios-today-toggle strong,
+.ios-today-toggle small {
+  display: block;
+}
+
+.ios-today-toggle strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ios-today-toggle small {
+  margin-top: 1px;
+  color: #8e8e93;
+  font-size: 11px;
+}
+
+.ios-today-toggle > i {
+  position: relative;
+  width: 53px;
+  height: 32px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #b9bac1;
+}
+
+.ios-today-toggle > i::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+}
+
+.ios-today-toggle.is-on > i {
+  background: #08bca8;
+}
+
+.ios-today-toggle.is-on > i::after {
+  transform: translateX(21px);
+}
+
+.ios-context-strip {
+  margin-bottom: 20px;
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: #fff;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.055);
+}
+
+.ios-context-strip p {
+  display: grid;
+  grid-template-columns: 19px 48px auto minmax(0, 1fr);
+  gap: 6px;
+  align-items: baseline;
+  color: #8e8e93;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.ios-context-strip p + p {
+  margin-top: 9px;
+}
+
+.ios-context-strip p > span {
+  color: #08bca8;
+  font-size: 15px;
+}
+
+.ios-context-strip p > strong {
+  color: #8e8e93;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+}
+
+.ios-context-strip p > b {
+  color: #111113;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ios-context-strip p > small {
+  color: #8e8e93;
+  font-size: 12px;
+}
+
+.ios-native-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ios-native-section-head strong {
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.ios-native-section-head small {
+  color: #8e8e93;
+  font-size: 11px;
+}
+
+.ios-macro-insights {
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ios-macro-insight {
+  position: relative;
+  display: block;
+  min-height: 145px;
+  border: 0;
+  border-radius: 18px;
+  padding: 14px 14px 13px;
+  background: #fff;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.05);
+}
+
+.ios-macro-insight__icon {
+  display: inline;
+  width: auto;
+  height: auto;
+  margin-right: 5px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--macro-tone);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.ios-macro-insight > .ios-macro-insight__icon {
+  display: inline;
+  width: auto;
+  height: auto;
+  margin: 0 5px 0 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ios-macro-insight > small {
+  display: inline;
+  color: #8e8e93;
+  font-size: 14px;
+}
+
+.ios-macro-insight__value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 9px;
+}
+
+.ios-macro-insight > .ios-macro-insight__value {
+  display: flex;
+  width: auto;
+  height: auto;
+  margin: 9px 0 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ios-macro-insight__value strong {
+  color: #09090b;
+  font-size: 31px;
+  font-weight: 770;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.ios-macro-insight__value em {
+  position: static;
+  color: #8e8e93;
+  font-size: 13px;
+  font-style: normal;
+}
+
+.ios-macro-insight__caption {
+  display: block;
+  margin-top: 8px;
+  color: #8e8e93;
+  font-size: 11px;
+}
+
+.ios-macro-insight > .ios-macro-insight__caption {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 8px 0 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ios-macro-insight__track {
+  position: absolute;
+  right: 14px;
+  bottom: 13px;
+  left: 14px;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--macro-tone) 14%, white);
+}
+
+.ios-macro-insight__track b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--macro-tone);
+}
+
+.ios-average-water {
+  border: 0;
+  border-radius: 18px;
+  padding: 15px;
+  box-shadow: 0 7px 24px rgba(35, 48, 72, 0.05);
+}
+
+.ios-average-water__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #8e8e93;
+  font-size: 13px;
+}
+
+.ios-average-water__head span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ios-average-water__head i {
+  color: #349ff0;
+  font-size: 13px;
+}
+
+.ios-average-water__head small {
+  font-size: 11px;
+}
+
+.ios-average-water > div {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 9px;
+}
+
+.ios-average-water > div strong {
+  font-size: 29px;
+  font-weight: 770;
+}
+
+.ios-average-water > div span,
+.ios-average-water p {
+  color: #8e8e93;
+  font-size: 12px;
+}
+
+.ios-average-water p {
+  margin-top: 5px;
+}
+
+.ios-average-water__track {
+  display: block;
+  height: 5px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: #ddecfa;
+}
+
+.ios-fiber-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 7px;
+  margin: 17px 0;
+  font-size: 14px;
+}
+
+.ios-fiber-progress > span {
+  font-weight: 650;
+}
+
+.ios-fiber-progress > strong {
+  font-weight: 560;
+}
+
+.ios-fiber-progress > i {
+  grid-column: 1 / -1;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dfeee5;
+}
+
+.ios-fiber-progress > i b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #5cc47d;
+}
+
+.ios-glucose-card {
+  overflow: hidden;
+  margin: 15px 0 20px;
+  border: 1px solid rgba(8, 188, 168, 0.24);
+  border-radius: 19px;
+  padding: 16px;
+  background: linear-gradient(155deg, rgba(8, 188, 168, 0.055), #fff 58%);
+}
+
+.ios-glucose-card__head {
+  display: grid;
+  grid-template-columns: 39px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.ios-glucose-card__head > span {
+  display: grid;
+  width: 37px;
+  height: 37px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(8, 188, 168, 0.15);
+  color: #08bca8;
+  font-size: 19px;
+}
+
+.ios-glucose-card__head strong,
+.ios-glucose-card__head small {
+  display: block;
+}
+
+.ios-glucose-card__head strong {
+  font-size: 17px;
+  line-height: 1.08;
+}
+
+.ios-glucose-card__head small {
+  margin-top: 3px;
+  color: #8e8e93;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.ios-glucose-card__head em {
+  border-radius: 999px;
+  padding: 5px 7px;
+  background: #eff1f2;
+  color: #a7a8ad;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.ios-glucose-card__empty {
+  display: grid;
+  min-height: 194px;
+  place-items: center;
+  align-content: center;
+  padding: 16px 24px 4px;
+  text-align: center;
+}
+
+.ios-glucose-card__empty > span {
+  color: #8e8e93;
+  font-size: 42px;
+}
+
+.ios-glucose-card__empty strong {
+  margin-top: 13px;
+  font-size: 18px;
+}
+
+.ios-glucose-card__empty p {
+  max-width: 260px;
+  margin-top: 7px;
+  color: #8e8e93;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.ios-micronutrient-heading {
+  margin: 18px 0 11px;
+}
+
+.ios-micronutrient-heading strong {
+  display: block;
+  color: #8e8e93;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.ios-micronutrient-heading p {
+  margin-top: 5px;
+  color: #aaa9af;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.ios-micronutrient-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ios-micronutrient-card {
+  display: block;
+  min-width: 0;
+  min-height: 112px;
+  border: 0;
+  border-radius: 17px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--nutrient-color) 7%, white);
+  color: #111113;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ios-micronutrient-card__title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+.ios-micronutrient-card__title i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--nutrient-color);
+}
+
+.ios-micronutrient-card__title strong {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 670;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-micronutrient-card__value {
+  display: block;
+  margin-top: 8px;
+  font-size: 17px;
+  font-weight: 740;
+}
+
+.ios-micronutrient-card__status {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.ios-micronutrient-card__status b {
+  color: var(--nutrient-color);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ios-micronutrient-card__status small {
+  color: #8e8e93;
+  font-size: 10px;
+  line-height: 1.1;
+}
+
+.ios-micronutrient-note {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 5px 14px;
+  color: #aaa9af;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.ios-micronutrient-note strong {
+  flex: 0 0 auto;
+  color: #08a995;
+  font-weight: 650;
+}
+
+.ios-all-nutrients {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  border: 0;
+  padding: 4px 0 15px;
+  background: transparent;
+  color: #111113;
+  font-family: inherit;
+}
+
+.ios-all-nutrients strong {
+  font-size: 17px;
+}
+
+.ios-all-nutrients strong span {
+  color: #319df0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ios-all-nutrients small {
+  color: #8e8e93;
+  font-size: 12px;
+}
+
+.ios-actionable-label {
+  margin: 10px 0;
+  color: #8e8e93;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.ios-local-insights {
+  display: grid;
+  min-height: 170px;
+  place-items: center;
+  align-content: center;
+  border: 0;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.ios-local-insights > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 3px solid #d5d5d9;
+  border-radius: 999px;
+  color: #c8c8cd;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.ios-local-insights strong {
+  margin-top: 13px;
+  font-size: 16px;
+}
+
+.ios-local-insights p {
+  max-width: 300px;
+  margin-top: 8px;
+  color: #8e8e93;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+@media (max-width: 860px) {
+  .founder-app-screens {
+    grid-template-columns: minmax(0, 430px);
+    gap: 54px;
+  }
+}
+
+@media (max-width: 480px) {
+  .founder-live-suite {
+    margin-top: 64px;
+  }
+
+  .founder-app-screens {
+    width: calc(100% + 16px);
+    margin-inline: -8px;
+  }
+
+  .founder-app-screen .founder-panel-head {
+    padding-inline: 5px;
+  }
+
+  .ios-device {
+    width: min(100%, 410px);
+    border-radius: 51px;
+    padding: 6px;
+  }
+
+  .ios-device__screen {
+    height: min(820px, 83svh);
+    min-height: 690px;
+    border-radius: 45px;
+  }
+
+  .ios-device__island {
+    top: 14px;
+    width: 112px;
+    height: 31px;
+  }
+
+  .ios-status-bar {
+    min-height: 45px;
+    padding-inline: 22px;
+    font-size: 14px;
+  }
+
+  .ios-app-toolbar {
+    min-height: 57px;
+    padding-inline: 12px;
+  }
+
+  .ios-toolbar-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ios-toolbar-button--refresh::before {
+    font-size: 28px;
+    line-height: 37px;
+  }
+
+  .ios-screen-scroll {
+    padding-inline: 13px;
+  }
+
+  .ios-large-title {
+    font-size: 32px;
+  }
+
+  .ios-start-workout {
+    padding-inline: 12px;
+  }
+
+  .ios-start-workout small {
+    max-width: 218px;
+  }
+
+  .ios-chip-row {
+    width: calc(100% + 26px);
+    margin-inline: -13px;
+  }
+
+  .ios-nutrition-ranges {
+    gap: 5px;
+  }
+
+  .ios-nutrition-ranges button {
+    padding-inline: 6px;
+    font-size: 12px;
+  }
+
+  .ios-context-strip {
+    padding-inline: 11px;
+  }
+
+  .ios-context-strip p {
+    grid-template-columns: 17px 43px auto minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .ios-context-strip p > small {
+    font-size: 11px;
+  }
+
+  .ios-micronutrient-card {
+    padding: 11px 10px;
+  }
+
+  .ios-micronutrient-card__title strong {
+    font-size: 12px;
+  }
+}
