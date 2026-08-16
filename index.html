@@ -125,33 +125,98 @@
       </section>
 
       <section id="experiment-001" class="section-block section-block--split experiment-section">
-        <div class="page-shell experiment-layout">
+        <div class="page-shell experiment-layout experiment-layout--live">
           <div class="section-heading experiment-copy reveal">
             <div class="kicker">How I'm using it</div>
             <h2>Can I run an Olympic marathon?</h2>
-            <p>I build StatsKey as I attempt to answer a real question: how far can disciplined recording, investigation, projection, and testing take me?</p>
+            <p>I don't know whether I can. That's the point. I build StatsKey while I train to find out how far disciplined recording, investigation, projection, and testing can take me — and I'd like to see myself doing it in Nike.</p>
+            <p class="experiment-copy__live-note">This is my actual, read-only Fitness view: training history and recorded food update from StatsKey. A run's map stays absent unless I publish that specific route from the app.</p>
             <div class="hero-actions">
               <a class="button button--primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
               <a class="button button--secondary" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
             </div>
           </div>
-          <div class="experiment-media reveal d2">
-            <video
-              src="/statskey-app/olympic-marathon-experiment-001.mp4"
-              poster="/statskey-app/olympic-marathon-experiment-001-poster.jpg"
-              width="720"
-              height="1280"
-              controls
-              muted
-              playsinline
-              preload="metadata"
-              data-viewport-video
-              data-power-poster
-              data-poster-time="1"
-              aria-label="StatsKey Experiment 001: Can I run an Olympic marathon?"
-            >
-              <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the StatsKey Experiment 001 video</a>
-            </video>
+
+          <div class="founder-live-stage reveal d2" id="founder-live" data-source="/statskey-app/founder-live-fallback.json">
+            <div class="ios-device" aria-label="Interactive live replica of the StatsKey iOS Fitness view">
+              <div class="ios-device__island" aria-hidden="true"></div>
+              <div class="ios-device__screen">
+                <div class="ios-status-bar" aria-hidden="true">
+                  <span>9:41</span>
+                  <span class="ios-status-bar__signals">
+                    <i class="ios-signal"></i>
+                    <i class="ios-wifi"></i>
+                    <i class="ios-battery"></i>
+                  </span>
+                </div>
+                <header class="ios-nav-bar">
+                  <button class="ios-nav-back" id="founder-live-back" type="button" aria-label="Go back" hidden>
+                    <span aria-hidden="true">‹</span>
+                  </button>
+                  <strong id="founder-live-title">Fitness</strong>
+                  <span class="ios-nav-action" aria-hidden="true">⚙︎</span>
+                </header>
+                <div class="ios-live-strip" role="status">
+                  <span class="ios-live-dot"></span>
+                  <span id="founder-live-status">Connecting to Ryan's record…</span>
+                </div>
+                <div class="ios-screen-scroll" id="founder-live-screen" tabindex="0" aria-live="polite">
+                  <div class="ios-skeleton-card ios-skeleton-card--hero"></div>
+                  <div class="ios-skeleton-card"></div>
+                  <div class="ios-skeleton-card"></div>
+                </div>
+                <nav class="ios-tab-bar" aria-label="StatsKey public fitness preview">
+                  <button type="button" data-founder-tab="activity" aria-label="Activity">
+                    <span class="ios-tab-icon" aria-hidden="true">◴</span>
+                    <small>Activity</small>
+                  </button>
+                  <button class="is-active" type="button" data-founder-tab="fitness" aria-label="Fitness" aria-current="page">
+                    <span class="ios-tab-icon" aria-hidden="true">⌁</span>
+                    <small>Fitness</small>
+                  </button>
+                  <button type="button" data-founder-tab="intelligence" aria-label="Intelligence">
+                    <span class="ios-tab-icon" aria-hidden="true">✦</span>
+                    <small>Intelligence</small>
+                  </button>
+                  <button type="button" data-founder-tab="friends" aria-label="Friends">
+                    <span class="ios-tab-icon" aria-hidden="true">♙</span>
+                    <small>Friends</small>
+                  </button>
+                  <button type="button" data-founder-tab="fuel" aria-label="Fuel">
+                    <span class="ios-tab-icon" aria-hidden="true">◉</span>
+                    <small>Fuel</small>
+                  </button>
+                </nav>
+              </div>
+            </div>
+
+            <aside class="founder-live-rail" aria-label="Live training and nutrition summary">
+              <div class="founder-live-rail__head">
+                <span class="founder-live-badge"><i></i> Live record</span>
+                <span id="founder-live-updated">Connecting…</span>
+              </div>
+              <div class="founder-live-macros" id="founder-live-macros" aria-label="Recent recorded nutrition">
+                <div><span>Calories</span><strong>—</strong><small>daily avg</small></div>
+                <div><span>Carbs</span><strong>—</strong><small>g / day</small></div>
+                <div><span>Protein</span><strong>—</strong><small>g / day</small></div>
+              </div>
+              <details class="founder-micro-details" id="founder-micro-details">
+                <summary>
+                  <span>
+                    <small>Recent micronutrition</small>
+                    <strong id="founder-micro-headline">Evaluating recorded food…</strong>
+                  </span>
+                  <i aria-hidden="true">⌄</i>
+                </summary>
+                <div class="founder-micro-list" id="founder-micro-list"></div>
+                <p id="founder-micro-note">Recorded food only. Supplements, medications, meal names, and food names are not published.</p>
+              </details>
+              <div class="founder-route-privacy">
+                <span aria-hidden="true">⌖</span>
+                <p><strong>Routes are private by default.</strong> This page never reads a private route. A map can load only after I publish that individual run in StatsKey, with my privacy zones applied.</p>
+              </div>
+              <a class="founder-live-open" href="#founder-live" id="founder-live-reset">Open Fitness home <span aria-hidden="true">→</span></a>
+            </aside>
           </div>
         </div>
       </section>
