@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
+import {
+  Navigate,
+  NavLink,
+  Route,
+  Routes,
+  useNavigate,
+} from 'react-router-dom'
 import { getDesktopBridge, type DesktopUpdateState } from '../lib/desktop'
 import { checkForDesktopUpdates } from '../components/DesktopUpdater'
 import { IntegrationCenter } from '../components/assistant/IntegrationCenter'
-import { RemoteAccessSettings } from '../components/RemoteAccessSettings'
 import { ModelProviders } from './ModelProviders'
 import { Customize } from './Customize'
 import './Settings.css'
@@ -16,15 +21,6 @@ const SETTINGS_SECTIONS = [
     label: 'Connections & billing',
     hint: 'Accounts, Stripe & universal tools',
   },
-  ...(getDesktopBridge()?.founderMode === true
-    ? [
-        {
-          path: 'remote',
-          label: 'Remote access',
-          hint: 'iPhone & private machines',
-        },
-      ]
-    : []),
   { path: 'about', label: 'About & updates', hint: 'Version & update checks' },
 ]
 
@@ -53,25 +49,10 @@ export function Settings() {
         <Route path="general" element={<GeneralSection />} />
         <Route path="models" element={<ModelsSection />} />
         <Route path="connections" element={<ConnectionsSection />} />
-        {getDesktopBridge()?.founderMode === true && (
-          <Route path="remote" element={<RemoteSection />} />
-        )}
         <Route path="about" element={<AboutSection />} />
         <Route path="*" element={<Navigate to="/settings/general" replace />} />
       </Routes>
     </div>
-  )
-}
-
-function RemoteSection() {
-  return (
-    <section className="settings-section" aria-label="Remote Access">
-      <SectionHeader
-        title="Remote access"
-        description="Private, owner-only controls shared between your StatsKey iPhone and this Desktop. Credentials and SSH keys remain local."
-      />
-      <RemoteAccessSettings />
-    </section>
   )
 }
 
@@ -91,12 +72,34 @@ function SectionHeader({
 }
 
 function GeneralSection() {
+  const navigate = useNavigate()
+
   return (
     <section className="settings-section" aria-label="General settings">
       <SectionHeader
         title="General"
         description="Workspace rules, skills, hooks, and connected tools that shape Intelligence. Edits save through the same review boundary as every other workspace change."
       />
+      <div className="settings-card">
+        <div>
+          <h3>Customize StatsKey with Intelligence</h3>
+          <p>
+            Describe the interface, tools, or workflows you want. StatsKey opens
+            its own source in a reviewable workspace where Intelligence can
+            propose and verify changes under your current review setting.
+          </p>
+        </div>
+        <div className="settings-card__actions">
+          <button
+            className="settings-card__button settings-card__button--primary"
+            onClick={() =>
+              navigate('/workspace?intent=customize-statskey')
+            }
+          >
+            Customize with Intelligence
+          </button>
+        </div>
+      </div>
       <Customize embedded />
     </section>
   )

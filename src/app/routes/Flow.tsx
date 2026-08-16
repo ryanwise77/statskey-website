@@ -1,4 +1,11 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { useFollowOutput } from '../lib/useFollowOutput'
@@ -33,6 +40,8 @@ import {
   AGENT_MODE_OPTIONS,
   agentModeCanAct,
   agentModeLabel,
+  anchoredPanelPlacement,
+  type AnchoredPanelPlacement,
   resolvedModeNeedsActionPermission,
 } from '../lib/ai/agentModePresentation'
 import { drainSteeringBatch } from '../lib/ai/agentLifecycle'
@@ -403,6 +412,8 @@ export function Flow({
   )
   const [agentMode, setAgentMode] = useState<AgentModeSelection>('auto')
   const [executionSettingsOpen, setExecutionSettingsOpen] = useState(false)
+  const [executionSettingsPlacement, setExecutionSettingsPlacement] =
+    useState<AnchoredPanelPlacement | null>(null)
   const [approvalMode, setApprovalMode] = useState<DesktopApprovalMode>(
     loadApprovalMode
   )
@@ -494,6 +505,7 @@ export function Flow({
   const workbenchRef = useRef<HTMLDivElement>(null)
   const chatSearchRef = useRef<HTMLInputElement>(null)
   const executionSettingsRef = useRef<HTMLDivElement>(null)
+  const executionSettingsTriggerRef = useRef<HTMLButtonElement>(null)
   const runningMoreRef = useRef<HTMLDetailsElement>(null)
   const executePermissionRequestRef = useRef<
     Promise<DesktopApprovalMode | null> | null
@@ -574,6 +586,35 @@ export function Flow({
     workContext,
     workspaceSessionReady,
   ])
+  useLayoutEffect(() => {
+    if (!executionSettingsOpen) return
+
+    const placePanel = () => {
+      const trigger = executionSettingsTriggerRef.current
+      if (!trigger) return
+      const anchor = trigger.getBoundingClientRect()
+      setExecutionSettingsPlacement(
+        anchoredPanelPlacement({
+          anchorBottom: anchor.bottom,
+          anchorRight: anchor.right,
+          viewportHeight: window.innerHeight,
+          viewportWidth: window.innerWidth,
+        })
+      )
+    }
+
+    placePanel()
+    window.addEventListener('resize', placePanel)
+    window.addEventListener('scroll', placePanel, true)
+    window.visualViewport?.addEventListener('resize', placePanel)
+    window.visualViewport?.addEventListener('scroll', placePanel)
+    return () => {
+      window.removeEventListener('resize', placePanel)
+      window.removeEventListener('scroll', placePanel, true)
+      window.visualViewport?.removeEventListener('resize', placePanel)
+      window.visualViewport?.removeEventListener('scroll', placePanel)
+    }
+  }, [executionSettingsOpen])
   useEffect(() => {
     const closeOutside = (event: PointerEvent) => {
       if (!(event.target instanceof Node)) return
@@ -3679,6 +3720,8 @@ ${evidenceContext}
       (!embedded || command.id !== 'workspace')
   )
   const actionCapableMode = agentModeCanAct(agentMode)
+  const selectedModeNeedsActionPermission =
+    agentMode !== 'auto' && resolvedModeNeedsActionPermission(agentMode)
   const executePermissionsApproved = approvalMode === 'everything'
 
   return (
@@ -3811,6 +3854,7 @@ ${evidenceContext}
             }`}
           >
             <button
+              ref={executionSettingsTriggerRef}
               type="button"
               className="flow-execution-settings__trigger"
               title="Choose how Intelligence handles your request"
@@ -3826,109 +3870,136 @@ ${evidenceContext}
                 className="flow-execution-settings__panel"
                 role="dialog"
                 aria-label="Choose an Intelligence mode"
+                style={executionSettingsPlacement ?? undefined}
               >
-              <header>
-                <div>
-                  <b>Choose a mode</b>
-                  <small>
-                    One clear behavior for this and future chats.
-                  </small>
-                </div>
-              </header>
-              <div className="flow-execution-settings__controls">
-                <div
-                  className="flow-agent-mode"
-                  role="radiogroup"
-                  aria-label="How Intelligence should work"
-                >
-                  {AGENT_MODE_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      role="radio"
-                      aria-checked={agentMode === option.value}
-                      className={agentMode === option.value ? 'active' : ''}
-                      onClick={() => void chooseAgentMode(option.value)}
-                    >
-                      <span>
-                        <b>{option.label}</b>
-                        <small>{option.description}</small>
-                      </span>
-                      <i aria-hidden="true">
-                        {agentMode === option.value ? '✓' : ''}
-                      </i>
-                    </button>
-                  ))}
-                </div>
-                {desktopBridge && actionCapableMode && (
-                  <div
-                    className="flow-execute-permissions"
-                    data-approved={executePermissionsApproved}
-                  >
-                    <i aria-hidden="true">
-                      {executePermissionsApproved ? '✓' : '◇'}
-                    </i>
-                    <span>
-                      <b>
-                        {executePermissionsApproved
-                          ? 'Action permissions approved'
-                          : 'Approve action permissions'}
-                      </b>
-                      <small>
-                        {executePermissionsApproved
-                          ? 'Execute and Fix can use the approved workspace tools without repeated prompts.'
-                          : 'Required before Execute or Fix starts. The choice is saved on this Mac.'}
-                      </small>
-                    </span>
-                    {executePermissionsApproved ? (
-                      <strong>Saved</strong>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => void ensureExecutePermissions()}
-                      >
-                        Approve & remember
-                      </button>
-                    )}
-                  </div>
-                )}
-                <details className="flow-mode-settings">
-                  <summary>
-                    <span>Model, context & controls</span>
-                    <b aria-hidden="true">›</b>
-                  </summary>
+                <header>
                   <div>
-                    {workContext && (
-                      <div className="flow-execution-context">
-                        <span>
-                          <b>Personal health</b>
-                          <small>
-                            {!uid
-                              ? 'Sign in to optionally include health context. Calendar, inbox, and personal memory stay separate.'
-                              : !projectBinding
-                                ? 'Open a workspace before including health context.'
-                                : 'Optional for this workspace. Calendar, inbox, and personal memory stay separate.'}
-                          </small>
-                        </span>
+                    <b>What should StatsKey do?</b>
+                    <small>
+                      Automatic is recommended. You can change this anytime.
+                    </small>
+                  </div>
+                  <button
+                    type="button"
+                    className="flow-execution-settings__close"
+                    aria-label="Close mode chooser"
+                    onClick={() => {
+                      setExecutionSettingsOpen(false)
+                      window.requestAnimationFrame(() =>
+                        executionSettingsTriggerRef.current?.focus()
+                      )
+                    }}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </header>
+                <div className="flow-execution-settings__controls">
+                  <div
+                    className="flow-agent-mode"
+                    role="radiogroup"
+                    aria-label="How Intelligence should work"
+                  >
+                    {AGENT_MODE_OPTIONS.map((option, index) => (
+                      <Fragment key={option.value}>
+                        {index === 1 && (
+                          <div className="flow-agent-mode__divider">
+                            Or choose directly
+                          </div>
+                        )}
                         <button
                           type="button"
-                          role="switch"
-                          aria-checked={includePersonalHealth}
-                          className={`flow-context-toggle${
-                            includePersonalHealth
-                              ? ' flow-context-toggle--active'
-                              : ''
-                          }`}
-                          disabled={!uid || !projectBinding}
-                          onClick={togglePersonalHealthContext}
+                          role="radio"
+                          aria-checked={agentMode === option.value}
+                          className={agentMode === option.value ? 'active' : ''}
+                          data-recommended={option.value === 'auto'}
+                          onClick={() => void chooseAgentMode(option.value)}
                         >
-                          <i aria-hidden="true" />
                           <span>
-                            {includePersonalHealth ? 'Included' : 'Off'}
+                            <span className="flow-agent-mode__label">
+                              <b>{option.label}</b>
+                              {option.value === 'auto' && <em>Recommended</em>}
+                            </span>
+                            <small>{option.description}</small>
                           </span>
+                          <i aria-hidden="true">
+                            {agentMode === option.value ? '✓' : ''}
+                          </i>
                         </button>
-                      </div>
-                    )}
+                      </Fragment>
+                    ))}
+                  </div>
+                  {desktopBridge && selectedModeNeedsActionPermission && (
+                    <div
+                      className="flow-execute-permissions"
+                      data-approved={executePermissionsApproved}
+                    >
+                      <i aria-hidden="true">
+                        {executePermissionsApproved ? '✓' : '◇'}
+                      </i>
+                      <span>
+                        <b>
+                          {executePermissionsApproved
+                            ? 'Changes are allowed'
+                            : 'Allow changes on this Mac'}
+                        </b>
+                        <small>
+                          {executePermissionsApproved
+                            ? 'This Mac is approved for Execute and Fix.'
+                            : 'Required before Execute or Fix can make changes.'}
+                        </small>
+                      </span>
+                      {executePermissionsApproved ? (
+                        <strong>On</strong>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void ensureExecutePermissions()}
+                        >
+                          Review & approve
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <details className="flow-mode-settings">
+                    <summary>
+                      <span>
+                        <b>Advanced settings</b>
+                        <small>Model, context and action controls</small>
+                      </span>
+                      <b aria-hidden="true">›</b>
+                    </summary>
+                    <div>
+                      {workContext && (
+                        <div className="flow-execution-context">
+                          <span>
+                            <b>Personal health</b>
+                            <small>
+                              {!uid
+                                ? 'Sign in to optionally include health context. Calendar, inbox, and personal memory stay separate.'
+                                : !projectBinding
+                                  ? 'Open a workspace before including health context.'
+                                  : 'Optional for this workspace. Calendar, inbox, and personal memory stay separate.'}
+                            </small>
+                          </span>
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={includePersonalHealth}
+                            className={`flow-context-toggle${
+                              includePersonalHealth
+                                ? ' flow-context-toggle--active'
+                                : ''
+                            }`}
+                            disabled={!uid || !projectBinding}
+                            onClick={togglePersonalHealthContext}
+                          >
+                            <i aria-hidden="true" />
+                            <span>
+                              {includePersonalHealth ? 'Included' : 'Off'}
+                            </span>
+                          </button>
+                        </div>
+                      )}
                     {actionCapableMode && (
                       <label className="flow-run-preference">
                         <span>

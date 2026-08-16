@@ -1,7 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuth } from '../lib/auth'
-import { getDesktopBridge } from '../lib/desktop'
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, nudgeAuthor, loading } = useAuth()
@@ -29,8 +28,6 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
         location.pathname === '/tasks' ||
         location.pathname === '/models' ||
         location.pathname === '/customize' ||
-        (location.pathname === '/founder' &&
-          getDesktopBridge()?.founderMode === true) ||
         location.pathname.startsWith('/settings') ||
         location.pathname === '/flow/history' ||
         (location.pathname === '/flow' &&

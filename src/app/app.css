@@ -7748,16 +7748,17 @@ body.app-desktop .desktop-login-panel + p {
 }
 
 .flow-execution-settings__panel {
-  position: absolute;
+  position: fixed;
   z-index: 130;
-  top: calc(100% + 6px);
+  top: 64px;
   right: auto;
-  left: 0;
+  left: 12px;
   width: min(420px, calc(100vw - 24px));
-  max-height: calc(100dvh - 112px);
+  max-height: calc(100dvh - 76px);
   display: grid;
   gap: 11px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid rgba(28, 67, 116, 0.12);
   border-radius: var(--radius-md);
   padding: 12px;
@@ -7773,18 +7774,46 @@ body.app-desktop .desktop-login-panel + p {
 }
 
 .flow-execution-settings__panel > header > div {
+  min-width: 0;
   display: grid;
   gap: 2px;
 }
 
 .flow-execution-settings__panel > header b {
   color: #2f4d69;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .flow-execution-settings__panel > header small {
   color: #8293a5;
-  font-size: 10.5px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.flow-execution-settings__close {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #788b9d;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.flow-execution-settings__close:hover,
+.flow-execution-settings__close:focus-visible {
+  background: rgba(227, 237, 247, 0.72);
+  color: #315875;
+}
+
+.flow-execution-settings__close:focus-visible {
+  outline: 2px solid rgba(0, 102, 204, 0.28);
+  outline-offset: 1px;
 }
 
 .flow-execution-settings__controls {
@@ -8001,8 +8030,27 @@ body.app-desktop .desktop-login-panel + p {
   gap: 4px;
 }
 
+.flow-agent-mode__divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 3px 2px 1px;
+  color: #8192a3;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.flow-agent-mode__divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: rgba(28, 67, 116, 0.08);
+}
+
 .flow-agent-mode button {
-  min-height: 48px;
+  min-height: 50px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 20px;
   align-items: center;
@@ -8013,6 +8061,7 @@ body.app-desktop .desktop-login-panel + p {
   background: transparent;
   color: #557088;
   text-align: left;
+  cursor: pointer;
   transition:
     border-color 130ms ease,
     background 130ms ease,
@@ -8024,22 +8073,43 @@ body.app-desktop .desktop-login-panel + p {
   background: rgba(237, 245, 252, 0.58);
 }
 
+.flow-agent-mode button[data-recommended='true']:not(.active) {
+  border-color: rgba(0, 102, 204, 0.11);
+  background: rgba(240, 247, 255, 0.68);
+}
+
 .flow-agent-mode button > span {
   min-width: 0;
   display: grid;
   gap: 2px;
 }
 
-.flow-agent-mode button > span b {
+.flow-agent-mode__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.flow-agent-mode__label b {
   color: #294c69;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
+}
+
+.flow-agent-mode__label em {
+  border-radius: var(--radius-pill);
+  padding: 2px 6px;
+  background: rgba(0, 102, 204, 0.09);
+  color: #1f6ba3;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 750;
 }
 
 .flow-agent-mode button > span small {
   color: #7e91a3;
-  font-size: 10.5px;
-  line-height: 1.3;
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 .flow-agent-mode button > i {
@@ -8211,13 +8281,31 @@ body.app-desktop .desktop-login-panel + p {
   display: none;
 }
 
-.flow-mode-settings > summary b {
+.flow-mode-settings > summary > span {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.flow-mode-settings > summary > span > b {
+  color: #4f687f;
+  font-size: 10.5px;
+  font-weight: 680;
+}
+
+.flow-mode-settings > summary > span > small {
+  color: #8a99a8;
+  font-size: 9.5px;
+  font-weight: 520;
+}
+
+.flow-mode-settings > summary > b {
   color: #90a0af;
   font-size: 14px;
   transition: transform 130ms ease;
 }
 
-.flow-mode-settings[open] > summary b {
+.flow-mode-settings[open] > summary > b {
   transform: rotate(90deg);
 }
 
@@ -8621,16 +8709,6 @@ body.app-desktop .desktop-login-panel + p {
   flex-wrap: wrap;
   overflow-x: visible;
   padding-bottom: 2px;
-}
-
-.intelligence-workbench--embedded .flow-execution-settings__panel {
-  position: fixed;
-  top: 108px;
-  right: 22px;
-  left: auto;
-  width: min(420px, calc(100vw - 44px));
-  max-height: calc(100dvh - 130px);
-  overflow-y: auto;
 }
 
 .intelligence-workbench--embedded .flow-header__navigation {

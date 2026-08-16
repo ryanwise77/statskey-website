@@ -16,24 +16,6 @@ const DEVICE_ACTIONS = new Set([
   'boot', 'install', 'launch', 'inspect', 'screenshot', 'tap', 'type',
   'swipe', 'back', 'home', 'open_url', 'add_media', 'process', 'logs', 'close',
 ])
-const FOUNDER_MODE =
-  Array.isArray(process.argv) && process.argv.includes('--statskey-founder')
-const FOUNDER_BUILD =
-  Array.isArray(process.argv) && process.argv.includes('--statskey-founder-build')
-const FOUNDER_CHECKS = new Set([
-  'oil-storage',
-  'macremote-doctor',
-  'macremote-connectivity',
-])
-const FOUNDER_ACTIONS = new Set([
-  'open-truenas',
-  'open-idrac',
-  'mount-oil-share',
-  'open-oil-workspace',
-  'start-mac-ssh',
-  'open-mac-screen',
-  'stop-mac-screen',
-])
 const DURABLE_RENDERER_STATE_KEYS = new Set([
   'statskey.agent.activeRuns.v2',
   'statskey.cad.recoveryDocument.v1',
@@ -100,41 +82,6 @@ contextBridge.exposeInMainWorld(
     platform: process.platform,
     terminalShell: terminalShellDescriptor(),
     electronVersion: process.versions.electron,
-    founderMode: FOUNDER_MODE,
-    founderBuild: FOUNDER_BUILD,
-    ...(FOUNDER_MODE
-      ? {
-          founder: Object.freeze({
-            state() {
-              return ipcRenderer.invoke('statskey-desktop:founder-state')
-            },
-            runCheck(check) {
-              if (!FOUNDER_CHECKS.has(check)) {
-                return Promise.resolve({
-                  ok: false,
-                  error: 'That Founder diagnostic is not allowed.',
-                })
-              }
-              return ipcRenderer.invoke(
-                'statskey-desktop:founder-check',
-                check
-              )
-            },
-            perform(action) {
-              if (!FOUNDER_ACTIONS.has(action)) {
-                return Promise.resolve({
-                  ok: false,
-                  error: 'That Founder action is not allowed.',
-                })
-              }
-              return ipcRenderer.invoke(
-                'statskey-desktop:founder-action',
-                action
-              )
-            },
-          }),
-        }
-      : {}),
     retry() {
       ipcRenderer.send('statskey-desktop:retry')
     },

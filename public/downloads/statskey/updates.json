@@ -1,7 +1,24 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.4",
+  "latest": "0.21.5",
   "releases": [
+    {
+      "version": "0.21.5",
+      "date": "2026-08-16",
+      "platforms": ["macOS"],
+      "title": "A clearer workspace with a hard public boundary",
+      "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages exclude internal infrastructure controls.",
+      "highlights": [
+        "The mode chooser stays inside the window, scrolls on compact screens, and has a clear Close control.",
+        "Automatic is clearly recommended, while Ask, Plan, Fix, and Execute explain their outcomes in plain language.",
+        "Model, context, and action controls remain available under Advanced settings without crowding the main choice.",
+        "Change permission appears only when Fix or Execute is explicitly selected, with clearer approval language.",
+        "Settings can open a reviewable StatsKey source workspace so you can describe the changes you want to Intelligence.",
+        "Public packages no longer contain the internal console, privileged bridge, infrastructure runtime, or private-machine setup.",
+        "Legacy command-line switches cannot restore removed internal operations.",
+        "Release verification now fails closed if an internal route, command, or artifact is bundled."
+      ]
+    },
     {
       "version": "0.21.4",
       "date": "2026-08-16",

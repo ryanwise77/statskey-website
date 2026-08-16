@@ -63,8 +63,6 @@ import { forkChatPlanCanvases } from '../lib/planCanvasChat'
 import { DesktopBridge } from './DesktopBridge'
 import { DesktopOperationGate } from './DesktopOperationGate'
 import { checkForDesktopUpdates } from './DesktopUpdater'
-import { RemoteAccessCoordinator } from './RemoteAccessCoordinator'
-import { RemoteAccessOnboardingPrompt } from './RemoteAccessSettings'
 import {
   DESKTOP_CHAT_TABS_KEY,
   DESKTOP_CLOSED_CHAT_TABS_KEY,
@@ -120,7 +118,6 @@ type DesktopIcon =
   | 'store'
   | 'models'
   | 'enterprise'
-  | 'founder'
   | 'settings'
   | 'more'
   | 'lock'
@@ -214,14 +211,10 @@ export function Shell() {
   )
   const [resizingSidebarChats, setResizingSidebarChats] = useState(false)
   const isDesktop = 'statsKeyDesktop' in window
-  const desktopBridge = getDesktopBridge()
-  const hasFounderControls = desktopBridge?.founderMode === true
-  const isFounderBuild = desktopBridge?.founderBuild === true
   const actions = useAssistantActions(isDesktop ? user?.uid : undefined)
   const isWorkbench =
     location.pathname === '/flow' ||
     location.pathname === '/enterprise' ||
-    location.pathname === '/founder' ||
     location.pathname === '/workspace' ||
     location.pathname === '/browser' ||
     location.pathname === '/cad' ||
@@ -230,10 +223,6 @@ export function Shell() {
   const isHealthSection = DESKTOP_HEALTH_ITEMS.some((item) =>
     location.pathname.startsWith(item.to)
   )
-
-  useEffect(() => {
-    if (isFounderBuild) document.title = 'StatsKey Founder'
-  }, [isFounderBuild])
 
   useEffect(() => {
     if (!isDesktop) return
@@ -447,7 +436,6 @@ export function Shell() {
       <div className="desktop-shell">
         <DesktopBridge pendingCount={actions.pendingCount} />
         <DesktopOperationGate />
-        <RemoteAccessCoordinator />
         <aside
           ref={sidebarRef}
           className={`desktop-sidebar${
@@ -456,7 +444,7 @@ export function Shell() {
         >
           <div className="desktop-sidebar__brand">
             <span className="site-brand__mark" aria-hidden="true" />
-            <span>{isFounderBuild ? 'StatsKey Founder' : 'StatsKey'}</span>
+            <span>StatsKey</span>
           </div>
 
           <button
@@ -466,19 +454,6 @@ export function Shell() {
             <NavIcon name="ask" />
             <span>Ask StatsKey</span>
           </button>
-
-          {hasFounderControls && (
-            <nav
-              className="desktop-sidebar__nav desktop-sidebar__nav--founder"
-              aria-label="Founder operations"
-            >
-              <DesktopNavLink
-                to="/founder"
-                label="Founder Console"
-                icon="founder"
-              />
-            </nav>
-          )}
 
           <div
             ref={sidebarChatPaneRef}
@@ -674,7 +649,6 @@ export function Shell() {
         </aside>
 
         <section className="desktop-stage">
-          <RemoteAccessOnboardingPrompt />
           <header className="desktop-titlebar">
             <div className="desktop-titlebar__context">
               {!['/flow', '/workspace'].includes(location.pathname) && (
@@ -2530,8 +2504,6 @@ function NavIcon({ name }: { name: DesktopIcon }) {
       return <svg {...common}><path d="M4 7.5 12 3l8 4.5-8 4.5-8-4.5Z" /><path d="m4 12 8 4.5 8-4.5M4 16.5 12 21l8-4.5" /></svg>
     case 'enterprise':
       return <svg {...common}><path d="M4 20V6l8-3 8 3v14M8 9h2M14 9h2M8 13h2M14 13h2M10 20v-3h4v3" /></svg>
-    case 'founder':
-      return <svg {...common}><path d="M12 2.8 20 6v5.8c0 4.8-3.1 8-8 9.4-4.9-1.4-8-4.6-8-9.4V6l8-3.2Z" /><path d="M8 13.8V10l4-2 4 2v3.8M10 14v-2h4v2" /></svg>
     case 'settings':
       return <svg {...common}><circle cx="12" cy="12" r="3" /><path d="M19 13.5v-3l-2-.6a7 7 0 0 0-.7-1.7l1-1.9-2.1-2.1-1.9 1a7 7 0 0 0-1.7-.7L11 2.5H8l-.6 2a7 7 0 0 0-1.7.7l-1.9-1-2.1 2.1 1 1.9A7 7 0 0 0 2 9.9l-2 .6v3l2 .6a7 7 0 0 0 .7 1.7l-1 1.9 2.1 2.1 1.9-1a7 7 0 0 0 1.7.7l.6 2h3l.6-2a7 7 0 0 0 1.7-.7l1.9 1 2.1-2.1-1-1.9a7 7 0 0 0 .7-1.7l2-.6Z" transform="translate(2 0) scale(.83)" /></svg>
     case 'more':
@@ -2544,7 +2516,6 @@ function NavIcon({ name }: { name: DesktopIcon }) {
 function desktopRouteTitle(pathname: string): string {
   if (pathname.startsWith('/flow/history')) return 'Conversations'
   if (pathname.startsWith('/flow')) return 'Intelligence'
-  if (pathname.startsWith('/founder')) return 'Founder Console'
   if (pathname.startsWith('/workspace')) return 'Workspace'
   if (pathname.startsWith('/browser')) return 'Browser'
   if (pathname.startsWith('/simulator')) return 'Simulator'

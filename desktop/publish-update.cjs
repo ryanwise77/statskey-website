@@ -72,6 +72,9 @@ const {
   normalizeUpdateMetadata: normalizeReleaseMetadata,
 } = require(path.join(desktopRoot, 'release-notes-runtime.cjs'))
 const {
+  assertPublicDesktopBundle,
+} = require(path.join(desktopRoot, 'public-release-boundary.cjs'))
+const {
   SHA256_METADATA_KEY,
   assertExactFeedContents,
   assertExactRemoteObject,
@@ -612,6 +615,7 @@ function validateBuild(target) {
     if (!existsSync(appDirectory)) {
       fail(`Missing packaged Mac application: ${appDirectory}`)
     }
+    validatePublicDesktopSurface(path.join(appDirectory, 'Contents', 'Resources'))
     run('codesign', [
       '--verify',
       '--deep',
@@ -624,6 +628,17 @@ function validateBuild(target) {
     validateDmg(target, appDirectory)
   } else if (target.channel === 'win-x64') {
     validateWindowsBuild(target)
+  }
+}
+
+function validatePublicDesktopSurface(resourcesDirectory) {
+  try {
+    assertPublicDesktopBundle({
+      appArchivePath: path.join(resourcesDirectory, 'app.asar'),
+      webRoot: path.join(resourcesDirectory, 'web'),
+    })
+  } catch (error) {
+    fail(error instanceof Error ? error.message : String(error))
   }
 }
 
@@ -955,6 +970,7 @@ function validateWindowsBuild(target) {
       fail(`Incomplete Windows package: ${candidate}`)
     }
   }
+  validatePublicDesktopSurface(path.join(appDirectory, 'resources'))
   assertPeExecutable(installerPath, [0x014c, 0x8664])
   assertPeExecutable(executable, [0x8664])
 }

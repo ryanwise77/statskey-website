@@ -32,6 +32,7 @@ test('Mac and Windows use the committed repo-local source icon byte-for-byte', (
 
 test('every packaged desktop source file must be committed in the snapshot', () => {
   const required = new Set(REQUIRED_RELEASE_SOURCE_FILES)
+  assert.equal(packageJson.build.files.includes('founder-runtime.cjs'), false)
   for (const relativePath of packageJson.build.files) {
     assert.equal(
       required.has(`desktop/${relativePath}`),
@@ -42,6 +43,7 @@ test('every packaged desktop source file must be committed in the snapshot', () 
   assert.equal(required.has(`desktop/${packageJson.build.afterPack}`), true)
   assert.equal(required.has(`desktop/${packageJson.build.mac.icon}`), true)
   assert.equal(required.has(`desktop/${packageJson.build.win.icon}`), true)
+  assert.equal(required.has('desktop/public-release-boundary.cjs'), true)
 })
 
 test('the unpublished 0.19.0 notes and fallback use the August 13 date', () => {
@@ -66,7 +68,7 @@ test('download manifest application stays safe when platform versions split', ()
     path.join(projectRoot, 'public', 'downloads', 'statskey', 'index.html'),
     'utf8'
   )
-  assert.match(html, /const macVersion = "0\.19\.0";/)
+  assert.match(html, /const macVersion = "0\.21\.5";/)
   const history = JSON.parse(
     readFileSync(
       path.join(projectRoot, 'public', 'downloads', 'statskey', 'updates.json'),

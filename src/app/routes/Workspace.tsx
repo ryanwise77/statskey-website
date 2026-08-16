@@ -8,7 +8,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type SetStateAction,
 } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   WorkbenchCommandPalette,
   type WorkbenchCommand,
@@ -91,6 +91,7 @@ const WORKSPACE_SAVE_EVENT = 'statskey:workspace-save-active'
 
 export function Workspace() {
   const bridge = getDesktopBridge()
+  const location = useLocation()
   const navigate = useNavigate()
   const {
     layout,
@@ -145,6 +146,7 @@ export function Workspace() {
   const [cloning, setCloning] = useState(false)
   const [treeVersion, setTreeVersion] = useState(0)
   const [sessionReady, setSessionReady] = useState(false)
+  const didStartStatsKeyCustomization = useRef(false)
   const searchRef = useRef<HTMLInputElement>(null)
   const searchTimerRef = useRef<number | null>(null)
   const searchRequestRef = useRef(0)
@@ -1263,6 +1265,22 @@ export function Workspace() {
       )
     }, 0)
   }
+
+  useEffect(() => {
+    const intent = new URLSearchParams(location.search).get('intent')
+    if (
+      intent !== 'customize-statskey' ||
+      !bridge ||
+      !sessionReady ||
+      didStartStatsKeyCustomization.current
+    ) {
+      return
+    }
+    didStartStatsKeyCustomization.current = true
+    void editStatsKey().finally(() => {
+      navigate('/workspace', { replace: true })
+    })
+  }, [bridge, location.search, navigate, sessionReady])
 
   async function createProject() {
     if (!bridge) return
