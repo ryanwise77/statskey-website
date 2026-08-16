@@ -565,7 +565,7 @@
           <a
             class="button button--primary"
             data-target="mac-arm64"
-            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.5/StatsKey-0.21.5-mac-arm64.dmg"
+            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.6/StatsKey-0.21.6-mac-arm64.dmg"
           >
             Download for Apple Silicon <span aria-hidden="true">↓</span>
           </a>
@@ -576,7 +576,7 @@
           >Download for Windows <span aria-hidden="true">↓</span></a>
           <a class="button" href="#why">Why StatsKey</a>
         </div>
-        <p class="hero__note">Mac 0.21.5 · signed and Apple notarized · Windows 0.19.1 preview</p>
+        <p class="hero__note">Mac 0.21.6 · signed and Apple notarized · Windows 0.19.1 preview</p>
       </header>
 
       <section class="shell product-wrap" aria-label="StatsKey in action">
@@ -686,7 +686,7 @@
       <section class="capability-catalog" id="capabilities">
         <div class="shell">
           <div class="section-heading">
-            <span class="kicker" id="capability-version">Capability catalog · Mac 0.21.5</span>
+            <span class="kicker" id="capability-version">Capability catalog · Mac 0.21.6</span>
             <h2>What StatsKey can do today.</h2>
             <p>
               A maintained, plain-language list of the current Mac app’s capabilities.
@@ -824,17 +824,14 @@
           </div>
           <div class="release-list" id="release-list" aria-live="polite">
             <article class="release-card">
-              <div class="release-card__meta">Version 0.21.5 · macOS<time datetime="2026-08-16">August 16, 2026</time></div>
+              <div class="release-card__meta">Version 0.21.6 · macOS<time datetime="2026-08-16">August 16, 2026</time></div>
               <div>
-                <h3>A clearer workspace with a hard public boundary</h3>
-                <p>The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages exclude internal infrastructure controls.</p>
+                <h3>Public boundary correction</h3>
+                <p>A focused Mac correction removes a residual private-machine command path from the public package and strengthens the checks that guard future releases.</p>
                 <ul>
-                  <li>The mode chooser stays inside the window, scrolls on compact screens, and has a clear Close control.</li>
-                  <li>Automatic is clearly recommended, while Ask, Plan, Fix, and Execute explain their outcomes in plain language.</li>
-                  <li>Model, context, and action controls remain under Advanced settings, while change permission appears only for an explicit Fix or Execute choice.</li>
-                  <li>Settings can open a reviewable StatsKey source workspace so you can describe the changes you want to Intelligence.</li>
-                  <li>Public packages exclude the internal console, privileged bridge, infrastructure runtime, and private-machine setup, and legacy switches cannot restore them.</li>
-                  <li>Release verification now fails closed if an internal route, command, or artifact is bundled.</li>
+                  <li>The public Mac package no longer contains the dormant Remote Access execution path that remained in 0.21.5.</li>
+                  <li>Compiled assets are now checked for Remote Access, MacRemote, Oil Data, remote-command, and private-machine markers before publishing.</li>
+                  <li>The clearer mode chooser and reviewable customization workflow from 0.21.5 are unchanged.</li>
                 </ul>
               </div>
             </article>
@@ -845,7 +842,7 @@
       <section class="download" id="download">
         <div class="shell">
           <div class="section-heading">
-            <span class="kicker" id="release-status">Mac 0.21.5 · Windows 0.19.1</span>
+            <span class="kicker" id="release-status">Mac 0.21.6 · Windows 0.19.1</span>
             <h2>Start with the outcome.</h2>
             <p>Bring a project. Tell StatsKey what finished looks like. Stay in the conversation.</p>
           </div>
@@ -853,7 +850,7 @@
             <a
               class="button button--primary"
               data-target="mac-arm64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.5/StatsKey-0.21.5-mac-arm64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.6/StatsKey-0.21.6-mac-arm64.dmg"
             >Download for Apple Silicon ↓</a>
             <a
               class="button"
@@ -864,7 +861,7 @@
           <div class="download__links">
             <a
               data-target="mac-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.5/StatsKey-0.21.5-mac-x64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.6/StatsKey-0.21.6-mac-x64.dmg"
             >Intel Mac</a>
             <a href="#capabilities">Capabilities</a>
             <a href="#updates">What’s new</a>
@@ -889,7 +886,7 @@
     </footer>
 
     <script>
-      const macVersion = "0.21.5";
+      const macVersion = "0.21.6";
       const windowsVersion = "0.19.1";
       const releaseRoot = (version) =>
         `https://storage.googleapis.com/statskey-workbench-downloads/releases/${version}`;
