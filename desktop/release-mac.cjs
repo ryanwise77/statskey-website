@@ -1,6 +1,9 @@
 const { execFileSync, spawnSync } = require('node:child_process')
 const path = require('node:path')
 const packageJson = require('./package.json')
+const {
+  assertPublicDesktopBundle,
+} = require('./public-release-boundary.cjs')
 
 const requested = new Set(process.argv.slice(2))
 const architectures =
@@ -111,6 +114,10 @@ for (const architecture of architectures) {
       ? path.join(__dirname, 'release', 'mac-arm64', 'StatsKey.app')
       : path.join(__dirname, 'release', 'mac', 'StatsKey.app')
 
+  assertPublicDesktopBundle({
+    appArchivePath: path.join(appDirectory, 'Contents', 'Resources', 'app.asar'),
+    webRoot: path.join(appDirectory, 'Contents', 'Resources', 'web'),
+  })
   run('codesign', ['--verify', '--deep', '--strict', '--verbose=2', appDirectory])
   run('spctl', ['-a', '-t', 'exec', '-vv', appDirectory])
   run('xcrun', ['stapler', 'validate', appDirectory])

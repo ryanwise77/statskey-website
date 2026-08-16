@@ -91,14 +91,6 @@ const {
 } = require('./workspace-binding-runtime.cjs')
 const { searchWorkspaceDirect } = require('./workspace-search-runtime.cjs')
 
-const FOUNDER_BUILD = global.__STATSKEY_FOUNDER_MODE__ === true
-const FOUNDER_CAPABILITIES =
-  FOUNDER_BUILD ||
-  process.argv.includes('--statskey-founder') ||
-  existsSync(path.join(app.getPath('userData'), 'founder-capabilities.enabled'))
-const FounderRuntime = FOUNDER_CAPABILITIES
-  ? require('./founder-runtime.cjs').FounderRuntime
-  : null
 const APP_URL_OVERRIDE = app.isPackaged
   ? null
   : normalizeAppUrl(process.env.STATSKEY_DESKTOP_URL)
@@ -247,12 +239,6 @@ const deviceControl = new DeviceControlRuntime({
   validateArtifact: validateDeviceArtifact,
   validateMedia: validateDeviceMedia,
 })
-const founderRuntime = FOUNDER_CAPABILITIES
-  ? new FounderRuntime({
-      userDataDirectory: app.getPath('userData'),
-      openExternal: (candidate) => shell.openExternal(candidate),
-    })
-  : null
 const terminalRuntime = new TerminalRuntime({
   emit(event) {
     if (!mainWindow || mainWindow.isDestroyed()) return
@@ -309,10 +295,8 @@ app.on('open-url', (event, url) => {
 })
 
 app.whenReady().then(async () => {
-  app.setAppUserModelId(
-    FOUNDER_BUILD ? 'ai.statskey.founder' : 'ai.statskey.desktop'
-  )
-  if (!FOUNDER_BUILD) app.setAsDefaultProtocolClient('statskey-desktop')
+  app.setAppUserModelId('ai.statskey.desktop')
+  app.setAsDefaultProtocolClient('statskey-desktop')
 
   if (process.platform === 'darwin') {
     app.setActivationPolicy('regular')
@@ -333,7 +317,7 @@ app.whenReady().then(async () => {
   configurePermissions()
   installApplicationMenu()
   createMainWindow()
-  if (!FOUNDER_BUILD) initializeDesktopUpdates()
+  initializeDesktopUpdates()
   initializeWorkspaceIndex()
   scheduleWorkspaceIndex(250)
 
@@ -374,7 +358,6 @@ app.on('will-quit', () => {
   workspaceFileSearchWorker = null
   controlledBrowser.closeAll?.()
   deviceControl.closeAll?.()
-  founderRuntime?.closeAll()
   terminalRuntime.closeAll()
   void localMcpManager.closeAll()
 })
@@ -462,66 +445,6 @@ ipcMain.handle('statskey-desktop:open-external', async (event, candidate) => {
   await shell.openExternal(new URL(candidate).toString())
   return true
 })
-
-ipcMain.handle('statskey-desktop:founder-state', async (event) => {
-  if (!isMainRenderer(event) || !founderRuntime) {
-    return { available: false, error: 'Founder controls are unavailable.' }
-  }
-  return founderRuntime.state()
-})
-
-ipcMain.handle(
-  'statskey-desktop:founder-check',
-  async (event, check) => {
-    if (!isMainRenderer(event) || !founderRuntime) {
-      return { ok: false, error: 'Founder controls are unavailable.' }
-    }
-    try {
-      return await founderRuntime.runCheck(check)
-    } catch (error) {
-      return { ok: false, error: safeProviderError(error) }
-    }
-  }
-)
-
-ipcMain.handle(
-  'statskey-desktop:founder-action',
-  async (event, action) => {
-    if (!isMainRenderer(event) || !founderRuntime) {
-      return { ok: false, error: 'Founder controls are unavailable.' }
-    }
-    try {
-      if (action === 'open-oil-workspace') {
-        const projectPath = founderRuntime.configuration().oil.projectPath
-        const workspace = activateWorkspaceRoot(projectPath)
-        if (!workspace) {
-          return { ok: false, error: 'The Oil Data project is unavailable.' }
-        }
-        return { ok: true, workspace }
-      }
-      if (action === 'start-mac-ssh') {
-        const command = founderRuntime.macRemoteShellCommand()
-        const workspace = activateWorkspaceRoot(command.cwd)
-        if (!workspace) {
-          return { ok: false, error: 'The MacRemote project is unavailable.' }
-        }
-        const session = terminalRuntime.start({
-          command: command.command,
-          cwd: command.cwd,
-          metadata: {
-            root: command.cwd,
-            rootName: 'MacRemote',
-            approvalMode: 'review',
-          },
-        })
-        return { ok: true, workspace, session }
-      }
-      return await founderRuntime.perform(action)
-    } catch (error) {
-      return { ok: false, error: safeProviderError(error) }
-    }
-  }
-)
 
 ipcMain.handle(
   'statskey-desktop:browser-open',
@@ -2132,7 +2055,7 @@ function cancelRendererOwnedWork() {
 function createMainWindow() {
   const savedBounds = readWindowState()
   const window = new BrowserWindow({
-    title: FOUNDER_BUILD ? 'StatsKey Founder' : 'StatsKey',
+    title: 'StatsKey',
     width: savedBounds?.width ?? 1280,
     height: savedBounds?.height ?? 860,
     x: savedBounds?.x,
@@ -2160,10 +2083,6 @@ function createMainWindow() {
       : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
-      additionalArguments: [
-        ...(FOUNDER_CAPABILITIES ? ['--statskey-founder'] : []),
-        ...(FOUNDER_BUILD ? ['--statskey-founder-build'] : []),
-      ],
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,

@@ -15,7 +15,6 @@ import {
   loadDesktopChatTabs,
   loadClosedDesktopChatTabIds,
 } from './lib/desktopChatTabs'
-import { getDesktopBridge } from './lib/desktop'
 
 const Dashboard = lazy(() =>
   import('./routes/Dashboard').then((module) => ({ default: module.Dashboard }))
@@ -129,12 +128,6 @@ const NudgeStudio = lazy(() =>
     default: module.NudgeStudio,
   }))
 )
-const FounderConsole = lazy(() =>
-  import('./routes/FounderConsole').then((module) => ({
-    default: module.FounderConsole,
-  }))
-)
-
 function AgentFlowRoute() {
   const location = useLocation()
   const { user } = useAuth()
@@ -222,9 +215,6 @@ export function App() {
         <Route path="health" element={<Health />} />
         <Route path="insights" element={<Insights />} />
         <Route path="library" element={<Library />} />
-        {getDesktopBridge()?.founderMode === true && (
-          <Route path="founder" element={<FounderConsole />} />
-        )}
         <Route path="workspace" element={<Workspace />} />
         <Route path="browser" element={<Browser />} />
         <Route path="simulator" element={<Simulator />} />
@@ -293,14 +283,13 @@ export function App() {
 function HomeRedirect() {
   const { user, nudgeAuthor, profileLoaded } = useAuth()
   const isDesktop = 'statsKeyDesktop' in window
-  const isFounderBuild = isDesktop && getDesktopBridge()?.founderBuild === true
 
   if (nudgeAuthor) {
     return <Navigate to="/nudge-studio" replace />
   }
 
   if (isDesktop && !user) {
-    return <Navigate to={isFounderBuild ? '/founder' : '/workspace'} replace />
+    return <Navigate to="/workspace" replace />
   }
 
   if (!profileLoaded) {
@@ -312,7 +301,6 @@ function HomeRedirect() {
   }
 
   if (isDesktop) {
-    if (isFounderBuild) return <Navigate to="/founder" replace />
     return (
       <Navigate
         to={desktopLaunchRoute(

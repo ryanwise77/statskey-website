@@ -1,8 +1,17 @@
 const assert = require('node:assert/strict')
-const { readFileSync } = require('node:fs')
+const {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} = require('node:fs')
+const { tmpdir } = require('node:os')
 const path = require('node:path')
 const test = require('node:test')
 const vm = require('node:vm')
+const {
+  assertPublicDesktopBundle,
+} = require('./public-release-boundary.cjs')
 
 function loadPreload(argv = []) {
   const calls = []
@@ -46,40 +55,51 @@ function loadPreload(argv = []) {
   return { bridge, calls }
 }
 
-test('ordinary desktop preload does not expose Founder operations', () => {
+test('desktop preload does not expose internal infrastructure operations', () => {
   const { bridge } = loadPreload([])
-  assert.equal(bridge.founderMode, false)
-  assert.equal(bridge.founderBuild, false)
-  assert.equal(bridge.founder, undefined)
+  assert.equal(Object.hasOwn(bridge, 'founderMode'), false)
+  assert.equal(Object.hasOwn(bridge, 'founderBuild'), false)
+  assert.equal(Object.hasOwn(bridge, 'founder'), false)
 })
 
-test('unified Desktop exposes fixed Founder controls without changing editions', async () => {
-  const { bridge, calls } = loadPreload(['--statskey-founder'])
-  assert.equal(bridge.founderMode, true)
-  assert.equal(bridge.founderBuild, false)
-
-  await bridge.founder.state()
-  await bridge.founder.runCheck('oil-storage')
-  await bridge.founder.runCheck('macremote-connectivity')
-  await bridge.founder.perform('start-mac-ssh')
-  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
-    ['statskey-desktop:founder-state'],
-    ['statskey-desktop:founder-check', 'oil-storage'],
-    ['statskey-desktop:founder-check', 'macremote-connectivity'],
-    ['statskey-desktop:founder-action', 'start-mac-ssh'],
-  ])
-
-  const before = calls.length
-  assert.equal((await bridge.founder.runCheck('shell')).ok, false)
-  assert.equal((await bridge.founder.perform('rm-everything')).ok, false)
-  assert.equal(calls.length, before)
-})
-
-test('isolated Founder build remains identifiable for compatibility', () => {
-  const { bridge } = loadPreload([
+test('legacy command-line arguments cannot reactivate removed operations', () => {
+  const { bridge, calls } = loadPreload([
     '--statskey-founder',
     '--statskey-founder-build',
   ])
-  assert.equal(bridge.founderMode, true)
-  assert.equal(bridge.founderBuild, true)
+  assert.equal(Object.hasOwn(bridge, 'founderMode'), false)
+  assert.equal(Object.hasOwn(bridge, 'founderBuild'), false)
+  assert.equal(Object.hasOwn(bridge, 'founder'), false)
+  assert.deepEqual(calls, [])
+})
+
+test('public release boundary rejects internal content and route chunks', () => {
+  const directory = mkdtempSync(path.join(tmpdir(), 'statskey-public-boundary-'))
+  const archivePath = path.join(directory, 'app.asar')
+  const webRoot = path.join(directory, 'web')
+  mkdirSync(path.join(webRoot, 'assets'), { recursive: true })
+  writeFileSync(archivePath, 'ordinary desktop application')
+  writeFileSync(
+    path.join(webRoot, 'assets', 'desktopApp-safe.js'),
+    'console.log("StatsKey")'
+  )
+  assert.doesNotThrow(() =>
+    assertPublicDesktopBundle({ appArchivePath: archivePath, webRoot })
+  )
+
+  writeFileSync(archivePath, 'ordinary application with Founder Console')
+  assert.throws(
+    () => assertPublicDesktopBundle({ appArchivePath: archivePath, webRoot }),
+    /internal-only content/
+  )
+
+  writeFileSync(archivePath, 'ordinary desktop application')
+  writeFileSync(
+    path.join(webRoot, 'assets', 'FounderConsole-old.js'),
+    'unused'
+  )
+  assert.throws(
+    () => assertPublicDesktopBundle({ appArchivePath: archivePath, webRoot }),
+    /internal-only path/
+  )
 })
