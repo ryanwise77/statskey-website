@@ -40,6 +40,9 @@ const RANGE_LABELS = {
 }
 
 const NUTRITION_RANGE_DAYS = [7, 14, 30, 90]
+const PUBLIC_HISTORY_START_DAY = '2025-09-01'
+const PUBLIC_HISTORY_START_MONTH = '2025-09'
+const PUBLIC_HISTORY_START_LABEL = 'September 2025'
 
 const NUTRIENT_COLORS = {
   strong: '#34c759',
@@ -71,10 +74,10 @@ const state = {
   selectedTab: 'activity',
   activityView: 'fitness',
   view: 'home',
-  range: 'month',
-  nutritionRangeDays: 7,
+  range: 'year',
+  nutritionRangeDays: 30,
   includeToday: false,
-  nutritionSurface: 'record',
+  nutritionSurface: 'insights',
   nutritionView: 'home',
   selectedNutrient: null,
   selectedWorkout: null,
@@ -350,8 +353,36 @@ function connectLiveRecord() {
 
 function rangeStats(range = state.range) {
   const key = RANGE_KEYS[range] || RANGE_KEYS.week
-  if (key === 'allTime') return state.root?.training?.allTime ?? {}
+  if (key === 'allTime') {
+    const publicRecord = publicHistorySummary()
+    return {
+      ...publicRecord,
+      runningActivities: publicRecord.activities,
+      elevationGainFeet: state.root?.training?.periods?.last365Days?.elevationGainFeet,
+    }
+  }
   return state.root?.training?.periods?.[key] ?? {}
+}
+
+function publicHistoryMonths(months = state.root?.training?.monthlyMileage ?? []) {
+  return (months || []).filter((month) => (
+    String(month.month || '') >= PUBLIC_HISTORY_START_MONTH
+  ))
+}
+
+function publicHistorySummary(months = state.root?.training?.monthlyMileage ?? []) {
+  const visible = publicHistoryMonths(months)
+  return visible.reduce((summary, month) => ({
+    runningMiles: summary.runningMiles + number(month.runningMiles),
+    activities: summary.activities + number(month.activities),
+    activeHours: summary.activeHours + number(month.activeHours),
+    months: summary.months + 1,
+  }), {
+    runningMiles: 0,
+    activities: 0,
+    activeHours: 0,
+    months: 0,
+  })
 }
 
 function calendarYearSummary() {
@@ -471,73 +502,82 @@ function historyBars(months, count = 18) {
   `
 }
 
-function pulseCard() {
+function fitnessTimelineBuckets() {
   const training = state.root?.training ?? {}
-  const month = training.periods?.last30Days ?? {}
-  const weeks = (training.weeklyMileage || []).slice(-12)
-  const values = weeks.map((week) => number(week.runningMiles))
-  const latestFour = values.slice(-4)
-  const priorFour = values.slice(-8, -4)
-  const latestAverage = latestFour.length
-    ? latestFour.reduce((sum, value) => sum + value, 0) / latestFour.length
-    : 0
-  const priorAverage = priorFour.length
-    ? priorFour.reduce((sum, value) => sum + value, 0) / priorFour.length
-    : 0
-  const delta = priorAverage > 0
-    ? ((latestAverage - priorAverage) / priorAverage) * 100
-    : null
-  const changeText = delta == null
-    ? 'Building four-week comparison'
-    : `${delta > 0 ? '↑' : delta < 0 ? '↓' : '→'} ${Math.abs(delta).toFixed(0)}% vs prior four weeks`
-  const twelveWeekMiles = values.reduce((sum, value) => sum + value, 0)
+  const anchor = latestDay() || state.root?.snapshotDay || isoDay(new Date())
+  if (state.range === 'year' || state.range === 'all') {
+    const months = publicHistoryMonths(training.monthlyMileage)
+    const visible = state.range === 'year' ? months.slice(-12) : months
+    return {
+      unit: 'Monthly distance',
+      buckets: visible.map((month) => ({
+        key: month.month,
+        label: new Intl.DateTimeFormat('en-US', {
+          month: 'short',
+          timeZone: 'UTC',
+        }).format(new Date(`${month.month}-01T12:00:00Z`)),
+        value: number(month.runningMiles),
+      })),
+    }
+  }
+
+  const dayCount = state.range === 'quarter' ? 90 : state.range === 'month' ? 30 : 7
+  const cutoff = shiftISODate(anchor, -(dayCount - 1))
+  return {
+    unit: 'Weekly distance',
+    buckets: (training.weeklyMileage ?? [])
+      .filter((week) => String(week.weekStart || '') >= cutoff)
+      .map((week) => ({
+        key: week.weekStart,
+        label: dateLabel(week.weekStart, { short: true, year: false }),
+        value: number(week.runningMiles),
+      })),
+  }
+}
+
+function fitnessTimeline() {
+  const timeline = fitnessTimelineBuckets()
+  if (!timeline.buckets.length) {
+    return '<div class="ios-empty">Running distance will appear after the next public projection.</div>'
+  }
+  const maximum = Math.max(...timeline.buckets.map((bucket) => bucket.value), 1)
+  const total = timeline.buckets.reduce((sum, bucket) => sum + bucket.value, 0)
+  const average = total / timeline.buckets.length
+  const peak = timeline.buckets.reduce((best, bucket) => (
+    bucket.value > best.value ? bucket : best
+  ), timeline.buckets[0])
   return `
-    <section class="ios-training-pulse" data-impressive-anchor aria-label="Twelve-week running training pulse">
-      <div class="ios-training-pulse__head">
-        <div>
-          <small>RUNNING INTELLIGENCE</small>
-          <strong>12-Week Training Pulse</strong>
-        </div>
-        <span><i aria-hidden="true"></i> Live</span>
+    <div class="ios-fitness-timeline">
+      <div class="ios-fitness-timeline__head">
+        <span>${escapeHTML(timeline.unit)}</span>
+        <small>Peak: ${number(peak.value).toFixed(1)} mi · ${escapeHTML(peak.label)}</small>
       </div>
-      <div class="ios-training-pulse__lead">
-        <small>30-day running volume</small>
-        <div><strong>${number(month.runningMiles).toFixed(1)}</strong><span>mi</span></div>
+      <div class="ios-fitness-timeline__bars" role="img" aria-label="${escapeHTML(timeline.unit)} for running">
+        ${timeline.buckets.map((bucket) => `
+          <span aria-label="${escapeHTML(bucket.label)}, ${number(bucket.value).toFixed(1)} miles" title="${escapeHTML(bucket.key)} · ${number(bucket.value).toFixed(1)} miles">
+            <i style="height:${Math.max(4, (bucket.value / maximum) * 100).toFixed(1)}%"></i>
+          </span>
+        `).join('')}
       </div>
-      <span class="ios-pulse-delta">${changeText}</span>
-      ${lineChart(values, 'Twelve-week running mileage', '#08a99d')}
-      <div class="ios-training-pulse__axis">
-        <span>${escapeHTML(dateLabel(weeks[0]?.weekStart, { short: true, year: false }))}</span>
-        <span>12 weeks</span>
-        <span>${escapeHTML(dateLabel(weeks.at(-1)?.weekStart, { short: true, year: false }))}</span>
+      <div class="ios-fitness-timeline__axis">
+        <span>${escapeHTML(timeline.buckets[0].label)}</span>
+        <span>${escapeHTML(RANGE_LABELS[state.range])}</span>
+        <span>${escapeHTML(timeline.buckets.at(-1).label)}</span>
       </div>
-      <div class="ios-training-pulse__stats">
-        <span><small>12-week miles</small><strong>${number(twelveWeekMiles).toFixed(1)}</strong></span>
-        <span><small>4-week avg</small><strong>${number(latestAverage).toFixed(1)} /wk</strong></span>
-        <span><small>30-day runs</small><strong>${integer(month.runningActivities)}</strong></span>
-        <span><small>Avg pace</small><strong>${formatPace(month.averageRunningPaceSecondsPerMile)}</strong></span>
+      <div class="ios-fitness-highlights">
+        <span><small>Peak</small><strong>${number(peak.value).toFixed(1)} mi</strong></span>
+        <span><small>Average</small><strong>${number(average).toFixed(1)} mi</strong></span>
+        <span><small>Total</small><strong>${number(total).toFixed(1)} mi</strong></span>
       </div>
-    </section>
+    </div>
   `
 }
 
 function summaryCard() {
   const stats = rangeStats()
-  const activityCount = number(stats.activities)
-  const rangeDays = {
-    week: 7,
-    month: 30,
-    quarter: 90,
-    year: 365,
-  }[state.range]
-  const anchor = latestDay() || state.root?.snapshotDay
-  const firstDay = rangeDays && anchor ? shiftISODate(anchor, -(rangeDays - 1)) : null
-  const visibleWorkouts = state.workouts.filter((workout) => (
-    !firstDay || workout.day >= firstDay
-  ))
-  const calories = visibleWorkouts.reduce((sum, workout) => sum + number(workout.calories), 0)
+  const activityCount = number(stats.runningActivities, stats.activities)
   return `
-    <div class="ios-card ios-fitness-summary">
+    <div class="ios-card ios-fitness-summary" data-impressive-anchor aria-label="Running ${escapeHTML(RANGE_LABELS[state.range])} fitness summary">
       <div class="ios-fitness-summary__head">
         <strong>Fitness Summary</strong>
         <span>${integer(activityCount)} ${activityCount === 1 ? 'activity' : 'activities'}</span>
@@ -552,14 +592,23 @@ function summaryCard() {
           <div><strong>${formatDuration(number(stats.activeHours) * 3600)}</strong><small>Time</small></div>
         </div>
         <div class="ios-overview-stat ios-overview-stat--calories">
-          <span aria-hidden="true">◆</span>
-          <div><strong>${integer(calories)}</strong><small>Calories</small></div>
+          <span aria-hidden="true">↗</span>
+          <div><strong>${integer(activityCount)}</strong><small>${state.range === 'all' ? 'Activities' : 'Runs'}</small></div>
         </div>
         <div class="ios-overview-stat ios-overview-stat--elevation">
           <span aria-hidden="true">↗</span>
           <div><strong>${integer(stats.elevationGainFeet)} ft</strong><small>Elevation</small></div>
         </div>
       </div>
+      <div class="ios-fitness-filter">
+        <small>EXERCISE TYPE</small>
+        <span><i aria-hidden="true">↗</i> Run</span>
+      </div>
+      <div class="ios-fitness-controls" aria-hidden="true">
+        <span><i>⌁</i><small>DATA</small><strong>Distance</strong><em>⌃⌄</em></span>
+        <span><i>▥</i><small>CHART</small><strong>Bars</strong><em>⌃⌄</em></span>
+      </div>
+      ${fitnessTimeline()}
       ${activityCount ? '' : '<div class="ios-fitness-summary__empty"><span aria-hidden="true">▥</span>No activities in this range.</div>'}
     </div>
   `
@@ -596,8 +645,8 @@ function nutritionCard() {
 }
 
 function historicalCard() {
-  const allTime = state.root?.training?.allTime ?? {}
-  const months = state.root?.training?.monthlyMileage ?? []
+  const months = publicHistoryMonths()
+  const history = publicHistorySummary(months)
   return `
     <button class="ios-card" type="button" data-live-action="history">
       <div class="ios-card-head">
@@ -605,13 +654,13 @@ function historicalCard() {
           <span class="ios-card-icon ios-card-icon--run">↗</span>
           <span>
             <small class="ios-card-kicker">Historical record</small>
-            <span class="ios-card-title">${number(allTime.runningMiles).toFixed(1)} running miles</span>
+            <span class="ios-card-title">${number(history.runningMiles).toFixed(1)} running miles</span>
           </span>
         </span>
         <span class="ios-card-chevron" aria-hidden="true">›</span>
       </div>
-      ${historyBars(months, 12)}
-      <p class="ios-card-copy" style="margin-top:9px">${integer(allTime.runningActivities)} runs since ${escapeHTML(dateLabel(allTime.firstDay))}</p>
+      ${historyBars(months, months.length)}
+      <p class="ios-card-copy" style="margin-top:9px">${integer(history.activities)} projected activities since ${PUBLIC_HISTORY_START_LABEL}</p>
     </button>
   `
 }
@@ -713,33 +762,8 @@ function fitnessPlannerCard() {
 }
 
 function fitnessDashboard() {
-  const year = calendarYearSummary()
-  const recent = state.root?.training?.periods?.last7Days ?? {}
-  const yearMonths = (state.root?.training?.monthlyMileage ?? [])
-    .filter((month) => String(month.month || '').startsWith(`${year.year}-`))
   return `
     ${rangeButtons()}
-    ${pulseCard()}
-    <div class="ios-card ios-running-year">
-      <div class="ios-running-year__head">
-        <span><i aria-hidden="true">↗</i><strong>Running This Year</strong></span>
-        <small>Live through ${escapeHTML(dateLabel(year.throughDay, { short: true, year: false }))}</small>
-      </div>
-      <div class="ios-running-year__primary">
-        <strong>${number(year.averageMilesPerWeek).toFixed(1)}</strong>
-        <span>mi / week</span>
-      </div>
-      <div class="ios-running-year__chart-label">
-        <span>Monthly mileage</span>
-        <small>${escapeHTML(year.year)}</small>
-      </div>
-      ${historyBars(yearMonths, 12)}
-      <div class="ios-running-year__stats">
-        <span><small>Distance</small><strong>${number(year.runningMiles).toFixed(1)} mi</strong></span>
-        <span><small>Last 7 days</small><strong>${number(recent.runningMiles).toFixed(1)} mi</strong></span>
-        <span><small>Runs</small><strong>${integer(year.runningActivities)}</strong></span>
-      </div>
-    </div>
     ${summaryCard()}
     <div class="ios-section-label">
       <span>Recent Workouts</span>
@@ -913,14 +937,14 @@ function longitudinalWeeklyChart(weeks) {
     </svg>
     <div class="founder-longitudinal-chart__axis">
       <span>${escapeHTML(dateLabel(weeks[0]?.weekStart, { short: true, year: false }))}</span>
-      <span>52 weekly totals</span>
+      <span>${integer(weeks.length)} weekly totals</span>
       <span>${escapeHTML(dateLabel(weeks.at(-1)?.weekStart, { short: true, year: false }))}</span>
     </div>
   `
 }
 
 function longitudinalMonthBars(months) {
-  const visible = (months || []).slice(-84)
+  const visible = publicHistoryMonths(months)
   if (!visible.length) {
     return '<div class="founder-longitudinal__empty">Monthly history is still being assembled.</div>'
   }
@@ -976,13 +1000,17 @@ function longitudinalActivityRows(workouts) {
 function renderLongitudinalRecord() {
   if (!state.root || !elements.longitudinal) return
   const training = state.root.training ?? {}
-  const allTime = training.allTime ?? {}
   const month = training.periods?.last30Days ?? {}
-  const weeks = (training.weeklyMileage || []).slice(-52)
-  const months = training.monthlyMileage || []
+  const weeks = (training.weeklyMileage || [])
+    .filter((week) => String(week.weekStart || '') >= PUBLIC_HISTORY_START_DAY)
+    .slice(-52)
+  const months = publicHistoryMonths(training.monthlyMileage)
+  const history = publicHistorySummary(months)
   const year = calendarYearSummary()
   const trailingYearMiles = weeks.reduce((sum, week) => sum + number(week.runningMiles), 0)
-  const recentWorkouts = state.workouts.slice(0, 48)
+  const recentWorkouts = state.workouts
+    .filter((workout) => String(workout.day || '') >= PUBLIC_HISTORY_START_DAY)
+    .slice(0, 48)
 
   elements.longitudinal.innerHTML = `
     <header class="founder-longitudinal__head">
@@ -994,24 +1022,24 @@ function renderLongitudinalRecord() {
       <strong><i aria-hidden="true"></i> Live record</strong>
     </header>
     <div class="founder-longitudinal__metrics">
-      <span><small>Trailing 52 weeks</small><strong>${number(trailingYearMiles).toFixed(1)}</strong><em>running miles</em></span>
+      <span><small>Since Sep 2025</small><strong>${number(trailingYearMiles).toFixed(1)}</strong><em>running miles</em></span>
       <span><small>${escapeHTML(year.year)} average</small><strong>${number(year.averageMilesPerWeek).toFixed(1)}</strong><em>miles / week</em></span>
       <span><small>Last 30 days</small><strong>${number(month.runningMiles).toFixed(1)}</strong><em>${integer(month.runningActivities)} runs</em></span>
       <span><small>Calendar year</small><strong>${number(year.runningMiles).toFixed(1)}</strong><em>running miles</em></span>
-      <span><small>Complete record</small><strong>${number(allTime.runningMiles).toFixed(1)}</strong><em>${integer(allTime.runningActivities)} runs</em></span>
+      <span><small>Projected record</small><strong>${number(history.runningMiles).toFixed(1)}</strong><em>${integer(history.activities)} activities</em></span>
     </div>
     <div class="founder-longitudinal__charts">
       <article class="founder-longitudinal__chart-card founder-longitudinal__chart-card--primary">
         <div class="founder-longitudinal__chart-head">
-          <div><small>Weekly running volume</small><strong>One year of work</strong></div>
+          <div><small>Weekly running volume</small><strong>Since September 2025</strong></div>
           <span>${number(trailingYearMiles / Math.max(weeks.length, 1)).toFixed(1)} mi / week</span>
         </div>
         ${longitudinalWeeklyChart(weeks)}
       </article>
       <article class="founder-longitudinal__chart-card">
         <div class="founder-longitudinal__chart-head">
-          <div><small>Monthly running volume</small><strong>Complete projected history</strong></div>
-          <span>Since ${escapeHTML((allTime.firstDay || '—').slice(0, 4))}</span>
+          <div><small>Monthly running volume</small><strong>Since September 2025</strong></div>
+          <span>${integer(months.length)} months</span>
         </div>
         ${longitudinalMonthBars(months)}
       </article>
@@ -1043,7 +1071,7 @@ function intelligenceHome() {
       <time>${escapeHTML(RANGE_LABELS[state.range])}</time>
     </div>
     ${rangeButtons()}
-    ${pulseCard()}
+    ${summaryCard()}
     <div class="ios-card">
       <div class="ios-card-head">
         <span><span class="ios-card-icon ios-card-icon--run">⌁</span><span class="ios-card-title">Running Dynamics Intelligence</span></span>
@@ -1065,7 +1093,7 @@ function nutritionRows(items) {
   const ordered = [
     ...preferred.map((key) => items.find((item) => item.key === key)).filter(Boolean),
     ...items.filter((item) => !preferred.includes(item.key)),
-  ].slice(0, 6)
+  ]
   return ordered.map((item) => {
     const color = NUTRIENT_COLORS[item.status] || NUTRIENT_COLORS.limited
     const status = item.status === 'strong'
@@ -1277,8 +1305,10 @@ function friendsHome() {
 
 function historyHome() {
   const training = state.root?.training ?? {}
-  const allTime = training.allTime ?? {}
-  const history = state.historyWorkouts ?? state.workouts
+  const months = publicHistoryMonths(training.monthlyMileage)
+  const summary = publicHistorySummary(months)
+  const history = (state.historyWorkouts ?? state.workouts)
+    .filter((workout) => String(workout.day || '') >= PUBLIC_HISTORY_START_DAY)
   const listStatus = state.historyLoading
     ? '<div class="ios-empty">Loading recent day-level activity…</div>'
     : state.historyError
@@ -1287,22 +1317,22 @@ function historyHome() {
   return `
     <div class="ios-screen-heading">
       <div><small>Longitudinal record</small><h3>Fitness Record</h3></div>
-      <time>${escapeHTML((allTime.firstDay || '').slice(0, 4))}—now</time>
+      <time>Sep 2025—now</time>
     </div>
     <div class="ios-card ios-card--tinted">
-      <div class="ios-pulse-value"><strong>${number(allTime.runningMiles).toFixed(1)}</strong><span>running miles</span></div>
+      <div class="ios-pulse-value"><strong>${number(summary.runningMiles).toFixed(1)}</strong><span>running miles</span></div>
       <div class="ios-stat-grid">
-        <div><small>Runs</small><strong>${integer(allTime.runningActivities)}</strong></div>
-        <div><small>Hours</small><strong>${number(allTime.activeHours).toFixed(0)}</strong></div>
-        <div><small>Active days</small><strong>${integer(allTime.activeDays)}</strong></div>
+        <div><small>Activities</small><strong>${integer(summary.activities)}</strong></div>
+        <div><small>Hours</small><strong>${number(summary.activeHours).toFixed(0)}</strong></div>
+        <div><small>Months</small><strong>${integer(summary.months)}</strong></div>
       </div>
     </div>
     <div class="ios-card">
       <div class="ios-card-head">
         <span><span class="ios-card-icon ios-card-icon--run">↗</span><span class="ios-card-title">Monthly Running Mileage</span></span>
       </div>
-      ${historyBars(training.monthlyMileage, 30)}
-      <p class="ios-card-copy" style="margin-top:9px">The chart covers every projected month. Detailed activity stays limited to the recent record until it is requested.</p>
+      ${historyBars(months, months.length)}
+      <p class="ios-card-copy" style="margin-top:9px">The public record begins in September 2025. Detailed activity stays limited to recent projected workouts until it is requested.</p>
     </div>
     <div class="ios-section-label"><span>Recent Activity</span></div>
     ${listStatus}
@@ -1454,36 +1484,13 @@ function renderScreen() {
   toolbar?.classList.remove('is-detail')
   elements.title.textContent = 'Activity'
   elements.screen.innerHTML = activityHome()
-  positionActivityAtLongitudinalPulse()
+  positionActivityAtYearSummary()
 }
 
 function renderNutritionScreen() {
   if (!state.root) return
   const toolbar = elements.nutritionBack.closest('.ios-app-toolbar')
-  const tabBar = elements.nutritionScreen
-    .closest('.ios-device__screen')
-    ?.querySelector('.ios-tab-bar')
-  const recordTab = tabBar?.querySelector('[data-live-nutrition-surface="record"]')
-  const insightsTab = tabBar?.querySelector('[data-live-nutrition-surface="insights"]')
-  const updateTab = (tab, active) => {
-    if (!tab) return
-    tab.classList.toggle('is-active', active)
-    if (active) tab.setAttribute('aria-current', 'page')
-    else tab.removeAttribute('aria-current')
-  }
-  updateTab(recordTab, state.nutritionSurface === 'record')
-  updateTab(insightsTab, state.nutritionSurface === 'insights')
-
-  if (state.nutritionSurface === 'record') {
-    elements.nutritionTitle.textContent = 'Ryan Sullivan'
-    elements.nutritionTitle.hidden = false
-    elements.nutritionBack.hidden = true
-    toolbar?.classList.remove('is-detail')
-    toolbar?.classList.add('is-profile')
-    elements.nutritionScreen.innerHTML = recordHome()
-    return
-  }
-
+  state.nutritionSurface = 'insights'
   toolbar?.classList.remove('is-profile')
   if (state.nutritionView === 'nutrient') {
     const nutrient = nutritionSnapshot()?.micronutrients
@@ -1543,7 +1550,7 @@ function render() {
   renderLongitudinalRecord()
 }
 
-function positionActivityAtLongitudinalPulse() {
+function positionActivityAtYearSummary() {
   if (
     state.activityPositionLocked ||
     state.view !== 'home' ||
@@ -1655,7 +1662,7 @@ function handleNutritionClick(event) {
   }
   const rangeButton = event.target.closest('[data-live-nutrition-range]')
   if (rangeButton && !rangeButton.disabled) {
-    state.nutritionRangeDays = number(rangeButton.dataset.liveNutritionRange, 7)
+    state.nutritionRangeDays = number(rangeButton.dataset.liveNutritionRange, 30)
     renderNutritionScreen()
     return
   }
@@ -1714,10 +1721,6 @@ export function initFounderLive() {
     }, { passive: true })
   })
   elements.nutritionScreen.addEventListener('click', handleNutritionClick)
-  elements.nutritionScreen
-    .closest('.ios-device__screen')
-    ?.querySelector('.ios-tab-bar')
-    ?.addEventListener('click', handleNutritionClick)
   stage.addEventListener('click', (event) => {
     const longitudinalWorkout = event.target.closest(
       '#founder-longitudinal-record [data-live-workout]'
