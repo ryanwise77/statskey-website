@@ -1,20 +1,32 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.5",
+  "latest": "0.21.6",
   "releases": [
+    {
+      "version": "0.21.6",
+      "date": "2026-08-16",
+      "platforms": ["macOS"],
+      "title": "Public boundary correction",
+      "summary": "A focused Mac correction removes a residual private-machine command path from the public package and strengthens the checks that guard future releases.",
+      "highlights": [
+        "The public Mac package no longer contains the dormant Remote Access execution path that remained in 0.21.5.",
+        "Compiled assets are now checked for Remote Access, MacRemote, Oil Data, remote-command, and private-machine markers before publishing.",
+        "The clearer mode chooser and reviewable customization workflow from 0.21.5 are unchanged."
+      ]
+    },
     {
       "version": "0.21.5",
       "date": "2026-08-16",
       "platforms": ["macOS"],
-      "title": "A clearer workspace with a hard public boundary",
-      "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages exclude internal infrastructure controls.",
+      "title": "A clearer, more approachable workspace",
+      "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages remove Founder-only interfaces.",
       "highlights": [
         "The mode chooser stays inside the window, scrolls on compact screens, and has a clear Close control.",
         "Automatic is clearly recommended, while Ask, Plan, Fix, and Execute explain their outcomes in plain language.",
         "Model, context, and action controls remain under Advanced settings, while change permission appears only for an explicit Fix or Execute choice.",
         "Settings can open a reviewable StatsKey source workspace so you can describe the changes you want to Intelligence.",
-        "Public packages exclude the internal console, privileged bridge, infrastructure runtime, and private-machine setup, and legacy switches cannot restore them.",
-        "Release verification now fails closed if an internal route, command, or artifact is bundled."
+        "Public packages remove the internal Founder console, privileged Founder bridge, Founder runtime, and legacy Founder switches.",
+        "Release verification rejects known Founder routes, commands, and artifacts before publishing."
       ]
     },
     {

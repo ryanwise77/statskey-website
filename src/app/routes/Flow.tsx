@@ -73,11 +73,6 @@ import {
   type DesktopProviderStatus,
   type DesktopWorkspaceInstructions,
 } from '../lib/desktop'
-import {
-  completeRemoteCommand,
-  remoteAgentPrompt,
-  takeRemoteAgentCommand,
-} from '../lib/remoteAccess'
 import { desktopAgentExecutionContext } from '../lib/desktopExecutionContext'
 import {
   announceWorkspaceMutation,
@@ -671,7 +666,6 @@ export function Flow({
   const activeCancel = useRef<(() => void) | null>(null)
   const sessionHookStarted = useRef(false)
   const sendInFlight = useRef(false)
-  const remoteCommandStarted = useRef<string | null>(null)
   const localStateSaveTimer = useRef<number | null>(null)
   const runHeartbeatAt = useRef(0)
   const steeringQueueRef = useRef<AgentRunSteeringMessage[]>([])
@@ -759,69 +753,6 @@ export function Flow({
       window.removeEventListener(AGENT_PREFILL_EVENT, onPrefill)
     }
   }, [])
-
-  useEffect(() => {
-    if (!composerStateReady || !workContext) return
-    const pending = takeRemoteAgentCommand(sessionId)
-    if (!pending || remoteCommandStarted.current === pending.commandId) return
-    remoteCommandStarted.current = pending.commandId
-
-    void (async () => {
-      const messageCountBeforeRun = messagesRef.current.length
-      try {
-        await send(
-          remoteAgentPrompt(pending.target, pending.prompt),
-          undefined,
-          'ask'
-        )
-        const response = messagesRef.current
-          .slice(messageCountBeforeRun)
-          .reverse()
-          .find(
-            (message) =>
-              message.role === 'model' &&
-              typeof message.content === 'string' &&
-              message.content.trim().length > 0
-          )
-        if (!response) {
-          throw new Error(
-            'The Desktop agent did not return a result for this remote request.'
-          )
-        }
-        await completeRemoteCommand({
-          commandId: pending.commandId,
-          executorId: pending.executorId,
-          claimToken: pending.claimToken,
-          status: 'succeeded',
-          summary: response.content.trim().slice(0, 8_000),
-          sessionId: pending.sessionId,
-        })
-        getDesktopBridge()?.notify({
-          title: 'Remote request complete',
-          body:
-            pending.target === 'mac-mini'
-              ? 'The Mac mini request finished.'
-              : 'The data center request finished.',
-        })
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'The remote request could not be completed.'
-        await completeRemoteCommand({
-          commandId: pending.commandId,
-          executorId: pending.executorId,
-          claimToken: pending.claimToken,
-          status: 'failed',
-          summary: message.slice(0, 8_000),
-          errorCode: 'agent_execution_failed',
-        }).catch(() => {})
-      }
-    })()
-    // `send` intentionally remains bound to this restored session. The staged
-    // command is removed before execution, and the command id guards rerenders.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [composerStateReady, sessionId, workContext])
 
   useEffect(() => {
     const refresh = () => setBackgroundRuns(getActiveAgentRuns())

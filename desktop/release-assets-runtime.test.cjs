@@ -68,7 +68,10 @@ test('download manifest application stays safe when platform versions split', ()
     path.join(projectRoot, 'public', 'downloads', 'statskey', 'index.html'),
     'utf8'
   )
-  assert.match(html, /const macVersion = "0\.21\.5";/)
+  assert.match(
+    html,
+    new RegExp(`const macVersion = "${packageJson.version.replaceAll('.', '\\.')}";`)
+  )
   const history = JSON.parse(
     readFileSync(
       path.join(projectRoot, 'public', 'downloads', 'statskey', 'updates.json'),

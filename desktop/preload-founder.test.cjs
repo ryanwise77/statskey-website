@@ -3,6 +3,7 @@ const {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  rmSync,
   writeFileSync,
 } = require('node:fs')
 const { tmpdir } = require('node:os')
@@ -96,6 +97,26 @@ test('public release boundary rejects internal content and route chunks', () => 
   writeFileSync(archivePath, 'ordinary desktop application')
   writeFileSync(
     path.join(webRoot, 'assets', 'FounderConsole-old.js'),
+    'unused'
+  )
+  assert.throws(
+    () => assertPublicDesktopBundle({ appArchivePath: archivePath, webRoot }),
+    /internal-only path/
+  )
+
+  rmSync(path.join(webRoot, 'assets', 'FounderConsole-old.js'))
+  writeFileSync(
+    path.join(webRoot, 'assets', 'Flow.js'),
+    'function remoteAgentPrompt() { return "Use the configured MacRemote project" }'
+  )
+  assert.throws(
+    () => assertPublicDesktopBundle({ appArchivePath: archivePath, webRoot }),
+    /internal-only content/
+  )
+
+  rmSync(path.join(webRoot, 'assets', 'Flow.js'))
+  writeFileSync(
+    path.join(webRoot, 'assets', 'RemoteAccess-old.js'),
     'unused'
   )
   assert.throws(
