@@ -11,11 +11,9 @@
       "highlights": [
         "The mode chooser stays inside the window, scrolls on compact screens, and has a clear Close control.",
         "Automatic is clearly recommended, while Ask, Plan, Fix, and Execute explain their outcomes in plain language.",
-        "Model, context, and action controls remain available under Advanced settings without crowding the main choice.",
-        "Change permission appears only when Fix or Execute is explicitly selected, with clearer approval language.",
+        "Model, context, and action controls remain under Advanced settings, while change permission appears only for an explicit Fix or Execute choice.",
         "Settings can open a reviewable StatsKey source workspace so you can describe the changes you want to Intelligence.",
-        "Public packages no longer contain the internal console, privileged bridge, infrastructure runtime, or private-machine setup.",
-        "Legacy command-line switches cannot restore removed internal operations.",
+        "Public packages exclude the internal console, privileged bridge, infrastructure runtime, and private-machine setup, and legacy switches cannot restore them.",
         "Release verification now fails closed if an internal route, command, or artifact is bundled."
       ]
     },
