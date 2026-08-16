@@ -13,6 +13,7 @@ import {
   type RoutePoint,
   type SavedRoute,
 } from '../lib/types'
+import { confirmDialog } from '../lib/ui/dialogs'
 
 const TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
 const TILE_ATTR =
@@ -387,7 +388,12 @@ function RouteCard({ route, canDelete, uid }: { route: SavedRoute; canDelete?: b
 
   async function remove() {
     if (!uid) return
-    if (!window.confirm(`Delete route "${route.name}"?`)) return
+    const confirmed = await confirmDialog({
+      title: `Delete route "${route.name}"?`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     await deleteRoute(uid, route.id).catch(() => {})
   }
 

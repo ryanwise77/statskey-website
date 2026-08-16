@@ -1,0 +1,84 @@
+.workspace-tabs {
+  position: relative;
+}
+
+.workspace-tabs__loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  overflow: hidden;
+  background: var(--sk-line, rgba(11, 31, 58, 0.12));
+  pointer-events: none;
+}
+
+.workspace-tabs__loading span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32%;
+  border-radius: 2px;
+  background: var(--sk-accent, #0066cc);
+  animation: workspace-tabs-loading 1.1s ease-in-out infinite;
+}
+
+@keyframes workspace-tabs-loading {
+  0% {
+    left: -32%;
+  }
+  60% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.workspace-tab-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+}
+
+.workspace-tab-menu {
+  position: fixed;
+  min-width: 208px;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  background: var(--sk-surface, #ffffff);
+  color: var(--sk-ink, #0b1f3a);
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: var(--radius-md, 12px);
+  box-shadow:
+    0 16px 40px rgba(11, 31, 58, 0.2),
+    0 3px 8px rgba(11, 31, 58, 0.1);
+}
+
+.workspace-tab-menu button {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.workspace-tab-menu button:hover:not(:disabled),
+.workspace-tab-menu button:focus-visible {
+  background: rgba(0, 102, 204, 0.1);
+  background: color-mix(in srgb, var(--sk-accent, #0066cc) 10%, transparent);
+  outline: none;
+}
+
+.workspace-tab-menu button:disabled {
+  color: var(--sk-ink-soft, #526d88);
+  opacity: 0.55;
+  cursor: default;
+}

@@ -1,0 +1,17 @@
+# Local/generated desktop artifacts are not website routes. Electron rebuilds
+# them from source and they exceed Vercel's 100 MB per-file upload limit.
+desktop/
+desktop-code/
+workbench-backend/
+node_modules/
+**/node_modules/
+
+# Local build and editor state; Vercel runs the root production build itself.
+dist/
+dist-failed-*/
+.vercel/
+.git/
+*.log
+**/*.log
+.DS_Store
+**/.DS_Store

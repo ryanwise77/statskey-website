@@ -1,0 +1,90 @@
+.workspace-inline-edit__diff {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.workspace-inline-edit__diff > header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.workspace-inline-edit__diff > header b {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.workspace-inline-edit__diff > header span {
+  font-size: 11px;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.workspace-inline-edit__diff > pre {
+  max-height: min(360px, 46vh);
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: var(--radius-sm, 8px);
+  padding: 6px 0;
+  background: #ffffff;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.workspace-inline-edit__diff-line {
+  display: block;
+  min-width: max-content;
+  padding: 0 10px 0 0;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.workspace-inline-edit__diff-line > i {
+  display: inline-block;
+  width: 22px;
+  font-style: normal;
+  text-align: center;
+  color: var(--sk-ink-soft, #526d88);
+  user-select: none;
+}
+
+.workspace-inline-edit__diff-line--add {
+  background: rgba(17, 143, 104, 0.1);
+  color: #1d5c49;
+}
+
+.workspace-inline-edit__diff-line--add > i {
+  color: #118f68;
+}
+
+.workspace-inline-edit__diff-line--remove {
+  background: rgba(191, 66, 50, 0.09);
+  color: #74403a;
+  text-decoration: line-through;
+  text-decoration-color: rgba(191, 66, 50, 0.4);
+}
+
+.workspace-inline-edit__diff-line--remove > i {
+  color: #bf4232;
+}
+
+.workspace-inline-edit__error-action {
+  margin-left: 8px;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: var(--radius-sm, 8px);
+  padding: 2px 8px;
+  background: #ffffff;
+  color: var(--sk-accent, #0066cc);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.workspace-inline-edit__error-action:hover {
+  border-color: var(--sk-accent, #0066cc);
+}

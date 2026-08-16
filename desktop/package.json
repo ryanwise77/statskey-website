@@ -1,0 +1,148 @@
+{
+  "name": "statskey-desktop",
+  "version": "0.21.2",
+  "private": true,
+  "author": "StatsKey",
+  "license": "UNLICENSED",
+  "description": "StatsKey desktop application for macOS and Windows",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "node prepare-node-pty.cjs",
+    "build:web": "npm --prefix .. run build:desktop",
+    "pack": "npm run build:web && electron-builder --dir",
+    "dist": "npm run build:web && electron-builder",
+    "test:updates": "node --test update-runtime.test.cjs",
+    "test:desktop": "node --test update-runtime.test.cjs release-notes-runtime.test.cjs publish-recovery-runtime.test.cjs release-integrity-runtime.test.cjs windows-release-runtime.test.cjs release-assets-runtime.test.cjs provider-runtime.test.cjs provider-run-guard.test.cjs provider-vault-runtime.test.cjs provider-vault-crypto.test.cjs integration-vault-runtime.test.cjs mcp-oauth-runtime.test.cjs safe-storage-runtime.test.cjs workspace-binding-runtime.test.cjs workspace-cache-key-runtime.test.cjs workspace-checkpoint-runtime.test.cjs workspace-index-worker.test.cjs workspace-file-search-worker.test.cjs workspace-search-runtime.test.cjs window-reveal-runtime.test.cjs control-runtime.test.cjs terminal-runtime.test.cjs child-process-runtime.test.cjs founder-runtime.test.cjs device-control-runtime.test.cjs preload-device-control.test.cjs preload-founder.test.cjs git-runtime.test.cjs approval-policy.test.cjs preferences-runtime.test.cjs self-edit-runtime.test.cjs calendar-feed-runtime.test.cjs workspace-runtime.test.cjs",
+    "publish:update": "node publish-update.cjs --confirm-publish",
+    "publish:update:mac": "APPLE_KEYCHAIN_PROFILE=StatsKeyNotary node publish-update.cjs --confirm-publish --mac-only",
+    "release:finalize:windows": "node publish-update.cjs --prepare-only --windows-only --finalize-native",
+    "publish:update:windows": "node publish-update.cjs --confirm-publish --windows-only --reuse-build",
+    "release:finalize:windows:preview": "node publish-update.cjs --prepare-only --windows-only --preview --finalize-native",
+    "publish:update:windows:preview": "node publish-update.cjs --confirm-publish --windows-only --preview --reuse-build",
+    "publish:update:preview": "node publish-update.cjs --confirm-publish --preview",
+    "release:mac": "npm run build:web && node release-mac.cjs --arm64 --x64",
+    "release:mac:arm64": "npm run build:web && node release-mac.cjs --arm64",
+    "release:mac:x64": "npm run build:web && node release-mac.cjs --x64"
+  },
+  "build": {
+    "appId": "ai.statskey.desktop",
+    "productName": "StatsKey",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/node-pty/**/*"
+    ],
+    "afterPack": "after-pack.cjs",
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "update-runtime.cjs",
+      "workspace-index-worker.cjs",
+      "workspace-file-search-worker.cjs",
+      "workspace-search-runtime.cjs",
+      "workspace-cache-key-runtime.cjs",
+      "window-reveal-runtime.cjs",
+      "provider-runtime.cjs",
+      "provider-run-guard.cjs",
+      "provider-vault-runtime.cjs",
+      "provider-vault-crypto.cjs",
+      "integration-vault-runtime.cjs",
+      "safe-storage-runtime.cjs",
+      "workspace-binding-runtime.cjs",
+      "workspace-checkpoint-runtime.cjs",
+      "mcp-runtime.cjs",
+      "mcp-oauth-runtime.cjs",
+      "controlled-browser.cjs",
+      "controlled-applications.cjs",
+      "terminal-runtime.cjs",
+      "child-process-runtime.cjs",
+      "device-control-runtime.cjs",
+      "founder-runtime.cjs",
+      "git-runtime.cjs",
+      "approval-policy.cjs",
+      "preferences-runtime.cjs",
+      "self-edit-runtime.cjs",
+      "calendar-feed-runtime.cjs",
+      "workspace-runtime.cjs",
+      "prepare-node-pty.cjs",
+      "offline.html",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist",
+        "to": "web",
+        "filter": [
+          "desktop-app.html",
+          "favicon.svg",
+          "assets/**/*"
+        ]
+      }
+    ],
+    "protocols": [
+      {
+        "name": "StatsKey Desktop",
+        "schemes": [
+          "statskey-desktop"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://storage.googleapis.com/statskey-workbench-downloads/updates"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "notarize": true,
+      "extendInfo": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false,
+          "NSAllowsLocalNetworking": true
+        }
+      },
+      "icon": "assets/AppIcon-1024.png",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "assets/AppIcon-1024.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}"
+  },
+  "devDependencies": {
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "@aws-sdk/client-bedrock": "^3.1104.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.1104.0",
+    "@google/genai": "^2.15.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "electron-updater": "^6.8.9",
+    "jsonc-parser": "^3.3.1",
+    "minimatch": "^10.2.6",
+    "node-pty": "1.2.0-beta.15",
+    "openai": "^7.4.0"
+  },
+  "allowScripts": {
+    "node-pty@1.2.0-beta.15": true
+  }
+}

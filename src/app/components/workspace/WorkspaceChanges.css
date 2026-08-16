@@ -1,0 +1,127 @@
+.workspace-changes__files > div {
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.workspace-changes__files > div:focus-visible {
+  outline: 2px solid rgba(0, 102, 204, 0.45);
+  outline-offset: 1px;
+}
+
+.workspace-changes__files > .workspace-changes__row--selected {
+  border-color: rgba(0, 102, 204, 0.42);
+  background: rgba(0, 102, 204, 0.06);
+}
+
+.workspace-changes__files .workspace-changes__open-file {
+  display: inline;
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.workspace-changes__files .workspace-changes__open-file:hover,
+.workspace-changes__files .workspace-changes__open-file:focus-visible {
+  color: var(--sk-accent, #0066cc);
+  text-decoration: underline;
+}
+
+.workspace-changes__body > aside .workspace-changes__all-changes {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: #fff;
+  color: var(--sk-ink-soft, #526d88);
+  cursor: pointer;
+  font-size: 11px;
+  text-align: left;
+}
+
+.workspace-changes__body > aside .workspace-changes__all-changes--selected {
+  border-color: rgba(0, 102, 204, 0.42);
+  background: rgba(0, 102, 204, 0.06);
+  color: var(--sk-accent, #0066cc);
+}
+
+.workspace-changes__diff-pane {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: auto;
+  background: #fff;
+}
+
+.workspace-changes__diff-pane > header {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  padding: 5px 11px;
+  background: rgba(247, 249, 252, 0.96);
+}
+
+.workspace-changes__diff-pane > header > span {
+  overflow: hidden;
+  color: var(--sk-ink-soft, #526d88);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-changes__diff-pane > header > button {
+  flex: 0 0 auto;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: 6px;
+  padding: 2px 7px;
+  background: #fff;
+  color: var(--sk-ink-soft, #526d88);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.workspace-changes__diff-pane > header > button:hover {
+  border-color: rgba(0, 102, 204, 0.35);
+  color: var(--sk-accent, #0066cc);
+}
+
+.workspace-changes__diff-pane > details {
+  margin: 0 11px 14px;
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 11px;
+}
+
+.workspace-changes__diff-pane > details > summary {
+  cursor: pointer;
+}
+
+.workspace-changes__diff-pane > details > pre {
+  margin: 6px 0 0;
+  overflow: auto;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 10px;
+  background: rgba(247, 249, 252, 0.8);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: pre;
+}

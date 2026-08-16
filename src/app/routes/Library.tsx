@@ -17,6 +17,7 @@ import { mealDisplayName, mealTotal } from '../lib/aggregates'
 import { EmptyState } from '../components/EmptyState'
 import { TrustBadge } from '../components/TrustBadge'
 import { NUTRIENT_KEYS, type FoodItem, type Meal } from '../lib/types'
+import { confirmDialog } from '../lib/ui/dialogs'
 
 type Tab = 'foods' | 'meals' | 'daily'
 type FoodFilter = 'all' | 'saved' | 'favorites'
@@ -132,7 +133,12 @@ function FoodsTab({ uid }: { uid?: string }) {
 
   async function removeSaved(item: FoodItem) {
     if (!uid) return
-    if (!window.confirm(`Remove "${item.name}" from your library? Recorded meals keep their copies.`)) return
+    const confirmed = await confirmDialog({
+      title: `Remove "${item.name}" from your library? Recorded meals keep their copies.`,
+      confirmLabel: 'Remove',
+      destructive: true,
+    })
+    if (!confirmed) return
     setActionError(null)
     try {
       await deleteLibraryFood(uid, item.id)
@@ -458,7 +464,12 @@ function DailyItemsTab({ uid }: { uid?: string }) {
 
   async function remove(item: { id: string; name: string }) {
     if (!uid) return
-    if (!window.confirm(`Stop recording "${item.name}" daily?`)) return
+    const confirmed = await confirmDialog({
+      title: `Stop recording "${item.name}" daily?`,
+      confirmLabel: 'Stop',
+      destructive: true,
+    })
+    if (!confirmed) return
     setActionError(null)
     try {
       await deleteDailyItem(uid, item.id)

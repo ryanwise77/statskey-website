@@ -6,7 +6,9 @@ import { createReportJob, deleteReport } from '../lib/writers'
 import { buildReportPrompts } from '../lib/ai/reportContext'
 import { addDays } from '../lib/firestore'
 import { EmptyState } from '../components/EmptyState'
+import { IntelligenceConsentGate } from '../components/assistant/IntelligenceConsentGate'
 import { REPORT_TOPICS, type ReportTopic, type SavedReport } from '../lib/types'
+import { confirmDialog } from '../lib/ui/dialogs'
 
 type RangeDays = 7 | 30 | 90 | 365
 
@@ -81,8 +83,9 @@ export function Reports() {
         </p>
       </header>
 
-      <section className="panel space-y-4">
-        <span className="card-title">New report</span>
+      <IntelligenceConsentGate requireAssistantActions={false}>
+        <section className="panel space-y-4">
+          <span className="card-title">New report</span>
 
         <div>
           <span className="text-text-muted text-[11px] uppercase tracking-wider block mb-1.5">Topic</span>
@@ -165,10 +168,11 @@ export function Reports() {
             <span className="text-[12px] text-red-300">Report failed: {jobState.error ?? 'unknown error'}</span>
           )}
         </div>
-        <p className="text-text-muted text-[12px]">
-          Reports keep running after you leave this page and appear below when finished.
-        </p>
-      </section>
+          <p className="text-text-muted text-[12px]">
+            Reports keep running after you leave this page and appear below when finished.
+          </p>
+        </section>
+      </IntelligenceConsentGate>
 
       <section className="space-y-3">
         <h2 className="card-title">Saved reports</h2>
@@ -195,7 +199,12 @@ export function Reports() {
 function ReportRow({ report, uid }: { report: SavedReport; uid?: string }) {
   async function remove() {
     if (!uid) return
-    if (!window.confirm(`Delete "${report.title}"?`)) return
+    const confirmed = await confirmDialog({
+      title: `Delete "${report.title}"?`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     await deleteReport(uid, report.id).catch(() => {})
   }
 
@@ -234,7 +243,12 @@ export function ReportDetail() {
 
   async function remove() {
     if (!user || !report) return
-    if (!window.confirm(`Delete "${report.title}"?`)) return
+    const confirmed = await confirmDialog({
+      title: `Delete "${report.title}"?`,
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     await deleteReport(user.uid, report.id).catch(() => {})
     navigate('/reports', { replace: true })
   }

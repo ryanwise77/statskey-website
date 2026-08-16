@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "latest": "0.21.2",
+  "releases": [
+    {
+      "version": "0.21.2",
+      "date": "2026-08-15",
+      "platforms": ["macOS"],
+      "title": "Work that stays with its workspace",
+      "summary": "StatsKey now keeps active tasks bound to the workspace where they started, while bringing billing, provider access, and third-party tools into one clearer setup.",
+      "highlights": [
+        "Active tasks continue against their original workspace when you switch tabs, folders, or projects.",
+        "Execute mode can run independent work concurrently while serializing only conflicting edits.",
+        "Connections & billing centralizes Stripe, Google, GitHub, model providers, and OAuth or MCP tools.",
+        "Model selection explains pricing, adds ChatGPT Fast and Kimi, and accepts any model returned by a connected provider."
+      ]
+    },
+    {
+      "version": "0.19.1",
+      "date": "2026-08-13",
+      "platforms": ["Windows"],
+      "windowsSigning": "unsigned-preview",
+      "title": "Windows, tested where it runs",
+      "summary": "The Windows preview now passes a native install, launch, restart, workspace, terminal, browser, and update-readiness gate before it can be published.",
+      "highlights": [
+        "Workspace changes remain available after restarting the Windows app.",
+        "Commands, installed apps, and Android tools follow the Windows environment automatically.",
+        "The release process binds the public installer to native Windows test evidence.",
+        "Completion stays tied to saved results and successful verification."
+      ]
+    },
+    {
+      "version": "0.19.0",
+      "date": "2026-08-13",
+      "platforms": ["macOS"],
+      "title": "Proof you can inspect",
+      "summary": "StatsKey can now exercise mobile work directly and only calls implementation complete when the saved result and its verification agree.",
+      "highlights": [
+        "Simulator Lab can discover, start, inspect, and interact with iOS Simulators and Android emulators.",
+        "Completed workspace changes include persisted-change and verification evidence you can review.",
+        "Files, search, browser tabs, and workspace navigation are easier to find and use.",
+        "Long-running work settles reliably in the background and keeps its final verification visible."
+      ]
+    },
+    {
+      "version": "0.18.34",
+      "date": "2026-08-07",
+      "platforms": ["macOS", "Windows"],
+      "title": "Desktop preview",
+      "summary": "The first public StatsKey workspace preview.",
+      "highlights": [
+        "Project workspaces, local tools, model choices, and update delivery.",
+        "A conversational work log with review preferences and resumable sessions."
+      ]
+    }
+  ]
+}

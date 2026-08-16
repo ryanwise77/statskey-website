@@ -1,0 +1,259 @@
+/* Multi-file tabs, review sidebar, and loading affordances for the GitHub
+   cloud workspace. The base layout for .github-workspace lives in app.css. */
+
+.github-editor-tabs {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  gap: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  padding: 6px 8px 0;
+  background: #f3f7fb;
+  scrollbar-width: thin;
+}
+
+.github-editor-tab {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  max-width: 200px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: var(--radius-sm, 8px) var(--radius-sm, 8px) 0 0;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.github-editor-tab.active {
+  border-color: var(--sk-line, rgba(11, 31, 58, 0.12));
+  background: #fff;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.github-editor-tab > button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.github-editor-tab > button:first-child {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  padding: 6px 2px 6px 9px;
+  font-size: 11px;
+}
+
+.github-editor-tab > button:first-child > b {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.github-editor-tab__dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 120ms ease;
+}
+
+.github-editor-tab.dirty .github-editor-tab__dot {
+  background: var(--sk-accent, #0066cc);
+}
+
+.github-editor-tab.conflicted .github-editor-tab__dot {
+  background: #b3541e;
+}
+
+.github-editor-tab__close {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  margin: 0 4px 0 2px;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.55;
+}
+
+.github-editor-tab__close:hover {
+  background: rgba(11, 31, 58, 0.07);
+  opacity: 1;
+}
+
+.github-editor-tab--opening {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.github-explorer-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  margin: 0 10px 6px;
+}
+
+.github-explorer-actions button {
+  min-height: 27px;
+  flex: 1;
+  border: 1px dashed rgba(0, 102, 204, 0.35);
+  border-radius: var(--radius-sm, 8px);
+  background: rgba(0, 102, 204, 0.04);
+  color: var(--sk-accent, #0066cc);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.github-explorer-actions button:hover:not(:disabled) {
+  background: rgba(0, 102, 204, 0.09);
+}
+
+.github-explorer-actions button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.github-review-body {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+
+.github-review-files {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  border-right: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  padding: 8px;
+  background: #f8fbfe;
+}
+
+.github-review-files button {
+  display: grid;
+  gap: 1px;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  padding: 6px 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.github-review-files button:hover {
+  background: rgba(0, 102, 204, 0.05);
+}
+
+.github-review-files button.active {
+  background: rgba(0, 102, 204, 0.09);
+}
+
+.github-review-files button b {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--sk-ink, #0b1f3a);
+  font-size: 11px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.github-review-files button span {
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 11px;
+}
+
+.github-review-files button span.conflict {
+  color: #b3541e;
+  font-weight: 650;
+}
+
+.github-review-pane {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.github-review-pane .github-commit-review__diff {
+  min-height: 0;
+  flex: 1;
+}
+
+.github-review-conflict {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  gap: 10px;
+  border-bottom: 1px solid rgba(179, 84, 30, 0.25);
+  padding: 7px 10px;
+  background: rgba(179, 84, 30, 0.08);
+  color: #8a4218;
+  font-size: 11px;
+}
+
+.github-review-conflict button {
+  flex: 0 0 auto;
+  border: 1px solid rgba(179, 84, 30, 0.4);
+  border-radius: var(--radius-sm, 8px);
+  padding: 4px 8px;
+  background: #fff;
+  color: #8a4218;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.github-review-limit {
+  display: block;
+  color: #9f1c14;
+  font-size: 11px;
+}
+
+.github-workspace__empty > span.github-opening-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(0, 102, 204, 0.16);
+  border-radius: 50%;
+  border-top-color: var(--sk-accent, #0066cc);
+  background: transparent;
+  animation: github-opening-spin 0.8s linear infinite;
+}
+
+@keyframes github-opening-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.github-workspace__explorer nav button.github-tree-loading > b {
+  opacity: 0.55;
+}
+
+.github-workspace__explorer nav button.github-tree-loading > span {
+  animation: github-tree-pulse 1s ease-in-out infinite;
+}
+
+@keyframes github-tree-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}

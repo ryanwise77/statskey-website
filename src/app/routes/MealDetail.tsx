@@ -8,6 +8,7 @@ import { deleteMeal, setMealFavorite } from '../lib/writers'
 import { NUTRIENT_KEYS, type FoodItem } from '../lib/types'
 import { TrustBadge } from '../components/TrustBadge'
 import { NutritionFactsPanel } from '../components/NutritionFacts'
+import { confirmDialog } from '../lib/ui/dialogs'
 
 export function MealDetail() {
   const { user } = useAuth()
@@ -44,8 +45,12 @@ export function MealDetail() {
 
   async function handleDelete() {
     if (!user || deleting || !meal) return
-    if (!window.confirm('Delete this meal? This cannot be undone.')) return
-
+    const confirmed = await confirmDialog({
+      title: 'Delete this meal? This cannot be undone.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     setDeleting(true)
     setActionError(null)
     try {

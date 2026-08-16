@@ -10,10 +10,15 @@ import { addDays, localDateString } from '../lib/firestore'
 import { dailyTotals, mealTotal } from '../lib/aggregates'
 import { NUTRIENT_KEYS, type Meal } from '../lib/types'
 import { BarChart, LineChart } from '../components/SimpleCharts'
+import { HealthInsights } from './HealthInsights'
 
 type Range = 7 | 30 | 90
 
 export function Insights() {
+  return <HealthInsights />
+}
+
+export function LegacyInsights() {
   const { user } = useAuth()
   const uid = user?.uid
   const [range, setRange] = useState<Range>(7)

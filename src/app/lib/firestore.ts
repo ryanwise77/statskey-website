@@ -42,7 +42,7 @@ export function startOfDay(d: Date): Date {
 
 export function endOfDay(d: Date): Date {
   const x = new Date(d)
-  x.setHours(23, 59, 59, 0)
+  x.setHours(23, 59, 59, 999)
   return x
 }
 

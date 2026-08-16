@@ -1,13 +1,16 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
+import { getDesktopBridge } from '../lib/desktop'
 
 const REDIRECT_PATH_KEY = 'statskey.login.redirectPath'
 
 export function Login() {
   const {
     user,
+    nudgeAuthor,
     signInWithEmail,
+    signInAsMillerAuthor,
     signInWithGoogle,
     signInWithApple,
     sendPasswordReset,
@@ -15,6 +18,7 @@ export function Login() {
     loading,
   } = useAuth()
   const location = useLocation()
+  const isDesktop = getDesktopBridge() !== null
   const [busy, setBusy] = useState<null | 'email' | 'google' | 'apple' | 'reset'>(null)
   const [localError, setLocalError] = useState<string | null>(null)
   const [email, setEmail] = useState('')
@@ -26,6 +30,10 @@ export function Login() {
   useEffect(() => { setLocalError(error) }, [error])
 
   if (user && !loading) {
+    if (nudgeAuthor) {
+      sessionStorage.removeItem(REDIRECT_PATH_KEY)
+      return <Navigate to="/nudge-studio" replace />
+    }
     const redirectPath =
       sessionStorage.getItem(REDIRECT_PATH_KEY) ??
       (from ? `${from.pathname}${from.search ?? ''}${from.hash ?? ''}` : null) ??
@@ -75,7 +83,11 @@ export function Login() {
     setLocalError(null)
     try {
       rememberRedirect()
-      await signInWithEmail(normalizedEmail, password)
+      if (isNudgeAuthorIdentifier(normalizedEmail)) {
+        await signInAsMillerAuthor(normalizedEmail, password)
+      } else {
+        await signInWithEmail(normalizedEmail, password)
+      }
     } catch {
       // error surfaced via context state
     } finally {
@@ -105,24 +117,69 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-[400px]">
-        <div className="text-center mb-10">
-          <a href="/" className="app-brand justify-center">
+    <div className={isDesktop ? 'desktop-login-page' : 'min-h-screen flex items-center justify-center px-6'}>
+      {isDesktop && (
+        <section className="desktop-login-intro">
+          <div className="desktop-login-intro__brand">
             <span className="site-brand__mark" aria-hidden="true" />
             <span>StatsKey</span>
-          </a>
+          </div>
+          <div className="desktop-login-intro__copy">
+            <span className="desktop-login-intro__eyebrow">Your personal health intelligence</span>
+            <h1>Your health, schedule, and inbox. One place to ask.</h1>
+            <p>
+              StatsKey turns your connected record into clear answers and useful next steps.
+            </p>
+            <div className="desktop-login-benefits">
+              <LoginBenefit
+                number="01"
+                title="Ask one question"
+                description="Nutrition, training, sleep, glucose, and wellness are already in context."
+              />
+              <LoginBenefit
+                number="02"
+                title="Handle the follow-through"
+                description="Prepare calendar events and email replies without switching apps."
+              />
+              <LoginBenefit
+                number="03"
+                title="You stay in control"
+                description="Nothing is sent or scheduled until you approve it."
+              />
+            </div>
+          </div>
+          <p className="desktop-login-intro__privacy">
+            Private by design. External actions always wait for your approval.
+          </p>
+        </section>
+      )}
+
+      <div className={isDesktop ? 'desktop-login-form' : 'w-full max-w-[400px]'}>
+        <div className="text-center mb-10">
+          {isDesktop ? (
+            <Link to="/" className="app-brand justify-center">
+              <span className="site-brand__mark" aria-hidden="true" />
+              <span>StatsKey</span>
+            </Link>
+          ) : (
+            <a href="/" className="app-brand justify-center">
+              <span className="site-brand__mark" aria-hidden="true" />
+              <span>StatsKey</span>
+            </a>
+          )}
           <h1 className="font-display text-[32px] font-bold tracking-[-0.02em] mt-6 mb-2">
-            {resetMode ? 'Reset password' : 'Sign in'}
+            {resetMode ? 'Reset password' : isDesktop ? 'Welcome back' : 'Sign in'}
           </h1>
           <p className="text-text-secondary text-[14px]">
             {resetMode
               ? 'We’ll email you a secure password reset link.'
-              : 'Use the same account as the iOS app.'}
+              : isDesktop
+                ? 'Sign in to sync health and cloud features, or continue locally.'
+                : 'Use the same account as the iOS app.'}
           </p>
         </div>
 
-        <div className="panel">
+        <div className="panel desktop-login-panel">
           {resetMode ? (
             <form className="space-y-4" onSubmit={submitReset}>
               <div>
@@ -185,7 +242,7 @@ export function Login() {
                   <input
                     id="login-email"
                     className="input"
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     autoComplete="email"
@@ -259,6 +316,27 @@ export function Login() {
                   <span>{busy === 'apple' ? 'Signing in…' : 'Continue with Apple'}</span>
                 </button>
               </div>
+              {isDesktop && (
+                <>
+                  <div className="flex items-center gap-3 my-5" aria-hidden>
+                    <div className="h-px flex-1 bg-white/10" />
+                    <span className="text-text-muted text-[11px] font-medium">
+                      LOCAL
+                    </span>
+                    <div className="h-px flex-1 bg-white/10" />
+                  </div>
+                  <Link
+                    className="btn btn-secondary w-full"
+                    to="/workspace"
+                  >
+                    Continue to local workspace
+                  </Link>
+                  <p className="text-text-muted text-[11px] mt-2 text-center">
+                    Files, Git, terminal, and your own model keys work without
+                    a StatsKey account.
+                  </p>
+                </>
+              )}
             </>
           )}
 
@@ -266,8 +344,86 @@ export function Login() {
         </div>
 
         <p className="text-text-muted text-[12px] mt-6 text-center leading-relaxed">
-          By continuing you agree to the <a className="link" href="/web-terms">Web Interface Terms</a>, <a className="link" href="/terms">iOS App Terms</a>, and <a className="link" href="/privacy">Privacy Policy</a>.
+          By continuing you agree to the{' '}
+          <LegalLink
+            isDesktop={isDesktop}
+            webHref="/web-terms"
+            desktopUrl="https://statskey.ai/web-terms.html"
+          >
+            Web Interface Terms
+          </LegalLink>
+          ,{' '}
+          <LegalLink
+            isDesktop={isDesktop}
+            webHref="/terms"
+            desktopUrl="https://statskey.ai/terms.html"
+          >
+            iOS App Terms
+          </LegalLink>
+          , and{' '}
+          <LegalLink
+            isDesktop={isDesktop}
+            webHref="/privacy"
+            desktopUrl="https://statskey.ai/privacy.html"
+          >
+            Privacy Policy
+          </LegalLink>
+          .
         </p>
+      </div>
+    </div>
+  )
+}
+
+function LegalLink({
+  isDesktop,
+  webHref,
+  desktopUrl,
+  children,
+}: {
+  isDesktop: boolean
+  webHref: string
+  desktopUrl: string
+  children: ReactNode
+}) {
+  if (!isDesktop) {
+    return (
+      <a className="link" href={webHref}>
+        {children}
+      </a>
+    )
+  }
+  return (
+    <a
+      className="link"
+      href={desktopUrl}
+      onClick={(event) => {
+        event.preventDefault()
+        const bridge = getDesktopBridge()
+        if (bridge) void bridge.openExternal(desktopUrl)
+        else window.open(desktopUrl, '_blank', 'noopener')
+      }}
+    >
+      {children}
+    </a>
+  )
+}
+
+function LoginBenefit({
+  number,
+  title,
+  description,
+}: {
+  number: string
+  title: string
+  description: string
+}) {
+  return (
+    <div className="desktop-login-benefit">
+      <span>{number}</span>
+      <div>
+        <b>{title}</b>
+        <p>{description}</p>
       </div>
     </div>
   )
@@ -290,4 +446,9 @@ function AppleIcon() {
       <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
     </svg>
   )
+}
+
+function isNudgeAuthorIdentifier(value: string): boolean {
+  const normalized = value.trim().toLowerCase()
+  return normalized === 'miller' || normalized === 'miller@statskeybiometrics.com'
 }

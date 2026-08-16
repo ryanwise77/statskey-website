@@ -1,0 +1,266 @@
+/* Shared foundation: brand dialogs, toasts, boot states.
+   Tokens fall back to the StatsKey brand palette when app.css tokens are absent. */
+
+.sk-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(11, 31, 58, 0.32);
+  backdrop-filter: blur(2px);
+  animation: sk-fade-in 120ms ease-out;
+}
+
+.sk-dialog {
+  width: min(420px, 100%);
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.1));
+  border-radius: var(--radius-lg, 16px);
+  padding: 20px;
+  background: var(--sk-surface, #ffffff);
+  box-shadow: 0 24px 64px rgba(11, 31, 58, 0.24);
+  animation: sk-rise-in 140ms ease-out;
+}
+
+.sk-dialog h2 {
+  margin: 0 0 6px;
+  color: var(--sk-ink, #0b1f3a);
+  font-family: var(--font-display, inherit);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.sk-dialog p {
+  margin: 0 0 4px;
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.sk-dialog__input {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.sk-dialog__input > span {
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sk-dialog__input input {
+  min-height: 36px;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.14));
+  border-radius: var(--radius-sm, 8px);
+  outline: none;
+  padding: 0 10px;
+  background: var(--sk-surface, #fff);
+  color: var(--sk-ink, #0b1f3a);
+  font-size: 12.5px;
+}
+
+.sk-dialog__input input:focus {
+  border-color: var(--sk-accent, #0066cc);
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.14);
+}
+
+.sk-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.sk-dialog__action {
+  min-height: 34px;
+  border-radius: var(--radius-sm, 8px);
+  padding: 0 14px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.sk-dialog__action--cancel {
+  border-color: var(--sk-line, rgba(11, 31, 58, 0.14));
+  background: var(--sk-surface, #fff);
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.sk-dialog__action--primary {
+  background: var(--sk-accent, #0066cc);
+  color: #fff;
+}
+
+.sk-dialog__action--destructive {
+  background: #c62b25;
+  color: #fff;
+}
+
+.sk-dialog__action:focus-visible {
+  outline: 2px solid var(--sk-accent, #0066cc);
+  outline-offset: 2px;
+}
+
+.sk-toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1300;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.sk-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.1));
+  border-radius: var(--radius-md, 12px);
+  padding: 10px 12px;
+  background: var(--sk-surface, #ffffff);
+  box-shadow: 0 12px 36px rgba(11, 31, 58, 0.18);
+  animation: sk-rise-in 160ms ease-out;
+}
+
+.sk-toast > span {
+  flex: 1;
+  color: var(--sk-ink, #0b1f3a);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sk-toast--success {
+  border-left: 3px solid #1a7f4e;
+}
+
+.sk-toast--error {
+  border-left: 3px solid #c62b25;
+}
+
+.sk-toast--info {
+  border-left: 3px solid var(--sk-accent, #0066cc);
+}
+
+.sk-toast button {
+  border: none;
+  background: none;
+  color: var(--sk-accent, #0066cc);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sk-toast__close {
+  color: var(--sk-ink-soft, #8193a6) !important;
+  font-size: 14px !important;
+  line-height: 1;
+}
+
+.sk-boot {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: var(--sk-canvas, #f4f8ff);
+}
+
+.sk-boot > div {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+
+.sk-boot b {
+  color: var(--sk-ink, #0b1f3a);
+  font-family: var(--font-display, inherit);
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+.sk-boot span {
+  width: 120px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 102, 204, 0.12) 25%,
+    rgba(0, 102, 204, 0.55) 50%,
+    rgba(0, 102, 204, 0.12) 75%
+  );
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s ease-in-out infinite;
+}
+
+.sk-error-boundary {
+  min-height: 60dvh;
+  display: grid;
+  place-items: center;
+  padding: 30px;
+}
+
+.sk-error-boundary > section {
+  width: min(440px, 100%);
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.1));
+  border-radius: var(--radius-lg, 16px);
+  padding: 24px;
+  background: var(--sk-surface, #fff);
+  box-shadow: 0 18px 56px rgba(11, 31, 58, 0.12);
+}
+
+.sk-error-boundary h1 {
+  margin: 0;
+  color: var(--sk-ink, #0b1f3a);
+  font-family: var(--font-display, inherit);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.sk-error-boundary p {
+  margin: 0;
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.sk-error-boundary button {
+  min-height: 34px;
+  border-radius: var(--radius-sm, 8px);
+  padding: 0 14px;
+  background: var(--sk-accent, #0066cc);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+@keyframes sk-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sk-rise-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes sk-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk-dialog-backdrop,
+  .sk-dialog,
+  .sk-toast,
+  .sk-boot span {
+    animation: none;
+  }
+}

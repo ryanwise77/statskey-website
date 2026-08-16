@@ -12,6 +12,7 @@ import {
   sportUsesGPS,
   sportUsesPace,
   sportUsesSpeed,
+  workoutTiming,
   type WorkoutComment,
   type WorkoutKudo,
   type WorkoutSession,
@@ -23,6 +24,7 @@ import { HeartRateChart } from '../components/HeartRateChart'
 import { ElevationChart } from '../components/ElevationChart'
 import { HeartRateZones, PaceZones } from '../components/ZoneBars'
 import { WorkoutLogForm } from '../components/log/WorkoutLogForm'
+import { confirmDialog } from '../lib/ui/dialogs'
 
 export function WorkoutDetail() {
   const { user, profile } = useAuth()
@@ -63,7 +65,12 @@ export function WorkoutDetail() {
 
   async function handleDelete() {
     if (!user || !isOwner || deleting || !workout) return
-    if (!window.confirm('Delete this workout? This cannot be undone.')) return
+    const confirmed = await confirmDialog({
+      title: 'Delete this workout? This cannot be undone.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     setDeleting(true)
     setActionError(null)
     try {
@@ -368,7 +375,7 @@ interface KeyMetricsProps {
 }
 
 function KeyMetrics({ workout, usesPace, usesSpeed, accent }: KeyMetricsProps) {
-  const hadPauses = workout.movingTime > 0 && workout.duration - workout.movingTime > 5
+  const timing = workoutTiming(workout)
   const movingPace = usesPace && workout.averagePace > 0 ? workout.averagePace : 0
 
   // Top row: Distance, Moving Time, Pace/Speed
@@ -384,13 +391,18 @@ function KeyMetrics({ workout, usesPace, usesSpeed, accent }: KeyMetricsProps) {
   }
 
   const middleRow: { label: string; value: string }[] = []
-  if (hadPauses) {
-    middleRow.push({ label: 'Elapsed', value: formatDuration(workout.duration) })
-    middleRow.push({ label: 'Paused', value: formatDuration(workout.duration - workout.movingTime) })
+  if (timing.hasPause || timing.hasSwimRest) {
+    middleRow.push({ label: 'Elapsed', value: formatDuration(timing.elapsed) })
+    if (timing.hasSwimRest) {
+      middleRow.push({ label: 'Rest', value: formatDuration(timing.swimRest) })
+    }
+    if (timing.hasPause) {
+      middleRow.push({ label: 'Paused', value: formatDuration(timing.paused) })
+    }
     if (usesPace && workout.distance > 0) {
       middleRow.push({
         label: 'Elapsed pace',
-        value: `${formatPace(workout.duration / workout.distance)} /mi`,
+        value: `${formatPace(timing.elapsed / workout.distance)} /mi`,
       })
     }
   }

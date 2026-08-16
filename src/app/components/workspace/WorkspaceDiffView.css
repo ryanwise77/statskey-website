@@ -1,0 +1,110 @@
+.workspace-diff-view {
+  display: grid;
+  gap: 10px;
+  padding: 9px 11px 18px;
+}
+
+.workspace-diff-view > section {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: var(--radius-sm, 8px);
+  background: #fff;
+}
+
+.workspace-diff-view > section > header {
+  overflow: hidden;
+  border-bottom: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  padding: 5px 9px;
+  background: rgba(0, 102, 204, 0.04);
+  color: var(--sk-ink, #0b1f3a);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-diff-view__hunk {
+  overflow-x: auto;
+  border-top: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+}
+
+.workspace-diff-view__hunk:first-of-type {
+  border-top: 0;
+}
+
+.workspace-diff-view__line {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  min-width: max-content;
+}
+
+.workspace-diff-view__line > span {
+  padding: 0 2px;
+  color: var(--sk-ink-soft, #526d88);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: center;
+  user-select: none;
+}
+
+.workspace-diff-view__line > code {
+  padding-right: 12px;
+  color: var(--sk-ink, #0b1f3a);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  tab-size: 2;
+  white-space: pre;
+}
+
+.workspace-diff-view__line--add {
+  background: rgba(31, 136, 61, 0.1);
+}
+
+.workspace-diff-view__line--add > span {
+  color: #1a7f37;
+}
+
+.workspace-diff-view__line--add > code {
+  color: #116329;
+}
+
+.workspace-diff-view__line--remove {
+  background: rgba(207, 34, 46, 0.09);
+}
+
+.workspace-diff-view__line--remove > span {
+  color: #cf222e;
+}
+
+.workspace-diff-view__line--remove > code {
+  color: #a40e26;
+}
+
+.workspace-diff-view__line--hunk {
+  background: rgba(0, 102, 204, 0.06);
+}
+
+.workspace-diff-view__line--hunk > code {
+  color: var(--sk-accent, #0066cc);
+}
+
+.workspace-diff-view__line--meta > code {
+  color: var(--sk-ink-soft, #526d88);
+  font-style: italic;
+}
+
+.workspace-diff-view__note,
+.workspace-diff-view__empty {
+  margin: 0;
+  padding: 8px 11px;
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 11px;
+}
+
+.workspace-diff-view__empty {
+  padding: 12px 13px;
+}

@@ -7,6 +7,9 @@ import { useGlucoseStatus } from '../lib/data/useGlucoseStatus'
 import { useSubscription } from '../lib/data/useSubscription'
 import { formatTokens, useTokenBalance } from '../lib/data/useTokenBalance'
 import { useMacroTargets } from '../lib/data/useMacroTargets'
+import { IntelligenceConsentSettings } from '../components/assistant/IntelligenceConsentGate'
+import { AssistantConnections } from '../components/assistant/AssistantConnections'
+import { AssistantIntegrationTest } from '../components/assistant/AssistantIntegrationTest'
 import {
   cancelAccountDeletion,
   requestAccountDeletion,
@@ -15,6 +18,7 @@ import {
   syncUserLookup,
 } from '../lib/writers'
 import type { ActivityLevel, AppFocus, BiologicalProfile, UserProfile } from '../lib/profile'
+import { confirmDialog } from '../lib/ui/dialogs'
 import type {
   ExerciseCalorieStrategy,
   MacroTargets,
@@ -199,7 +203,7 @@ export function Profile() {
         <div>
           <span className="card-title">Health & fine-tuning</span>
           <p className="text-text-muted text-[12px] mt-1">
-            These personalize AI analysis, meal plans, and micronutrient targets — same as the iOS Health
+            These personalize Intelligence analysis, meal plans, and micronutrient targets — same as the iOS Health
             &amp; Fine-tuning settings.
           </p>
         </div>
@@ -271,7 +275,7 @@ export function Profile() {
             )}
             <p className="text-text-muted text-[12px] mt-2">
               iOS subscriptions are managed through the App Store. Web token packs are available
-              separately for power users who need more managed AI usage without bringing an API key.
+              separately for power users who need more managed Intelligence usage without bringing an API key.
             </p>
             <Link to="/tokens" className="link text-[13px] font-medium">
               Buy web token packs
@@ -281,7 +285,7 @@ export function Profile() {
       </div>
 
       <div className="panel space-y-3">
-        <span className="card-title">AI Tokens</span>
+        <span className="card-title">Intelligence Credits</span>
         {tokenState.loading ? (
           <p className="text-text-muted text-[13px]">Loading…</p>
         ) : tokenState.error ? (
@@ -349,6 +353,10 @@ export function Profile() {
           </>
         )}
       </div>
+
+      <IntelligenceConsentSettings />
+      <AssistantConnections />
+      <AssistantIntegrationTest />
 
       <AccountPanel
         uid={user?.uid}
@@ -610,9 +618,12 @@ function AccountPanel({
 
   async function requestDeletion() {
     if (!uid) return
-    const ok = window.confirm(
-      'Delete your account? Your data is scheduled for permanent deletion in 30 days. Signing back in during that window lets you restore it.'
-    )
+    const ok = await confirmDialog({
+      title: 'Delete your account?',
+      body: 'Your data is scheduled for permanent deletion in 30 days. Signing back in during that window lets you restore it.',
+      confirmLabel: 'Delete account',
+      destructive: true,
+    })
     if (!ok) return
     setBusy(true)
     setError(null)

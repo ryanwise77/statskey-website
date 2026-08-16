@@ -14,6 +14,7 @@ import { useConversations } from '../lib/data/useMessages'
 import { acceptFriendship, deleteFriendship, sendFriendRequest } from '../lib/writers'
 import { ActivityFeedCard } from '../components/ActivityFeedCard'
 import { EmptyState } from '../components/EmptyState'
+import { confirmDialog, showToast } from '../lib/ui/dialogs'
 
 type Tab = 'feed' | 'friends' | 'requests' | 'messages'
 
@@ -123,12 +124,16 @@ function FriendsTab({ uid }: { uid?: string }) {
   }
 
   async function remove(friend: Friend) {
-    const ok = window.confirm(`Remove ${friendLabel(friend)}?`)
+    const ok = await confirmDialog({
+      title: `Remove ${friendLabel(friend)}?`,
+      confirmLabel: 'Remove',
+      destructive: true,
+    })
     if (!ok) return
     try {
       await deleteFriendship(friend.friendship.id)
     } catch (e) {
-      alert(e instanceof Error ? e.message : String(e))
+      showToast(e instanceof Error ? e.message : String(e), { kind: 'error' })
     }
   }
 

@@ -1,0 +1,88 @@
+/* Signed-out locked state for the desktop sidebar's personal groups.
+   Owned by Shell.tsx — the health/planning entries render as dimmed,
+   lock-marked rows that route to /login instead of bouncing to a
+   full-screen login. */
+
+.desktop-sidebar-locked {
+  display: grid;
+  gap: 3px;
+  padding: 5px 12px 8px;
+}
+
+.desktop-sidebar-locked__unlock {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 11px;
+  border: 1px dashed rgba(0, 102, 204, 0.3);
+  border-radius: var(--radius-md, 12px);
+  background: rgba(0, 102, 204, 0.04);
+  color: var(--sk-accent, #0066cc);
+  font-size: 12px;
+  font-weight: 620;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.desktop-sidebar-locked__unlock:hover {
+  background: rgba(0, 102, 204, 0.09);
+  border-color: rgba(0, 102, 204, 0.45);
+}
+
+.desktop-sidebar-locked__unlock svg {
+  flex: 0 0 auto;
+}
+
+.desktop-sidebar-locked__unlock span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.desktop-sidebar-locked__item {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--sk-ink-soft, #526d88);
+  font-size: 13px;
+  font-weight: 540;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.55;
+  transition:
+    opacity 140ms ease,
+    background 140ms ease;
+}
+
+.desktop-sidebar-locked__item:hover,
+.desktop-sidebar-locked__item:focus-visible {
+  opacity: 0.85;
+  background: rgba(19, 91, 172, 0.055);
+}
+
+.desktop-sidebar-locked__item > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.desktop-sidebar-locked__item svg {
+  flex: 0 0 auto;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.desktop-sidebar-locked__item svg:last-child {
+  width: 13px;
+  height: 13px;
+  opacity: 0.8;
+}

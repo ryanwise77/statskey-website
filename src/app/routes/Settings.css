@@ -1,0 +1,234 @@
+/* Settings — one organized surface for app configuration.
+   A compact local section nav on the left; each section renders the
+   existing surface (embedded, without its page-level hero) on the right. */
+
+.settings-page {
+  display: grid;
+  grid-template-columns: 212px minmax(0, 1fr);
+  gap: 30px;
+  align-items: start;
+}
+
+.settings-page__nav {
+  position: sticky;
+  top: 2px;
+  display: grid;
+  gap: 14px;
+}
+
+.settings-page__nav h1 {
+  margin: 0;
+  padding: 2px 10px 0;
+  font-size: 20px;
+  font-weight: 660;
+  letter-spacing: -0.015em;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.settings-page__nav nav {
+  display: grid;
+  gap: 4px;
+}
+
+.settings-page__nav-item {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 8px);
+  text-decoration: none;
+  transition: background-color 130ms ease, border-color 130ms ease;
+}
+
+.settings-page__nav-item b {
+  font-size: 13px;
+  font-weight: 570;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.settings-page__nav-item small {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.settings-page__nav-item:hover {
+  background: rgba(11, 31, 58, 0.045);
+}
+
+.settings-page__nav-item.active {
+  background: rgba(0, 102, 204, 0.08);
+  border-color: rgba(0, 102, 204, 0.16);
+}
+
+.settings-page__nav-item.active b {
+  color: var(--sk-accent, #0066cc);
+}
+
+.settings-section {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  min-width: 0;
+}
+
+.settings-section__header {
+  display: grid;
+  gap: 4px;
+}
+
+.settings-section__header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.settings-section__header p {
+  margin: 0;
+  max-width: 64ch;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.settings-card {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 18px;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: var(--radius-md, 12px);
+  background: var(--sk-surface, #ffffff);
+}
+
+.settings-card > b {
+  font-size: 14px;
+  font-weight: 620;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.settings-card > p {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.settings-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.settings-card__button {
+  appearance: none;
+  border: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  border-radius: var(--radius-pill, 999px);
+  background: var(--sk-surface, #ffffff);
+  color: var(--sk-ink, #0b1f3a);
+  padding: 7px 16px;
+  font-size: 12.5px;
+  font-weight: 570;
+  cursor: pointer;
+  transition: background-color 130ms ease, border-color 130ms ease,
+    color 130ms ease;
+}
+
+.settings-card__button:hover:not(:disabled) {
+  border-color: rgba(0, 102, 204, 0.35);
+  color: var(--sk-accent, #0066cc);
+}
+
+.settings-card__button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.settings-card__button--primary {
+  border-color: var(--sk-accent, #0066cc);
+  background: var(--sk-accent, #0066cc);
+  color: #ffffff;
+}
+
+.settings-card__button--primary:hover:not(:disabled) {
+  border-color: var(--sk-accent-strong, #0057b8);
+  background: var(--sk-accent-strong, #0057b8);
+  color: #ffffff;
+}
+
+/* About & updates */
+
+.settings-about__identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-about__identity .site-brand__mark {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 9px;
+}
+
+.settings-about__identity b {
+  display: block;
+  font-size: 14px;
+  font-weight: 640;
+  color: var(--sk-ink, #0b1f3a);
+}
+
+.settings-about__identity small {
+  display: block;
+  margin-top: 1px;
+  font-size: 12px;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.settings-about__status {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid var(--sk-line, rgba(11, 31, 58, 0.12));
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--sk-ink-soft, #526d88);
+}
+
+.settings-about__meta {
+  font-size: 11.5px;
+  color: var(--sk-muted, #8193a6);
+}
+
+@media (max-width: 880px) {
+  .settings-page {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .settings-page__nav {
+    position: static;
+    gap: 10px;
+  }
+
+  .settings-page__nav nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .settings-page__nav-item {
+    flex: 0 0 auto;
+  }
+
+  .settings-page__nav-item small {
+    display: none;
+  }
+}

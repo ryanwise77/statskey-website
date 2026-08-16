@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f7f8fb" />
+    <meta name="color-scheme" content="light" />
+    <meta
+      name="description"
+      content="StatsKey Desktop stays on the job, shows its progress, accepts redirection, and hands back verified work."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="StatsKey Desktop — Intelligence that finishes the work" />
+    <meta
+      property="og:description"
+      content="See the work. Steer it live. Review a clean, verified handoff."
+    />
+    <meta property="og:url" content="https://statskey.ai/downloads/statskey/" />
+    <meta property="og:image" content="https://statskey.ai/downloads/statskey/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="StatsKey Desktop — Intelligence that finishes the work" />
+    <meta
+      name="twitter:description"
+      content="See the work. Steer it live. Review a clean, verified handoff."
+    />
+    <meta name="twitter:image" content="https://statskey.ai/downloads/statskey/og.png" />
+    <title>StatsKey Desktop — Intelligence that finishes the work</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+      :root {
+        --ink: #101828;
+        --muted: #64748b;
+        --line: rgba(15, 23, 42, 0.1);
+        --blue: #0878e4;
+        --blue-dark: #0064c8;
+        --blue-soft: #eaf4ff;
+        --green: #12805c;
+        --surface: rgba(255, 255, 255, 0.86);
+        --shadow: 0 32px 90px rgba(30, 64, 110, 0.13);
+      }
+
+      * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 82% 4%, rgba(105, 174, 255, 0.17), transparent 30rem),
+          linear-gradient(180deg, #fbfcfe 0%, #f5f7fb 48%, #ffffff 100%);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a { color: inherit; }
+      button, a { -webkit-tap-highlight-color: transparent; }
+
+      .skip-link {
+        position: fixed;
+        left: 16px;
+        top: -60px;
+        z-index: 100;
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+      }
+
+      .skip-link:focus { top: 16px; }
+
+      .shell {
+        width: min(1160px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+        background: rgba(251, 252, 254, 0.82);
+        backdrop-filter: blur(22px) saturate(160%);
+      }
+
+      .nav__inner {
+        min-height: 66px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .brand img {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        box-shadow: 0 5px 14px rgba(8, 120, 228, 0.25);
+      }
+
+      .brand span { color: #8190a5; font-weight: 500; }
+
+      .button {
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 0 20px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--ink);
+        font-weight: 650;
+        text-decoration: none;
+        transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      }
+
+      .button:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(30, 64, 110, 0.12); }
+      .button:focus-visible { outline: 3px solid rgba(8, 120, 228, 0.24); outline-offset: 3px; }
+
+      .button--primary {
+        border-color: var(--blue);
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 10px 26px rgba(8, 120, 228, 0.23);
+      }
+
+      .button--primary:hover { background: var(--blue-dark); }
+
+      .hero {
+        padding: 104px 0 58px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 23px;
+        color: var(--blue-dark);
+        font-size: 13px;
+        font-weight: 750;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #16a278;
+        box-shadow: 0 0 0 5px rgba(22, 162, 120, 0.1);
+      }
+
+      h1 {
+        max-width: 900px;
+        margin: 0 auto;
+        font-size: clamp(48px, 7vw, 84px);
+        line-height: 0.98;
+        letter-spacing: -0.065em;
+        font-weight: 730;
+      }
+
+      .hero__lead {
+        max-width: 720px;
+        margin: 28px auto 0;
+        color: #53657c;
+        font-size: clamp(19px, 2.1vw, 24px);
+        line-height: 1.48;
+        letter-spacing: -0.02em;
+      }
+
+      .hero__actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 34px;
+      }
+
+      .hero__note {
+        margin-top: 15px;
+        color: #8290a3;
+        font-size: 13px;
+      }
+
+      .product-wrap { padding: 12px 0 94px; }
+
+      .product {
+        overflow: hidden;
+        border: 1px solid rgba(93, 137, 187, 0.18);
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: var(--shadow);
+      }
+
+      .product__bar {
+        min-height: 54px;
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(248, 250, 253, 0.92);
+        color: #5f7188;
+        font-size: 13px;
+      }
+
+      .traffic { display: flex; gap: 7px; }
+      .traffic i { width: 10px; height: 10px; border-radius: 50%; background: #d6dde7; }
+      .product__status { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-weight: 650; }
+      .product__status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #1aab7e; }
+
+      .product__body {
+        min-height: 560px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+      }
+
+      .conversation { padding: 38px; }
+
+      .message {
+        max-width: 720px;
+        margin-left: auto;
+        padding: 17px 20px;
+        border: 1px solid #c7e0fb;
+        border-radius: 19px 19px 6px 19px;
+        background: #eaf4ff;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
+      .update {
+        margin: 30px 0 0;
+        display: grid;
+        grid-template-columns: 30px 1fr;
+        gap: 12px;
+      }
+
+      .update__mark {
+        width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        background: var(--blue);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .update h2 { margin: 1px 0 6px; font-size: 16px; letter-spacing: -0.02em; }
+      .update p { margin: 0; color: #60738b; line-height: 1.55; font-size: 14px; }
+
+      .steps {
+        margin: 23px 0 0 42px;
+        padding: 0;
+        list-style: none;
+        border-left: 1px solid #dce4ee;
+      }
+
+      .steps li {
+        position: relative;
+        padding: 0 0 20px 23px;
+        color: #64758a;
+        font-size: 14px;
+      }
+
+      .steps li::before {
+        content: "✓";
+        position: absolute;
+        left: -11px;
+        top: -3px;
+        width: 21px;
+        height: 21px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #e7f7f1;
+        color: #14815f;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .summary {
+        margin: 6px 0 0 42px;
+        padding: 20px;
+        border: 1px solid #d8e4f1;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 12px 38px rgba(31, 64, 103, 0.07);
+      }
+
+      .summary__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .summary__top strong { font-size: 15px; }
+      .summary__top span { color: var(--green); font-size: 12px; font-weight: 750; }
+      .summary p { margin: 11px 0 14px; color: #51657d; font-size: 14px; line-height: 1.55; }
+      .file-link { display: flex; justify-content: space-between; gap: 12px; padding-top: 13px; border-top: 1px solid var(--line); color: #24415f; font-size: 13px; font-weight: 650; }
+      .file-link span:last-child { color: #8594a7; font-weight: 500; }
+
+      .composer {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 10px 10px 16px;
+        border: 1px solid #cfdbea;
+        border-radius: 16px;
+        background: #fff;
+        color: #66798f;
+        font-size: 14px;
+        box-shadow: 0 9px 24px rgba(30, 64, 110, 0.06);
+      }
+
+      .composer span { flex: 1; text-align: left; }
+      .composer b { padding: 9px 13px; border-radius: 10px; background: var(--blue); color: #fff; font-size: 12px; }
+
+      .side {
+        padding: 28px 24px;
+        border-left: 1px solid var(--line);
+        background: #f8fafc;
+      }
+
+      .side__label { margin: 0 0 16px; color: #8090a5; font-size: 11px; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; }
+
+      .side-card {
+        margin-bottom: 12px;
+        padding: 17px;
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: #fff;
+      }
+
+      .side-card b { display: block; margin-bottom: 6px; font-size: 14px; }
+      .side-card p { margin: 0; color: #6d7e92; font-size: 13px; line-height: 1.45; }
+      .side-card--blue { border-color: #cde3fb; background: var(--blue-soft); }
+
+      .section { padding: 96px 0; border-top: 1px solid var(--line); }
+      .section-heading { max-width: 720px; }
+      .section-heading .kicker { color: var(--blue-dark); font-size: 13px; font-weight: 760; letter-spacing: 0.06em; text-transform: uppercase; }
+      .section-heading h2 { margin: 13px 0 0; font-size: clamp(36px, 5vw, 58px); line-height: 1.04; letter-spacing: -0.052em; }
+      .section-heading p { margin: 20px 0 0; color: #61748b; font-size: 19px; line-height: 1.55; }
+
+      .proof-grid {
+        margin-top: 46px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      .proof {
+        min-height: 190px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+      }
+
+      .proof span { display: grid; place-items: center; width: 35px; height: 35px; margin-bottom: 28px; border-radius: 11px; background: var(--blue-soft); color: var(--blue-dark); font-weight: 800; }
+      .proof h3 { margin: 0 0 8px; font-size: 17px; letter-spacing: -0.025em; }
+      .proof p { margin: 0; color: #6c7d91; font-size: 14px; line-height: 1.5; }
+
+      .principles {
+        margin-top: 72px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .principle { padding: 30px; border-radius: 20px; background: #101d30; color: #fff; }
+      .principle:last-child { background: #eef5fc; color: var(--ink); }
+      .principle h3 { margin: 0 0 10px; font-size: 24px; letter-spacing: -0.035em; }
+      .principle p { margin: 0; color: #b8c5d6; line-height: 1.58; }
+      .principle:last-child p { color: #5f738b; }
+
+      .release-history { padding: 96px 0; border-top: 1px solid var(--line); }
+      .release-list { display: grid; gap: 12px; margin-top: 40px; }
+      .release-card {
+        display: grid;
+        grid-template-columns: minmax(120px, 0.28fr) minmax(0, 1fr);
+        gap: 28px;
+        padding: 26px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+      }
+      .release-card__meta { color: var(--blue-dark); font-size: 13px; font-weight: 750; }
+      .release-card__meta time { display: block; margin-top: 7px; color: #8090a5; font-weight: 500; }
+      .release-card h3 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
+      .release-card p { margin: 8px 0 0; color: #61748b; line-height: 1.5; }
+      .release-card ul { margin: 15px 0 0; padding-left: 19px; color: #53657c; line-height: 1.55; }
+      .release-card li + li { margin-top: 5px; }
+
+      .download { padding: 102px 0; text-align: center; }
+      .download .section-heading { margin: 0 auto; }
+      .download .section-heading p { max-width: 590px; margin-left: auto; margin-right: auto; }
+      .download__actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+      .download__links { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px; margin-top: 20px; color: #6c7e92; font-size: 13px; }
+      .download__links a { text-underline-offset: 3px; }
+
+      .notice {
+        max-width: 720px;
+        margin: 28px auto 0;
+        padding: 15px 18px;
+        border: 1px solid #e8d9b9;
+        border-radius: 14px;
+        background: #fffaf0;
+        color: #765f37;
+        font-size: 12px;
+        line-height: 1.55;
+        text-align: left;
+      }
+
+      footer { padding: 28px 0 38px; border-top: 1px solid var(--line); color: #718197; font-size: 13px; }
+      .footer__inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+      .footer__links { display: flex; gap: 18px; }
+
+      @media (max-width: 900px) {
+        .hero { padding-top: 80px; }
+        .product__body { grid-template-columns: 1fr; }
+        .side { display: none; }
+        .proof-grid { grid-template-columns: 1fr 1fr; }
+      }
+
+      @media (max-width: 620px) {
+        .shell { width: min(100% - 24px, 1160px); }
+        .nav .button { min-height: 40px; padding: 0 14px; font-size: 13px; }
+        .brand span { display: none; }
+        .hero { padding: 64px 0 42px; }
+        h1 { font-size: clamp(44px, 14vw, 62px); }
+        .hero__lead { font-size: 18px; }
+        .product-wrap { padding-bottom: 66px; }
+        .product { border-radius: 18px; }
+        .product__bar { padding: 0 13px; }
+        .conversation { padding: 24px 17px; }
+        .message { font-size: 14px; }
+        .summary, .steps { margin-left: 0; }
+        .update { grid-template-columns: 1fr; }
+        .update__mark { display: none; }
+        .section { padding: 72px 0; }
+        .proof-grid, .principles { grid-template-columns: 1fr; }
+        .release-card { grid-template-columns: 1fr; gap: 12px; padding: 21px; }
+        .proof { min-height: 0; }
+        .proof span { margin-bottom: 20px; }
+        .footer__inner { align-items: flex-start; flex-direction: column; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="nav" aria-label="Primary navigation">
+      <div class="shell nav__inner">
+        <a class="brand" href="/">
+          <img src="/favicon.png" alt="" />
+          StatsKey <span>/ Desktop</span>
+        </a>
+        <a class="button button--primary" id="nav-download" href="#download">Download</a>
+      </div>
+    </nav>
+
+    <main id="main">
+      <header class="shell hero">
+        <p class="eyebrow">StatsKey Desktop</p>
+        <h1>Intelligence that finishes the work.</h1>
+        <p class="hero__lead">
+          Give StatsKey the outcome. Follow its progress in plain English, steer it
+          without starting over, then review the files, checks, and final handoff.
+        </p>
+        <div class="hero__actions">
+          <a class="button button--primary" id="primary-download" href="#download">
+            Download for Apple Silicon <span aria-hidden="true">↓</span>
+          </a>
+          <a class="button" href="#why">Why StatsKey</a>
+        </div>
+        <p class="hero__note">Mac 0.19.0 · signed and Apple notarized · Windows 0.19.1 preview</p>
+      </header>
+
+      <section class="shell product-wrap" aria-label="StatsKey in action">
+        <div class="product">
+          <div class="product__bar">
+            <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span>Search experience · StatsKey workspace</span>
+            <span class="product__status">Complete</span>
+          </div>
+          <div class="product__body">
+            <div class="conversation">
+              <div class="message">
+                Make the search field usable, verify it, and tell me exactly what changed.
+              </div>
+              <div class="update">
+                <span class="update__mark">✦</span>
+                <div>
+                  <h2>I found the layout issue.</h2>
+                  <p>I’m widening the field, then I’ll run the focused verification.</p>
+                </div>
+              </div>
+              <ul class="steps" aria-label="Completed work">
+                <li>Read the search interface</li>
+                <li>Updated the field layout</li>
+                <li>Build and verification passed</li>
+              </ul>
+              <div class="summary">
+                <div class="summary__top"><strong>Done</strong><span>Verified</span></div>
+                <p>
+                  The search field now stays usable in a narrow window and expands when
+                  more room is available.
+                </p>
+                <div class="file-link">
+                  <span>RecordView.swift</span><span>View changes →</span>
+                </div>
+              </div>
+              <div class="composer">
+                <span>Message StatsKey at any point…</span><b>Send</b>
+              </div>
+            </div>
+            <aside class="side">
+              <p class="side__label">This run</p>
+              <div class="side-card side-card--blue">
+                <b>Clear progress</b>
+                <p>Current action, completed steps, and what comes next.</p>
+              </div>
+              <div class="side-card">
+                <b>Live direction</b>
+                <p>Correct course or add context without losing the work.</p>
+              </div>
+              <div class="side-card">
+                <b>Clean handoff</b>
+                <p>Linked files, verification results, and a concise summary.</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="why">
+        <div class="shell">
+          <div class="section-heading">
+            <span class="kicker">Less ceremony. More completion.</span>
+            <h2>You should never wonder what it is doing.</h2>
+            <p>
+              StatsKey turns autonomous work into a conversation you can follow,
+              influence, and review.
+            </p>
+          </div>
+          <div class="proof-grid">
+            <article class="proof">
+              <span>1</span><h3>Stays on the job</h3>
+              <p>It works through implementation and verification before handing back control.</p>
+            </article>
+            <article class="proof">
+              <span>2</span><h3>Shows real progress</h3>
+              <p>Plain-language updates explain the current action and the next concrete step.</p>
+            </article>
+            <article class="proof">
+              <span>3</span><h3>Steer it live</h3>
+              <p>Send a correction while it works. Queue a follow-up without breaking the run.</p>
+            </article>
+            <article class="proof">
+              <span>4</span><h3>Hands back proof</h3>
+              <p>Review linked files, changed lines, checks, and the final result in one place.</p>
+            </article>
+          </div>
+          <div class="principles">
+            <article class="principle">
+              <h3>Parallel when useful. Quiet when not.</h3>
+              <p>
+                Separate tasks can move at once. Overlapping edits and builds are coordinated.
+                Simple questions stay simple.
+              </p>
+            </article>
+            <article class="principle">
+              <h3>Your context, only when invited.</h3>
+              <p>
+                Projects, email, calendar, and health context stay bounded. Personal context is
+                off in workspaces unless you enable it.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="release-history" id="updates">
+        <div class="shell">
+          <div class="section-heading">
+            <span class="kicker">What’s new</span>
+            <h2>A running record, in plain language.</h2>
+            <p>
+              A concise, product-level history of the improvements that matter day to day.
+            </p>
+          </div>
+          <div class="release-list" id="release-list" aria-live="polite">
+            <article class="release-card">
+              <div class="release-card__meta">Version 0.19.1 · Windows<time datetime="2026-08-13">August 13, 2026</time></div>
+              <div>
+                <h3>Windows, tested where it runs</h3>
+                <p>The Windows preview now has to pass native install, restart, workspace, terminal, browser, and update-readiness checks before release.</p>
+                <ul>
+                  <li>Workspace changes remain available after restarting the app.</li>
+                  <li>Commands and installed tools follow the Windows environment.</li>
+                  <li>The public installer is tied to native Windows proof.</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="download" id="download">
+        <div class="shell">
+          <div class="section-heading">
+            <span class="kicker" id="release-status">Mac 0.19.0 · Windows 0.19.1</span>
+            <h2>Start with the outcome.</h2>
+            <p>Bring a project. Tell StatsKey what finished looks like. Stay in the conversation.</p>
+          </div>
+          <div class="download__actions">
+            <a
+              class="button button--primary"
+              data-target="mac-arm64"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.0/StatsKey-0.19.0-mac-arm64.dmg"
+            >Download for Apple Silicon ↓</a>
+          </div>
+          <div class="download__links">
+            <a
+              data-target="mac-x64"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.0/StatsKey-0.19.0-mac-x64.dmg"
+            >Intel Mac</a>
+            <a
+              data-target="win-x64"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.1/StatsKey-0.19.1-win-x64.exe"
+            >Windows</a>
+            <a href="#updates">What’s new</a>
+            <a href="/privacy">Privacy</a>
+          </div>
+          <div class="notice">
+            On Mac, open the DMG and drag StatsKey to Applications. The app and disk image
+            are signed and notarized by Apple. On Windows, SmartScreen may require
+            <strong>More info → Run anyway</strong> while the Windows preview is unsigned.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer__inner">
+        <span>© 2026 StatsKey</span>
+        <div class="footer__links">
+          <a href="/">Home</a><a href="/privacy">Privacy</a><a href="/support">Support</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const macVersion = "0.19.0";
+      const windowsVersion = "0.19.1";
+      const releaseRoot = (version) =>
+        `https://storage.googleapis.com/statskey-workbench-downloads/releases/${version}`;
+      const targets = {
+        "mac-arm64": { version: macVersion, file: `StatsKey-${macVersion}-mac-arm64.dmg`, label: "Download for Apple Silicon" },
+        "mac-x64": { version: macVersion, file: `StatsKey-${macVersion}-mac-x64.dmg`, label: "Download for Intel Mac" },
+        "win-x64": { version: windowsVersion, file: `StatsKey-${windowsVersion}-win-x64.exe`, label: "Download for Windows" },
+      };
+
+      const userAgent = navigator.userAgent.toLowerCase();
+      const preferredTarget = userAgent.includes("windows") ? "win-x64" : "mac-arm64";
+      const preferred = targets[preferredTarget];
+
+      for (const id of ["primary-download", "nav-download"]) {
+        const link = document.getElementById(id);
+        if (!link) continue;
+        link.href = `${releaseRoot(preferred.version)}/${preferred.file}`;
+        link.textContent = id === "nav-download" ? "Download" : `${preferred.label} ↓`;
+      }
+
+      for (const version of new Set([macVersion, windowsVersion])) {
+        fetch(`${releaseRoot(version)}/release-manifest.json`, { cache: "no-store" })
+          .then((response) => {
+            if (!response.ok) throw new Error("Release manifest unavailable");
+            return response.json();
+          })
+          .then((manifest) => {
+            const downloads = manifest.downloads || manifest.artifacts;
+            if (manifest.version !== version || !downloads) return;
+            for (const [target, artifact] of Object.entries(downloads)) {
+              if (targets[target]?.version !== version) continue;
+              document.querySelectorAll(`[data-target="${target}"]`).forEach((link) => {
+                if (artifact.url) link.href = artifact.url;
+              });
+            }
+          })
+          .catch(() => {});
+      }
+
+      fetch('/downloads/statskey/updates.json', { cache: 'no-store' })
+        .then((response) => {
+          if (!response.ok) throw new Error('Update history unavailable');
+          return response.json();
+        })
+        .then((history) => {
+          if (!Array.isArray(history.releases)) return;
+          const list = document.getElementById('release-list');
+          if (!list) return;
+          list.replaceChildren();
+          for (const release of history.releases.slice(0, 8)) {
+            if (!release || typeof release.version !== 'string') continue;
+            const article = document.createElement('article');
+            article.className = 'release-card';
+            const meta = document.createElement('div');
+            meta.className = 'release-card__meta';
+            const platforms = Array.isArray(release.platforms)
+              ? release.platforms.filter((value) => typeof value === 'string').slice(0, 3)
+              : [];
+            meta.append(
+              document.createTextNode(
+                `Version ${release.version}${platforms.length ? ` · ${platforms.join(' + ')}` : ''}`
+              )
+            );
+            if (typeof release.date === 'string') {
+              const time = document.createElement('time');
+              time.dateTime = release.date;
+              time.textContent = new Date(`${release.date}T12:00:00Z`).toLocaleDateString(
+                undefined,
+                { year: 'numeric', month: 'long', day: 'numeric' }
+              );
+              meta.append(time);
+            }
+            const body = document.createElement('div');
+            const title = document.createElement('h3');
+            title.textContent = typeof release.title === 'string' ? release.title : 'StatsKey update';
+            const summary = document.createElement('p');
+            summary.textContent = typeof release.summary === 'string' ? release.summary : '';
+            body.append(title, summary);
+            if (Array.isArray(release.highlights)) {
+              const highlights = document.createElement('ul');
+              for (const value of release.highlights.slice(0, 6)) {
+                if (typeof value !== 'string') continue;
+                const item = document.createElement('li');
+                item.textContent = value;
+                highlights.append(item);
+              }
+              if (highlights.childElementCount > 0) body.append(highlights);
+            }
+            article.append(meta, body);
+            list.append(article);
+          }
+        })
+        .catch(() => {});
+    </script>
+  </body>
+</html>

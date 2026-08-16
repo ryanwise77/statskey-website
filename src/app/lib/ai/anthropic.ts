@@ -3,7 +3,13 @@ import { firebaseApp } from '../firebase'
 
 const functions = getFunctions(firebaseApp, 'us-central1')
 
-export type ClaudeModel = 'claude-sonnet-4-6' | 'claude-sonnet-5' | 'claude-opus-4-7' | 'claude-opus-4-8'
+export type ClaudeModel =
+  | 'claude-sonnet-4-6'
+  | 'claude-sonnet-5'
+  | 'claude-opus-4-7'
+  | 'claude-opus-4-8'
+  | 'claude-opus-5'
+  | 'claude-fable-5'
 
 // Anthropic content blocks — the server passes message content through
 // verbatim, so tool_use / tool_result rounds work end-to-end.
@@ -56,9 +62,11 @@ export interface AnthropicChatRequest {
   longContext?: boolean
   tools?: AnthropicToolDef[]
   max_output_tokens?: number
-  reasoning_effort?: 'low' | 'medium' | 'high'
+  reasoning_effort?: 'low' | 'medium' | 'high' | 'xhigh' | 'max'
   /** Pro+ fair-use flag for the Auto route (validated server-side). */
   unlimitedAuto?: boolean
+  /** Desktop requests are settled against the server token ledger. */
+  billingClient?: 'statskey-desktop'
 }
 
 export interface AnthropicUsage {
@@ -85,7 +93,11 @@ export interface AnthropicChatResponse {
   citations?: string[]
 }
 
-const call = httpsCallable<AnthropicChatRequest, AnthropicChatResponse>(functions, 'anthropicChat')
+const call = httpsCallable<AnthropicChatRequest, AnthropicChatResponse>(
+  functions,
+  'anthropicChat',
+  { timeout: 4 * 60_000 }
+)
 
 export async function anthropicChat(
   req: AnthropicChatRequest

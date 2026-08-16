@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Packaged Electron releases can be several gigabytes and contain copies of
+   the renderer. They are build artifacts, not Tailwind sources. Keeping them
+   out of automatic source detection makes desktop release builds predictable
+   without deleting any existing package or touching another active build. */
+@source not "../desktop";
+@source not "../dist";
+@source not "../dist-failed-*";
+
 @theme {
   --color-void: #000000;
   --color-surface: #0a0a0a;
@@ -141,11 +149,9 @@ a { color: inherit; text-decoration: none; }
 .site-brand__mark {
   width: 18px;
   height: 18px;
-  border-radius: 7px;
-  background:
-    radial-gradient(circle at 68% 32%, #fff 0 8%, transparent 9%),
-    linear-gradient(135deg, var(--cyan), var(--blue) 52%, var(--violet));
-  box-shadow: 0 0 24px rgba(110, 142, 255, 0.45);
+  border-radius: 6px;
+  background: #1676d2 url("/favicon.svg") center / cover no-repeat;
+  box-shadow: 0 6px 18px rgba(22, 118, 210, 0.3);
 }
 
 .site-nav__links {
@@ -2904,9 +2910,7 @@ body.marketing-light .site-brand {
 }
 
 body.marketing-light .site-brand__mark {
-  background:
-    radial-gradient(circle at 68% 32%, #fff 0 8%, transparent 9%),
-    linear-gradient(135deg, #7cc8ff, var(--blue) 54%, #0d4fa9);
+  background: #1676d2 url("/favicon.svg") center / cover no-repeat;
   box-shadow: 0 8px 24px rgba(20, 111, 232, 0.3);
 }
 

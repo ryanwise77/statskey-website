@@ -12,7 +12,7 @@ const APP_RETURN_URL = 'statskey://tokens/success'
 interface TokenPack {
   id: TokenPackId
   name: string
-  tokens: string
+  credits: string
   price: string
   subtitle: string
   bestFor: string
@@ -25,7 +25,7 @@ const TOKEN_PACKS: TokenPack[] = [
   {
     id: '1m',
     name: 'Starter top-up',
-    tokens: '1M',
+    credits: '1M',
     price: '$12.99',
     subtitle: 'Small overflow pack for extra Intelligence questions.',
     bestFor: 'A few deeper chats',
@@ -33,7 +33,7 @@ const TOKEN_PACKS: TokenPack[] = [
   {
     id: '5m',
     name: 'Power month',
-    tokens: '5M',
+    credits: '5M',
     price: '$59.99',
     subtitle: 'The cleanest option for heavy Intelligence use.',
     bestFor: 'Frequent deep analysis',
@@ -42,7 +42,7 @@ const TOKEN_PACKS: TokenPack[] = [
   {
     id: '25m',
     name: 'Research pack',
-    tokens: '25M',
+    credits: '25M',
     price: '$299.99',
     subtitle: 'Large one-time reserve for long context and bulk analysis.',
     bestFor: 'Power users and reports',
@@ -50,10 +50,10 @@ const TOKEN_PACKS: TokenPack[] = [
   {
     id: '100m',
     name: 'Frontier reserve',
-    tokens: '100M',
+    credits: '100M',
     price: '$1,199.99',
     subtitle: 'High-volume reserve for users who do not want BYOK.',
-    bestFor: 'Never think about tokens',
+    bestFor: 'Never think about credits',
   },
 ]
 
@@ -134,7 +134,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
     <div className="max-w-[940px] space-y-8">
       <header className="space-y-3">
         <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-data">
-          Store · Intelligence tokens
+          Store · Intelligence credits
         </div>
         {testMode && (
           <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
@@ -143,12 +143,12 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
         )}
         <div className="space-y-2">
           <h1 className="font-display text-[34px] font-bold tracking-[-0.035em]">
-            {testMode ? 'Test token checkout before going live.' : 'More Intelligence tokens, no API key.'}
+            {testMode ? 'Test credit checkout before going live.' : 'More Intelligence credits, no API key.'}
           </h1>
           <p className="max-w-[680px] text-[15px] leading-relaxed text-text-secondary">
             {testMode
-              ? 'This hidden route uses Stripe test keys and fake cards. It only grants tokens for Firebase UIDs in the server allowlist.'
-              : "Buy web-only Stripe top-ups for Intelligence — StatsKey's managed Claude, ChatGPT, and Grok routes. Tokens are added to the same account you use in the iOS app."}
+              ? 'This hidden route uses Stripe test keys and fake cards. It only grants credits for Firebase UIDs in the server allowlist.'
+              : "Buy Stripe top-ups for StatsKey's managed Claude, ChatGPT, and Grok routes. Credits are cost-weighted by provider price and added to the same account you use in the iOS app. Kimi uses your connected Moonshot key."}
           </p>
         </div>
       </header>
@@ -159,7 +159,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
           <div className="font-display text-[30px] font-bold tracking-[-0.04em] text-text-primary">
             {tokenState.loading ? 'Loading…' : formatTokens(tokenState.tokens?.balance ?? 0)}
           </div>
-          <p className="text-[12px] text-text-muted">Intelligence token balance</p>
+          <p className="text-[12px] text-text-muted">Intelligence credit balance</p>
         </div>
         <div className="panel space-y-1">
           <span className="card-title">Lifetime used</span>
@@ -227,9 +227,9 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
               </div>
               <div className="text-right">
                 <div className="font-display text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-                  {pack.tokens}
+                  {pack.credits}
                 </div>
-                <div className="text-[11px] uppercase tracking-[0.14em] text-text-muted">tokens</div>
+                <div className="text-[11px] uppercase tracking-[0.14em] text-text-muted">credits</div>
               </div>
             </div>
 
@@ -257,7 +257,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
           <span className="card-title">How this works</span>
           <p className="text-[14px] leading-relaxed text-text-secondary">
             Stripe handles the payment page. After payment succeeds, a Firebase webhook grants
-            the token pack to your StatsKey account and the iOS app picks it up from Firebase.
+            the credit pack to your StatsKey account and the iOS app picks it up from Firebase.
           </p>
           <p className="text-[12px] leading-relaxed text-text-muted">
             Do not open this checkout from inside the iOS app unless StatsKey has the relevant
@@ -268,7 +268,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
         <div className="panel space-y-3">
           <span className="card-title">Already subscribed?</span>
           <p className="text-[14px] leading-relaxed text-text-secondary">
-            Pro+ remains the normal power-user plan with 2M Intelligence tokens every month.
+            Pro+ remains the normal power-user plan with 2M Intelligence credits every month.
             Packs are for spikes when you need more without bringing your own provider key.
           </p>
           <Link to="/profile" className="link text-[13px] font-medium">

@@ -495,6 +495,7 @@ export interface WorkoutSession {
   endDate?: Date
   duration: number // seconds
   movingTime: number // seconds
+  pausedTime?: number // explicit manual/automatic pause seconds
   distance: number // miles
   elevationGain: number // feet
   elevationLoss: number // feet
@@ -506,6 +507,13 @@ export interface WorkoutSession {
   averageHeartRate: number // bpm
   maxHeartRate: number
   averageCadence: number
+  averagePower?: number
+  maxPower?: number
+  averageStrideLength?: number
+  averageVerticalOscillation?: number
+  averageGroundContactTime?: number
+  heartRateRecoveryOneMinute?: number
+  workoutEffortScore?: number
   isFavorite: boolean
   notes?: string
   perceivedEffort?: number
@@ -525,6 +533,49 @@ export interface WorkoutSession {
   splits: Split[]
   heartRateZones?: HeartRateZoneDistribution
   paceZones?: PaceZoneDistribution
+}
+
+export interface WorkoutTimingBreakdown {
+  elapsed: number
+  moving: number
+  paused: number
+  swimRest: number
+  hasPause: boolean
+  hasSwimRest: boolean
+  pauseBasis: 'explicit' | 'movingGap' | 'unavailable'
+}
+
+/**
+ * Separates true workout pauses from sport-specific active-time gaps.
+ * Pool-swim moving time is the length ledger, so duration - movingTime is
+ * rest at the wall—not evidence that the swimmer paused the recording.
+ */
+export function workoutTiming(workout: Pick<
+  WorkoutSession,
+  'sportType' | 'isIndoor' | 'startDate' | 'endDate' | 'duration' | 'movingTime' | 'pausedTime'
+>): WorkoutTimingBreakdown {
+  const duration = Number.isFinite(workout.duration) ? Math.max(0, workout.duration) : 0
+  const moving = Number.isFinite(workout.movingTime) ? Math.max(0, workout.movingTime) : 0
+  const storedPause = Number.isFinite(workout.pausedTime)
+    ? Math.max(0, workout.pausedTime ?? 0)
+    : 0
+  const explicitPause = storedPause
+  const hasExplicitPause = explicitPause > 5
+  const usesSwimLengthLedger = workout.sportType === 'swimming' && workout.isIndoor
+  const swimRest = usesSwimLengthLedger && moving > 0 ? Math.max(0, duration - moving) : 0
+  const movingGap = !usesSwimLengthLedger && moving > 0 ? Math.max(0, duration - moving) : 0
+  const hasMovingGap = movingGap > 5
+  const paused = hasExplicitPause ? explicitPause : (hasMovingGap ? movingGap : 0)
+
+  return {
+    elapsed: duration + explicitPause,
+    moving,
+    paused,
+    swimRest,
+    hasPause: paused > 5,
+    hasSwimRest: swimRest > 5,
+    pauseBasis: hasExplicitPause ? 'explicit' : (hasMovingGap ? 'movingGap' : 'unavailable'),
+  }
 }
 
 /** Sport types that use GPS. Mirrors SportType.usesGPS in Swift. */

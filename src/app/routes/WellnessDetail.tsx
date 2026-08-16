@@ -17,6 +17,7 @@ import {
   parseFeelTagsFromNotes,
 } from '../lib/gi'
 import type { BowelMovementEntry, WellnessEntry, WellnessData } from '../lib/types'
+import { confirmDialog } from '../lib/ui/dialogs'
 
 export function WellnessDetail() {
   const { user } = useAuth()
@@ -51,8 +52,12 @@ export function WellnessDetail() {
 
   async function handleDelete() {
     if (!user || deleting || !entry) return
-    if (!window.confirm('Delete this entry? This cannot be undone.')) return
-
+    const confirmed = await confirmDialog({
+      title: 'Delete this entry? This cannot be undone.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     setDeleting(true)
     setActionError(null)
     try {

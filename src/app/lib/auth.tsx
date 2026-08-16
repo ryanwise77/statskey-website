@@ -9,26 +9,29 @@ import {
 import {
   GoogleAuthProvider,
   OAuthProvider,
-  getRedirectResult,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithCustomToken,
   signInWithPopup,
   signOut as fbSignOut,
   type User,
 } from 'firebase/auth'
 import { onSnapshot, doc } from 'firebase/firestore'
-import { auth, db } from './firebase'
+import { httpsCallable } from 'firebase/functions'
+import { auth, db, functions } from './firebase'
 import { ensureProfile, loadProfile, saveProfile, type UserProfile } from './profile'
 import { syncUserLookup } from './writers'
 
 interface AuthState {
   user: User | null
+  nudgeAuthor: boolean
   profile: UserProfile | null
   profileLoaded: boolean
   loading: boolean
   error: string | null
   signInWithEmail: (email: string, password: string) => Promise<void>
+  signInAsMillerAuthor: (identifier: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   signInWithApple: () => Promise<void>
   sendPasswordReset: (email: string) => Promise<void>
@@ -40,6 +43,7 @@ const AuthContext = createContext<AuthState | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [nudgeAuthor, setNudgeAuthor] = useState(false)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [profileLoaded, setProfileLoaded] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -48,30 +52,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
     let authStateSettled = false
-    let redirectSettled = false
 
     function finishInitialLoad() {
-      if (!cancelled && authStateSettled && redirectSettled) {
+      if (!cancelled && authStateSettled) {
         setLoading(false)
       }
     }
 
-    getRedirectResult(auth)
-      .then(async (result) => {
-        if (!result?.user) return
-        setUser(result.user)
-        await ensureProfile(result.user)
-      })
-      .catch((e) => {
-        if (!cancelled) setError(toMessage(e))
-      })
-      .finally(() => {
-        redirectSettled = true
-        finishInitialLoad()
-      })
-
-    const unsub = onAuthStateChanged(auth, (next) => {
+    const unsub = onAuthStateChanged(auth, async (next) => {
       if (cancelled) return
+      let isNudgeAuthor = false
+      if (next) {
+        try {
+          const tokenResult = await next.getIdTokenResult()
+          isNudgeAuthor = hasNudgeAuthorClaims(tokenResult.claims)
+        } catch (e) {
+          if (!cancelled) setError(toMessage(e))
+        }
+      }
+      if (cancelled) return
+      setNudgeAuthor(isNudgeAuthor)
       setUser(next)
       authStateSettled = true
       finishInitialLoad()
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (!user) {
+    if (!user || nudgeAuthor) {
       setProfile(null)
       setProfileLoaded(true)
       return
@@ -132,18 +132,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true
       unsub()
     }
-  }, [user])
+  }, [user, nudgeAuthor])
 
   const api = useMemo<AuthState>(
     () => ({
       user,
+      nudgeAuthor,
       profile,
       profileLoaded,
       loading,
       error,
       async signInWithEmail(email, password) {
         setError(null)
-        setLoading(true)
         try {
           const result = await signInWithEmailAndPassword(
             auth,
@@ -154,13 +154,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (e) {
           setError(toMessage(e))
           throw e
-        } finally {
-          setLoading(false)
+        }
+      },
+      async signInAsMillerAuthor(identifier, password) {
+        setError(null)
+        try {
+          const signIn = httpsCallable<
+            { identifier: string; password: string },
+            { token: string; destination: string }
+          >(functions, 'millerNudgeAuthorSignIn', {
+            limitedUseAppCheckTokens: true,
+          })
+          const response = await signIn({
+            identifier: identifier.trim(),
+            password,
+          })
+          const result = await signInWithCustomToken(auth, response.data.token)
+          const tokenResult = await result.user.getIdTokenResult()
+          if (!hasNudgeAuthorClaims(tokenResult.claims)) {
+            await fbSignOut(auth)
+            throw new Error('Nudge Studio access was not granted.')
+          }
+          setNudgeAuthor(true)
+        } catch (e) {
+          setError(toMessage(e))
+          throw e
         }
       },
       async signInWithGoogle() {
         setError(null)
-        setLoading(true)
         try {
           const provider = new GoogleAuthProvider()
           provider.setCustomParameters({ prompt: 'select_account' })
@@ -169,13 +191,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (e) {
           setError(toMessage(e))
           throw e
-        } finally {
-          setLoading(false)
         }
       },
       async signInWithApple() {
         setError(null)
-        setLoading(true)
         try {
           const provider = new OAuthProvider('apple.com')
           provider.addScope('email')
@@ -185,13 +204,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (e) {
           setError(toMessage(e))
           throw e
-        } finally {
-          setLoading(false)
         }
       },
       async sendPasswordReset(email) {
         setError(null)
-        setLoading(true)
         try {
           await sendPasswordResetEmail(auth, email.trim())
         } catch (e) {
@@ -200,8 +216,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setError(toMessage(e))
             throw e
           }
-        } finally {
-          setLoading(false)
         }
       },
       async signOut() {
@@ -213,7 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(next)
       },
     }),
-    [user, profile, profileLoaded, loading, error]
+    [user, nudgeAuthor, profile, profileLoaded, loading, error]
   )
 
   return <AuthContext.Provider value={api}>{children}</AuthContext.Provider>
@@ -241,11 +255,37 @@ function toMessage(err: unknown): string {
       return 'Network error. Check your connection and try again.'
     case 'auth/operation-not-allowed':
       return 'Email and password sign-in is currently unavailable.'
+    case 'auth/argument-error':
+      return 'Sign-in did not initialize correctly. Refresh the page and try again.'
+    case 'auth/internal-error':
+    case 'auth/popup-blocked':
+      return 'The secure sign-in window could not open. Quit and reopen StatsKey, then try again.'
+    case 'auth/cancelled-popup-request':
+      return 'Another sign-in window is already open.'
+    case 'auth/unauthorized-domain':
+      return 'This StatsKey build is not authorized to sign in. Download the latest version.'
     case 'auth/popup-closed-by-user':
       return 'The sign-in window was closed before completion.'
+    case 'functions/unauthenticated':
+    case 'functions/permission-denied':
+      return 'Incorrect email or password.'
+    case 'functions/resource-exhausted':
+      return 'Too many attempts. Wait a few minutes and try again.'
+    case 'appCheck/recaptcha-error':
+    case 'appCheck/initial-throttle':
+      return 'Could not verify this browser. Refresh the page and try again.'
   }
   if (err instanceof Error) return err.message
   return String(err)
+}
+
+function hasNudgeAuthorClaims(claims: Record<string, unknown>): boolean {
+  return (
+    claims.src === 'miller_nudge_author' &&
+    claims.nudgeAuthor === true &&
+    Number(claims.nudgeAuthorVersion) === 1 &&
+    claims.nudgeAuthorId === 'miller'
+  )
 }
 
 function authErrorCode(err: unknown): string | undefined {

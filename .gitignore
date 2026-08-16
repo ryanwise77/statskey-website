@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+desktop/staged-release*/
+desktop/release*/
+desktop/disabled-old-apps*/
+dist-failed*/
 
 # Editor directories and files
 .vscode/*

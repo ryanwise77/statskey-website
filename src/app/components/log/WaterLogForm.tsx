@@ -11,6 +11,7 @@ import { useWaterForDay } from '../../lib/data/useTodayWater'
 import { useWaterEntries } from '../../lib/data/useWaterEntries'
 import { localDateString } from '../../lib/firestore'
 import type { WaterEntry } from '../../lib/types'
+import { confirmDialog } from '../../lib/ui/dialogs'
 
 const QUICK_AMOUNTS = [8, 12, 16, 20, 32]
 
@@ -63,7 +64,12 @@ export function WaterLogForm({ onSaved }: { onSaved?: () => void }) {
 
   async function reset() {
     if (!uid) return
-    if (!window.confirm('Remove all water entries for this day?')) return
+    const confirmed = await confirmDialog({
+      title: 'Remove all water entries for this day?',
+      confirmLabel: 'Remove',
+      destructive: true,
+    })
+    if (!confirmed) return
     setError(null)
     try {
       await deleteAllWaterEntries(uid, day)

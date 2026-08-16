@@ -62,6 +62,10 @@ export interface UserProfile {
   latitude?: number
   isPro: boolean
   onboardingComplete: boolean
+  /** Opt-in home surface. False keeps the dashboard as the signed-in home. */
+  startInWorkbench: boolean
+  /** Set after the first-run home choice so the choice is not repeated. */
+  homePreferenceChosen: boolean
   pendingDeletionAt?: Date
   createdAt: Date
   updatedAt: Date
@@ -95,6 +99,8 @@ function defaultProfile(user: User): UserProfile {
     healthNotes: '',
     isPro: false,
     onboardingComplete: false,
+    startInWorkbench: false,
+    homePreferenceChosen: false,
     createdAt: now,
     updatedAt: now,
   }
@@ -159,6 +165,8 @@ function decodeProfile(data: Record<string, unknown>, uid: string): UserProfile 
     latitude: typeof data.latitude === 'number' ? (data.latitude as number) : undefined,
     isPro: Boolean(data.isPro),
     onboardingComplete: Boolean(data.onboardingComplete),
+    startInWorkbench: data.startInWorkbench === true,
+    homePreferenceChosen: data.homePreferenceChosen === true,
     pendingDeletionAt: toDate(data.pendingDeletionAt),
     createdAt: toDate(data.createdAt) ?? new Date(),
     updatedAt: toDate(data.updatedAt) ?? new Date(),
@@ -184,6 +192,8 @@ function encodeProfile(profile: UserProfile): Record<string, unknown> {
     healthNotes: profile.healthNotes,
     isPro: profile.isPro,
     onboardingComplete: profile.onboardingComplete,
+    startInWorkbench: profile.startInWorkbench === true,
+    homePreferenceChosen: profile.homePreferenceChosen === true,
     createdAt: profile.createdAt,
     updatedAt: new Date(),
   }

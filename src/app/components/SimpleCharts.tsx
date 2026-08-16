@@ -96,6 +96,7 @@ export function LineChart({
   color = 'var(--color-data)',
   bandLow,
   bandHigh,
+  baseline,
   formatValue = (v: number) => String(Math.round(v)),
 }: {
   points: LinePoint[]
@@ -104,6 +105,7 @@ export function LineChart({
   /** Optional shaded reference band (e.g. glucose 70–180). */
   bandLow?: number
   bandHigh?: number
+  baseline?: number
   formatValue?: (v: number) => string
 }) {
   const width = 600
@@ -115,9 +117,13 @@ export function LineChart({
     let hi = Math.max(...points.map((p) => p.y))
     if (bandLow != null) lo = Math.min(lo, bandLow)
     if (bandHigh != null) hi = Math.max(hi, bandHigh)
+    if (baseline != null) {
+      lo = Math.min(lo, baseline)
+      hi = Math.max(hi, baseline)
+    }
     const pad = Math.max((hi - lo) * 0.12, 1)
     return { min: lo - pad, max: hi + pad }
-  }, [points, bandLow, bandHigh])
+  }, [points, bandLow, bandHigh, baseline])
 
   if (points.length === 0) {
     return <p className="text-text-muted text-[13px]">No data in this range.</p>
@@ -141,6 +147,17 @@ export function LineChart({
             y={yFor(bandHigh)}
             height={Math.max(0, yFor(bandLow) - yFor(bandHigh))}
             fill="var(--app-chart-band, rgba(48,213,200,0.07))"
+          />
+        )}
+        {baseline != null && (
+          <line
+            x1={0}
+            x2={width}
+            y1={yFor(baseline)}
+            y2={yFor(baseline)}
+            stroke="var(--app-chart-grid, rgba(255,255,255,0.25))"
+            strokeDasharray="5 4"
+            strokeWidth={1}
           />
         )}
         <path d={path} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" />

@@ -8,7 +8,7 @@ const de = {
   __title: 'Datenschutzerklärung — StatsKey',
   'lp-title': 'Datenschutzerklärung',
   'lp-date':
-    'Gültig ab: 30. Juni 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
+    'Gültig ab: 31. Juli 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Einleitung</h2>
@@ -83,6 +83,7 @@ const de = {
               <li><strong class="text-text-primary">Nährwertdatenquellen:</strong> Öffentliche oder lizenzierte Datenbanken zur Anreicherung von Nährwertangaben. Wir übermitteln nur Lebensmittelkontext, keine persönlichen Identifikatoren.</li>
             </ul>
             <p class="mt-3">Alle Verarbeiter sind verpflichtet, deine Informationen zu schützen und sie nur gemäß unseren Anweisungen und dem geltenden Recht zu verwenden.</p>
+            <p class="mt-3">Die Nutzung und Übertragung von Informationen aus Google-APIs durch StatsKey entspricht der <a href="https://developers.google.com/terms/api-services-user-data-policy" class="text-accent hover:underline" target="_blank" rel="noopener">Google API Services User Data Policy</a> einschließlich der Limited-Use-Anforderungen.</p>
           </section>
 
           <section>
@@ -191,7 +192,7 @@ const ja = {
   __title: 'プライバシーポリシー — StatsKey',
   'lp-title': 'プライバシーポリシー',
   'lp-date':
-    '発効日: 2026年6月30日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
+    '発効日: 2026年7月31日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. はじめに</h2>
@@ -266,6 +267,7 @@ const ja = {
               <li><strong class="text-text-primary">栄養データソース:</strong> 栄養情報を充実させるための、公開またはライセンスされたデータベース。当社が送信するのは食品のコンテキストのみで、個人識別子は送信しません。</li>
             </ul>
             <p class="mt-3">すべてのプロセッサは、お客様の情報を保護し、当社の指示および適用される法律に従ってのみ使用することが義務付けられています。</p>
+            <p class="mt-3">StatsKeyによるGoogle API由来情報の利用および転送は、Limited Use要件を含む<a href="https://developers.google.com/terms/api-services-user-data-policy" class="text-accent hover:underline" target="_blank" rel="noopener">Google API Services User Data Policy</a>に従います。</p>
           </section>
 
           <section>
@@ -374,7 +376,7 @@ const pt = {
   __title: 'Política de Privacidade — StatsKey',
   'lp-title': 'Política de Privacidade',
   'lp-date':
-    'Em vigor a partir de: 30 de junho de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
+    'Em vigor a partir de: 31 de julho de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Introdução</h2>
@@ -449,6 +451,7 @@ const pt = {
               <li><strong class="text-text-primary">Fontes de dados nutricionais:</strong> Bancos de dados públicos ou licenciados para enriquecer as informações nutricionais. Transmitimos apenas o contexto do alimento, não identificadores pessoais.</li>
             </ul>
             <p class="mt-3">Todos os processadores são obrigados a proteger suas informações e a usá-las somente de acordo com nossas instruções e a legislação aplicável.</p>
+            <p class="mt-3">O uso e a transferência de informações recebidas das APIs do Google pelo StatsKey seguem a <a href="https://developers.google.com/terms/api-services-user-data-policy" class="text-accent hover:underline" target="_blank" rel="noopener">Google API Services User Data Policy</a>, incluindo os requisitos de Limited Use.</p>
           </section>
 
           <section>
@@ -557,7 +560,7 @@ const es = {
   __title: 'Política de Privacidad — StatsKey',
   'lp-title': 'Política de Privacidad',
   'lp-date':
-    'Fecha de entrada en vigor: 30 de junio de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
+    'Fecha de entrada en vigor: 31 de julio de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Introducción</h2>
@@ -632,6 +635,7 @@ const es = {
               <li><strong class="text-text-primary">Fuentes de datos nutricionales:</strong> Bases de datos públicas o con licencia para enriquecer la información nutricional. Transmitimos únicamente el contexto del alimento, no identificadores personales.</li>
             </ul>
             <p class="mt-3">Todos los procesadores están obligados a proteger tu información y a usarla únicamente conforme a nuestras instrucciones y a la legislación aplicable.</p>
+            <p class="mt-3">El uso y la transferencia de información recibida de las API de Google por parte de StatsKey cumple la <a href="https://developers.google.com/terms/api-services-user-data-policy" class="text-accent hover:underline" target="_blank" rel="noopener">Google API Services User Data Policy</a>, incluidos los requisitos de Limited Use.</p>
           </section>
 
           <section>

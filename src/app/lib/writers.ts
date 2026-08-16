@@ -14,7 +14,8 @@ import {
   where,
   writeBatch,
 } from 'firebase/firestore'
-import { db } from './firebase'
+import { getFunctions, httpsCallable } from 'firebase/functions'
+import { db, firebaseApp } from './firebase'
 import { decodeWaterEntry } from './decoders'
 import { endOfDay, localDateString, startOfDay } from './firestore'
 import { deriveTrustMetadata } from './provenance'
@@ -602,23 +603,36 @@ export async function createReportJob(uid: string, params: {
   rangeStart: Date
   rangeEnd: Date
 }): Promise<string> {
+  void uid // Callable authentication is authoritative.
   const jobId = newId()
-  await setDoc(doc(db, 'users', uid, 'reportJobs', jobId), {
+  const queueReportJob = httpsCallable<
+    {
+      id: string
+      topicRaw: string
+      title: string
+      promptUsed: string
+      systemPrompt: string
+      userPrompt: string
+      modelId: string
+      modelLabel: string
+      rangeStartMs: number
+      rangeEndMs: number
+    },
+    { jobId: string; status: string; reservedCredits: number; existing: boolean }
+  >(getFunctions(firebaseApp, 'us-central1'), 'queueReportJob')
+  const { data } = await queueReportJob({
     id: jobId,
-    userId: uid,
     topicRaw: params.topic,
     title: params.title,
-    promptUsed: params.userPrompt,
+    promptUsed: params.userPrompt.slice(0, 50_000),
     systemPrompt: params.systemPrompt,
     userPrompt: params.userPrompt,
     modelId: params.modelId,
     modelLabel: params.modelLabel,
-    rangeStart: Timestamp.fromDate(params.rangeStart),
-    rangeEnd: Timestamp.fromDate(params.rangeEnd),
-    status: 'queued',
-    createdAt: Timestamp.fromDate(new Date()),
+    rangeStartMs: params.rangeStart.getTime(),
+    rangeEndMs: params.rangeEnd.getTime(),
   })
-  return jobId
+  return data.jobId
 }
 
 export async function deleteReport(uid: string, reportId: string): Promise<void> {

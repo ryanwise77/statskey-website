@@ -16,6 +16,7 @@ import { MealTimelineRow, WellnessTimelineRow } from '../components/TimelineRow'
 import { WorkoutCard } from '../components/WorkoutCard'
 import { EmptyState } from '../components/EmptyState'
 import type { Meal, SubstanceEntry, WellnessEntry } from '../lib/types'
+import { confirmDialog } from '../lib/ui/dialogs'
 
 type Tab = 'meals' | 'workouts' | 'wellness' | 'weight' | 'glucose' | 'substances'
 type Range = 7 | 30 | 90
@@ -269,7 +270,12 @@ function WeightHistory({ uid, start, end }: { uid?: string; start: Date; end: Da
 
   async function remove(id: string) {
     if (!uid) return
-    if (!window.confirm('Delete this weight entry?')) return
+    const confirmed = await confirmDialog({
+      title: 'Delete this weight entry?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     await deleteWeightEntry(uid, id).catch(() => {})
   }
 
@@ -355,7 +361,12 @@ function SubstancesHistory({ uid, start, end }: { uid?: string; start: Date; end
 
   async function remove(entry: SubstanceEntry) {
     if (!uid) return
-    if (!window.confirm('Delete this entry?')) return
+    const confirmed = await confirmDialog({
+      title: 'Delete this entry?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     await deleteSubstanceEntry(uid, entry.id).catch(() => {})
   }
 

@@ -69,9 +69,12 @@ export function buildSystemPrompt(inputs: ContextInputs): string {
       [
         '--- TOOLS ---',
         "You have tools over the user's full StatsKey record (about a year of meals, workouts, wellness, weights, glucose) plus persistent memory.",
-        'Below you only see TODAY\'s snapshot — anything historical must come from tools. Prefer: index_manifest to scope, keyword_search + chunk_read for named things, get_daily_overview for broad ranges before drilling in, and the specific getters for detail.',
+        'Below you only see TODAY\'s snapshot — anything historical must come from tools. Prefer: index_manifest to scope, keyword_search for exact terms, semantic_search for concepts/patterns, chunk_read for the cited chunks, get_daily_overview for broad ranges before drilling in, and the specific getters for detail.',
         'Use run_subagent for deep side-investigations so the main thread stays focused. Keep tool calls purposeful; do not re-fetch what you already have.',
         'Memory: read get_scratch_pad when useful; call update_scratch_pad (full overwrite) when you learn durable preferences, goals, or confirmed patterns worth keeping across sessions.',
+        'Email: when the user asks about their inbox, use get_unread_emails first, then read_email_thread for the specific thread. Extract the sender, ask, deadline, and missing details. Draft the reply in the thread, but call propose_email only after recipient, subject, and body are known. Never send or mark anything read; sending is approval-only.',
+        'Personal assistant actions: when the user explicitly asks you to schedule something or write/send an email, use the proposal tool only after you have every material detail. Never invent a recipient, address, account, date, time, time zone, or message content.',
+        'Proposal tools create a pending Action Inbox item only. They never write a calendar or send anything. After proposing, say exactly that it is waiting for approval; never claim the action happened. Any material change requires a new proposal and approval.',
       ].join('\n')
     )
   }
@@ -86,13 +89,14 @@ export function buildSystemPrompt(inputs: ContextInputs): string {
   }
 
   const now = new Date()
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
   sections.push(
     `--- CURRENT TIME ---\n${now.toLocaleDateString([], {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
       year: 'numeric',
-    })} at ${fmtTimeOfDay(now)}`
+    })} at ${fmtTimeOfDay(now)}\nIANA time zone: ${timeZone}`
   )
 
   if (inputs.profile) {

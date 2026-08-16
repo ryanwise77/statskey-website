@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../../lib/auth'
 import { deleteGlucoseReading, newId, saveGlucoseReading } from '../../lib/writers'
 import { useGlucoseRange } from '../../lib/data/useGlucoseRange'
+import { confirmDialog } from '../../lib/ui/dialogs'
 
 export function GlucoseLogForm({ onSaved }: { onSaved?: () => void }) {
   const { user } = useAuth()
@@ -35,7 +36,12 @@ export function GlucoseLogForm({ onSaved }: { onSaved?: () => void }) {
 
   async function remove(id: string) {
     if (!uid) return
-    if (!window.confirm('Delete this reading?')) return
+    const confirmed = await confirmDialog({
+      title: 'Delete this reading?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     try {
       await deleteGlucoseReading(uid, id)
     } catch (e) {

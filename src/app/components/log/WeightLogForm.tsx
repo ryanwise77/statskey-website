@@ -3,6 +3,7 @@ import { useAuth } from '../../lib/auth'
 import { deleteWeightEntry, newId, saveWeightEntry } from '../../lib/writers'
 import { useWeights } from '../../lib/data/useWeights'
 import { addDays } from '../../lib/firestore'
+import { confirmDialog } from '../../lib/ui/dialogs'
 
 export function WeightLogForm({ onSaved }: { onSaved?: () => void }) {
   const { user, profile, saveProfile } = useAuth()
@@ -47,7 +48,12 @@ export function WeightLogForm({ onSaved }: { onSaved?: () => void }) {
 
   async function remove(id: string) {
     if (!uid) return
-    if (!window.confirm('Delete this weight entry?')) return
+    const confirmed = await confirmDialog({
+      title: 'Delete this weight entry?',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!confirmed) return
     try {
       await deleteWeightEntry(uid, id)
     } catch (e) {
