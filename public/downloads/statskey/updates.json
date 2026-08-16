@@ -6,15 +6,13 @@
       "version": "0.21.5",
       "date": "2026-08-16",
       "platforms": ["macOS"],
-      "title": "A clearer workspace with a hard public boundary",
-      "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages exclude internal infrastructure controls.",
+      "title": "Private tooling stays private",
+      "summary": "StatsKey now keeps internal infrastructure controls out of public builds while giving you a reviewable way to customize the app with Intelligence.",
       "highlights": [
-        "The mode chooser stays inside the window, scrolls on compact screens, and has a clear Close control.",
-        "Automatic is clearly recommended, while Ask, Plan, Fix, and Execute explain their outcomes in plain language.",
-        "Model, context, and action controls remain under Advanced settings, while change permission appears only for an explicit Fix or Execute choice.",
-        "Settings can open a reviewable StatsKey source workspace so you can describe the changes you want to Intelligence.",
-        "Public packages exclude the internal console, privileged bridge, infrastructure runtime, and private-machine setup, and legacy switches cannot restore them.",
-        "Release verification now fails closed if an internal route, command, or artifact is bundled."
+        "Internal storage and remote-machine controls are no longer included in public packages.",
+        "Legacy launch switches cannot restore removed internal operations.",
+        "Settings can open StatsKey's source in a reviewable workspace for changes you describe.",
+        "Release verification now blocks packages containing internal routes, commands, or artifacts."
       ]
     },
     {
