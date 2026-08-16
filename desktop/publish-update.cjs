@@ -216,7 +216,7 @@ async function main() {
       run('npm', ['run', 'test:desktop'])
       nativeDesktopTestsPassed = true
     }
-    run('npm', ['--prefix', '..', 'run', 'build'])
+    run('npm', ['--prefix', '..', 'run', 'build:desktop'])
     mkdirSync(outputRoot, { recursive: false })
   }
   if (finalizeNative) {
