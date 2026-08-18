@@ -1,7 +1,20 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.6",
+  "latest": "0.21.7",
   "releases": [
+    {
+      "version": "0.21.7",
+      "date": "2026-08-17",
+      "platforms": ["macOS"],
+      "title": "Helpers that follow your lead",
+      "summary": "Investigators now follow your chosen model unless you quietly customize them, final answers stay active while providers are healthy, and releases use one guarded path from build to launch.",
+      "highlights": [
+        "Investigators now inherit the main model and provider route by default.",
+        "An advanced Helper model control can assign a different configured model without cluttering the everyday interface.",
+        "Final responses no longer stop at the former one-minute cutoff while the provider remains healthy.",
+        "A deterministic Mac release command now builds, publishes, installs, launches, and verifies the same artifact."
+      ]
+    },
     {
       "version": "0.21.6",
       "date": "2026-08-16",
