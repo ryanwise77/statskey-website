@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.8",
+  "latest": "0.21.9",
   "releases": [
+    {
+      "version": "0.21.9",
+      "date": "2026-08-17",
+      "platforms": ["macOS"],
+      "title": "Helpers that stay in step",
+      "summary": "Investigators follow the active model and provider route by default, with one quiet advanced control for choosing any available StatsKey or My key route.",
+      "highlights": [
+        "Investigators inherit the chat's model, provider, billing route, and service tier by default.",
+        "The advanced Helper model control can choose any runnable StatsKey or configured My key route.",
+        "Ask and Plan can use read-only helpers while action review stays limited to action modes.",
+        "Platform-aware preparation keeps Mac and Windows versions, links, and signing disclosures aligned.",
+        "Private source provenance and launch health checks make each published build reproducible and verifiable."
+      ]
+    },
     {
       "version": "0.21.8",
       "date": "2026-08-17",
