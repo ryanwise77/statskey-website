@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.7",
+  "latest": "0.21.8",
   "releases": [
+    {
+      "version": "0.21.8",
+      "date": "2026-08-17",
+      "platforms": ["Windows"],
+      "title": "Helpers that follow your lead on Windows",
+      "summary": "The Windows preview now lets investigators inherit the active model and provider route by default, with a quiet advanced control for choosing a different configured model.",
+      "highlights": [
+        "Investigators inherit the main model and provider route by default.",
+        "An advanced Helper model control can assign a different configured model without cluttering the everyday interface.",
+        "Final responses stay active while the configured provider remains healthy.",
+        "Native Windows checks bind the public installer to install, restart, workspace, terminal, browser, and update-readiness proof."
+      ],
+      "windowsSigning": "unsigned-preview"
+    },
     {
       "version": "0.21.7",
       "date": "2026-08-17",
