@@ -8,5 +8,18 @@
       "rules": "firestore.rules",
       "indexes": "firestore.indexes.json"
     }
-  ]
+  ],
+  "emulators": {
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8180
+    },
+    "functions": {
+      "host": "127.0.0.1",
+      "port": 5199
+    },
+    "ui": {
+      "enabled": false
+    }
+  }
 }
