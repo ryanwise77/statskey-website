@@ -842,11 +842,35 @@ function dayValueTotals(workouts, start, end) {
   return totals
 }
 
+// The live subscription only holds the newest page of workouts until history
+// loads, so a dense axis must not backfill unfetched periods as zero training.
+function workoutCoverageStart() {
+  if (state.source !== 'live' || state.workoutHistoryExhausted) {
+    return PUBLIC_HISTORY_START_DAY
+  }
+  let oldest = null
+  for (const workout of state.allWorkouts ?? state.workouts) {
+    if (workout.day && (!oldest || workout.day < oldest)) oldest = workout.day
+  }
+  return oldest ?? PUBLIC_HISTORY_START_DAY
+}
+
+function ensureWorkoutCoverage(startDay) {
+  if (
+    state.source !== 'live' ||
+    state.workoutHistoryExhausted ||
+    state.workoutsLoading ||
+    workoutCoverageStart() <= startDay
+  ) return
+  window.setTimeout(() => { void loadMoreWorkouts() }, 0)
+}
+
 function timelineBuckets() {
   const today = todayDay()
   const workouts = (state.allWorkouts ?? state.workouts).filter(isRun)
   if (state.range === 'week') {
     const days = daySeries(today, 7)
+    ensureWorkoutCoverage(days[0])
     const totals = dayValueTotals(workouts, days[0], today)
     return days.map((day) => ({
       key: day,
@@ -860,8 +884,11 @@ function timelineBuckets() {
     }))
   }
   if (state.range === 'month') {
-    const days = daySeries(today, 30)
-    const totals = dayValueTotals(workouts, days[0], today)
+    const allDays = daySeries(today, 30)
+    ensureWorkoutCoverage(allDays[0])
+    const coverage = workoutCoverageStart()
+    const days = allDays.filter((day) => day >= coverage)
+    const totals = dayValueTotals(workouts, days[0] ?? today, today)
     return days.map((day, index) => ({
       key: day,
       label: index % 5 === 0 || day === today ? String(Number(day.slice(-2))) : '',
@@ -870,18 +897,22 @@ function timelineBuckets() {
     }))
   }
   if (state.range === 'quarter') {
-    const weekStarts = daySeries(mondayForDay(today), 13, 7)
+    const allWeekStarts = daySeries(mondayForDay(today), 13, 7)
     if (state.fitnessMetric === 'distance') {
       const byWeek = new Map(
         (state.root?.training?.weeklyMileage ?? []).map((week) => [week.weekStart, number(week.runningMiles)])
       )
-      return weekStarts.map((weekStart, index) => ({
+      return allWeekStarts.map((weekStart, index) => ({
         key: weekStart,
         label: index % 3 === 0 ? dateLabel(weekStart, { short: true, year: false }) : '',
         value: number(byWeek.get(weekStart)),
+        title: `Week of ${dateLabel(weekStart, { short: true })}`,
       }))
     }
-    const totals = dayValueTotals(workouts, weekStarts[0], today)
+    ensureWorkoutCoverage(allWeekStarts[0])
+    const coverage = workoutCoverageStart()
+    const weekStarts = allWeekStarts.filter((weekStart) => weekStart >= coverage)
+    const totals = dayValueTotals(workouts, weekStarts[0] ?? today, today)
     const byWeek = new Map()
     for (const [day, value] of totals) {
       const weekStart = mondayForDay(day)
@@ -891,6 +922,7 @@ function timelineBuckets() {
       key: weekStart,
       label: index % 3 === 0 ? dateLabel(weekStart, { short: true, year: false }) : '',
       value: number(byWeek.get(weekStart)),
+      title: `Week of ${dateLabel(weekStart, { short: true })}`,
     }))
   }
 
@@ -905,17 +937,21 @@ function timelineBuckets() {
   const startMonth = actualStart < PUBLIC_HISTORY_START_MONTH
     ? PUBLIC_HISTORY_START_MONTH
     : actualStart
-  const months = monthSequence(startMonth, endMonth)
+  const allMonths = monthSequence(startMonth, endMonth)
   if (state.fitnessMetric === 'distance') {
     const monthMap = new Map(publicHistoryMonths().map((month) => [month.month, month]))
-    return months.map((month, index) => ({
+    return allMonths.map((month, index) => ({
       key: month,
-      label: index === 0 || index === months.length - 1 || index % 3 === 0
+      label: index === 0 || index === allMonths.length - 1 || index % 3 === 0
         ? monthLabel(month)
         : '',
       value: number(monthMap.get(month)?.runningMiles),
+      title: monthLabel(month, false),
     }))
   }
+  ensureWorkoutCoverage(`${startMonth}-01`)
+  const coverage = workoutCoverageStart()
+  const months = allMonths.filter((month) => `${month}-01` >= coverage || month === endMonth)
   const byMonth = new Map(
     workoutBuckets(
       workouts.filter((workout) => workout.day.slice(0, 7) >= startMonth),
@@ -929,6 +965,7 @@ function timelineBuckets() {
       ? monthLabel(month)
       : '',
     value: number(byMonth.get(month)),
+    title: monthLabel(month, false),
   }))
 }
 
