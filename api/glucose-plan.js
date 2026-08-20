@@ -337,6 +337,10 @@ export default async function handler(req, res) {
     res.status(405).json({ error: 'method_not_allowed' });
     return;
   }
+  if (process.env.PUBLIC_HEALTH_TOOLS_ENABLED !== 'true') {
+    res.status(503).json({ error: 'feature_unavailable' });
+    return;
+  }
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     res.status(500).json({ error: 'not_configured' });

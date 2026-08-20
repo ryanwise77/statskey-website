@@ -7,6 +7,9 @@ const {
   writeFileSync,
 } = require('node:fs')
 const path = require('node:path')
+const {
+  assertPublicDesktopBundle,
+} = require('./public-release-boundary.cjs')
 
 module.exports = async function afterPack(context) {
   const resources =
@@ -28,16 +31,35 @@ module.exports = async function afterPack(context) {
     'node-pty',
     'prebuilds'
   )
-  if (!existsSync(prebuilds)) return
-  const architecture = architectureName(context.arch)
-  const keep = `${context.electronPlatformName}-${architecture}`
-  for (const directory of readdirSync(prebuilds)) {
-    if (directory !== keep) {
-      rmSync(path.join(prebuilds, directory), { recursive: true, force: true })
-    }
+  const localNativeBuild = path.join(
+    resources,
+    'app.asar.unpacked',
+    'node_modules',
+    'node-pty',
+    'build'
+  )
+  // npm may leave a host-architecture build beside node-pty's audited
+  // per-platform prebuilds. node-pty probes build/Release first, so remove that
+  // ambiguous fallback and force the package to load the selected prebuild.
+  if (existsSync(localNativeBuild)) {
+    rmSync(localNativeBuild, { recursive: true, force: true })
   }
-  const helper = path.join(prebuilds, keep, 'spawn-helper')
-  if (existsSync(helper)) chmodSync(helper, 0o755)
+  if (existsSync(prebuilds)) {
+    const architecture = architectureName(context.arch)
+    const keep = `${context.electronPlatformName}-${architecture}`
+    for (const directory of readdirSync(prebuilds)) {
+      if (directory !== keep) {
+        rmSync(path.join(prebuilds, directory), { recursive: true, force: true })
+      }
+    }
+    const helper = path.join(prebuilds, keep, 'spawn-helper')
+    if (existsSync(helper)) chmodSync(helper, 0o755)
+  }
+
+  assertPublicDesktopBundle({
+    appArchivePath: path.join(resources, 'app.asar'),
+    webRoot: path.join(resources, 'web'),
+  })
 }
 
 function hardenMacInfoPlist(infoPath) {

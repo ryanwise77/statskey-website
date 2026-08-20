@@ -12,7 +12,10 @@ import {
   formatUsdPerMillion,
   managedCoverageTokens,
 } from '../../lib/ai/modelEconomics'
-import { modelMatchesQuery } from '../../lib/ai/modelCatalog'
+import {
+  isLikelyAgenticModelId,
+  modelMatchesQuery,
+} from '../../lib/ai/modelCatalog'
 import {
   getDesktopBridge,
   type DesktopProviderId,
@@ -24,11 +27,21 @@ interface DiscoveredModel {
   model: DesktopProviderModel
 }
 
+interface ProviderModelCacheEntry {
+  models: DesktopProviderModel[]
+  refreshedAt: number
+  pending?: Promise<DesktopProviderModel[]>
+}
+
+const PROVIDER_MODEL_REFRESH_MS = 15 * 60_000
+const providerModelCache = new Map<DesktopProviderId, ProviderModelCacheEntry>()
+
 const RECOMMENDED_MODEL_IDS = new Set([
   'auto',
   'claude-sonnet-5',
-  'gpt-5.6-sol-fast',
+  'gpt-5.6-sol-max-fast',
   'kimi-k3',
+  'gemini-3.7-flash',
   'grok-4.6',
 ])
 
@@ -38,6 +51,34 @@ export interface ModelControlsValue {
   contextWindowTokens: number
   executionRoute: 'managed' | 'direct'
   reasoningMode: 'standard' | 'pro'
+}
+
+export function modelSelectionValue(
+  value: ModelControlsValue,
+  model: ChatModelOption
+): ModelControlsValue {
+  const effort = model.effortOptions.includes(value.effort)
+    ? value.effort
+    : model.defaultEffort
+  const allowedContext =
+    model.contextOptions.includes(value.contextWindowTokens) &&
+    value.contextWindowTokens <= model.maxContextTokens
+      ? value.contextWindowTokens
+      : model.contextOptions.includes(272_000)
+        ? 272_000
+        : model.contextOptions[model.contextOptions.length - 1]
+  const executionRoute =
+    value.executionRoute === 'managed' && !model.managedAvailable
+      ? 'direct'
+      : value.executionRoute
+  return {
+    ...value,
+    model,
+    effort,
+    contextWindowTokens: allowedContext,
+    executionRoute,
+    reasoningMode: effectiveReasoningMode(model, effort, executionRoute),
+  }
 }
 
 export function ModelControls({
@@ -62,6 +103,10 @@ export function ModelControls({
   const [discoveryState, setDiscoveryState] = useState<
     'idle' | 'loading' | 'ready'
   >('idle')
+  const configuredProviderKey = useMemo(
+    () => [...configuredProviders].sort().join('|'),
+    [configuredProviders]
+  )
   const panelId = useId()
   const panelRef = useRef<HTMLElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -71,11 +116,26 @@ export function ModelControls({
     const existing = new Set(
       result.map((model) => `${model.directProvider}:${model.modelId}`)
     )
-    for (const discovered of discoveredModels) {
+    const newestFirst = [...discoveredModels].sort((left, right) => {
+      const leftCreated = Date.parse(left.model.createdAt || '')
+      const rightCreated = Date.parse(right.model.createdAt || '')
+      if (Number.isFinite(leftCreated) || Number.isFinite(rightCreated)) {
+        return (Number.isFinite(rightCreated) ? rightCreated : 0) -
+          (Number.isFinite(leftCreated) ? leftCreated : 0)
+      }
+      return left.model.label.localeCompare(right.model.label)
+    })
+    for (const discovered of newestFirst) {
       const key = `${discovered.provider}:${discovered.model.id}`
       if (existing.has(key)) continue
       existing.add(key)
-      result.push(customDirectModel(discovered.provider, discovered.model.id))
+      result.push(
+        customDirectModel(
+          discovered.provider,
+          discovered.model.id,
+          discovered.model.label
+        )
+      )
     }
     return result
   }, [discoveredModels, models])
@@ -98,33 +158,68 @@ export function ModelControls({
   }, [catalogFilter, catalogModels, query])
 
   useEffect(() => {
-    if (!open || configuredProviders.size === 0) return
+    const providers = configuredProviderKey
+      ? (configuredProviderKey.split('|') as DesktopProviderId[])
+      : []
+    if (providers.length === 0) {
+      setDiscoveredModels([])
+      setDiscoveryState('idle')
+      return
+    }
     const bridge = getDesktopBridge()
     if (!bridge || typeof bridge.providers.models !== 'function') {
       setDiscoveryState('ready')
       return
     }
     let cancelled = false
-    setDiscoveryState('loading')
-    void Promise.all(
-      [...configuredProviders].map(async (provider) => {
-        const result = await bridge.providers.models(provider)
-        if (!result.ok || !Array.isArray(result.models)) return []
-        return result.models.map((model) => ({ provider, model }))
-      })
+    const cached = providers.flatMap((provider) =>
+      (providerModelCache.get(provider)?.models ?? []).map((model) => ({
+        provider,
+        model,
+      }))
     )
+    if (cached.length > 0) {
+      setDiscoveredModels(cached)
+      setDiscoveryState('ready')
+    } else {
+      setDiscoveryState(open ? 'loading' : 'idle')
+    }
+    if (!open) return
+
+    const refresh = (force: boolean) => {
+      void Promise.all(
+        providers.map(async (provider) => ({
+          provider,
+          models: await providerModels(
+            bridge,
+            provider,
+            force
+          ),
+        }))
+      )
       .then((groups) => {
         if (cancelled) return
-        setDiscoveredModels(groups.flat())
+        setDiscoveredModels(
+          groups.flatMap(({ provider, models: providerModels }) =>
+            providerModels.map((model) => ({ provider, model }))
+          )
+        )
         setDiscoveryState('ready')
       })
       .catch(() => {
         if (!cancelled) setDiscoveryState('ready')
       })
+    }
+    refresh(false)
+    const refreshTimer = window.setInterval(
+      () => refresh(true),
+      PROVIDER_MODEL_REFRESH_MS
+    )
     return () => {
       cancelled = true
+      window.clearInterval(refreshTimer)
     }
-  }, [configuredProviders, open])
+  }, [configuredProviderKey, open])
 
   useEffect(() => {
     if (!open) return
@@ -186,29 +281,17 @@ export function ModelControls({
     }
   }, [configuredProviders, customProvider])
 
-  function selectModel(model: ChatModelOption) {
-    const effort = model.effortOptions.includes(value.effort)
-      ? value.effort
-      : model.defaultEffort
-    const allowedContext =
-      model.contextOptions.includes(value.contextWindowTokens) &&
-      value.contextWindowTokens <= model.maxContextTokens
-        ? value.contextWindowTokens
-        : model.contextOptions.includes(272_000)
-          ? 272_000
-          : model.contextOptions[model.contextOptions.length - 1]
-    const executionRoute =
-      value.executionRoute === 'managed' && !model.managedAvailable
-        ? 'direct'
-        : value.executionRoute
-    onChange({
-      ...value,
-      model,
-      effort,
-      contextWindowTokens: allowedContext,
-      executionRoute,
-      reasoningMode: effectiveReasoningMode(model, effort, executionRoute),
-    })
+  function selectModel(model: ChatModelOption): 'managed' | 'direct' {
+    const next = modelSelectionValue(value, model)
+    onChange(next)
+    return next.executionRoute
+  }
+
+  function selectModelAndClose(model: ChatModelOption) {
+    const route = selectModel(model)
+    if (route === 'managed' || configuredProviders.has(model.directProvider)) {
+      closePanel()
+    }
   }
 
   function closePanel() {
@@ -227,7 +310,8 @@ export function ModelControls({
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-controls={panelId}
-        title="Choose a model"
+        aria-keyshortcuts="Meta+/ Control+/"
+        title="Choose a model (⌘/ or Ctrl+/ switches quickly)"
       >
         <span
           className="model-controls__dot"
@@ -261,8 +345,8 @@ export function ModelControls({
             <div>
               <b id={`${panelId}-title`}>Choose your model</b>
               <p>
-                Search curated models with verified pricing, or use any model
-                returned by a connected provider.
+                Pick once to switch immediately. Connected providers refresh
+                their model lists automatically.
               </p>
             </div>
             <button
@@ -392,7 +476,7 @@ export function ModelControls({
               <button
                 key={model.id}
                 className={model.id === value.model.id ? 'active' : ''}
-                onClick={() => selectModel(model)}
+                onClick={() => selectModelAndClose(model)}
                 role="option"
                 aria-selected={model.id === value.model.id}
               >
@@ -442,7 +526,7 @@ export function ModelControls({
                 event.preventDefault()
                 const modelId = customModelId.trim()
                 if (!modelId || !configuredProviders.has(customProvider)) return
-                selectModel(customDirectModel(customProvider, modelId))
+                selectModelAndClose(customDirectModel(customProvider, modelId))
                 setCustomModelId('')
               }}
             >
@@ -638,7 +722,8 @@ function ModelPriceExplanation({
 
 function customDirectModel(
   providerId: DesktopProviderId,
-  modelId: string
+  modelId: string,
+  discoveredLabel?: string
 ): ChatModelOption {
   const metadata: Record<
     DesktopProviderId,
@@ -662,22 +747,75 @@ function customDirectModel(
     },
   }
   const provider = metadata[providerId]
+  const label = discoveredLabel?.trim()
   return {
     id: `custom:${providerId}:${modelId}`,
     provider: provider.provider,
     modelId,
-    label: modelId,
+    label: label && label.length <= 240 ? label : modelId,
     providerLabel: provider.label,
     agentic: true,
     dotColor: provider.color,
-    description: `Exact ${provider.label} model ID.`,
+    description: discoveredLabel
+      ? `Automatically discovered from ${provider.label}.`
+      : `Exact ${provider.label} model ID.`,
     maxContextTokens: 1_000_000,
     contextOptions: [64_000, 128_000, 272_000, 1_000_000],
     effortOptions: ['low', 'medium', 'high', 'xhigh', 'max'],
     defaultEffort: 'medium',
     directProvider: providerId,
     managedAvailable: false,
+    badges: discoveredLabel ? ['Provider discovery'] : undefined,
   }
+}
+
+async function providerModels(
+  bridge: NonNullable<ReturnType<typeof getDesktopBridge>>,
+  provider: DesktopProviderId,
+  force: boolean
+): Promise<DesktopProviderModel[]> {
+  const cached = providerModelCache.get(provider)
+  if (cached?.pending) return cached.pending
+  if (
+    !force &&
+    cached &&
+    Date.now() - cached.refreshedAt < PROVIDER_MODEL_REFRESH_MS
+  ) {
+    return cached.models
+  }
+
+  const fallback = cached?.models ?? []
+  const pending = bridge.providers
+    .models(provider)
+    .then((result) => {
+      const models =
+        result.ok && Array.isArray(result.models)
+          ? result.models.filter(
+              (model) =>
+                model != null &&
+                typeof model.id === 'string' &&
+                isLikelyAgenticModelId(provider, model.id)
+            )
+          : fallback
+      providerModelCache.set(provider, {
+        models,
+        refreshedAt: Date.now(),
+      })
+      return models
+    })
+    .catch(() => {
+      providerModelCache.set(provider, {
+        models: fallback,
+        refreshedAt: Date.now(),
+      })
+      return fallback
+    })
+  providerModelCache.set(provider, {
+    models: fallback,
+    refreshedAt: cached?.refreshedAt ?? 0,
+    pending,
+  })
+  return pending
 }
 
 function providerName(provider: DesktopProviderId): string {

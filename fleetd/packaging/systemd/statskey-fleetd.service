@@ -1,0 +1,27 @@
+[Unit]
+Description=StatsKey Fleet privileged execution daemon
+# Socket-activated by statskey-fleetd.socket. Requires/After tie the
+# daemon's lifetime and startup ordering to its control socket.
+Requires=statskey-fleetd.socket
+After=statskey-fleetd.socket
+
+[Service]
+Type=notify
+ExecStart=/usr/libexec/statskey-fleetd
+# The daemon must sd_notify(READY=1) at startup and then ping the watchdog.
+# Watchdog failure kills the daemon; per design invariant 6 every active
+# job is stopped before a restarted daemon accepts new work.
+WatchdogSec=30s
+Restart=on-failure
+
+# Hardening — exactly per FLEETD_DESIGN.md "systemd units". The daemon is
+# root and talks to systemd, so the design deliberately does NOT restrict
+# it further (it must be able to manage transient units and job cgroups).
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/statskey-fleetd /var/lib/statskey-fleet-jobs
+# The daemon has no network access of its own. AF_UNIX covers the control
+# socket and the systemd D-Bus/private socket; AF_NETLINK covers kernel
+# event notification. Both are per the design doc.
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK

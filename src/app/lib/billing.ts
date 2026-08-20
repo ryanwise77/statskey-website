@@ -8,8 +8,19 @@ export type SubscriptionCheckoutPlan =
   | 'proPlusMonthly'
   | 'proPlusAnnual'
 
+export type AutoRechargeThresholdPercent = 10 | 25 | 50
+export type AutoRechargeMonthlyLimit = 1 | 3 | 5
+
+export interface AutoRechargeCheckoutSettings {
+  enabled: true
+  thresholdPercent: AutoRechargeThresholdPercent
+  maxMonthlyRecharges: AutoRechargeMonthlyLimit
+}
+
 interface TokenPackCheckoutRequest {
   pack: TokenPackId
+  checkoutAttemptId: string
+  autoRecharge?: AutoRechargeCheckoutSettings
   successUrl: string
   cancelUrl: string
 }
@@ -17,6 +28,29 @@ interface TokenPackCheckoutRequest {
 interface CheckoutResponse {
   url?: string
   sessionId?: string
+  amountCents?: number
+  currency?: string
+}
+
+export interface TokenPackCheckoutStatus {
+  status: string
+  terminal: boolean
+  creditsGranted: boolean
+}
+
+export interface TokenPackCatalogEntry {
+  credits: number
+  amountCents: number
+  baseAmountCents: number
+  processingReserveAmountCents: number
+  netOwnerMarginAmountCents: number
+  currency: string
+  pricingVersion: string
+}
+
+export interface TokenPackCatalog {
+  pricingVersion: string
+  packs: Record<TokenPackId, TokenPackCatalogEntry>
 }
 
 const createSubscriptionCheckout = httpsCallable<
@@ -40,10 +74,26 @@ const createBillingPortal = httpsCallable<
   { returnUrl: string },
   { url?: string }
 >(functions, 'createBillingPortalSession')
+const disableAutoRecharge = httpsCallable<
+  Record<string, never>,
+  { disabled?: boolean; pendingCharge?: boolean }
+>(functions, 'disableTokenAutoRecharge')
+const getTokenCheckoutStatus = httpsCallable<
+  { sessionId: string; testMode: boolean },
+  TokenPackCheckoutStatus
+>(functions, 'getTokenPackCheckoutStatus')
+const getTokenCatalog = httpsCallable<Record<string, never>, TokenPackCatalog>(
+  functions,
+  'getTokenPackCatalog'
+)
 
 export async function startTokenPackCheckout(
   pack: TokenPackId,
-  options: { testMode?: boolean; returnToApp?: boolean } = {}
+  options: {
+    testMode?: boolean
+    returnToApp?: boolean
+    autoRecharge?: AutoRechargeCheckoutSettings
+  } = {}
 ): Promise<void> {
   const origin = checkoutReturnOrigin()
   const path = options.testMode ? '/app/tokens-test' : '/app/tokens'
@@ -53,6 +103,10 @@ export async function startTokenPackCheckout(
   const returnSuffix = options.returnToApp ? '&return=app' : ''
   const { data } = await callable({
     pack,
+    checkoutAttemptId: newCheckoutAttemptId(),
+    ...(options.testMode || !options.autoRecharge
+      ? {}
+      : { autoRecharge: options.autoRecharge }),
     successUrl: `${origin}${path}?checkout=success${returnSuffix}`,
     cancelUrl: `${origin}${path}?checkout=cancelled${returnSuffix}`,
   })
@@ -62,6 +116,27 @@ export async function startTokenPackCheckout(
   }
 
   await openStripeHostedPage(data.url)
+}
+
+export async function disableTokenAutoRecharge(): Promise<{ pendingCharge: boolean }> {
+  const { data } = await disableAutoRecharge({})
+  if (!data.disabled) {
+    throw new Error('StatsKey could not disable automatic re-up.')
+  }
+  return { pendingCharge: data.pendingCharge === true }
+}
+
+export async function fetchTokenPackCheckoutStatus(
+  sessionId: string,
+  testMode = false
+): Promise<TokenPackCheckoutStatus> {
+  const { data } = await getTokenCheckoutStatus({ sessionId, testMode })
+  return data
+}
+
+export async function fetchTokenPackCatalog(): Promise<TokenPackCatalog> {
+  const { data } = await getTokenCatalog({})
+  return data
 }
 
 export async function startSubscriptionCheckout(
@@ -92,6 +167,14 @@ export async function openStripeBillingPortal(): Promise<void> {
 
 function checkoutReturnOrigin(): string {
   return getDesktopBridge() ? 'https://statskey.ai' : window.location.origin
+}
+
+function newCheckoutAttemptId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  const random = Math.random().toString(36).slice(2)
+  return `checkout_${Date.now().toString(36)}_${random}_${random}`
 }
 
 async function openStripeHostedPage(url: string): Promise<void> {

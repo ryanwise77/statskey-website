@@ -639,9 +639,11 @@ function searchFileNamesOnDisk(query) {
         // A live filename query should reach nested source directories before
         // spending its bounded budget walking every file at the current level.
         entries.sort(liveFileSearchEntryOrder)
-        for (const entry of entries) {
-          queue.push(path.join(resolved, entry.name))
-        }
+        queue.splice(
+          queueIndex,
+          0,
+          ...entries.map((entry) => path.join(resolved, entry.name))
+        )
         continue
       }
       if (!stats.isFile()) continue

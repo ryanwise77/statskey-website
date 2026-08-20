@@ -29,6 +29,10 @@ const SOURCE_COMMIT = 'a'.repeat(40)
 const THUMBPRINT = 'B'.repeat(40)
 const NATIVE_TESTS = [
   { name: 'desktop test suite', status: 'passed' },
+  {
+    name: 'packaged process-owner parent-exit and lease-expiry containment',
+    status: 'passed',
+  },
   { name: 'packaged application launch smoke test', status: 'passed' },
   { name: 'installer install/uninstall smoke test', status: 'passed' },
 ]
@@ -76,14 +80,34 @@ test('native Authenticode verification uses the same PowerShell runtime as deep 
   assert.doesNotMatch(authenticodeBody, /spawnSync\(\s*'powershell\.exe'/)
 })
 
+test('release manifest revalidates the packaged process owner', () => {
+  const source = readFileSync(require.resolve('./publish-update.cjs'), 'utf8')
+  const body = source.slice(
+    source.indexOf('function publicWindowsVerification'),
+    source.indexOf('function normalizeUpdateMetadata')
+  )
+  assert.match(
+    body,
+    /processOwnerPath:\s*windowsProcessOwnerPath\(target\)/
+  )
+})
+
 function fixture() {
   const directory = mkdtempSync(path.join(tmpdir(), 'statskey-windows-release-'))
   const installerPath = path.join(directory, `StatsKey-${VERSION}-win-x64.exe`)
   const executablePath = path.join(directory, 'StatsKey.exe')
+  const processOwnerPath = path.join(directory, 'windows-process-owner.ps1')
   const recordPath = path.join(directory, WINDOWS_NATIVE_VERIFICATION_FILE)
   writeFileSync(installerPath, Buffer.from('MZ signed installer fixture'))
   writeFileSync(executablePath, Buffer.from('MZ signed application fixture'))
-  return { directory, installerPath, executablePath, recordPath }
+  writeFileSync(processOwnerPath, Buffer.from('# process owner fixture'))
+  return {
+    directory,
+    installerPath,
+    executablePath,
+    processOwnerPath,
+    recordPath,
+  }
 }
 
 function sha256(value) {
@@ -219,6 +243,7 @@ test('selects Windows without including either Mac update channel', () => {
     { channel: 'mac-arm64' },
     { channel: 'mac-x64' },
     { channel: 'win-x64' },
+    { channel: 'linux-x64' },
   ]
   assert.deepEqual(
     selectReleaseTargets(allTargets, { windowsOnly: true }).map(
@@ -233,8 +258,14 @@ test('selects Windows without including either Mac update channel', () => {
     ['mac-arm64', 'mac-x64']
   )
   assert.deepEqual(
+    selectReleaseTargets(allTargets, { linuxOnly: true }).map(
+      (target) => target.channel
+    ),
+    ['linux-x64']
+  )
+  assert.deepEqual(
     selectReleaseTargets(allTargets).map((target) => target.channel),
-    ['mac-arm64', 'mac-x64', 'win-x64']
+    ['mac-arm64', 'mac-x64', 'win-x64', 'linux-x64']
   )
 })
 
@@ -244,6 +275,15 @@ test('rejects conflicting platform-only selections', () => {
       selectReleaseTargets([{ channel: 'win-x64' }], {
         macOnly: true,
         windowsOnly: true,
+        linuxOnly: false,
+      }),
+    /mutually exclusive/
+  )
+  assert.throws(
+    () =>
+      selectReleaseTargets([{ channel: 'linux-x64' }], {
+        windowsOnly: true,
+        linuxOnly: true,
       }),
     /mutually exclusive/
   )
@@ -316,6 +356,16 @@ test('records and verifies hash-pinned native Windows Authenticode evidence', ()
         sourceCommit: SOURCE_COMMIT,
       }),
       JSON.parse(readFileSync(files.recordPath, 'utf8'))
+    )
+    writeFileSync(files.processOwnerPath, '# replaced process owner')
+    assert.throws(
+      () =>
+        assertWindowsNativeVerification({
+          ...files,
+          version: VERSION,
+          sourceCommit: SOURCE_COMMIT,
+        }),
+      /process owner differs/
     )
   } finally {
     rmSync(files.directory, { recursive: true, force: true })
@@ -457,43 +507,63 @@ test('unsigned preview still requires native tests and hash-pinned NotSigned pro
 })
 
 test('native smoke evidence is returned only after both PowerShell checks pass', () => {
+  const files = fixture()
   const calls = []
-  assert.deepEqual(
-    runNativeWindowsReleaseSmokeTests({
-      installerPath: 'C:\\release\\StatsKey.exe',
-      executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
-      platform: 'win32',
-      desktopTestsPassed: true,
-      powershellRunner(command, environment) {
-        calls.push({ command, environment })
-      },
-    }),
-    NATIVE_TESTS
-  )
-  assert.equal(calls.length, 2)
-  assert.match(calls[0].command, /launch smoke test/)
-  assert.match(calls[1].command, /Uninstaller/)
-  assert.throws(
-    () =>
+  try {
+    assert.deepEqual(
       runNativeWindowsReleaseSmokeTests({
         installerPath: 'C:\\release\\StatsKey.exe',
         executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
+        processOwnerPath: files.processOwnerPath,
         platform: 'win32',
-        powershellRunner() {},
-      }),
-    /desktop test suite/
-  )
-  assert.throws(
-    () =>
-      runNativeWindowsReleaseSmokeTests({
-        installerPath: 'C:\\release\\StatsKey.exe',
-        executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
-        platform: 'darwin',
         desktopTestsPassed: true,
-        powershellRunner() {},
+        powershellRunner(command, environment) {
+          calls.push({ command, environment })
+        },
       }),
-    /native Windows/
-  )
+      NATIVE_TESTS
+    )
+    assert.equal(calls.length, 4)
+    assert.match(calls[0].command, /launch smoke test/)
+    assert.match(calls[1].command, /Installed StatsKey/)
+    assert.match(calls[2].command, /Owned descendant survived parent exit/)
+    assert.match(calls[2].command, /Installed process owner differs/)
+    assert.match(calls[2].command, /ErrorActionPreference = 'Stop'/)
+    assert.match(calls[2].command, /Set-StrictMode/)
+    assert.match(calls[2].command, /TryParse/)
+    assert.match(calls[2].command, /Owned processes are not live/)
+    assert.match(calls[2].command, /RedirectStandardInput/)
+    assert.doesNotMatch(calls[2].command, /'-Payload'/)
+    assert.match(calls[2].command, /exclusive lock/)
+    assert.notEqual(
+      calls[2].environment.STATSKEY_PARENT_EXIT_PID_PATH,
+      calls[2].environment.STATSKEY_LEASE_EXPIRY_PID_PATH
+    )
+    assert.match(calls[3].command, /Uninstaller/)
+    assert.throws(
+      () =>
+        runNativeWindowsReleaseSmokeTests({
+          installerPath: 'C:\\release\\StatsKey.exe',
+          executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
+          platform: 'win32',
+          powershellRunner() {},
+        }),
+      /desktop test suite/
+    )
+    assert.throws(
+      () =>
+        runNativeWindowsReleaseSmokeTests({
+          installerPath: 'C:\\release\\StatsKey.exe',
+          executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
+          platform: 'darwin',
+          desktopTestsPassed: true,
+          powershellRunner() {},
+        }),
+      /native Windows/
+    )
+  } finally {
+    rmSync(files.directory, { recursive: true, force: true })
+  }
 })
 
 test('accepts canonical native deep-smoke proof bound to installer and latest.yml', () => {
@@ -602,9 +672,10 @@ test('native finalization accepts deep-smoked output before basic proof and mani
   const directory = mkdtempSync(path.join(tmpdir(), 'statskey-finalize-native-'))
   const target = path.join(directory, 'win-x64')
   const resources = path.join(target, 'win-unpacked', 'resources')
+  const unpackedResources = path.join(resources, 'app.asar.unpacked')
   const artifact = `StatsKey-${VERSION}-win-x64.exe`
   try {
-    mkdirSync(resources, { recursive: true })
+    mkdirSync(unpackedResources, { recursive: true })
     for (const file of [
       path.join(target, artifact),
       path.join(target, `${artifact}.blockmap`),
@@ -612,6 +683,7 @@ test('native finalization accepts deep-smoked output before basic proof and mani
       path.join(directory, WINDOWS_DEEP_SMOKE_FILE),
       path.join(target, 'win-unpacked', 'StatsKey.exe'),
       path.join(resources, 'app.asar'),
+      path.join(unpackedResources, 'windows-process-owner.ps1'),
       path.join(resources, 'app-update.yml'),
     ]) {
       writeFileSync(file, 'prepared native evidence')
@@ -647,36 +719,73 @@ test('native finalization accepts deep-smoked output before basic proof and mani
 })
 
 test('native smoke test failure cannot fabricate passing evidence', () => {
+  const files = fixture()
   let calls = 0
-  assert.throws(
-    () =>
-      runNativeWindowsReleaseSmokeTests({
-        installerPath: 'C:\\release\\StatsKey.exe',
-        executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
-        platform: 'win32',
-        desktopTestsPassed: true,
-        powershellRunner() {
-          calls += 1
-          if (calls === 2) throw new Error('installer launch failed')
-        },
-      }),
-    /installer launch failed/
-  )
-  assert.equal(calls, 2)
+  try {
+    assert.throws(
+      () =>
+        runNativeWindowsReleaseSmokeTests({
+          installerPath: 'C:\\release\\StatsKey.exe',
+          executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
+          processOwnerPath: files.processOwnerPath,
+          platform: 'win32',
+          desktopTestsPassed: true,
+          powershellRunner() {
+            calls += 1
+            if (calls === 2) throw new Error('installer launch failed')
+          },
+        }),
+      /installer launch failed/
+    )
+    assert.equal(calls, 2)
+  } finally {
+    rmSync(files.directory, { recursive: true, force: true })
+  }
+})
+
+test('native containment failure still runs the packaged uninstaller', () => {
+  const files = fixture()
+  const calls = []
+  try {
+    assert.throws(
+      () =>
+        runNativeWindowsReleaseSmokeTests({
+          installerPath: 'C:\\release\\StatsKey.exe',
+          executablePath: 'C:\\release\\win-unpacked\\StatsKey.exe',
+          processOwnerPath: files.processOwnerPath,
+          platform: 'win32',
+          desktopTestsPassed: true,
+          powershellRunner(command) {
+            calls.push(command)
+            if (calls.length === 3) {
+              throw new Error('containment failed')
+            }
+          },
+        }),
+      /containment failed/
+    )
+    assert.equal(calls.length, 4)
+    assert.match(calls[3], /Uninstaller/)
+  } finally {
+    rmSync(files.directory, { recursive: true, force: true })
+  }
 })
 
 test('published signature evidence strips native runner paths', () => {
   const directory = mkdtempSync(path.join(tmpdir(), 'statskey-signature-privacy-'))
   const installerPath = path.join(directory, 'StatsKey.exe')
   const executablePath = path.join(directory, 'StatsKey-app.exe')
+  const processOwnerPath = path.join(directory, 'windows-process-owner.ps1')
   const recordPath = path.join(directory, WINDOWS_NATIVE_VERIFICATION_FILE)
   try {
     writeFileSync(installerPath, 'installer')
     writeFileSync(executablePath, 'application')
+    writeFileSync(processOwnerPath, '# process owner')
     const record = recordWindowsNativeVerification({
       recordPath,
       installerPath,
       executablePath,
+      processOwnerPath,
       version: VERSION,
       sourceCommit: SOURCE_COMMIT,
       platform: 'win32',

@@ -1,5 +1,5 @@
 const { spawnSync } = require('node:child_process')
-const { createHash } = require('node:crypto')
+const { createHash, createHmac } = require('node:crypto')
 const {
   existsSync,
   lstatSync,
@@ -156,15 +156,19 @@ function assertWindowsDeepSmoke({
 
 function selectReleaseTargets(
   allTargets,
-  { macOnly = false, windowsOnly = false } = {}
+  { macOnly = false, windowsOnly = false, linuxOnly = false } = {}
 ) {
-  if (macOnly && windowsOnly) {
-    throw new Error('--mac-only and --windows-only are mutually exclusive.')
+  if ([macOnly, windowsOnly, linuxOnly].filter(Boolean).length > 1) {
+    throw new Error(
+      '--mac-only, --windows-only, and --linux-only are mutually exclusive.'
+    )
   }
   const targets = windowsOnly
     ? allTargets.filter((target) => target.channel === 'win-x64')
     : macOnly
       ? allTargets.filter((target) => target.channel.startsWith('mac-'))
+      : linuxOnly
+        ? allTargets.filter((target) => target.channel === 'linux-x64')
       : [...allTargets]
   if (targets.length === 0) {
     throw new Error('The requested release target is unavailable.')
@@ -195,6 +199,13 @@ function assertFinalizeNativePreconditions({
     path.join(outputRoot, WINDOWS_DEEP_SMOKE_FILE),
     path.join(targetOutput, 'win-unpacked', 'StatsKey.exe'),
     path.join(targetOutput, 'win-unpacked', 'resources', 'app.asar'),
+    path.join(
+      targetOutput,
+      'win-unpacked',
+      'resources',
+      'app.asar.unpacked',
+      'windows-process-owner.ps1'
+    ),
     path.join(targetOutput, 'win-unpacked', 'resources', 'app-update.yml'),
   ]
   const missing = required.filter(
@@ -249,6 +260,7 @@ function recordWindowsNativeVerification({
   recordPath,
   installerPath,
   executablePath,
+  processOwnerPath,
   version,
   sourceCommit,
   platform = process.platform,
@@ -265,6 +277,7 @@ function recordWindowsNativeVerification({
   assertVersionAndCommit(version, sourceCommit)
   const installer = fileEvidence(installerPath)
   const application = fileEvidence(executablePath)
+  const processOwner = fileEvidence(processOwnerPath)
   const installerSignature = normalizeSignature(
     authenticodeReader(installerPath),
     'Windows installer',
@@ -298,7 +311,7 @@ function recordWindowsNativeVerification({
     recordedAt,
     verifier: 'Get-AuthenticodeSignature',
     nativeTests: normalizeNativeTests(nativeTests),
-    files: { installer, application },
+    files: { installer, application, processOwner },
     authenticode: {
       installer: installerSignature,
       application: applicationSignature,
@@ -317,6 +330,7 @@ function assertWindowsNativeVerification({
   recordPath,
   installerPath,
   executablePath,
+  processOwnerPath,
   version,
   sourceCommit,
   unsignedPreview = false,
@@ -360,6 +374,11 @@ function assertWindowsNativeVerification({
     record.files?.application,
     executablePath,
     'packaged Windows application'
+  )
+  assertFileEvidence(
+    record.files?.processOwner,
+    processOwnerPath,
+    'packaged Windows process owner'
   )
   const installerSignature = normalizeSignature(
     record.authenticode?.installer,
@@ -484,6 +503,7 @@ function normalizeSignature(candidate, label, unsignedPreview) {
 function runNativeWindowsReleaseSmokeTests({
   installerPath,
   executablePath,
+  processOwnerPath,
   platform = process.platform,
   powershellRunner = runPowerShell,
   desktopTestsPassed = false,
@@ -496,11 +516,14 @@ function runNativeWindowsReleaseSmokeTests({
       'Windows release smoke evidence requires the desktop test suite to pass first.'
     )
   }
+  fileEvidence(processOwnerPath)
   const temporaryRoot = mkdtempSync(
     path.join(tmpdir(), 'statskey-windows-release-smoke-')
   )
   try {
     const unpackedLaunch = [
+      "$ErrorActionPreference = 'Stop';",
+      'Set-StrictMode -Version Latest;',
       "$process = Start-Process -FilePath $env:STATSKEY_EXE -ArgumentList ('--user-data-dir=' + $env:STATSKEY_USER_DATA) -PassThru;",
       'Start-Sleep -Seconds 8;',
       "if ($process.HasExited) { throw 'Packaged StatsKey exited during launch smoke test.' };",
@@ -512,8 +535,16 @@ function runNativeWindowsReleaseSmokeTests({
     })
     const installRoot = path.join(temporaryRoot, 'installed')
     const installedExecutable = path.join(installRoot, 'StatsKey.exe')
+    const installedProcessOwner = path.join(
+      installRoot,
+      'resources',
+      'app.asar.unpacked',
+      'windows-process-owner.ps1'
+    )
     const uninstallExecutable = path.join(installRoot, 'Uninstall StatsKey.exe')
     const installerSmoke = [
+      "$ErrorActionPreference = 'Stop';",
+      'Set-StrictMode -Version Latest;',
       '$application = $null;',
       'try {',
       "  $installer = Start-Process -FilePath $env:STATSKEY_INSTALLER -ArgumentList @('/S',('/D=' + $env:STATSKEY_INSTALL_ROOT)) -PassThru -Wait;",
@@ -526,8 +557,6 @@ function runNativeWindowsReleaseSmokeTests({
       '  if (($null -ne $application) -and (-not $application.HasExited)) { Stop-Process -Id $application.Id -Force };',
       '}',
       "if (-not (Test-Path -LiteralPath $env:STATSKEY_UNINSTALLER)) { throw 'StatsKey uninstaller is missing.' };",
-      "$uninstaller = Start-Process -FilePath $env:STATSKEY_UNINSTALLER -ArgumentList '/S' -PassThru -Wait;",
-      "if ($uninstaller.ExitCode -ne 0) { throw ('Uninstaller exited ' + $uninstaller.ExitCode) };",
     ].join(' ')
     powershellRunner(installerSmoke, {
       STATSKEY_INSTALLER: installerPath,
@@ -536,20 +565,210 @@ function runNativeWindowsReleaseSmokeTests({
       STATSKEY_INSTALLED_PROFILE: path.join(temporaryRoot, 'installed-profile'),
       STATSKEY_UNINSTALLER: uninstallExecutable,
     })
+    const childScriptPath = path.join(
+      temporaryRoot,
+      'process-owner-child.ps1'
+    )
+    const parentExitProcessIdsPath = path.join(
+      temporaryRoot,
+      'process-owner-parent-exit-pids.json'
+    )
+    const leaseExpiryProcessIdsPath = path.join(
+      temporaryRoot,
+      'process-owner-lease-expiry-pids.json'
+    )
+    const parentExitPayloadPath = path.join(
+      temporaryRoot,
+      'process-owner-parent-exit-payload.txt'
+    )
+    const leaseExpiryPayloadPath = path.join(
+      temporaryRoot,
+      'process-owner-lease-expiry-payload.txt'
+    )
+    const authorityFencePath = path.join(
+      temporaryRoot,
+      'process-owner.authority'
+    )
+    const ownerLockPath = path.join(temporaryRoot, 'process-owner.lock')
+    const authorityToken = 'native-release-smoke-authority-token'
+    const authorityKey = Buffer.alloc(32, 0x5a).toString('base64url')
+    const authorityDeadlineUnixMilliseconds = Date.now() + 10 * 60_000
+    const authorityFields = [
+      'statskey-fleet-authority-v1',
+      'lease_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      authorityToken,
+      String(Date.now() + 5 * 60_000),
+      String(authorityDeadlineUnixMilliseconds),
+    ]
+    writeFileSync(
+      authorityFencePath,
+      [
+        ...authorityFields,
+        createHmac('sha256', Buffer.from(authorityKey, 'base64url'))
+          .update(authorityFields.join('\n'))
+          .digest('base64url'),
+      ].join('\n'),
+      { encoding: 'utf8', mode: 0o600 }
+    )
+    writeFileSync(
+      childScriptPath,
+      [
+        'param([Parameter(Mandatory = $true)][string]$PidPath)',
+        "$descendant = Start-Process -FilePath $env:SystemRoot\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ArgumentList @('-NoProfile','-NonInteractive','-Command','Start-Sleep -Seconds 120') -PassThru",
+        '[pscustomobject]@{ rootPid = $PID; descendantPid = $descendant.Id } | ConvertTo-Json -Compress | Set-Content -LiteralPath $PidPath -Encoding UTF8',
+        'Start-Sleep -Seconds 120',
+      ].join('\r\n'),
+      { encoding: 'utf8', mode: 0o600 }
+    )
+    const processOwnerSmoke = [
+      "$ErrorActionPreference = 'Stop';",
+      'Set-StrictMode -Version Latest;',
+      '$parent = $null; $owner = $null; $contender = $null; $owned = $null; [int]$rootPid = 0; [int]$descendantPid = 0;',
+      'try {',
+      "  if (-not (Test-Path -LiteralPath $env:STATSKEY_PROCESS_OWNER)) { throw 'Installed process owner is missing.' };",
+      '  $installedOwnerHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $env:STATSKEY_PROCESS_OWNER -ErrorAction Stop).Hash;',
+      '  $sourceOwnerHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $env:STATSKEY_SOURCE_PROCESS_OWNER -ErrorAction Stop).Hash;',
+      "  if (($installedOwnerHash -notmatch '^[A-Fa-f0-9]{64}$') -or ($sourceOwnerHash -notmatch '^[A-Fa-f0-9]{64}$') -or ($installedOwnerHash -ne $sourceOwnerHash)) { throw 'Installed process owner differs from tested output.' };",
+      "  $parent = Start-Process -FilePath $env:STATSKEY_POWERSHELL -ArgumentList @('-NoProfile','-NonInteractive','-Command','Start-Sleep -Seconds 120') -PassThru;",
+      '  $request = [ordered]@{',
+      '    executable = $env:STATSKEY_POWERSHELL;',
+      "    arguments = @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$env:STATSKEY_CHILD_SCRIPT,'-PidPath',$env:STATSKEY_PARENT_EXIT_PID_PATH);",
+      '    parentProcessId = $parent.Id;',
+      '    parentStartedUnixMilliseconds = ([DateTimeOffset]($parent.StartTime.ToUniversalTime())).ToUnixTimeMilliseconds();',
+      '    deadlineUnixMilliseconds = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() + 60000;',
+      '    authorityFencePath = $env:STATSKEY_AUTHORITY_FENCE;',
+      '    ownerLockPath = $env:STATSKEY_OWNER_LOCK;',
+      "    authorityLeaseId = 'lease_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';",
+      '    authorityToken = $env:STATSKEY_AUTHORITY_TOKEN;',
+      '    authorityKey = $env:STATSKEY_AUTHORITY_KEY;',
+      '    maximumAuthorityDeadlineUnixMilliseconds = [long]$env:STATSKEY_AUTHORITY_DEADLINE',
+      '  };',
+      '  $base64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(($request | ConvertTo-Json -Compress)));',
+      "  $payload = $base64.TrimEnd('=').Replace('+','-').Replace('/','_');",
+      '  $ownerArguments = @(',
+      "    '-NoLogo','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',",
+      "    ('\"' + $env:STATSKEY_PROCESS_OWNER + '\"')",
+      '  );',
+      '  Set-Content -LiteralPath $env:STATSKEY_PARENT_EXIT_PAYLOAD_PATH -Value $payload -Encoding Ascii -NoNewline;',
+      '  $owner = Start-Process -FilePath $env:STATSKEY_POWERSHELL -ArgumentList $ownerArguments -RedirectStandardInput $env:STATSKEY_PARENT_EXIT_PAYLOAD_PATH -PassThru;',
+      '  $deadline = [DateTime]::UtcNow.AddSeconds(15);',
+      '  while ((-not (Test-Path -LiteralPath $env:STATSKEY_PARENT_EXIT_PID_PATH)) -and ([DateTime]::UtcNow -lt $deadline)) { Start-Sleep -Milliseconds 50 };',
+      "  if (-not (Test-Path -LiteralPath $env:STATSKEY_PARENT_EXIT_PID_PATH)) { throw 'Owned process did not start.' };",
+      '  $owned = Get-Content -LiteralPath $env:STATSKEY_PARENT_EXIT_PID_PATH -Raw | ConvertFrom-Json;',
+      '  $rootPid = 0; $descendantPid = 0;',
+      "  if ((-not [int]::TryParse([string]$owned.rootPid,[ref]$rootPid)) -or (-not [int]::TryParse([string]$owned.descendantPid,[ref]$descendantPid)) -or ($rootPid -lt 1) -or ($descendantPid -lt 1) -or ($rootPid -eq $descendantPid)) { throw 'Owned process ids are invalid.' };",
+      "  if ((-not (Get-Process -Id $rootPid -ErrorAction SilentlyContinue)) -or (-not (Get-Process -Id $descendantPid -ErrorAction SilentlyContinue))) { throw 'Owned processes are not live.' };",
+      '  $contender = Start-Process -FilePath $env:STATSKEY_POWERSHELL -ArgumentList $ownerArguments -RedirectStandardInput $env:STATSKEY_PARENT_EXIT_PAYLOAD_PATH -PassThru;',
+      "  if (-not $contender.WaitForExit(5000)) { throw 'Concurrent process owner did not fail closed.' };",
+      "  if ($contender.ExitCode -eq 0) { throw 'Concurrent process owner bypassed the exclusive lock.' };",
+      '  Stop-Process -Id $parent.Id -Force;',
+      "  if (-not $owner.WaitForExit(15000)) { throw 'Process owner did not react to parent exit.' };",
+      "  if ($owner.ExitCode -eq 0) { throw 'Process owner reported success after parent exit.' };",
+      '  Start-Sleep -Milliseconds 250;',
+      "  if (Get-Process -Id $rootPid -ErrorAction SilentlyContinue) { throw 'Owned root survived parent exit.' };",
+      "  if (Get-Process -Id $descendantPid -ErrorAction SilentlyContinue) { throw 'Owned descendant survived parent exit.' };",
+      "  $parent = Start-Process -FilePath $env:STATSKEY_POWERSHELL -ArgumentList @('-NoProfile','-NonInteractive','-Command','Start-Sleep -Seconds 120') -PassThru;",
+      '  $request.parentProcessId = $parent.Id;',
+      '  $request.parentStartedUnixMilliseconds = ([DateTimeOffset]($parent.StartTime.ToUniversalTime())).ToUnixTimeMilliseconds();',
+      '  $request.arguments[-1] = $env:STATSKEY_LEASE_EXPIRY_PID_PATH;',
+      '  $base64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(($request | ConvertTo-Json -Compress)));',
+      "  $payload = $base64.TrimEnd('=').Replace('+','-').Replace('/','_');",
+      '  Set-Content -LiteralPath $env:STATSKEY_LEASE_EXPIRY_PAYLOAD_PATH -Value $payload -Encoding Ascii -NoNewline;',
+      '  $owner = Start-Process -FilePath $env:STATSKEY_POWERSHELL -ArgumentList $ownerArguments -RedirectStandardInput $env:STATSKEY_LEASE_EXPIRY_PAYLOAD_PATH -PassThru;',
+      '  $deadline = [DateTime]::UtcNow.AddSeconds(15);',
+      '  while ((-not (Test-Path -LiteralPath $env:STATSKEY_LEASE_EXPIRY_PID_PATH)) -and ([DateTime]::UtcNow -lt $deadline)) { Start-Sleep -Milliseconds 50 };',
+      "  if (-not (Test-Path -LiteralPath $env:STATSKEY_LEASE_EXPIRY_PID_PATH)) { throw 'Lease-fenced process did not start.' };",
+      '  $owned = Get-Content -LiteralPath $env:STATSKEY_LEASE_EXPIRY_PID_PATH -Raw | ConvertFrom-Json;',
+      '  $rootPid = 0; $descendantPid = 0;',
+      "  if ((-not [int]::TryParse([string]$owned.rootPid,[ref]$rootPid)) -or (-not [int]::TryParse([string]$owned.descendantPid,[ref]$descendantPid)) -or ($rootPid -lt 1) -or ($descendantPid -lt 1) -or ($rootPid -eq $descendantPid)) { throw 'Lease-fenced process ids are invalid.' };",
+      "  if ((-not (Get-Process -Id $rootPid -ErrorAction SilentlyContinue)) -or (-not (Get-Process -Id $descendantPid -ErrorAction SilentlyContinue))) { throw 'Lease-fenced processes are not live.' };",
+      '  $authority = Get-Content -LiteralPath $env:STATSKEY_AUTHORITY_FENCE;',
+      '  $authority[3] = ([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() - 1).ToString();',
+      "  $authorityKeyBase64 = $env:STATSKEY_AUTHORITY_KEY.Replace('-','+').Replace('_','/');",
+      "  switch ($authorityKeyBase64.Length % 4) { 2 { $authorityKeyBase64 += '==' } 3 { $authorityKeyBase64 += '=' } 1 { throw 'Authority key is invalid.' } };",
+      '  $authorityHmac = [Security.Cryptography.HMACSHA256]::new([Convert]::FromBase64String($authorityKeyBase64));',
+      '  try { $authoritySignature = $authorityHmac.ComputeHash([Text.Encoding]::UTF8.GetBytes(($authority[0..4] -join "`n"))) } finally { $authorityHmac.Dispose() };',
+      "  $authority[5] = [Convert]::ToBase64String($authoritySignature).TrimEnd('=').Replace('+','-').Replace('/','_');",
+      '  Set-Content -LiteralPath $env:STATSKEY_AUTHORITY_FENCE -Value $authority -Encoding UTF8;',
+      "  if (-not $owner.WaitForExit(15000)) { throw 'Process owner did not react to lease expiry.' };",
+      "  if ($owner.ExitCode -eq 0) { throw 'Process owner reported success after lease expiry.' };",
+      '  Start-Sleep -Milliseconds 250;',
+      "  if (Get-Process -Id $rootPid -ErrorAction SilentlyContinue) { throw 'Owned root survived lease expiry.' };",
+      "  if (Get-Process -Id $descendantPid -ErrorAction SilentlyContinue) { throw 'Owned descendant survived lease expiry.' };",
+      '} finally {',
+      '  if (($null -ne $parent) -and (-not $parent.HasExited)) { Stop-Process -Id $parent.Id -Force };',
+      '  if (($null -ne $owner) -and (-not $owner.HasExited)) { Stop-Process -Id $owner.Id -Force };',
+      '  if (($null -ne $contender) -and (-not $contender.HasExited)) { Stop-Process -Id $contender.Id -Force };',
+      '  if ($rootPid -gt 0) { Stop-Process -Id $rootPid -Force -ErrorAction SilentlyContinue };',
+      '  if ($descendantPid -gt 0) { Stop-Process -Id $descendantPid -Force -ErrorAction SilentlyContinue };',
+      '}',
+    ].join(' ')
+    try {
+      powershellRunner(processOwnerSmoke, {
+        STATSKEY_POWERSHELL: path.join(
+          process.env.SystemRoot || 'C:\\Windows',
+          'System32',
+          'WindowsPowerShell',
+          'v1.0',
+          'powershell.exe'
+        ),
+        STATSKEY_PROCESS_OWNER: installedProcessOwner,
+        STATSKEY_SOURCE_PROCESS_OWNER: processOwnerPath,
+        STATSKEY_CHILD_SCRIPT: childScriptPath,
+        STATSKEY_PARENT_EXIT_PID_PATH: parentExitProcessIdsPath,
+        STATSKEY_LEASE_EXPIRY_PID_PATH: leaseExpiryProcessIdsPath,
+        STATSKEY_PARENT_EXIT_PAYLOAD_PATH: parentExitPayloadPath,
+        STATSKEY_LEASE_EXPIRY_PAYLOAD_PATH: leaseExpiryPayloadPath,
+        STATSKEY_AUTHORITY_FENCE: authorityFencePath,
+        STATSKEY_OWNER_LOCK: ownerLockPath,
+        STATSKEY_AUTHORITY_TOKEN: authorityToken,
+        STATSKEY_AUTHORITY_KEY: authorityKey,
+        STATSKEY_AUTHORITY_DEADLINE: String(
+          authorityDeadlineUnixMilliseconds
+        ),
+      })
+    } finally {
+      const uninstallSmoke = [
+        "$ErrorActionPreference = 'Stop';",
+        'Set-StrictMode -Version Latest;',
+        "if (-not (Test-Path -LiteralPath $env:STATSKEY_UNINSTALLER)) { throw 'StatsKey uninstaller is missing.' };",
+        "$uninstaller = Start-Process -FilePath $env:STATSKEY_UNINSTALLER -ArgumentList '/S' -PassThru -Wait;",
+        "if ($uninstaller.ExitCode -ne 0) { throw ('Uninstaller exited ' + $uninstaller.ExitCode) };",
+      ].join(' ')
+      powershellRunner(uninstallSmoke, {
+        STATSKEY_UNINSTALLER: uninstallExecutable,
+      })
+    }
   } finally {
     rmSync(temporaryRoot, { recursive: true, force: true })
   }
   return [
     { name: 'desktop test suite', status: 'passed' },
+    {
+      name: 'packaged process-owner parent-exit and lease-expiry containment',
+      status: 'passed',
+    },
     { name: 'packaged application launch smoke test', status: 'passed' },
     { name: 'installer install/uninstall smoke test', status: 'passed' },
   ]
 }
 
 function runPowerShell(command, environment) {
+  const guardedCommand = [
+    "$ErrorActionPreference = 'Stop';",
+    'Set-StrictMode -Version Latest;',
+    command,
+  ].join(' ')
   const result = spawnSync(
     'powershell.exe',
-    ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', command],
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-Command',
+      guardedCommand,
+    ],
     {
       encoding: 'utf8',
       env: { ...process.env, ...environment },

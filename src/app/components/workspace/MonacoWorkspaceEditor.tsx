@@ -93,6 +93,7 @@ const inlineCompletionsProvider: monaco.languages.InlineCompletionsProvider = {
             },
           ],
           effort: 'low',
+          serviceTier: preference.model.serviceTier,
           reasoningMode: 'standard',
           maxOutputTokens: 1200,
           webSearch: false,
@@ -325,6 +326,7 @@ function monacoLanguage(language: string): string {
 function readDirectModelPreference(stored: Record<string, unknown> | null) {
   try {
     const raw = (stored ?? {}) as {
+      modelKey?: unknown
       modelLabel?: unknown
       modelId?: unknown
       directProvider?: unknown
@@ -333,10 +335,20 @@ function readDirectModelPreference(stored: Record<string, unknown> | null) {
     if (raw.executionRoute !== 'direct' || typeof raw.modelLabel !== 'string') {
       return null
     }
-    const model = CHAT_MODELS.find(
-      (candidate) => candidate.label === raw.modelLabel
-    )
-    if (model) return { model }
+    const model =
+      (typeof raw.modelKey === 'string'
+        ? CHAT_MODELS.find((candidate) => candidate.id === raw.modelKey)
+        : undefined) ??
+      CHAT_MODELS.find((candidate) => candidate.label === raw.modelLabel)
+    if (model && isDesktopProviderId(model.directProvider)) {
+      return {
+        model: {
+          modelId: model.modelId,
+          directProvider: model.directProvider,
+          serviceTier: model.serviceTier,
+        },
+      }
+    }
     if (
       typeof raw.modelId === 'string' &&
       isDesktopProviderId(raw.directProvider)
@@ -345,6 +357,7 @@ function readDirectModelPreference(stored: Record<string, unknown> | null) {
         model: {
           modelId: raw.modelId,
           directProvider: raw.directProvider,
+          serviceTier: undefined,
         },
       }
     }

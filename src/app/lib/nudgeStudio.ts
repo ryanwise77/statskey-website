@@ -37,11 +37,26 @@ export interface NudgeDraft {
   savedBy: string | null
 }
 
+export interface FounderJourneyWeekNoteState {
+  startDay: string
+  weekId: string
+  weekNumber: number
+  weekStartDay: string
+  weekEndDay: string
+  maxLength: number
+  active: {
+    text: string
+    revision: number
+    publishedAtMillis: number | null
+  }
+}
+
 export interface NudgeStudioState {
   definitions: Record<string, NudgeSlotDefinition>
   active: NudgeRevision
   history: NudgeRevision[]
   draft?: NudgeDraft | null
+  founderJourneyWeek: FounderJourneyWeekNoteState
 }
 
 export interface LocalNudgeDraft {
@@ -66,6 +81,17 @@ const saveDraftCall = httpsCallable<
   },
   NudgeDraft
 >(functions, 'saveRecordingNudgeDraft')
+
+const publishFounderJourneyWeekNoteCall = httpsCallable<
+  {
+    weekId: string
+    expectedRevision: number
+    text: string
+  },
+  FounderJourneyWeekNoteState
+>(functions, 'publishFounderJourneyWeekNote', {
+  limitedUseAppCheckTokens: true,
+})
 
 const publishCall = httpsCallable<
   { expectedRevision: number; slots: Record<string, NudgeCopy> },
@@ -95,6 +121,19 @@ export async function saveNudgeDraft(
     expectedDraftVersion,
     baseRevision,
     slots,
+  })
+  return result.data
+}
+
+export async function publishFounderJourneyWeekNote(
+  weekId: string,
+  expectedRevision: number,
+  text: string
+): Promise<FounderJourneyWeekNoteState> {
+  const result = await publishFounderJourneyWeekNoteCall({
+    weekId,
+    expectedRevision,
+    text,
   })
   return result.data
 }

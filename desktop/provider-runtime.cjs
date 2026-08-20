@@ -982,7 +982,77 @@ function collectHttpUrls(value) {
   return [...urls].slice(0, 50)
 }
 
+function normalizeProviderModelList(provider, rawModels, maximum = 250) {
+  if (!Array.isArray(rawModels)) return []
+  const result = []
+  const seen = new Set()
+  for (const raw of rawModels) {
+    let id = String(raw?.id || raw?.name || '').trim()
+    if (provider === 'google' && id.startsWith('models/')) {
+      id = id.slice('models/'.length)
+    }
+    if (
+      !id ||
+      id.length > 240 ||
+      /[\u0000-\u001f\u007f]/.test(id) ||
+      seen.has(id) ||
+      !providerModelSupportsAgenticText(provider, id, raw)
+    ) {
+      continue
+    }
+    seen.add(id)
+    const rawLabel = String(raw?.display_name || raw?.displayName || id).trim()
+    result.push({
+      id,
+      label: rawLabel && rawLabel.length <= 240 ? rawLabel : id,
+      createdAt: providerModelCreatedAt(
+        raw?.created || raw?.created_at || raw?.createTime
+      ),
+    })
+    if (result.length >= Math.max(1, Math.min(500, Number(maximum) || 250))) {
+      break
+    }
+  }
+  return result
+}
+
+function providerModelSupportsAgenticText(provider, id, raw) {
+  const excluded =
+    /(?:^|[-_.])(?:audio|dall-e|embed|embedding|image|imagen|moderation|realtime|speech|transcri(?:be|ption)|tts|veo|video|whisper)(?:$|[-_.])/i
+  if (excluded.test(id)) return false
+  if (provider === 'google') {
+    const methods =
+      raw?.supportedGenerationMethods || raw?.supported_generation_methods
+    if (Array.isArray(methods) && methods.length > 0) {
+      return methods.some((method) =>
+        ['generateContent', 'streamGenerateContent'].includes(String(method))
+      )
+    }
+    return /^gemini-/i.test(id)
+  }
+  if (provider === 'openai') {
+    return /^(?:chatgpt-|codex-|gpt-|o\d)/i.test(id)
+  }
+  if (provider === 'anthropic') return /^claude-/i.test(id)
+  if (provider === 'xai') return /^grok-/i.test(id)
+  if (provider === 'moonshot') return /^(?:kimi|moonshot)/i.test(id)
+  return false
+}
+
+function providerModelCreatedAt(value) {
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Date.parse(value)
+    return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null
+  }
+  const numeric = Number(value || 0)
+  if (!Number.isFinite(numeric) || numeric <= 0) return null
+  const milliseconds = numeric < 1_000_000_000_000 ? numeric * 1000 : numeric
+  const parsed = new Date(milliseconds)
+  return Number.isFinite(parsed.getTime()) ? parsed.toISOString() : null
+}
+
 module.exports = {
+  normalizeProviderModelList,
   runProviderRound,
   withProviderToolCatalog,
 }

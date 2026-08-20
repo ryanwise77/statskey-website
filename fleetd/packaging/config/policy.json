@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "policyEpoch": 1,
+  "executionServiceId": "",
+  "minimumHelperProtocol": 1,
+  "apparmorProfile": "statskey-fleet-job",
+  "executorProfileIds": ["command-v1"],
+  "sandboxProfileIds": ["ubuntu-build-v1"],
+  "networkProfileIds": ["none"],
+  "resourceCeilings": {
+    "cpuMilli": 4000,
+    "memoryBytes": 8589934592,
+    "pids": 256,
+    "diskBytes": 21474836480,
+    "wallTimeMs": 3600000
+  }
+}

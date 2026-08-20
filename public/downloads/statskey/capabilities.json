@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "asOfVersion": "0.21.8",
+  "updated": "2026-08-19",
+  "groups": [
+    {
+      "id": "modes",
+      "title": "Choose how StatsKey helps",
+      "summary": "Start simply, then expose technical controls only when you need them.",
+      "items": [
+        "Automatic chooses the safest capable approach from your request.",
+        "Ask researches and explains without changing anything.",
+        "Plan creates an editable step-by-step plan without changing anything.",
+        "Fix diagnoses a problem, makes the repair, and verifies the result.",
+        "Execute completes the task, makes the needed changes, and verifies them.",
+        "Advanced settings keep model, context, reasoning, and action controls available."
+      ]
+    },
+    {
+      "id": "platforms",
+      "title": "Use the desktop that fits the machine",
+      "summary": "Platform support is disclosed at the level that has actually been verified.",
+      "items": [
+        "macOS releases are signed and Apple notarized.",
+        "The Windows installer remains an explicitly unsigned preview.",
+        "The Ubuntu 26.04 LTS x64 DEB remains an explicitly unsigned preview.",
+        "Ubuntu supports the desktop workspace, local tools, and Fleet control; automatic updates and unattended Fleet jobs remain disabled until their Linux trust services are verified."
+      ]
+    },
+    {
+      "id": "workspace",
+      "title": "Work in real projects",
+      "summary": "Use the same local files and project structure you already trust.",
+      "items": [
+        "Open local and multi-root workspaces with files, tabs, split editors, and persistent layouts.",
+        "Read, search, create, edit, rename, and delete files inside the approved workspace.",
+        "Use encrypted local indexing with ignored-file and secret-file exclusions.",
+        "Review workspace changes, linked files, checkpoints, and saved results in one place.",
+        "Open GitHub-backed browser workspaces with explicit remote diff review."
+      ]
+    },
+    {
+      "id": "execution",
+      "title": "Run and verify the work",
+      "summary": "Implementation and proof stay connected.",
+      "items": [
+        "Run terminal commands, builds, tests, and focused verification in the bound workspace.",
+        "Inspect Git status and diffs, stage or unstage changes, and approve commits.",
+        "Generate and preview selection-aware inline edits before applying them.",
+        "Keep long-running tool output visible and synthesize a final verified handoff.",
+        "Restore checkpoints when a reviewed change needs to be reversed."
+      ]
+    },
+    {
+      "id": "control",
+      "title": "Stay in control while it works",
+      "summary": "You can follow, redirect, pause, and resume without starting over.",
+      "items": [
+        "See the current action, elapsed work, completed steps, and next concrete step.",
+        "Send corrections, queue follow-ups, reorder queued work, or interrupt with a priority message.",
+        "Keep conversations and active work recoverable when tabs are closed or switched.",
+        "Run up to two independent top-level tasks at once while conflicting edits remain coordinated.",
+        "Create isolated task workspaces from a clean committed baseline."
+      ]
+    },
+    {
+      "id": "verification",
+      "title": "Test what people actually use",
+      "summary": "Verification can extend beyond source files.",
+      "items": [
+        "Open isolated browser tabs, inspect bounded page content, click, type non-secret text, and capture screenshots.",
+        "Discover and launch approved local applications.",
+        "Discover, boot, inspect, and interact with iOS Simulators and Android emulators.",
+        "Install and launch mobile builds, capture device screenshots, and inspect process logs.",
+        "Keep browser and device evidence tied to the conversation that requested it."
+      ]
+    },
+    {
+      "id": "intelligence",
+      "title": "Use the right Intelligence",
+      "summary": "Choose a managed route or connect your own provider.",
+      "items": [
+        "Select a model, reasoning effort, context size, and managed or direct-provider route.",
+        "Store supported provider keys in encrypted local storage.",
+        "Stream responses, cancel work, and use bounded subagents for independent investigation.",
+        "Connect approved MCP tools over local or remote transports with exact-argument review.",
+        "Attach files and inspect how much context a task is using."
+      ]
+    },
+    {
+      "id": "personal",
+      "title": "Connect personal tools only when invited",
+      "summary": "Work and personal context remain separate by default.",
+      "items": [
+        "Work conversations cannot read health, calendar, inbox, or personal memory unless you explicitly include allowed context.",
+        "Personal conversations do not receive project files, terminal, Git, MCP, or browser automation.",
+        "Connect Google Calendar or Gmail with separately chosen read, create, and send capabilities.",
+        "Review the exact email or calendar event before an external action is completed.",
+        "Bring optional health context into an approved workspace without silently enabling other personal sources."
+      ]
+    },
+    {
+      "id": "planning",
+      "title": "Turn plans into durable artifacts",
+      "summary": "Plans remain editable, reviewable, and connected to implementation.",
+      "items": [
+        "Create local planning canvases with checklists, revisions, and bounded flow diagrams.",
+        "Refine a plan conversationally without losing its prior revisions.",
+        "Save a plan into the workspace with conflict checks.",
+        "Fork a plan without changing the original.",
+        "Start implementation from an immutable plan handoff."
+      ]
+    },
+    {
+      "id": "customization",
+      "title": "Customize the workspace",
+      "summary": "Shape StatsKey through the same review boundary as project work.",
+      "items": [
+        "Discover workspace rules, skills, hooks, MCP configuration, and connected tools in one Customize surface.",
+        "Open StatsKey's own source from Settings and describe the interface or workflow change you want.",
+        "Review and verify customization changes before they become part of a release.",
+        "Use workspace hooks for prompts, responses, file reads, mutations, terminal commands, and MCP actions."
+      ]
+    },
+    {
+      "id": "safety",
+      "title": "Review and protect changes",
+      "summary": "Capability does not remove the approval boundary.",
+      "items": [
+        "Choose Review each, Auto-review, or Run everything for local actions.",
+        "Keep file writes and commands contained to the approved workspace with symlink and external-file protection.",
+        "Require explicit approval for deletion, external actions, commits, MCP calls, and configured hooks.",
+        "Block password fields, unsafe destinations, popups, downloads, and hidden permissions in controlled browsing.",
+        "Receive signed, notarized macOS updates through immutable architecture-specific feeds.",
+        "Keep unsigned Windows and Ubuntu previews explicit; neither is described as a signed release."
+      ]
+    }
+  ]
+}

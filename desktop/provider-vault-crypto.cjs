@@ -1,4 +1,7 @@
 const DEFAULT_PROVIDER_VAULT_DEADLINE_MILLISECONDS = 10_000
+const {
+  secureStorageBackendError,
+} = require('./safe-storage-runtime.cjs')
 
 class ProviderVaultCryptoTimeoutError extends Error {
   constructor(operation, milliseconds) {
@@ -26,9 +29,11 @@ class ProviderVaultCryptoUnavailableError extends Error {
 class ProviderVaultCrypto {
   constructor({
     safeStorage,
+    platform = process.platform,
     deadlineMilliseconds = DEFAULT_PROVIDER_VAULT_DEADLINE_MILLISECONDS,
   }) {
     this.safeStorage = safeStorage
+    this.platform = platform
     this.deadlineMilliseconds = positiveMilliseconds(
       deadlineMilliseconds,
       DEFAULT_PROVIDER_VAULT_DEADLINE_MILLISECONDS
@@ -89,6 +94,13 @@ class ProviderVaultCrypto {
   }
 
   async assertAvailable() {
+    const backendError = secureStorageBackendError(
+      this.safeStorage,
+      this.platform
+    )
+    if (backendError) {
+      throw new ProviderVaultCryptoUnavailableError(backendError)
+    }
     const check = this.safeStorage?.isAsyncEncryptionAvailable
     if (typeof check !== 'function') {
       throw new ProviderVaultCryptoUnavailableError(

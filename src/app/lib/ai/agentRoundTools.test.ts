@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   isProviderRoundTimeout,
+  openAIStyleSubagentMessages,
+  resolvedSubagentModel,
+  runDirectFinalHandoff,
   toolsForAgentMode,
   toolsForRound,
   type AgentStep,
@@ -13,6 +16,106 @@ describe('agent round tool availability', () => {
       true
     )
     expect(isProviderRoundTimeout(new Error('permission-denied'))).toBe(false)
+  })
+
+  it('allows a healthy final synthesis to run beyond the former one-minute cap', async () => {
+    vi.useFakeTimers()
+    try {
+      let finish: ((value: string) => void) | undefined
+      const run = runDirectFinalHandoff(async (markAlive) => {
+        markAlive('active')
+        return await new Promise<string>((resolve) => {
+          finish = resolve
+        })
+      })
+
+      await vi.advanceTimersByTimeAsync(61_000)
+      finish?.('complete final summary')
+
+      await expect(run).resolves.toBe('complete final summary')
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('inherits the parent model unless an investigator override is selected', () => {
+    const parent = {
+      provider: 'chatgpt' as const,
+      modelId: 'gpt-5.6-sol',
+      executionRoute: 'direct' as const,
+      directProvider: 'openai' as const,
+      serviceTier: 'fast' as const,
+    }
+    expect(resolvedSubagentModel(parent)).toEqual(parent)
+    expect(
+      resolvedSubagentModel({
+        ...parent,
+        subagentModel: {
+          provider: 'claude',
+          modelId: 'claude-sonnet-5',
+          executionRoute: 'managed',
+          directProvider: 'anthropic',
+        },
+      })
+    ).toEqual({
+      provider: 'claude',
+      modelId: 'claude-sonnet-5',
+      executionRoute: 'managed',
+      directProvider: 'anthropic',
+    })
+  })
+
+  it('preserves investigator tool history when using a managed OpenAI-style model', () => {
+    expect(
+      openAIStyleSubagentMessages('Investigate carefully.', [
+        { role: 'user', content: 'Objective: inspect the timeout.' },
+        {
+          role: 'assistant',
+          content: [
+            { type: 'text', text: 'I will inspect the source.' },
+            {
+              type: 'tool_use',
+              id: 'read-1',
+              name: 'workspace_read',
+              input: { file_path: 'src/agent.ts' },
+            },
+          ],
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'tool_result',
+              tool_use_id: 'read-1',
+              content: 'source evidence',
+            },
+          ],
+        },
+      ])
+    ).toEqual([
+      { role: 'system', content: 'Investigate carefully.' },
+      { role: 'user', content: 'Objective: inspect the timeout.' },
+      {
+        role: 'assistant',
+        content: 'I will inspect the source.',
+        tool_calls: [
+          {
+            id: 'read-1',
+            type: 'function',
+            function: {
+              name: 'workspace_read',
+              arguments: '{"file_path":"src/agent.ts"}',
+            },
+          },
+        ],
+      },
+      {
+        role: 'tool',
+        tool_call_id: 'read-1',
+        content: 'source evidence',
+      },
+    ])
   })
 
   it('gives the screenshot work request file and command tools before provider dispatch', () => {

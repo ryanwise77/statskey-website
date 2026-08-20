@@ -17,6 +17,49 @@ describe('model catalog', () => {
       managedAvailable: true,
       serviceTier: 'fast',
     })
+    const maxFast = CHAT_MODELS.find(
+      (model) => model.id === 'gpt-5.6-sol-max-fast'
+    )
+    expect(maxFast).toMatchObject({
+      modelId: 'gpt-5.6-sol',
+      defaultEffort: 'max',
+      effortOptions: ['max'],
+      directProvider: 'openai',
+      managedAvailable: true,
+      serviceTier: 'fast',
+      pricing: {
+        inputUsdPer1M: 10,
+        cachedInputUsdPer1M: 1,
+        outputUsdPer1M: 60,
+      },
+    })
+  })
+
+  it('includes the latest Grok and Gemini agent routes at verified rates', () => {
+    expect(
+      CHAT_MODELS.find((model) => model.id === 'grok-4.6')
+    ).toMatchObject({
+      modelId: 'grok-4.6',
+      defaultEffort: 'high',
+      effortOptions: ['low', 'medium', 'high', 'xhigh'],
+      pricing: {
+        inputUsdPer1M: 2,
+        cachedInputUsdPer1M: 0.5,
+        outputUsdPer1M: 6,
+      },
+    })
+    expect(
+      CHAT_MODELS.find((model) => model.id === 'gemini-3.7-flash')
+    ).toMatchObject({
+      modelId: 'gemini-3.7-flash',
+      directProvider: 'google',
+      managedAvailable: false,
+      pricing: {
+        inputUsdPer1M: 0.75,
+        cachedInputUsdPer1M: 0.075,
+        outputUsdPer1M: 3.75,
+      },
+    })
   })
 
   it('includes Kimi K3 through a user-owned Moonshot key', () => {

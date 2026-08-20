@@ -13,6 +13,7 @@ import {
   clearLocalNudgeDraft,
   loadNudgeStudio,
   loadLocalNudgeDraft,
+  publishFounderJourneyWeekNote,
   publishNudges,
   rollbackNudges,
   saveLocalNudgeDraft,
@@ -37,6 +38,8 @@ export function NudgeStudio() {
   const [draftWarning, setDraftWarning] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [action, setAction] = useState<'publish' | `rollback-${number}` | null>(null)
+  const [weekNoteText, setWeekNoteText] = useState('')
+  const [weekNotePublishing, setWeekNotePublishing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const initializedRef = useRef(false)
@@ -85,6 +88,7 @@ export function NudgeStudio() {
         initializedRef.current = true
         setStudio(next)
         setDrafts(selectedDrafts)
+        setWeekNoteText(next.founderJourneyWeek.active.text)
         setDraftBaseRevision(selectedBaseRevision)
         setDraftSavedAt(
           useLocalDraft
@@ -118,6 +122,10 @@ export function NudgeStudio() {
     if (!studio) return false
     return JSON.stringify(drafts) !== JSON.stringify(studio.active.slots)
   }, [drafts, studio])
+  const normalizedWeekNote = weekNoteText.trim().replace(/\s+/g, ' ')
+  const weekNoteDirty =
+    studio !== null &&
+    normalizedWeekNote !== studio.founderJourneyWeek.active.text
 
   const groupedDefinitions = useMemo(() => {
     if (!studio) return []
@@ -327,6 +335,44 @@ export function NudgeStudio() {
     }
   }
 
+  async function publishWeekNote() {
+    if (
+      !studio ||
+      weekNotePublishing ||
+      !weekNoteDirty ||
+      normalizedWeekNote.length === 0
+    ) {
+      return
+    }
+    const week = studio.founderJourneyWeek
+    const confirmed = await confirmDialog({
+      title: `Publish the Week ${week.weekNumber} founder note?`,
+      body: 'This note will appear immediately on the public Olympic Marathon training screen.',
+      confirmLabel: 'Publish note',
+    })
+    if (!confirmed) return
+
+    setWeekNotePublishing(true)
+    setError(null)
+    setNotice(null)
+    try {
+      const next = await publishFounderJourneyWeekNote(
+        week.weekId,
+        week.active.revision,
+        normalizedWeekNote
+      )
+      setStudio((current) =>
+        current ? { ...current, founderJourneyWeek: next } : current
+      )
+      setWeekNoteText(next.active.text)
+      setNotice(`Week ${next.weekNumber} founder note is live.`)
+    } catch (publishError) {
+      setError(toStudioError(publishError))
+    } finally {
+      setWeekNotePublishing(false)
+    }
+  }
+
   async function handleSignOut() {
     navigate('/login', { replace: true })
     await signOut()
@@ -424,6 +470,84 @@ export function NudgeStudio() {
             {draftWarning}
           </div>
         )}
+
+        <section className="panel grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <div>
+            <span className="card-title">Public founder journey</span>
+            <h2 className="font-display text-[24px] font-bold tracking-[-0.025em] mt-2">
+              Week {studio.founderJourneyWeek.weekNumber} since September 1, 2025
+            </h2>
+            <p className="text-text-secondary text-[13px] leading-relaxed mt-2">
+              {formatWeekRange(
+                studio.founderJourneyWeek.weekStartDay,
+                studio.founderJourneyWeek.weekEndDay
+              )}
+              . Write the agency note that appears beneath Ryan&apos;s live training
+              week on the public Olympic Marathon screen.
+            </p>
+
+            <label className="block mt-5">
+              <span className="flex justify-between gap-3 text-text-secondary text-[11px] font-medium mb-1.5">
+                <span>Miller week note</span>
+                <span>
+                  {weekNoteText.length}/{studio.founderJourneyWeek.maxLength}
+                </span>
+              </span>
+              <textarea
+                className="input min-h-[132px] resize-y"
+                value={weekNoteText}
+                maxLength={studio.founderJourneyWeek.maxLength}
+                disabled={weekNotePublishing}
+                placeholder="Add the public context for this week’s training."
+                onChange={(event) => setWeekNoteText(event.target.value)}
+              />
+            </label>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-4">
+              <button
+                className="btn btn-primary"
+                disabled={
+                  weekNotePublishing ||
+                  !weekNoteDirty ||
+                  normalizedWeekNote.length === 0
+                }
+                onClick={publishWeekNote}
+              >
+                {weekNotePublishing
+                  ? 'Publishing…'
+                  : `Publish Week ${studio.founderJourneyWeek.weekNumber} note`}
+              </button>
+              <span className="text-text-muted text-[11px]">
+                {studio.founderJourneyWeek.active.publishedAtMillis
+                  ? `Revision ${studio.founderJourneyWeek.active.revision} published ${formatDate(
+                      studio.founderJourneyWeek.active.publishedAtMillis
+                    )}`
+                  : 'No public note has been published for this week.'}
+              </span>
+            </div>
+          </div>
+
+          <aside className="rounded-[18px] border border-white/10 bg-white/[0.035] p-5 self-start">
+            <span className="card-title">Public preview</span>
+            <div className="mt-4 flex items-baseline justify-between gap-3">
+              <strong className="font-display text-[30px] leading-none">
+                Week {studio.founderJourneyWeek.weekNumber}
+              </strong>
+              <small className="text-data text-[10px] font-bold uppercase tracking-[0.12em]">
+                Live record
+              </small>
+            </div>
+            <p className="text-text-primary text-[13px] leading-relaxed mt-4">
+              {normalizedWeekNote ||
+                studio.founderJourneyWeek.active.text ||
+                'The note will appear here after it is written.'}
+            </p>
+            <p className="text-text-muted text-[10px] leading-relaxed mt-4 pt-4 border-t border-white/10">
+              Publishing exposes only this text and the week dates. It does not open
+              Ryan&apos;s private StatsKey data or location.
+            </p>
+          </aside>
+        </section>
 
         {groupedDefinitions.map((group) => (
           <section key={group.surface} className="space-y-3">
@@ -669,6 +793,18 @@ function formatDate(milliseconds: number): string {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(milliseconds))
+}
+
+function formatWeekRange(startDay: string, endDay: string): string {
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+  return `${formatter.format(new Date(`${startDay}T12:00:00Z`))}–${formatter.format(
+    new Date(`${endDay}T12:00:00Z`)
+  )}`
 }
 
 function toStudioError(error: unknown): string {

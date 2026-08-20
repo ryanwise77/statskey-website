@@ -1,0 +1,50 @@
+{
+  "deviceSeedHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "coordinatorSeedHex": "fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0efeeedecebeae9e8e7e6e5e4e3e2e1e0",
+  "deviceId": "dev_a050837d85070582ccf7394b0988847c",
+  "coordinatorKeyId": "coord-1",
+  "coordinatorPublicKeySpki": "MCowBQYDK2VwAyEAuvxxvq06xeS2PpyCFu5xo0quxlci7tvKcotOmzzM45Y",
+  "request": {
+    "action": "job.poll",
+    "payload": {
+      "maxJobs": 1,
+      "capabilities": {
+        "linuxExecution": true
+      }
+    },
+    "issuedAt": 1780000000000,
+    "expiresAt": 1780000060000,
+    "requestId": "req_0123456789abcdef0123456789abcdef",
+    "envelope": {
+      "protocolVersion": 1,
+      "deviceId": "dev_a050837d85070582ccf7394b0988847c",
+      "requestId": "req_0123456789abcdef0123456789abcdef",
+      "action": "job.poll",
+      "issuedAt": 1780000000000,
+      "expiresAt": 1780000060000,
+      "payloadDigest": "9wfwKmYSlV7fOntrf8bzV3AKGkqFInmQ9LAPa3sl7lA",
+      "signature": "hLGso7Ko9FxpKT-s7q2iS8QMcDS2gTwiQcGtR7y0iBM90PPG_jixD4ILUj_QXOVmK7rs0baS4IzyqqscispnAQ"
+    }
+  },
+  "response": {
+    "result": {
+      "jobs": [],
+      "serverTime": 1780000001000,
+      "attestation": {
+        "accepted": true,
+        "expiresAt": "2026-08-19T22:00:00.000Z"
+      }
+    },
+    "envelope": {
+      "protocolVersion": 1,
+      "keyId": "coord-1",
+      "deviceId": "dev_a050837d85070582ccf7394b0988847c",
+      "requestId": "req_0123456789abcdef0123456789abcdef",
+      "action": "job.poll",
+      "issuedAt": 1780000000500,
+      "expiresAt": 1780000060500,
+      "resultDigest": "fwBT4lznVMgCCye4fUQ5nE2xtKi-Wx8UrigEtFIjyp4",
+      "signature": "Kxe5KZlZicOv8J_C2hoqN09SwX8mBsjSOaTQOXYQLOt_yh5VsiEx92CayGlQiblz40nC6E0X6B4ZdZNK_GLiCw"
+    }
+  }
+}

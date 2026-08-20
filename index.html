@@ -17,14 +17,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <link rel="icon" type="image/png" sizes="1024x1024" href="/statskey-logo-white-blue.png?v=5" />
-    <link rel="apple-touch-icon" href="/statskey-logo-white-blue.png?v=5" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=6" />
+    <link rel="apple-touch-icon" href="/favicon.svg?v=6" />
   </head>
   <body class="antialiased marketing-light">
     <nav id="nav" class="site-nav">
       <div class="site-nav__inner">
         <a href="#" class="site-brand" aria-label="StatsKey home">
-          <span class="site-brand__mark"></span>
+          <img class="site-brand__mark" src="/favicon.svg?v=6" alt="" width="26" height="26" />
           <span>StatsKey</span>
         </a>
         <div class="site-nav__links" aria-label="Primary navigation">
@@ -46,6 +46,13 @@
               </svg>
               <span>Android</span>
             </a>
+            <a class="site-nav__app-link" href="/downloads/statskey/" aria-label="Download the StatsKey desktop preview">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8 21h8M12 17v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <span>Desktop</span>
+            </a>
           </span>
           <a href="/mindscape">Mindscape</a>
           <a href="/app/login">Sign in</a>
@@ -63,6 +70,7 @@
         <a href="/app/tokens">Store</a>
         <a data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
         <a data-store="play" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener">Get the Android app</a>
+        <a href="/downloads/statskey/">Get the desktop preview</a>
         <a href="/mindscape">Mindscape</a>
         <a href="/app/login">Sign in</a>
         <a href="/app/signup">Sign up</a>
@@ -117,33 +125,130 @@
       </section>
 
       <section id="experiment-001" class="section-block section-block--split experiment-section">
-        <div class="page-shell experiment-layout">
-          <div class="section-heading experiment-copy reveal">
-            <div class="kicker">How I'm using it</div>
-            <h2>Can I run an Olympic marathon?</h2>
-            <p>I build StatsKey as I attempt to answer a real question: how far can disciplined recording, investigation, projection, and testing take me?</p>
-            <div class="hero-actions">
-              <a class="button button--primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
-              <a class="button button--secondary" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
+        <div class="page-shell experiment-marathon">
+          <div class="experiment-marathon__intro">
+            <div class="experiment-media experiment-media--marathon reveal d2">
+              <video
+                src="/statskey-app/olympic-marathon-experiment-001.mp4"
+                poster="/statskey-app/olympic-marathon-experiment-001-poster.jpg"
+                width="720"
+                height="1280"
+                controls
+                muted
+                playsinline
+                preload="metadata"
+                data-viewport-video
+                data-power-poster
+                data-poster-time="1"
+                aria-label="StatsKey Experiment 001: Can I run an Olympic marathon?"
+              >
+                <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the StatsKey Experiment 001 video</a>
+              </video>
+            </div>
+            <div class="section-heading experiment-copy experiment-copy--marathon reveal">
+              <div class="kicker">How I'm using it</div>
+              <h2>Can I run an Olympic marathon?</h2>
+              <p>I build StatsKey to answer a real question: how far can training principle take me?</p>
+              <p class="experiment-copy__live-note">The live record below follows the experiment from September 2025 forward: running, every publicly shared food recording, thirty-day Nutrition Insights, and the current training plan. Location coordinates never load in this public view.</p>
+              <div class="hero-actions">
+                <a class="button button--primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
+                <a class="button button--secondary" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
+              </div>
             </div>
           </div>
-          <div class="experiment-media reveal d2">
-            <video
-              src="/statskey-app/olympic-marathon-experiment-001.mp4"
-              poster="/statskey-app/olympic-marathon-experiment-001-poster.jpg"
-              width="720"
-              height="1280"
-              controls
-              muted
-              playsinline
-              preload="metadata"
-              data-viewport-video
-              data-power-poster
-              data-poster-time="1"
-              aria-label="StatsKey Experiment 001: Can I run an Olympic marathon?"
-            >
-              <a href="/statskey-app/olympic-marathon-experiment-001.mp4">Open the StatsKey Experiment 001 video</a>
-            </video>
+
+          <div class="founder-live-stage reveal d2" id="founder-live" data-source="/statskey-app/founder-live-fallback.json">
+            <header class="founder-live-header">
+              <div>
+                <span class="founder-live-badge"><i></i> Live from StatsKey</span>
+                <h3>Ryan's public performance record</h3>
+                <p id="founder-live-status" role="status">Connecting to Ryan's record…</p>
+              </div>
+              <time id="founder-live-updated">Connecting…</time>
+            </header>
+
+            <div class="founder-performance-summary" id="founder-performance-summary" aria-label="Live performance summary">
+              <div class="founder-summary-skeleton"></div>
+              <div class="founder-summary-skeleton"></div>
+              <div class="founder-summary-skeleton"></div>
+              <div class="founder-summary-skeleton"></div>
+            </div>
+
+            <nav class="founder-data-nav" aria-label="Public record sections">
+              <a href="#founder-running-app"><span>01</span>Training history</a>
+              <a href="#founder-nutrition-app"><span>02</span>Nutrition intelligence</a>
+              <a href="#founder-meals-app"><span>03</span>Food record</a>
+              <a href="#founder-plan-app"><span>04</span>Active plan</a>
+            </nav>
+
+            <div class="founder-data-grid">
+              <article class="founder-data-panel founder-data-panel--activity" id="founder-running-app">
+                <header class="founder-data-panel__head">
+                  <div>
+                    <span>Longitudinal training</span>
+                    <h4 id="founder-running-title">Performance history</h4>
+                    <p>Every public workout since September 2025, with live totals and complete record-level detail.</p>
+                  </div>
+                  <button class="founder-panel-back" id="founder-running-back" type="button" hidden>Back to history</button>
+                </header>
+                <div class="founder-data-surface" id="founder-running-screen" aria-live="polite">
+                  <div class="founder-data-skeleton founder-data-skeleton--wide"></div>
+                  <div class="founder-data-skeleton"></div>
+                </div>
+              </article>
+
+              <article class="founder-data-panel founder-data-panel--nutrition" id="founder-nutrition-app">
+                <header class="founder-data-panel__head">
+                  <div>
+                    <span>Nutrition intelligence</span>
+                    <h4>Complete nutrient spectrum</h4>
+                    <p>Range-adjusted intake, every recorded nutrient, and food-level source evidence.</p>
+                  </div>
+                </header>
+                <div class="founder-data-surface" id="founder-nutrition-screen" aria-live="polite">
+                  <div class="founder-data-skeleton founder-data-skeleton--wide"></div>
+                  <div class="founder-data-skeleton"></div>
+                </div>
+              </article>
+
+              <article class="founder-data-panel founder-data-panel--meals" id="founder-meals-app">
+                <header class="founder-data-panel__head" id="founder-meals-nav">
+                  <div>
+                    <span>Primary nutrition record</span>
+                    <h4 id="founder-meals-title">Food history</h4>
+                    <p>Individual meals, food items, complete nutrient fields, and source evidence.</p>
+                  </div>
+                  <div class="founder-panel-actions">
+                    <button id="founder-meals-back" type="button" hidden>Back</button>
+                    <button id="founder-meals-today" type="button" hidden>Today</button>
+                    <button id="founder-meals-done" type="button" hidden>Done</button>
+                  </div>
+                </header>
+                <div class="founder-data-surface" id="founder-meals-screen" aria-live="polite">
+                  <div class="founder-data-skeleton founder-data-skeleton--wide"></div>
+                  <div class="founder-data-skeleton"></div>
+                </div>
+              </article>
+
+              <article class="founder-data-panel founder-data-panel--plan" id="founder-plan-app">
+                <header class="founder-data-panel__head">
+                  <div>
+                    <span>Live training plan</span>
+                    <h4>Plan execution and long-term context</h4>
+                    <p>The current block, this week's prescription, and its place in the marathon experiment.</p>
+                  </div>
+                </header>
+                <div class="founder-data-surface" id="founder-plan-screen" aria-live="polite">
+                  <div class="founder-data-skeleton founder-data-skeleton--wide"></div>
+                  <div class="founder-data-skeleton"></div>
+                </div>
+              </article>
+            </div>
+
+            <div class="founder-route-privacy">
+              <span aria-hidden="true">×</span>
+              <p><strong>Location is excluded.</strong> The public record can load workout measurements, splits, crop edits, and training context, but it never requests a route or any coordinate document.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -509,6 +614,7 @@
               </svg>
               <span class="store-button__copy"><span>Get it on</span><strong>Google Play</strong></span>
             </a>
+            <a class="button button--secondary" href="/downloads/statskey/">Desktop preview</a>
           </div>
         </div>
       </section>
@@ -522,6 +628,7 @@
           <a href="/mindscape">Mindscape</a>
           <a href="/hardware">Hardware</a>
           <a href="/for-dietitians">For dietitians</a>
+          <a href="/for-clinicians">For clinicians</a>
           <a href="https://statskeybiometrics.com/support">Support</a>
           <a href="https://statskeybiometrics.com/privacy">Privacy</a>
           <a href="https://statskeybiometrics.com/terms">Terms</a>

@@ -1,0 +1,20 @@
+{
+  "name": "statskey-workbench-code",
+  "version": "0.1.0",
+  "private": true,
+  "author": "StatsKey",
+  "license": "UNLICENSED",
+  "description": "Code OSS-based StatsKey Workbench desktop track",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "setup:reset": "CODE_OSS_RESET=1 node scripts/setup.mjs",
+    "build": "node scripts/build.mjs",
+    "package": "node scripts/package.mjs",
+    "ext:install": "npm --prefix extensions/statskey-workbench install",
+    "ext:compile": "npm --prefix extensions/statskey-workbench run compile",
+    "ext:package": "npm --prefix extensions/statskey-workbench run package"
+  }
+}

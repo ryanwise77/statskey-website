@@ -1,15 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18341057139"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18341057139');
-</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Glucose Action Plan — StatsKey</title>
@@ -309,8 +300,8 @@
       <main id="app"></main>
       <footer class="site no-print">
         This tool shares general wellness ideas to talk through with your doctor. It is not medical
-        advice, it never suggests medicine changes, and it is not for emergencies. Your answers stay
-        on this device and are used only to create your plan.
+        advice, it never suggests medicine changes, and it is not for emergencies. When enabled, the
+        survey answers are sent securely to a disclosed Intelligence provider to create the plan.
       </footer>
     </div>
 
@@ -695,12 +686,15 @@
 
       /* ---------- State ---------- */
 
-      const LS_KEY = "glucose-plan-v1";
+      const LEGACY_LS_KEY = "glucose-plan-v1";
+      const SESSION_KEY = "glucose-plan-session-v1";
       const LEGACY_SS_KEY = "glucose-plan-answers-v1";
 
       function loadSaved() {
         try {
-          const raw = localStorage.getItem(LS_KEY);
+          // Remove health answers retained by the earlier pilot.
+          localStorage.removeItem(LEGACY_LS_KEY);
+          const raw = sessionStorage.getItem(SESSION_KEY);
           if (raw) return JSON.parse(raw);
         } catch (e) { /* private mode etc. */ }
         try {
@@ -712,7 +706,7 @@
       const SAVED = loadSaved();
 
       const state = {
-        // Reopening the page after a finished plan brings the plan right back.
+        // Session-only recovery survives refresh but not closing the tab.
         screen: SAVED.plan || SAVED.planText ? "plan" : "intro", // intro | step | loading | plan | error
         stepIndex: 0,
         answers: SAVED.answers || {},
@@ -729,7 +723,7 @@
 
       function saveAnswers() {
         try {
-          localStorage.setItem(LS_KEY, JSON.stringify({
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify({
             answers: state.answers,
             plan: state.plan,
             planText: state.planText,
@@ -737,13 +731,15 @@
         } catch (e) { /* ignore */ }
       }
       function clearSaved() {
-        try { localStorage.removeItem(LS_KEY); } catch (e) { /* ignore */ }
+        try { localStorage.removeItem(LEGACY_LS_KEY); } catch (e) { /* ignore */ }
+        try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
         try { sessionStorage.removeItem(LEGACY_SS_KEY); } catch (e) { /* ignore */ }
       }
 
       /* ---------- Rendering helpers ---------- */
 
       const app = document.getElementById("app");
+      const PUBLIC_HEALTH_TOOL_ENABLED = false;
       function el(tag, attrs, children) {
         const node = document.createElement(tag);
         if (attrs) {
@@ -1343,7 +1339,7 @@
           nodes.push(section("The plan", [el("p", { class: "plan-raw", text: state.planText })]));
         }
 
-        nodes.push(el("p", { class: "plan-meta", text: "Written with AI assistance from your answers. It offers general wellness ideas, not medical advice — please review it with your care team before changing anything." }));
+        nodes.push(el("p", { class: "plan-meta", text: "Written with Intelligence assistance from your answers. It offers general wellness ideas, not medical advice — please review it with your care team before changing anything." }));
 
         nodes.push(el("div", { class: "btn-row no-print" }, [
           el("button", { class: "btn btn-primary", text: "Print the plan", onclick: () => window.print() }),
@@ -1372,7 +1368,23 @@
         else if (state.screen === "plan") renderPlan();
         else renderError();
       }
-      render();
+      if (PUBLIC_HEALTH_TOOL_ENABLED) {
+        render();
+      } else {
+        setScreen([
+          el("div", { class: "card stack" }, [
+            el("h1", { text: "This private pilot is paused" }),
+            el("p", {
+              class: "sub",
+              text: "StatsKey is upgrading consent, security, and clinical review before collecting health answers through this tool.",
+            }),
+            el("p", {
+              class: "smallprint",
+              text: "Do not enter health information here. The consumer StatsKey app remains available for personal recording.",
+            }),
+          ]),
+        ], "h1");
+      }
     </script>
   </body>
 </html>

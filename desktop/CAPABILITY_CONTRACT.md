@@ -33,7 +33,10 @@ helps complete a task.
 - **Shipped:** macOS, Windows, authenticated browser app, local desktop
   workspace, GitHub-backed browser workspace, distinct personal Plan surface,
   iOS health application.
-- **Partial:** web editing is GitHub-backed but does not host long-running
+- **Partial:** Ubuntu 26.04 LTS amd64 has an explicit DEB preview with local
+  workspace, browser, Android tooling, and Fleet-controller support; its
+  package remains unsigned, updates are manual, and unattended Fleet execution
+  is disabled. Web editing is GitHub-backed but does not host long-running
   agents; desktop and mobile conversations are not yet one unified task list.
 - **Next local:** command-line companion and deep links into files, chats, and
   approvals.
@@ -183,15 +186,17 @@ helps complete a task.
 
 ## 11. Terminal and execution security
 
-- **Shipped:** Review each, Auto-review, and Run everything modes; exact
-  operation dialogs; canonical workspace containment; symlink escape
-  protection; external-file protection; deletion approval; checkpoints;
-  command/MCP/hook approval; protected renderer IPC.
+- **Shipped:** Review each, Auto-review, and Work independently modes; automatic
+  approval only for reversible workspace write/create/rename/mkdir operations;
+  exact review for delete, restore, terminal, Git, browser effects, apps,
+  devices, hooks, and MCP; canonical workspace containment; symlink escape
+  protection; external-file protection; checkpoints; protected renderer IPC.
 - **Partial:** Auto-review is policy-driven but not an OS-level sandbox with
-  network/path policy; no plain-language permissions file UI.
+  network/path policy; the standing grant is not yet a separate main-owned,
+  workspace-bound capability receipt; no plain-language permissions file UI.
 - **Next local:** macOS/Windows sandbox adapters, network controls,
-  project/user permission files, protected configuration paths, and visible
-  policy explanations.
+  main-owned capability grants, project/user permission files, protected
+  configuration paths, and visible policy explanations.
 - **Excluded:** silent unrestricted execution as a default.
 
 ## 12. Parallel work

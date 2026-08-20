@@ -256,6 +256,7 @@ function shellInvocation(
   {
     failClosed = false,
     platform = process.platform,
+    environment = process.env,
     windowsReadyMarker = '',
   } = {}
 ) {
@@ -273,8 +274,16 @@ function shellInvocation(
       ],
     }
   }
+  const configuredShell = String(environment?.SHELL || '').trim()
+  const fallbackShell = platform === 'linux' ? '/bin/bash' : '/bin/zsh'
+  const executable =
+    platform === 'linux' &&
+    failClosed &&
+    /(?:^|\/)(?:sh|dash)$/.test(configuredShell)
+      ? '/bin/bash'
+      : configuredShell || fallbackShell
   return {
-    executable: process.env.SHELL || '/bin/zsh',
+    executable,
     args: ['-lc', failClosed ? failClosedPosixCommand(command) : command],
   }
 }

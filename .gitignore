@@ -34,3 +34,7 @@ public/guitar/brand manufactured models/
 *.step
 *.STP
 *.STEP
+
+# Fleet local-only state (never commit)
+workbench-backend/functions/.env.*
+workbench-backend/.fleet-ops/

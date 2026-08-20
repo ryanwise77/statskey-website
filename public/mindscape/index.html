@@ -261,6 +261,11 @@
     .btn.primary { background: var(--cyan); color: #fff; box-shadow: 0 10px 28px rgba(0, 102, 204, .18); }
     .btn.ghost { border: 1px solid var(--line-strong); color: #145bbd; background: rgba(255, 255, 255, .72); }
     .fine { color: var(--quiet); font-size: 12.5px; line-height: 1.5; margin: 14px 0 0; }
+    .desktop-inline-link {
+      color: inherit; text-decoration-color: rgba(20, 91, 189, .3);
+      text-underline-offset: 3px; transition: color .18s ease, text-decoration-color .18s ease;
+    }
+    .desktop-inline-link:hover { color: var(--ink); text-decoration-color: var(--cyan); }
 
     /* ── cross-device claim path ── */
     dialog {
@@ -400,7 +405,7 @@
         <p class="sect-kicker">How I'm using it</p>
         <h2>Can I run an Olympic marathon?</h2>
         <p class="intro">
-          I build StatsKey as I attempt to answer a real question in public: how far can disciplined
+          I build StatsKey as I attempt to answer a real question: how far can disciplined
           recording, investigation, projection, and testing take me?
         </p>
         <div class="experiment-actions">
@@ -564,8 +569,10 @@
           it, test a change, and decide which state to sustain.
         </p>
         <p>
-          StatsKey is available on iPhone, Apple Watch, Android, and the web, built by a solo
-          founder-engineer who needed the instrument to exist. The core app is <b>free</b> —
+          StatsKey is available on iPhone, Apple Watch, Android, and the web — with an
+          <a class="desktop-inline-link" data-desktop href="/downloads/statskey">experimental and rapidly evolving desktop app</a>
+          for larger-screen exploration — and is
+          built by a solo founder-engineer who needed the instrument to exist. The core app is <b>free</b> —
           recording, nutrients, workouts, biometrics. Pro ($4.99/mo) and Pro+ ($19.99/mo) add
           more Intelligence on top. Set the state you intend to hold, and steer toward it with
           evidence.
@@ -647,6 +654,10 @@
         link.addEventListener("click", () => {
           track("mindscape_play_click", { surface: link.dataset.surface || "unknown" });
         });
+      });
+
+      document.querySelector("[data-desktop]")?.addEventListener("click", () => {
+        track("mindscape_desktop_click", { surface: "offer" });
       });
 
       document.querySelectorAll("[data-claim]").forEach((link) => {

@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed data model
+// ===============================================================
+// This named Enterprise database contains only server-owned operational data:
+//   githubWorkspaceSecrets/{statsKeyUid}
+//   githubWorkspaceConnections/{statsKeyUid}
+//   users/{statsKeyUid}/githubWorkspaceCommits/{commitSha}
+//   rateLimits/{hashedUidAndAction}
+//   fleetOwners/{hashedOwnerUid}
+//   fleetDevices/{deviceId}
+//   fleetDeviceRequests/{hashedDeviceAndRequestId}
+//   fleetGrants/{grantId}
+//   fleetJobs/{jobId} and fleetJobs/{jobId}/events/{sequence}
+//   fleetLeases/{leaseId}
+//   fleetResourceLeases/{ownerAndResourceHash}
+//   fleetArtifacts/{artifactId}
+//
+// The browser never reads or writes this database directly. Every operation
+// passes through workbenchApi, which verifies a StatsKey Firebase ID token and
+// uses the Admin SDK against this database.
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

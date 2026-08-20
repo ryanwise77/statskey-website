@@ -1,0 +1,190 @@
+# AppArmor profile for statskey-fleet job units — ENFORCING (no complain
+# flag; job units reference it via AppArmorProfile=statskey-fleet-job).
+#
+# Loaded at install time by deb/postinst (`apparmor_parser -r`). The profile
+# digest is attested in HelperAttestationV1 (security.apparmorProfileDigest)
+# and checked against coordinator policy at poll/claim time: any local edit
+# changes the digest and the helper fails closed. This file is therefore
+# package-managed, NOT a conffile.
+#
+# Threat model (FLEETD_DESIGN.md): repository contents, command arguments,
+# and job payloads are hostile. Job code runs as a per-job DynamicUser
+# inside a non-delegated cgroup; this profile is the mandatory access
+# control layer underneath that sandbox.
+
+#include <tunables/global>
+
+profile statskey-fleet-job {
+
+  # ---------------------------------------------------------------------
+  # Base runtime: dynamic loader, libc, locale data, /dev/null|zero|full|
+  # random|urandom, /dev/log. Read/mmap only. Justified: no dynamically
+  # linked executable starts without it.
+  # ---------------------------------------------------------------------
+  #include <abstractions/base>
+
+  # abstractions/nameservice is intentionally OFF: the default network
+  # profile is "none", and a job that cannot open an inet socket has no
+  # legitimate need to resolve names. A future signed network profile
+  # enables this include together with the network rules at the bottom.
+  # #include <abstractions/nameservice>
+
+  # Runtimes that do their own NSS parsing need these directly (the runner
+  # is built CGO_ENABLED=0, so Go reads them instead of calling NSS).
+  /etc/passwd r,
+  /etc/group r,
+  /etc/nsswitch.conf r,
+
+  # Read-only runtime introspection used by common standard libraries (Go,
+  # OpenSSL, glibc). No sensitive host data: the unit's mount namespace
+  # already restricts the visible /proc and /sys. Go's runtime reads
+  # /proc/self/cgroup plus the unit's own cgroup limit files for
+  # cgroup-aware GOMAXPROCS/memory limits; ProtectControlGroups=yes makes
+  # the cgroup hierarchy read-only, so these grants cannot be used to
+  # mutate anything.
+  @{PROC}/sys/kernel/{hostname,ngroups_max,osrelease,ostype,version} r,
+  @{PROC}/@{pid}/{stat,statm,status,mountinfo,cgroup} r,
+  @{PROC}/@{pid}/task/@{tid}/{stat,status} r,
+  /sys/devices/system/cpu/{online,present} r,
+  /sys/fs/cgroup/** r,
+
+  # The unit's own credentials directory: systemd delivers the signed
+  # request (and any scoped fetch credential) here read-only before the
+  # runner starts. Only job units' credential dirs are readable; the
+  # daemon's and other services' stay denied.
+  /run/credentials/statskey-fleet-job-*/ r,
+  /run/credentials/statskey-fleet-job-*/** r,
+
+  # ---------------------------------------------------------------------
+  # Fixed entry point. systemd attaches this profile at exec of the unit's
+  # main process; the target profile must permit that exec or the unit
+  # fails to start (fail closed). ix = executed child inherits THIS
+  # profile.
+  # ---------------------------------------------------------------------
+  /usr/libexec/statskey-fleet-runner ix,
+
+  # Job commands are bare names resolved by the runner against a fixed
+  # root-owned search path (/usr/bin:/bin:/usr/local/bin; on merged-/usr
+  # /bin is a symlink to /usr/bin). Every executed child inherits this
+  # profile, so repository-controlled code cannot escape confinement by
+  # exec'ing a different binary.
+  /usr/bin/** ix,
+  /bin/** ix,
+  /usr/local/bin/** ix,
+  # git re-execs itself and its remote helpers from libexec.
+  /usr/lib/git-core/** ix,
+
+  # System libraries (read + executable mmap) and public read-only system
+  # data (zoneinfo, charset tables, CA bundle). No write anywhere outside
+  # the job workspace below.
+  /{usr/,}lib{,32,64}/** mr,
+  /usr/share/** r,
+
+  # ---------------------------------------------------------------------
+  # Job workspace — the ONLY writable tree.
+  #
+  # WHY A WILDCARD INSTEAD OF @{JOB_ROOT}: AppArmor expands @{variables}
+  # only at policy-compile time (apparmor_parser); a kernel-loaded profile
+  # cannot be re-parameterized per job, and this package installs one
+  # static, digest-attested profile. Per-job isolation is therefore
+  # enforced by the unit's ProtectSystem=strict +
+  # ReadWritePaths=<opaque workspace> mount namespace and by DAC ownership
+  # of the daemon-created opaque directory; this wildcard is the coarse
+  # outer bound that keeps job writes inside the jobs tree even if unit
+  # generation regresses.
+  # ---------------------------------------------------------------------
+  # DynamicUser StateDirectory lives at /var/lib/private/... with a
+  # symlink at the public path; AppArmor mediates the RESOLVED path, so both
+  # forms must be granted.
+  /var/lib/statskey-fleet-jobs/ r,
+  /var/lib/statskey-fleet-jobs/*/ rw,
+  /var/lib/statskey-fleet-jobs/*/** rwlk,
+  /var/lib/private/statskey-fleet-jobs/ r,
+  /var/lib/private/statskey-fleet-jobs/*/ rw,
+  /var/lib/private/statskey-fleet-jobs/*/** rwlk,
+  # Build jobs execute artifacts they just produced (test binaries, codegen
+  # output). ix keeps that execution inside this same confined profile; no
+  # privilege gain is possible because the profile grants no additional
+  # rights over anything the job can write.
+  /var/lib/statskey-fleet-jobs/*/** ix,
+  /var/lib/private/statskey-fleet-jobs/*/** ix,
+
+  # ---------------------------------------------------------------------
+  # Explicit denies. AppArmor is default-deny, so these are defense in
+  # depth: they subtract from present AND future broad allow rules
+  # (abstraction updates, local includes) and document intent.
+  # ---------------------------------------------------------------------
+
+  # Worker device key and agent state. Job code must never read the device
+  # identity it runs on behalf of.
+  deny /var/lib/statskey-fleet/ r,
+  deny /var/lib/statskey-fleet/** rwlk,
+
+  # Helper key, ticket journal, receipts. The runner receives the ticket
+  # request inside its own workspace (or via a trusted dirfd from the
+  # daemon, per design invariant 10); the daemon state directory — including
+  # the root-owned request journal — stays fully denied to job code.
+  deny /var/lib/statskey-fleetd/ r,
+  deny /var/lib/statskey-fleetd/** rwlk,
+
+  # Privileged control socket: job code must never speak to the daemon.
+  deny /run/statskey-fleetd/ r,
+  deny /run/statskey-fleetd/** rw,
+
+  # User homes and root's home (ProtectHome=yes already hides these; these
+  # denies survive unit-file regressions).
+  deny /home/ r,
+  deny /home/** rwlk,
+  deny /root/ r,
+  deny /root/** rwlk,
+
+  # Container control sockets: a job must not escape via Docker, LXD,
+  # containerd, CRI-O, or Podman. Path rules cover the well-known sockets
+  # (connect requires write on the socket node). Abstract-namespace sockets
+  # are not path-mediable, so deployments must not expose container runtimes
+  # on abstract sockets; the unit's RestrictNamespaces=yes and empty
+  # capability set block the namespace creation such escapes rely on.
+  deny /run/docker.sock rw,
+  deny /run/docker/ r,
+  deny /run/docker/** rw,
+  deny /run/containerd/ r,
+  deny /run/containerd/** rw,
+  deny /run/crio/crio.sock rw,
+  deny /run/lxd.sock rw,
+  deny /var/snap/lxd/common/lxd/unix.socket rw,
+  deny /run/podman/podman.sock rw,
+
+  # No kernel object manipulation: ptrace could attack the runner or sibling
+  # jobs; mount/umount/remount could defeat the workspace sandbox;
+  # capabilities are already emptied by the unit's CapabilityBoundingSet=
+  # and are denied here as a second layer.
+  deny ptrace,
+  deny mount,
+  deny umount,
+  deny remount,
+  deny capability,
+
+  # A confined job must never switch profiles or hats. (change_hat has no
+  # deny form in the AppArmor rule grammar; hats are unreachable because no
+  # hat is defined and change_profile is denied.)
+  deny change_profile,
+
+  # ---------------------------------------------------------------------
+  # Network. networkProfileId "none" is enforced HERE, not by the unit:
+  # the job unit's RestrictAddressFamilies deliberately keeps
+  # AF_INET/AF_INET6 so a signed network profile can enable IP without
+  # regenerating units. AppArmor switches network mediation ON once any
+  # network rule exists, so AF_UNIX/AF_NETLINK are explicitly allowed
+  # first (runtime plumbing, syslog, nss-systemd userdb) — matching the
+  # unit's RestrictAddressFamilies.
+  # ---------------------------------------------------------------------
+  network unix,
+  network netlink,
+  deny network inet,
+  deny network inet6,
+
+  # FUTURE signed network profile (networkProfileId != "none"): shipped as
+  # an include installed only by a policy-signed package update. Editing
+  # this file by hand changes the attested digest and fails closed.
+  # #include <abstractions/statskey-fleet-network>
+}

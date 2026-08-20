@@ -111,6 +111,7 @@ export function WorkspaceInlineEdit({
             },
           ],
           effort: preference.effort,
+          serviceTier: preference.serviceTier,
           reasoningMode: 'standard',
           maxOutputTokens: nextMode === 'edit' ? 8_000 : 3_000,
           webSearch: false,
@@ -266,6 +267,7 @@ export async function getDirectWorkspaceModelPreference(): Promise<{
   provider: DesktopProviderId
   modelId: string
   effort: ReasoningEffort
+  serviceTier?: 'fast'
 } | null> {
   const bridge = getDesktopBridge()
   if (!bridge) return null
@@ -278,9 +280,11 @@ export async function getDirectWorkspaceModelPreference(): Promise<{
   ) {
     return null
   }
-  const known = CHAT_MODELS.find(
-    (candidate) => candidate.label === stored.modelLabel
-  )
+  const known =
+    (typeof stored.modelKey === 'string'
+      ? CHAT_MODELS.find((candidate) => candidate.id === stored.modelKey)
+      : undefined) ??
+    CHAT_MODELS.find((candidate) => candidate.label === stored.modelLabel)
   const provider = known?.directProvider ?? stored.directProvider
   const modelId = known?.modelId ?? stored.modelId
   if (!isDesktopProviderId(provider) || typeof modelId !== 'string') {
@@ -289,7 +293,7 @@ export async function getDirectWorkspaceModelPreference(): Promise<{
   const effort = isReasoningEffort(stored.effort)
     ? stored.effort
     : known?.defaultEffort ?? 'medium'
-  return { provider, modelId, effort }
+  return { provider, modelId, effort, serviceTier: known?.serviceTier }
 }
 
 function cleanReplacement(value: string): string {

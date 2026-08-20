@@ -1,0 +1,88 @@
+#!/bin/sh
+# postinst for statskey-fleetd — see PACKAGING.md.
+#
+# Idempotent and `set -e` safe as required by dpkg. Install order:
+#   1. sysusers  (create the unprivileged agent account; tmpfiles and the
+#                 socket unit reference this user/group)
+#   2. tmpfiles  (state + runtime directories with design-doc ownership)
+#   3. AppArmor  (load/replace the enforcing job profile)
+#   4. daemon-reload
+#   5. enable — but NEVER start — statskey-fleetd.socket and
+#      statskey-fleet-agent.service. Services stay dormant until pairing
+#      and attestation succeed.
+set -e
+
+case "$1" in
+  configure)
+    # 1. Unprivileged agent account (idempotent; no-op once the user exists).
+    systemd-sysusers statskey-fleet.conf
+
+    # 2. /var/lib/statskey-fleet{,d,-jobs} and /run/statskey-fleetd with the
+    #    exact modes/ownership from FLEETD_DESIGN.md (idempotent).
+    systemd-tmpfiles --create statskey-fleet.conf
+
+    # 2b. The execution service ID is a stable per-host identity generated at
+    #     install time (never regenerated on upgrade, so attestations and
+    #     bindings stay valid). The daemon refuses to start without it.
+    if [ -f /etc/statskey/fleetd/policy.json ]; then
+      if ! grep -q '"executionServiceId": "svc_' /etc/statskey/fleetd/policy.json; then
+        SVC_ID="svc_$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+        TMP=$(mktemp /etc/statskey/fleetd/.policy.XXXXXX)
+        sed 's/"executionServiceId": ""/"executionServiceId": "'"$SVC_ID"'"/' \
+          /etc/statskey/fleetd/policy.json > "$TMP"
+        chmod 644 "$TMP" && chown root:root "$TMP"
+        mv "$TMP" /etc/statskey/fleetd/policy.json
+        echo "statskey-fleetd: generated execution service id $SVC_ID" >&2
+      fi
+    fi
+
+    # 3. Load (or replace) the enforcing AppArmor profile for job units.
+    #    Non-fatal when the parser or an AppArmor-enabled kernel is absent
+    #    (containers, chroots, installer environments): the daemon fails
+    #    closed at runtime per the acceptance gate ("unconfined fails
+    #    closed"), and verify-install.sh flags a missing profile on real
+    #    hosts. A load failure on a real host must be investigated — the
+    #    profile digest is attested.
+    if command -v apparmor_parser >/dev/null 2>&1 && [ -e /sys/module/apparmor ]; then
+      AA_OK=1
+      apparmor_parser -r /etc/apparmor.d/statskey-fleet-job || AA_OK=0
+      apparmor_parser -r /etc/apparmor.d/statskey-fleet-prep || AA_OK=0
+      if [ "$AA_OK" -ne 1 ]; then
+        echo "statskey-fleetd: WARNING: failed to load an AppArmor profile" >&2
+        echo "statskey-fleetd: ('statskey-fleet-job'/'statskey-fleet-prep');" >&2
+        echo "statskey-fleetd: job units fail closed until both load" >&2
+      fi
+    else
+      echo "statskey-fleetd: NOTE: apparmor_parser or kernel AppArmor unavailable;" >&2
+      echo "statskey-fleetd: skipping profile load (job units fail closed)" >&2
+    fi
+
+    # 4. Pick up the new unit files (only meaningful when systemd is PID 1).
+    if [ -d /run/systemd/system ]; then
+      systemctl daemon-reload
+    fi
+
+    # 5. Enable only. `systemctl enable` manipulates symlinks and is safe
+    #    without PID 1; nothing is started here or by this package's
+    #    installation. After a reboot the socket listens and the agent runs,
+    #    but both remain inert until pairing + attestation succeed.
+    systemctl enable statskey-fleetd.socket statskey-fleet-agent.service
+
+    # 6. Upgrades: restart only units that were already active (try-restart
+    #    is a no-op for dormant installs). prerm has already drained job
+    #    cgroups by this point, so this never strands running work.
+    if [ -d /run/systemd/system ]; then
+      systemctl try-restart statskey-fleetd.socket statskey-fleetd.service statskey-fleet-agent.service || true
+    fi
+    ;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+  *)
+    echo "postinst called with unknown argument '$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

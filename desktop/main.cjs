@@ -1,12 +1,18 @@
-const { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, Notification, ShareMenu, globalShortcut, safeStorage, session, shell, screen } = require('electron')
-const { chmodSync, createReadStream, existsSync, readFileSync, realpathSync, readdirSync, statSync, writeFileSync, mkdirSync } = require('node:fs')
+const { app, BrowserWindow, clipboard, desktopCapturer, dialog, ipcMain, Menu, Notification, ShareMenu, globalShortcut, safeStorage, session, shell, screen } = require('electron')
+const { chmodSync, closeSync, constants: fsConstants, createReadStream, existsSync, fsyncSync, lstatSync, openSync, readFileSync, realpathSync, readdirSync, statSync, writeFileSync, mkdirSync } = require('node:fs')
 const { renameSync, unlinkSync } = require('node:fs')
+const { access, statfs } = require('node:fs/promises')
 const http = require('node:http')
+const os = require('node:os')
 const path = require('node:path')
 const { Worker } = require('node:worker_threads')
+const { execFileSync } = require('node:child_process')
 const { AsyncLocalStorage } = require('node:async_hooks')
 const { createHash } = require('node:crypto')
-const { runProviderRound } = require('./provider-runtime.cjs')
+const {
+  normalizeProviderModelList,
+  runProviderRound,
+} = require('./provider-runtime.cjs')
 const {
   ProviderCancelledError,
   ProviderHardTimeoutError,
@@ -46,7 +52,10 @@ const {
 } = require('./mcp-runtime.cjs')
 const { minimatch } = require('minimatch')
 const { autoUpdater } = require('electron-updater')
-const { DesktopUpdateRuntime } = require('./update-runtime.cjs')
+const {
+  DesktopUpdateRuntime,
+  desktopHealthPayload,
+} = require('./update-runtime.cjs')
 const { ControlledBrowserRuntime } = require('./controlled-browser.cjs')
 const {
   ControlledApplicationsRuntime,
@@ -66,6 +75,7 @@ const {
   defaultDesktopPreferences,
   preferencesWithUpdate,
   sanitizeAgentMode,
+  sanitizeDesktopModelSettings,
 } = require('./preferences-runtime.cjs')
 const {
   findStatsKeySource,
@@ -90,6 +100,67 @@ const {
   WorkspaceBindingRuntime,
 } = require('./workspace-binding-runtime.cjs')
 const { searchWorkspaceDirect } = require('./workspace-search-runtime.cjs')
+const {
+  createWorkspaceSyncRuntime,
+} = require('./workspace-sync-runtime.cjs')
+const {
+  createSignedDeviceRequest,
+  deviceIdentityForPublicKey,
+  normalizePublicKeySpki,
+} = require('./fleet-auth-runtime.cjs')
+const { FleetIdentityStore } = require('./fleet-identity-store.cjs')
+const {
+  createFleetDeviceTransport,
+  normalizeFleetDeviceEndpoint,
+} = require('./fleet-node-client.cjs')
+const { FleetNodeSupervisor } = require('./fleet-node-supervisor.cjs')
+const {
+  FleetPairingApprovalRegistry,
+  createControllerPairingReceipt,
+  createPairingReceipt,
+  isControllerCandidateProfile,
+  publicFleetDeviceIdentity,
+  signPairingReceipt,
+  validatePairingSigner,
+} = require('./fleet-pairing-runtime.cjs')
+const {
+  DEFAULT_ALLOWED_REPOSITORY_HOSTS,
+  FleetLeaseAuthorityStore,
+  createFleetWorkerAdapters,
+  directExecutableExtensions,
+  kernelBackedFleetProcessContainment,
+  listArtifactSpool,
+  purgeArtifactSpoolEntry,
+  revealArtifactSpoolEntry,
+} = require('./fleet-worker-adapters.cjs')
+const {
+  validateDownloadGrant: validateFleetArtifactDownloadGrant,
+} = require('./fleet-artifact-uploader.cjs')
+const {
+  fleetJobAuthorizationDetail,
+  normalizeCreateJob: normalizeFleetCreateJob,
+  normalizeGrant: normalizeFleetGrant,
+} = require('./fleet-runtime.cjs')
+const {
+  FRAME_SESSION_CONTROL,
+  FRAME_VIDEO,
+  SESSION_ID_PATTERN: REMOTE_SESSION_ID_PATTERN,
+  connectRelaySession,
+  createInputHelperClient,
+  createInputRateLimiter,
+  createRemoteSessionHostRuntime,
+  createScreenCapture,
+  createSessionIndicator,
+  decodeStreamHeader,
+  generateEphemeralKeyPair,
+  normalizeRelayEndpoint,
+  normalizeRemoteInputEvent,
+  normalizeSessionKey,
+  parseSessionControl,
+  remoteError: remoteSessionError,
+  resolveInputHelperPath,
+  spawnInputHelper,
+} = require('./remote-session-runtime.cjs')
 
 const APP_URL_OVERRIDE = app.isPackaged
   ? null
@@ -98,8 +169,10 @@ const DESKTOP_SERVER_PORT = configuredDesktopPort()
 const SUMMON_ACCELERATOR = 'CmdOrCtrl+Shift+Space'
 const UPDATE_FEED_ROOT =
   'https://storage.googleapis.com/statskey-workbench-downloads/updates'
+const DESKTOP_HEALTH_PATH = '/.well-known/statskey-desktop-health'
 const MAX_WORKSPACE_FILE_BYTES = 2 * 1024 * 1024
 const MAX_WORKSPACE_MEDIA_BYTES = Math.floor(3.5 * 1024 * 1024)
+const MAX_WORKSPACE_SYNC_FILE_BYTES = 25 * 1024 * 1024
 const MAX_WORKSPACE_SEARCH_FILES = 12_000
 const MAX_WORKSPACE_SEARCH_BYTES = 96 * 1024 * 1024
 const DURABLE_RENDERER_STATE_FILES = new Map([
@@ -194,6 +267,20 @@ let workspaceIndexWorker = null
 let workspaceIndexTimer = null
 let workspaceIndexInterval = null
 let workspaceFileSearchWorker = null
+let workspaceSyncRuntime = null
+let fleetIdentityStore = null
+let fleetNodeSupervisor = null
+const fleetPairingApprovalRegistry = new FleetPairingApprovalRegistry()
+let fleetNodeInitializationPromise = null
+let fleetNodeInitializationGeneration = 0
+let fleetNodeInitializationTimer = null
+let fleetNodeInitializationFailures = 0
+let fleetQuitReady = false
+let fleetQuitPromise = null
+let fleetShutdownStarted = false
+let remoteSessionHostRuntime = null
+const remoteViewerSessions = new Map()
+const remoteSessionEphemerals = new Map()
 let workspaceIndexStatus = {
   status: 'idle',
   indexedFiles: 0,
@@ -265,8 +352,14 @@ const terminalRuntime = new TerminalRuntime({
     )
   },
 })
-const providerVaultCrypto = new ProviderVaultCrypto({ safeStorage })
-const safeStorageCrypto = new SafeStorageCrypto({ safeStorage })
+const providerVaultCrypto = new ProviderVaultCrypto({
+  safeStorage,
+  platform: process.platform,
+})
+const safeStorageCrypto = new SafeStorageCrypto({
+  safeStorage,
+  platform: process.platform,
+})
 const approvedMcpConfigurations = new Set()
 const approvedHookConfigurations = new Set()
 const workspaceIgnoreCache = new Map()
@@ -294,6 +387,213 @@ app.on('open-url', (event, url) => {
   routeProtocolUrl(url)
 })
 
+function fleetArtifactSpoolRoot() {
+  return path.join(app.getPath('userData'), 'fleet-artifact-spool')
+}
+
+function fleetWorkerQuarantinePath() {
+  return path.join(app.getPath('userData'), 'fleet-worker-quarantine.json')
+}
+
+function currentSystemBootAt() {
+  return Date.now() - Math.max(0, Number(os.uptime()) || 0) * 1_000
+}
+
+let cachedSystemBootId
+
+function currentSystemBootId() {
+  if (cachedSystemBootId !== undefined) return cachedSystemBootId
+  try {
+    let source
+    if (process.platform === 'darwin') {
+      source = execFileSync('/usr/sbin/sysctl', ['-n', 'kern.boottime'], {
+        encoding: 'utf8',
+        timeout: 2_000,
+      })
+    } else if (process.platform === 'linux') {
+      source = readFileSync('/proc/sys/kernel/random/boot_id', 'utf8')
+    } else if (process.platform === 'win32') {
+      const systemRoot = process.env.SystemRoot || process.env.SYSTEMROOT
+      if (!systemRoot || !path.win32.isAbsolute(systemRoot)) {
+        throw new Error('Windows system root is unavailable.')
+      }
+      source = execFileSync(
+        path.win32.join(
+          systemRoot,
+          'System32',
+          'WindowsPowerShell',
+          'v1.0',
+          'powershell.exe'
+        ),
+        [
+          '-NoLogo',
+          '-NoProfile',
+          '-NonInteractive',
+          '-Command',
+          '(Get-CimInstance Win32_OperatingSystem).LastBootUpTime.ToFileTimeUtc()',
+        ],
+        { encoding: 'utf8', timeout: 5_000, windowsHide: true }
+      )
+    }
+    const normalized = String(source || '').trim()
+    cachedSystemBootId = normalized
+      ? createHash('sha256').update(normalized).digest('hex')
+      : null
+  } catch {
+    cachedSystemBootId = null
+  }
+  return cachedSystemBootId
+}
+
+function fsyncFleetSafetyPath(filePath) {
+  const descriptor = openSync(filePath, 'r')
+  try {
+    fsyncSync(descriptor)
+  } finally {
+    closeSync(descriptor)
+  }
+}
+
+function fsyncFleetSafetyDirectory(directory) {
+  try {
+    fsyncFleetSafetyPath(directory)
+  } catch (error) {
+    if (
+      process.platform === 'win32' &&
+      ['EACCES', 'EBADF', 'EINVAL', 'EISDIR', 'EPERM'].includes(error?.code)
+    ) {
+      // Windows does not expose a regular fsync handle for directories.
+      return
+    }
+    throw error
+  }
+}
+
+function loadActiveFleetWorkerQuarantine() {
+  const filePath = fleetWorkerQuarantinePath()
+  try {
+    const stat = lstatSync(filePath)
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 16 * 1024) {
+      return { reason: 'quarantine-record-invalid' }
+    }
+    const record = JSON.parse(readFileSync(filePath, 'utf8'))
+    if (
+      record?.version !== 1 ||
+      !['job-active', 'process-termination-unconfirmed'].includes(
+        record.reason
+      ) ||
+      !/^job_[a-f0-9]{32,64}$/.test(String(record.jobId || '')) ||
+      !Number.isFinite(Number(record.systemBootAt)) ||
+      (record.systemBootId != null &&
+        !/^[a-f0-9]{64}$/.test(String(record.systemBootId))) ||
+      (record.systemUptimeSeconds != null &&
+        !Number.isFinite(Number(record.systemUptimeSeconds)))
+    ) {
+      return { reason: 'quarantine-record-invalid' }
+    }
+    const currentUptime = Math.max(0, Number(os.uptime()) || 0)
+    const bootId = currentSystemBootId()
+    if (record.systemBootId && bootId) {
+      if (record.systemBootId === bootId) return record
+      unlinkSync(filePath)
+      fsyncFleetSafetyDirectory(path.dirname(filePath))
+      return null
+    }
+    const bootTimeMatches =
+      Math.abs(currentSystemBootAt() - Number(record.systemBootAt)) < 5 * 60_000
+    const uptimeDidNotReset =
+      record.systemUptimeSeconds != null &&
+      currentUptime + 1 >= Number(record.systemUptimeSeconds)
+    if (bootTimeMatches || uptimeDidNotReset) {
+      if (record.systemUptimeSeconds == null) {
+        persistFleetWorkerQuarantine(record)
+      }
+      return record
+    }
+    unlinkSync(filePath)
+    fsyncFleetSafetyDirectory(path.dirname(filePath))
+    return null
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null
+    return { reason: 'quarantine-record-unreadable' }
+  }
+}
+
+function persistFleetWorkerQuarantine({ reason, jobId, attempt }) {
+  if (
+    !['job-active', 'process-termination-unconfirmed'].includes(reason) ||
+    !/^job_[a-f0-9]{32,64}$/.test(String(jobId || ''))
+  ) {
+    throw new Error('Fleet worker safety marker is invalid.')
+  }
+  const filePath = fleetWorkerQuarantinePath()
+  mkdirSync(path.dirname(filePath), { recursive: true })
+  const temporary = `${filePath}.${process.pid}.${Date.now()}.tmp`
+  const record = {
+    version: 1,
+    reason,
+    jobId,
+    attempt: Number(attempt || 0),
+    recordedAt: new Date().toISOString(),
+    systemBootAt: currentSystemBootAt(),
+    systemBootId: currentSystemBootId(),
+    systemUptimeSeconds: Math.max(0, Number(os.uptime()) || 0),
+  }
+  writeFileSync(temporary, `${JSON.stringify(record)}\n`, {
+    encoding: 'utf8',
+    mode: 0o600,
+  })
+  fsyncFleetSafetyPath(temporary)
+  renameSync(temporary, filePath)
+  chmodSync(filePath, 0o600)
+  fsyncFleetSafetyPath(filePath)
+  fsyncFleetSafetyDirectory(path.dirname(filePath))
+}
+
+function clearFleetWorkerQuarantine() {
+  const filePath = fleetWorkerQuarantinePath()
+  try {
+    unlinkSync(filePath)
+    fsyncFleetSafetyDirectory(path.dirname(filePath))
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error
+  }
+}
+
+function surfaceFleetWorkerQuarantine(record) {
+  console.error(
+    'StatsKey Fleet worker is quarantined until this computer restarts.',
+    record
+  )
+  if (!Notification.isSupported()) return
+  const notification = new Notification({
+    title: 'Fleet worker paused',
+    body:
+      'StatsKey exited during Fleet work or could not confirm process shutdown. Restart this computer before running more Fleet jobs.',
+  })
+  notification.on('click', () => focusMainWindow())
+  notification.show()
+}
+
+async function surfaceRetainedFleetArtifacts() {
+  const retained = await listArtifactSpool({
+    artifactSpoolRoot: fleetArtifactSpoolRoot(),
+  })
+  if (retained.length === 0) return
+  console.warn(
+    `StatsKey Fleet retained ${retained.length} artifact archive(s) after publication failures.`
+  )
+  if (!Notification.isSupported()) return
+  const notification = new Notification({
+    title: 'Fleet evidence retained',
+    body: `${retained.length} artifact archive${
+      retained.length === 1 ? ' is' : 's are'
+    } waiting for review on this computer.`,
+  })
+  notification.on('click', () => focusMainWindow())
+  notification.show()
+}
+
 app.whenReady().then(async () => {
   app.setAppUserModelId('ai.statskey.desktop')
   app.setAsDefaultProtocolClient('statskey-desktop')
@@ -320,6 +620,10 @@ app.whenReady().then(async () => {
   initializeDesktopUpdates()
   initializeWorkspaceIndex()
   scheduleWorkspaceIndex(250)
+  void initializeFleetNode().catch(handleFleetNodeInitializationFailure)
+  void surfaceRetainedFleetArtifacts().catch((error) => {
+    console.error('StatsKey Fleet artifact spool inspection failed:', error)
+  })
 
   globalShortcut.register(SUMMON_ACCELERATOR, summonStatsKey)
 
@@ -359,12 +663,33 @@ app.on('will-quit', () => {
   controlledBrowser.closeAll?.()
   deviceControl.closeAll?.()
   terminalRuntime.closeAll()
+  for (const sessionId of [...remoteViewerSessions.keys()]) {
+    closeRemoteViewerSession(sessionId)
+  }
+  workspaceSyncRuntime?.dispose()
+  workspaceSyncRuntime = null
+  void invalidateFleetNodeRuntime()
+  fleetIdentityStore?.dispose()
+  fleetIdentityStore = null
   void localMcpManager.closeAll()
 })
 
-app.on('before-quit', () => {
+app.on('before-quit', (event) => {
+  fleetShutdownStarted = true
   bundledWebServer?.close()
   bundledWebServer = null
+  if (fleetQuitReady) return
+  event.preventDefault()
+  if (!fleetQuitPromise) {
+    fleetQuitPromise = invalidateFleetNodeRuntime()
+      .catch((error) => {
+        console.error('StatsKey Fleet shutdown failed:', error)
+      })
+      .finally(() => {
+        fleetQuitReady = true
+        app.quit()
+      })
+  }
 })
 
 ipcMain.on('statskey-desktop:retry', (event) => {
@@ -438,6 +763,734 @@ ipcMain.handle('statskey-desktop:updates-dismiss', (event) => {
   if (!isMainRenderer(event) || !updateRuntime) return desktopUpdateState()
   return updateRuntime.dismiss()
 })
+
+ipcMain.handle('statskey-desktop:fleet-identity-state', async (event) => {
+  if (!isMainRenderer(event)) return null
+  return getFleetIdentityStore().getPublicState()
+})
+
+ipcMain.handle(
+  'statskey-desktop:fleet-identity-ensure',
+  async (event, profile) => {
+    if (!isMainRenderer(event)) return null
+    await getFleetIdentityStore().ensure(profile)
+    return getFleetIdentityStore().getPublicState()
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-identity-replace',
+  async (event) => {
+    if (!isMainRenderer(event)) return null
+    const identity = await getFleetIdentityStore().load()
+    if (!identity?.enrollment) {
+      throw new Error('Only an enrolled Fleet identity can be replaced.')
+    }
+    const controllerLike = ['controller', 'hybrid'].includes(
+      identity.profile.role
+    )
+    const approved = await confirmFleetIdentityUse({
+      message: 'Prepare a replacement Fleet identity?',
+      detail: [
+        `Current device ID: ${identity.deviceId}`,
+        `Current key: ${identity.publicKeyFingerprint}`,
+        'This replaces the current private key in StatsKey identity storage.',
+        controllerLike
+          ? 'The new key remains untrusted until you complete controller recovery or pairing.'
+          : 'The new key remains untrusted until an enrolled controller pairs it.',
+        'Active local Fleet work stops immediately.',
+      ].join('\n'),
+    })
+    if (!approved) return null
+    await invalidateFleetNodeRuntime()
+    try {
+      await getFleetIdentityStore().replace(identity.profile)
+      return getFleetIdentityStore().getPublicState()
+    } catch (error) {
+      const persisted = await getFleetIdentityStore().reload().catch(() => null)
+      if (
+        persisted?.deviceId === identity.deviceId &&
+        persisted.publicKeyFingerprint === identity.publicKeyFingerprint &&
+        persisted.enrollment?.ownerUid === identity.enrollment.ownerUid &&
+        persisted.enrollment?.endpoint === identity.enrollment.endpoint &&
+        persisted.enrollment?.coordinatorKeyId ===
+          identity.enrollment.coordinatorKeyId &&
+        persisted.enrollment?.coordinatorPublicKeySpki ===
+          identity.enrollment.coordinatorPublicKeySpki
+      ) {
+        void initializeFleetNode().catch(() => {})
+      }
+      throw error
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-bootstrap-create',
+  async (event, input) => {
+    if (!isMainRenderer(event)) return null
+    const identity = await getFleetIdentityStore().load()
+    if (!identity || !['controller', 'hybrid'].includes(identity.profile.role)) {
+      throw new Error('Create a controller identity before starting Fleet.')
+    }
+    const ownerUid = String(input?.ownerUid || '').trim()
+    if (
+      ownerUid.length === 0 ||
+      ownerUid.length > 128 ||
+      /[\u0000-\u001f\u007f]/.test(ownerUid)
+    ) {
+      throw new Error('The signed-in Fleet account is invalid.')
+    }
+    const authorization = {
+      ownerUid,
+      audience: 'statskey-workbench:fleet:v1',
+    }
+    const approved = await confirmFleetIdentityUse({
+      message: 'Start this device as your Fleet controller?',
+      detail: [
+        `StatsKey account: ${ownerUid}`,
+        `Device ID: ${identity.deviceId}`,
+        `Key fingerprint: ${identity.publicKeyFingerprint}`,
+        'This registers only the public key. The private key remains protected by this device.',
+      ].join('\n'),
+    })
+    if (!approved) return null
+    const device = {
+      ...identity.profile,
+      publicKeySpki: identity.publicKeySpki,
+    }
+    return {
+      device,
+      authorization,
+      proof: createSignedDeviceRequest({
+        privateKey: identity.privateKey,
+        deviceId: identity.deviceId,
+        action: 'pairing.bootstrap',
+        payload: { device, authorization },
+      }),
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-controller-recovery-create',
+  async (event, input) => {
+    if (!isMainRenderer(event)) return null
+    const identity = await getFleetIdentityStore().load()
+    if (
+      !identity ||
+      identity.enrollment ||
+      !['controller', 'hybrid'].includes(identity.profile.role)
+    ) {
+      throw new Error(
+        'Create a new, unenrolled controller identity before recovery.'
+      )
+    }
+    const ownerUid = String(input?.ownerUid || '').trim()
+    const expectedControllerDeviceId = String(
+      input?.expectedControllerDeviceId || ''
+    ).trim()
+    if (
+      ownerUid.length === 0 ||
+      ownerUid.length > 128 ||
+      /[\u0000-\u001f\u007f]/.test(ownerUid) ||
+      !/^dev_[a-f0-9]{32}$/.test(expectedControllerDeviceId) ||
+      expectedControllerDeviceId === identity.deviceId
+    ) {
+      throw new Error('The Fleet controller recovery request is invalid.')
+    }
+    const authorization = {
+      ownerUid,
+      audience: 'statskey-workbench:fleet-recovery:v1',
+      expectedControllerDeviceId,
+    }
+    const approved = await confirmFleetIdentityUse({
+      message: 'Replace the lost Fleet controller?',
+      detail: [
+        `StatsKey account: ${ownerUid}`,
+        `Controller being replaced: ${expectedControllerDeviceId}`,
+        `Replacement device: ${identity.deviceId}`,
+        `Replacement key: ${identity.publicKeyFingerprint}`,
+        'The old key is revoked immediately. Grants it issued stop authorizing new work or lease renewals.',
+        'You must have signed in to StatsKey recently to complete this recovery.',
+      ].join('\n'),
+    })
+    if (!approved) return null
+    const device = {
+      ...identity.profile,
+      publicKeySpki: identity.publicKeySpki,
+    }
+    return {
+      device,
+      authorization,
+      proof: createSignedDeviceRequest({
+        privateKey: identity.privateKey,
+        deviceId: identity.deviceId,
+        action: 'controller.recover',
+        payload: { device, authorization },
+      }),
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-pairing-create-receipt',
+  async (event, input) => {
+    if (!isMainRenderer(event)) return null
+    const controller = await getFleetIdentityStore().load()
+    if (
+      !controller?.enrollment ||
+      !['controller', 'hybrid'].includes(controller.profile.role)
+    ) {
+      throw new Error('This device is not a Fleet controller.')
+    }
+    // A hybrid candidate with worker mode disabled is a controller-only
+    // device (for example a phone): it authorizes jobs but never executes
+    // them, so the receipt carries no workspace, repository, or capability
+    // scope and pairing creates no grant.
+    if (isControllerCandidateProfile(input?.candidate?.profile)) {
+      const receipt = createControllerPairingReceipt({
+        candidate: input.candidate,
+        ownerUid: controller.enrollment.ownerUid,
+        controller: publicFleetDeviceIdentity(controller),
+      })
+      return fleetPairingApprovalRegistry.retainControllerApproval(
+        receipt,
+        controller.deviceId
+      )
+    }
+    const receipt = createPairingReceipt({
+      ...input,
+      ownerUid: controller.enrollment.ownerUid,
+      controller: publicFleetDeviceIdentity(controller),
+    })
+    return fleetPairingApprovalRegistry.retainWorkerApproval(
+      receipt,
+      controller.deviceId
+    )
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-local-grant-create',
+  async (event, input) => {
+    if (!isMainRenderer(event)) return null
+    const identity = await getFleetIdentityStore().load()
+    if (
+      !identity?.enrollment ||
+      identity.profile.role !== 'hybrid' ||
+      identity.profile.workerMode !== 'opt-in'
+    ) {
+      throw new Error('This device is not an enrolled opt-in hybrid worker.')
+    }
+    const now = Date.now()
+    const normalized = normalizeFleetGrant(
+      {
+        id: `grant_${'0'.repeat(32)}`,
+        ownerUid: identity.enrollment.ownerUid,
+        controllerDeviceId: identity.deviceId,
+        workerDeviceId: identity.deviceId,
+        workspaceIds: input?.workspaceIds,
+        repositoryIdentities: input?.repositoryIdentities,
+        capabilities: input?.capabilities,
+        unattended: input?.unattended === true,
+        expiresAt: input?.expiresAt,
+        policyVersion: input?.policyVersion,
+      },
+      { at: now }
+    )
+    const receipt = {
+      deviceId: identity.deviceId,
+      workspaceIds: normalized.workspaceIds,
+      repositoryIdentities: normalized.repositoryIdentities,
+      capabilities: normalized.capabilities,
+      unattended: normalized.unattended,
+      expiresAt: normalized.expiresAt,
+      policyVersion: normalized.policyVersion,
+    }
+    const approved = await confirmFleetIdentityUse({
+      message: 'Enable this computer for local Fleet jobs?',
+      detail: [
+        `Device ID: ${identity.deviceId}`,
+        `Workspaces: ${receipt.workspaceIds.join(', ')}`,
+        `Repositories: ${receipt.repositoryIdentities.join(', ')}`,
+        `Capabilities: ${receipt.capabilities.join(', ')}`,
+        `Unattended work: ${receipt.unattended ? 'Allowed' : 'Not allowed'}`,
+        ...(receipt.capabilities.some((capability) =>
+          ['terminal.run', 'windows.build'].includes(capability)
+        )
+          ? [
+              'Host command access: approved programs run as this OS user; use a dedicated worker account.',
+            ]
+          : []),
+        `Grant expires: ${new Date(receipt.expiresAt).toISOString()}`,
+        `Policy version: ${receipt.policyVersion}`,
+      ].join('\n'),
+    })
+    if (!approved) return null
+    return {
+      receipt,
+      proof: createSignedDeviceRequest({
+        privateKey: identity.privateKey,
+        deviceId: identity.deviceId,
+        action: 'grant.local',
+        payload: receipt,
+      }),
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-job-authorize',
+  async (event, input) => {
+    if (!isMainRenderer(event)) return null
+    const identity = await getFleetIdentityStore().load()
+    if (
+      !identity?.enrollment ||
+      !['controller', 'hybrid'].includes(identity.profile.role)
+    ) {
+      throw new Error(
+        'This computer must be an enrolled Fleet controller to authorize jobs.'
+      )
+    }
+    if (
+      !input ||
+      typeof input !== 'object' ||
+      Array.isArray(input) ||
+      Object.hasOwn(input, 'controllerAuthorization')
+    ) {
+      throw new Error('The Fleet job authorization request is invalid.')
+    }
+    const normalizedJob = normalizeFleetCreateJob(input, {
+      ownerUid: identity.enrollment.ownerUid,
+      at: Date.now(),
+    })
+    const approved = await confirmFleetIdentityUse({
+      message: 'Authorize this exact Fleet job?',
+      detail: fleetJobAuthorizationDetail(normalizedJob),
+    })
+    if (!approved) return null
+    const payload = {
+      ownerUid: identity.enrollment.ownerUid,
+      job: input,
+    }
+    return {
+      controllerDeviceId: identity.deviceId,
+      proof: createSignedDeviceRequest({
+        privateKey: identity.privateKey,
+        deviceId: identity.deviceId,
+        action: 'job.authorize',
+        payload,
+      }),
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-pairing-sign',
+  async (event, receipt, action) => {
+    if (!isMainRenderer(event)) return null
+    const identity = await getFleetIdentityStore().load()
+    if (!identity) throw new Error('Create a Fleet identity before pairing.')
+    if (
+      action === 'pairing.approve' &&
+      (
+        !identity.enrollment ||
+        identity.enrollment.ownerUid !== receipt?.ownerUid ||
+        !['controller', 'hybrid'].includes(identity.profile.role)
+      )
+    ) {
+      throw new Error(
+        'Only the enrolled Fleet controller for this account can approve pairing.'
+      )
+    }
+    const validated = validatePairingSigner({
+      identity,
+      receipt,
+      action,
+    })
+    const claim =
+      action === 'pairing.approve'
+        ? fleetPairingApprovalRegistry.beginWorkerApproval(
+            validated.normalizedReceipt,
+            identity.deviceId
+          )
+        : null
+    try {
+      const approved = await confirmFleetIdentityUse({
+        message:
+          action === 'pairing.approve'
+            ? 'Approve this device for Fleet work?'
+            : 'Confirm this device pairing request?',
+        detail: fleetPairingConfirmationDetail(validated.normalizedReceipt),
+      })
+      if (!approved) return null
+      return signPairingReceipt({ identity, receipt, action })
+    } finally {
+      if (claim) fleetPairingApprovalRegistry.finishWorkerApproval(claim)
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-identity-mark-enrolled',
+  async (event, enrollment) => {
+    if (!isMainRenderer(event)) return null
+    const identity = await getFleetIdentityStore().load()
+    if (!identity) throw new Error('Create a Fleet identity before enrollment.')
+    const endpoint = trustedFleetDeviceEndpoint(enrollment?.endpoint)
+    const transport = createFleetDeviceTransport({
+      endpoint,
+      privateKey: identity.privateKey,
+      deviceId: identity.deviceId,
+      allowLoopback: !app.isPackaged,
+      coordinatorKeyId: enrollment?.coordinatorKeyId,
+      coordinatorPublicKeySpki: enrollment?.coordinatorPublicKeySpki,
+    })
+    const verified = await transport('device.status', {})
+    if (
+      verified?.status !== 'active' ||
+      verified.deviceId !== identity.deviceId ||
+      verified.publicKeyFingerprint !== identity.publicKeyFingerprint ||
+      verified.ownerUid !== enrollment?.ownerUid
+    ) {
+      throw new Error('Fleet enrollment could not be verified.')
+    }
+    const state = await getFleetIdentityStore().markEnrolled({
+      ownerUid: verified.ownerUid,
+      endpoint,
+      coordinatorKeyId: enrollment?.coordinatorKeyId,
+      coordinatorPublicKeySpki: enrollment?.coordinatorPublicKeySpki,
+    })
+    await initializeFleetNode({
+      restart: true,
+      verifiedIdentityFingerprint: identity.publicKeyFingerprint,
+    })
+    return state
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-artifact-download',
+  async (event, grant) => {
+    if (!isMainRenderer(event) || !mainWindow || mainWindow.isDestroyed()) {
+      return false
+    }
+    const download = validateFleetArtifactDownloadGrant(grant)
+    mainWindow.webContents.downloadURL(download.url)
+    return true
+  }
+)
+
+ipcMain.handle('statskey-desktop:fleet-artifact-spool-list', async (event) => {
+  if (!isMainRenderer(event)) return []
+  return listArtifactSpool({
+    artifactSpoolRoot: fleetArtifactSpoolRoot(),
+  })
+})
+
+ipcMain.handle(
+  'statskey-desktop:fleet-artifact-spool-reveal',
+  async (event, input) => {
+    if (!isMainRenderer(event)) return false
+    const archivePath = await revealArtifactSpoolEntry({
+      artifactSpoolRoot: fleetArtifactSpoolRoot(),
+      spoolId: input?.spoolId,
+      kind: input?.kind,
+    })
+    shell.showItemInFolder(archivePath)
+    return true
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:fleet-artifact-spool-purge',
+  async (event, input) => {
+    if (!isMainRenderer(event) || !mainWindow || mainWindow.isDestroyed()) {
+      return false
+    }
+    const retained = await listArtifactSpool({
+      artifactSpoolRoot: fleetArtifactSpoolRoot(),
+    })
+    const selected = retained.find(
+      (entry) => entry.spoolId === input?.spoolId
+    )
+    if (!selected) return false
+    const confirmation = await dialog.showMessageBox(mainWindow, {
+      type: 'warning',
+      buttons: ['Keep Evidence', 'Delete Evidence'],
+      defaultId: 0,
+      cancelId: 0,
+      message: 'Delete this retained Fleet evidence?',
+      detail: [
+        `Job: ${selected.jobId}`,
+        `Artifact: ${selected.kind}`,
+        `Size: ${selected.sizeBytes} bytes`,
+        'This local archive cannot be recovered after deletion.',
+      ].join('\n'),
+    })
+    if (confirmation.response !== 1) return false
+    return purgeArtifactSpoolEntry({
+      artifactSpoolRoot: fleetArtifactSpoolRoot(),
+      spoolId: selected.spoolId,
+    })
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Fleet Remote Session. The main process owns every relay connection; the
+// renderer never touches the socket. Video frames and session state flow to
+// the renderer over IPC; input events are validated and rate-limited here
+// before they are encrypted for the host.
+// ---------------------------------------------------------------------------
+
+function remoteViewerStatePayload(record) {
+  return {
+    sessionId: record.sessionId,
+    state: record.state,
+    paired: record.client?.paired === true,
+    header: record.header || null,
+    error: record.error || null,
+  }
+}
+
+function sendRemoteViewerState(record) {
+  if (
+    !mainWindow ||
+    mainWindow.isDestroyed() ||
+    mainWindow.webContents.isDestroyed()
+  ) {
+    return
+  }
+  mainWindow.webContents.send(
+    'statskey-desktop:remote-session-state',
+    remoteViewerStatePayload(record)
+  )
+}
+
+function closeRemoteViewerSession(sessionId) {
+  const record = remoteViewerSessions.get(sessionId)
+  if (!record) return false
+  remoteViewerSessions.delete(sessionId)
+  try {
+    record.client?.close()
+  } catch {}
+  return true
+}
+
+ipcMain.handle(
+  'statskey-desktop:remote-session-prepare-request',
+  async (event) => {
+    if (!isMainRenderer(event)) return null
+    const ephemeral = generateEphemeralKeyPair()
+    if (remoteSessionEphemerals.size >= 64) {
+      const oldest = remoteSessionEphemerals.keys().next().value
+      remoteSessionEphemerals.delete(oldest)
+    }
+    remoteSessionEphemerals.set(ephemeral.publicKeySpki, ephemeral)
+    return { controllerEphemeralKey: ephemeral.publicKeySpki }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:remote-session-connect',
+  async (event, input) => {
+    if (!isMainRenderer(event)) return { ok: false, error: 'Unavailable.' }
+    const sessionId = String(input?.sessionId || '')
+    try {
+      if (!REMOTE_SESSION_ID_PATTERN.test(sessionId)) {
+        throw remoteSessionError('invalid_session', 'Invalid remote session.')
+      }
+      if (remoteViewerSessions.has(sessionId)) {
+        return { ok: true }
+      }
+      const identity = await getFleetIdentityStore().load()
+      if (
+        !identity?.enrollment ||
+        !['controller', 'hybrid'].includes(identity.profile.role)
+      ) {
+        throw remoteSessionError(
+          'not_controller',
+          'This device is not an enrolled Fleet controller.'
+        )
+      }
+      const relayEndpoint = normalizeRelayEndpoint(input?.relayEndpoint)
+      const sessionKey = normalizeSessionKey(input?.sessionKey)
+      normalizePublicKeySpki(String(input?.controllerEphemeralKey || ''))
+      const capabilities = Array.isArray(input?.capabilities)
+        ? input.capabilities.filter((capability) =>
+            ['screen.view', 'screen.input'].includes(capability)
+          )
+        : []
+      if (!capabilities.includes('screen.view')) {
+        throw remoteSessionError(
+          'invalid_session',
+          'The remote session capabilities are invalid.'
+        )
+      }
+      const registered = remoteSessionEphemerals.get(
+        String(input?.controllerEphemeralKey || '')
+      )
+      const ephemeral = registered || generateEphemeralKeyPair()
+      const record = {
+        sessionId,
+        state: 'connecting',
+        client: null,
+        header: null,
+        error: null,
+        capabilities,
+        rateLimiter: createInputRateLimiter({}),
+      }
+      remoteViewerSessions.set(sessionId, record)
+      const { client, ready } = connectRelaySession({
+        endpoint: relayEndpoint,
+        privateKey: identity.privateKey,
+        publicKeySpki: identity.publicKeySpki,
+        ephemeralPublicKey: ephemeral.publicKeySpki,
+        sessionId,
+        role: 'viewer',
+        sessionKey,
+        onFrame: (type, plaintext) => {
+          if (type === FRAME_VIDEO) {
+            if (
+              mainWindow &&
+              !mainWindow.isDestroyed() &&
+              !mainWindow.webContents.isDestroyed()
+            ) {
+              mainWindow.webContents.send(
+                'statskey-desktop:remote-session-frame',
+                { sessionId, jpeg: plaintext }
+              )
+            }
+            return
+          }
+          if (type !== FRAME_SESSION_CONTROL) return
+          try {
+            const control = parseSessionControl(plaintext)
+            if (control?.type === 'stream.header') {
+              record.header = decodeStreamHeader(control)
+              record.state = 'active'
+              sendRemoteViewerState(record)
+            }
+          } catch {}
+        },
+        onPaired: () => {
+          record.state = record.header ? 'active' : 'waiting'
+          sendRemoteViewerState(record)
+        },
+        onControl: (control) => {
+          if (control?.type === 'error') {
+            record.state = 'failed'
+            record.error = String(control.code || 'relay_error').slice(0, 64)
+            sendRemoteViewerState(record)
+          }
+        },
+        onClose: () => {
+          if (record.state !== 'failed') {
+            record.state = 'closed'
+            sendRemoteViewerState(record)
+          }
+        },
+      })
+      record.client = client
+      await ready
+      record.state = 'waiting'
+      sendRemoteViewerState(record)
+      return { ok: true }
+    } catch (error) {
+      remoteViewerSessions.delete(sessionId)
+      const code = typeof error?.code === 'string' ? error.code : 'failed'
+      return { ok: false, error: code }
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:remote-session-input',
+  (event, sessionId, inputEvent) => {
+    if (!isMainRenderer(event)) return { ok: false, error: 'Unavailable.' }
+    const record = remoteViewerSessions.get(String(sessionId || ''))
+    if (!record?.client || record.state !== 'active' || !record.header) {
+      return { ok: false, error: 'not_active' }
+    }
+    if (!record.capabilities.includes('screen.input')) {
+      return { ok: false, error: 'view_only' }
+    }
+    try {
+      const command = normalizeRemoteInputEvent(inputEvent, {
+        width: record.header.width,
+        height: record.header.height,
+      })
+      if (!record.rateLimiter.allow()) {
+        return { ok: false, error: 'rate_limited' }
+      }
+      record.client.sendInput(command)
+      return { ok: true }
+    } catch {
+      return { ok: false, error: 'invalid_input' }
+    }
+  }
+)
+
+ipcMain.handle('statskey-desktop:remote-session-end', (event, sessionId) => {
+  if (!isMainRenderer(event)) return false
+  return closeRemoteViewerSession(String(sessionId || ''))
+})
+
+ipcMain.handle('statskey-desktop:remote-session-state', (event, sessionId) => {
+  if (!isMainRenderer(event)) return null
+  const record = remoteViewerSessions.get(String(sessionId || ''))
+  return record ? remoteViewerStatePayload(record) : null
+})
+
+// The host side of a remote session runs on this device when it is an
+// enrolled worker: it polls the control plane, approves sessions under the
+// Fleet consent model, streams the screen, and injects validated input.
+function startRemoteSessionHostRuntime(identity, postAction) {
+  if (remoteSessionHostRuntime) return
+  if (process.platform === 'linux') return
+  const runtime = createRemoteSessionHostRuntime({
+    postAction,
+    deviceId: identity.deviceId,
+    privateKey: identity.privateKey,
+    publicKeySpki: identity.publicKeySpki,
+    platform: process.platform,
+    electron: { BrowserWindow, desktopCapturer, screen },
+    captureFactory: ({ electron: captureElectron, onFrame, onReady }) =>
+      createScreenCapture({
+        BrowserWindow: captureElectron.BrowserWindow,
+        desktopCapturer: captureElectron.desktopCapturer,
+        screen: captureElectron.screen,
+        ipcMain,
+        onFrame,
+        onReady,
+        onError: (message) => {
+          console.error('[remote-session] capture error:', message)
+        },
+      }),
+    inputClientFactory:
+      process.platform === 'win32'
+        ? () => {
+            const helperPath = resolveInputHelperPath({
+              resourcesPath: process.resourcesPath,
+            })
+            if (!existsSync(helperPath)) return null
+            try {
+              spawnInputHelper({ helperPath })
+            } catch (error) {
+              console.error('[remote-session] input helper failed to start:', error)
+              return null
+            }
+            return createInputHelperClient({})
+          }
+        : null,
+    indicatorFactory: ({ sessionId }) =>
+      createSessionIndicator({ BrowserWindow, sessionId }),
+    logger: console,
+  })
+  remoteSessionHostRuntime = runtime
+  runtime.start()
+}
 
 ipcMain.handle('statskey-desktop:open-external', async (event, candidate) => {
   if (!mainWindow || event.sender !== mainWindow.webContents) return false
@@ -1634,6 +2687,685 @@ ipcMain.handle(
       () => restoreWorkspaceCheckpoint(checkpointId, approvalMode, binding),
       binding
     )
+  }
+)
+
+function getFleetIdentityStore() {
+  if (!fleetIdentityStore) {
+    fleetIdentityStore = new FleetIdentityStore({
+      filePath: path.join(app.getPath('userData'), 'fleet-device-identity.json'),
+      crypto: safeStorageCrypto,
+      allowLoopback: !app.isPackaged,
+    })
+  }
+  return fleetIdentityStore
+}
+
+function fleetRepositoryHosts() {
+  return [...DEFAULT_ALLOWED_REPOSITORY_HOSTS]
+}
+
+function trustedFleetDeviceEndpoint(value) {
+  const allowLoopback = !app.isPackaged
+  const requested = normalizeFleetDeviceEndpoint(value, { allowLoopback })
+  const allowed = [
+    'https://us-central1-statskey-workbench.cloudfunctions.net/workbenchDeviceApi',
+    process.env.STATSKEY_FLEET_DEVICE_ENDPOINT,
+  ]
+    .filter(Boolean)
+    .map((endpoint) =>
+      normalizeFleetDeviceEndpoint(endpoint, { allowLoopback })
+    )
+  if (!allowed.includes(requested)) {
+    throw new Error('That Fleet coordinator is not trusted by this build.')
+  }
+  return requested
+}
+
+function fleetAllowedExecutables(profile) {
+  const dedicatedWorkerDefaults =
+    profile?.workerMode === 'dedicated'
+      ? process.platform === 'win32'
+        ? ['node', 'dotnet', 'msbuild']
+        : ['node', 'npm', 'npx', 'pnpm', 'yarn', 'make', 'cmake', 'swift']
+      : []
+  const configured = String(process.env.STATSKEY_FLEET_ALLOWED_EXECUTABLES || '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value) => /^[A-Za-z0-9][A-Za-z0-9._+-]{0,119}$/.test(value))
+    .map((value) => (process.platform === 'win32' ? value.toLowerCase() : value))
+  return [...new Set([...dedicatedWorkerDefaults, ...configured])]
+}
+
+async function fleetExecutablePath(executable) {
+  const pathEntries = String(process.env.PATH || '')
+    .split(path.delimiter)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+  const extensions = directExecutableExtensions({
+    executable,
+    platform: process.platform,
+    pathExt: process.env.PATHEXT,
+  })
+  for (const entry of pathEntries) {
+    for (const extension of extensions) {
+      const candidate = path.join(
+        entry,
+        process.platform === 'win32'
+          ? `${executable}${extension}`
+          : executable
+      )
+      try {
+        await access(candidate, fsConstants.X_OK)
+        const resolved = realpathSync(candidate)
+        const metadata = statSync(resolved)
+        if (
+          metadata.isFile() &&
+          (process.platform !== 'win32' ||
+            ['.com', '.exe'].includes(path.extname(resolved).toLowerCase()))
+        ) {
+          return resolved
+        }
+      } catch {}
+    }
+  }
+  return null
+}
+
+function fleetNodeCapabilities(
+  allowedExecutables,
+  { gitAvailable = false, xcodeAvailable = false } = {}
+) {
+  if (!gitAvailable) return []
+  const capabilities = [
+    'workspace.read',
+    'workspace.snapshot',
+    'git.inspect',
+  ]
+  if (process.platform === 'darwin' && xcodeAvailable) {
+    capabilities.push('xcode.build', 'xcode.test', 'xcode.archive')
+  }
+  if (allowedExecutables.length > 0) capabilities.push('terminal.run')
+  if (
+    process.platform === 'win32' &&
+    allowedExecutables.some((executable) =>
+      ['dotnet', 'msbuild'].includes(executable)
+    )
+  ) {
+    capabilities.push('windows.build')
+  }
+  return capabilities
+}
+
+async function fleetDiskAvailableBytes() {
+  try {
+    const stats = await statfs(app.getPath('userData'))
+    const available = Number(stats.bavail) * Number(stats.bsize)
+    return Number.isFinite(available)
+      ? Math.max(0, Math.min(available, 100 * 1024 ** 4))
+      : 0
+  } catch {
+    return 0
+  }
+}
+
+async function collectFleetHeartbeat(capabilities, executables) {
+  const logicalCpu = Math.max(1, os.cpus()?.length || 1)
+  const oneMinuteLoad = Number(os.loadavg?.()[0]) || 0
+  const totalMemory = Math.max(0, os.totalmem())
+  return {
+    capabilities,
+    executables,
+    resources: {
+      cpuLogical: logicalCpu,
+      cpuAvailable: Math.max(0, Math.min(logicalCpu, logicalCpu - oneMinuteLoad)),
+      memoryBytes: totalMemory,
+      memoryAvailableBytes: Math.max(0, Math.min(totalMemory, os.freemem())),
+      diskAvailableBytes: await fleetDiskAvailableBytes(),
+      gpuCount: 0,
+    },
+  }
+}
+
+function clearFleetNodeInitializationRetry() {
+  if (fleetNodeInitializationTimer) {
+    clearTimeout(fleetNodeInitializationTimer)
+    fleetNodeInitializationTimer = null
+  }
+  fleetNodeInitializationFailures = 0
+}
+
+function retryableFleetNodeInitialization(error) {
+  const status = Number(error?.status)
+  return (
+    error?.code === 'offline' ||
+    error?.code === 'timeout' ||
+    error?.code === 'worker_authority_fence_unavailable' ||
+    status === 408 ||
+    status === 429 ||
+    status >= 500
+  )
+}
+
+function handleFleetNodeInitializationFailure(error) {
+  console.warn('StatsKey Fleet node did not start:', error?.message || error)
+  if (
+    fleetShutdownStarted ||
+    !retryableFleetNodeInitialization(error) ||
+    fleetNodeInitializationTimer
+  ) {
+    return
+  }
+  fleetNodeInitializationFailures += 1
+  const delay = Math.min(
+    5 * 60_000,
+    5_000 * 2 ** Math.min(fleetNodeInitializationFailures - 1, 6)
+  )
+  fleetNodeInitializationTimer = setTimeout(() => {
+    fleetNodeInitializationTimer = null
+    void initializeFleetNode().catch(handleFleetNodeInitializationFailure)
+  }, delay)
+  fleetNodeInitializationTimer.unref?.()
+}
+
+async function initializeFleetNode({
+  restart = false,
+  verifiedIdentityFingerprint = null,
+} = {}) {
+  if (fleetShutdownStarted) return false
+  if (restart) await invalidateFleetNodeRuntime()
+  if (fleetShutdownStarted) return false
+  if (fleetNodeSupervisor) return true
+  if (fleetNodeInitializationPromise) return fleetNodeInitializationPromise
+  const generation = fleetNodeInitializationGeneration
+  const pending = initializeFleetNodeCandidate({
+    generation,
+    verifiedIdentityFingerprint,
+  })
+  fleetNodeInitializationPromise = pending
+  try {
+    return await pending
+  } catch (error) {
+    if (generation !== fleetNodeInitializationGeneration) return false
+    throw error
+  } finally {
+    if (fleetNodeInitializationPromise === pending) {
+      fleetNodeInitializationPromise = null
+    }
+  }
+}
+
+async function invalidateFleetNodeRuntime() {
+  fleetNodeInitializationGeneration += 1
+  fleetNodeInitializationPromise = null
+  const supervisor = fleetNodeSupervisor
+  clearFleetNodeInitializationRetry()
+  const hostRuntime = remoteSessionHostRuntime
+  remoteSessionHostRuntime = null
+  if (hostRuntime) {
+    await hostRuntime.stop().catch((error) => {
+      console.error('[remote-session] host runtime shutdown failed:', error)
+    })
+  }
+  if (supervisor) await supervisor.stop()
+  if (fleetNodeSupervisor === supervisor) fleetNodeSupervisor = null
+}
+
+async function initializeFleetNodeCandidate({
+  generation,
+  verifiedIdentityFingerprint,
+}) {
+  const identity = await getFleetIdentityStore().load()
+  if (
+    !identity?.enrollment ||
+    !['worker', 'hybrid'].includes(identity.profile.role) ||
+    identity.profile.workerMode === 'disabled'
+  ) {
+    clearFleetNodeInitializationRetry()
+    return false
+  }
+  // Ubuntu is currently a controller/local-work platform only. Starting a
+  // polling worker with empty capabilities can race a stale heartbeat and
+  // consume a remote attempt even though the adapter will fail closed. A
+  // future Linux worker must be gated on an attested privileged cgroup service.
+  if (process.platform === 'linux') {
+    clearFleetNodeInitializationRetry()
+    return false
+  }
+  const quarantine = loadActiveFleetWorkerQuarantine()
+  if (quarantine) {
+    clearFleetNodeInitializationRetry()
+    surfaceFleetWorkerQuarantine(quarantine)
+    return false
+  }
+  const endpoint = trustedFleetDeviceEndpoint(identity.enrollment.endpoint)
+  const postAction = createFleetDeviceTransport({
+    endpoint,
+    privateKey: identity.privateKey,
+    deviceId: identity.deviceId,
+    allowLoopback: !app.isPackaged,
+    coordinatorKeyId: identity.enrollment.coordinatorKeyId,
+    coordinatorPublicKeySpki:
+      identity.enrollment.coordinatorPublicKeySpki,
+  })
+  if (verifiedIdentityFingerprint !== identity.publicKeyFingerprint) {
+    const verified = await postAction('device.status', {})
+    if (
+      verified?.status !== 'active' ||
+      verified.deviceId !== identity.deviceId ||
+      verified.publicKeyFingerprint !== identity.publicKeyFingerprint ||
+      verified.ownerUid !== identity.enrollment.ownerUid
+    ) {
+      throw new Error('Stored Fleet enrollment could not be verified.')
+    }
+  }
+  const configuredExecutables = fleetAllowedExecutables(identity.profile)
+  const executableAvailability = await Promise.all(
+    configuredExecutables.map(async (executable) => ({
+      executable,
+      path: await fleetExecutablePath(executable),
+    }))
+  )
+  // The current Windows Job Object owner shares the desktop user's security
+  // token with its workload. It proves lifecycle behavior but is not an
+  // adversarial execution boundary, so packaged clients stay fail-closed until
+  // a separately privileged signed service owns the job and lease authority.
+  //
+  // Development-only escape hatch for a single-owner trusted macOS machine:
+  // the best-effort POSIX owner enforces lease/deadline fencing for ordinary
+  // process trees, but a job that creates a new session can escape it. This
+  // is not containment and must never reach a packaged build or Linux.
+  const allowBestEffortPosixOwner =
+    !app.isPackaged &&
+    process.platform === 'darwin' &&
+    process.env.STATSKEY_FLEET_ALLOW_BEST_EFFORT_POSIX_OWNER === '1'
+  const fleetProcessContainmentAvailable =
+    (kernelBackedFleetProcessContainment(process.platform) ||
+      allowBestEffortPosixOwner) &&
+    !app.isPackaged
+  const allowedExecutables = executableAvailability
+    .filter((item) => fleetProcessContainmentAvailable && item.path)
+    .map((item) => item.executable)
+  const executablePaths = Object.fromEntries(
+    executableAvailability
+      .filter((item) => item.path)
+      .map((item) => [item.executable, item.path])
+  )
+  const [gitPath, xcodePath, dittoPath] = await Promise.all([
+    fleetExecutablePath('git'),
+    process.platform === 'darwin'
+      ? fleetExecutablePath('xcodebuild')
+      : Promise.resolve(null),
+    process.platform === 'darwin'
+      ? fleetExecutablePath('ditto')
+      : Promise.resolve(null),
+  ])
+  const capabilities = fleetNodeCapabilities(allowedExecutables, {
+    gitAvailable: fleetProcessContainmentAvailable && Boolean(gitPath),
+    xcodeAvailable:
+      fleetProcessContainmentAvailable && Boolean(xcodePath && dittoPath),
+  })
+  if (gitPath) executablePaths.git = gitPath
+  if (xcodePath) executablePaths.xcodebuild = xcodePath
+  if (dittoPath) executablePaths.ditto = dittoPath
+  const leaseAuthorityStore = new FleetLeaseAuthorityStore({
+    directory: path.join(
+      app.getPath('userData'),
+      'fleet-lease-authority'
+    ),
+  })
+  await leaseAuthorityStore.assertOwnerAvailable()
+  const adapters = createFleetWorkerAdapters({
+    workRoot: path.join(app.getPath('userData'), 'fleet-workspaces'),
+    artifactSpoolRoot: fleetArtifactSpoolRoot(),
+    allowedRepositoryHosts: fleetRepositoryHosts(),
+    allowedExecutables,
+    executablePaths,
+    platform: process.platform,
+    authorityFenceProvider: () => leaseAuthorityStore.current(),
+    allowBestEffortPosixOwner,
+  })
+  const supervisor = new FleetNodeSupervisor({
+    deviceId: identity.deviceId,
+    postAction,
+    adapters,
+    collectHeartbeat: () =>
+      collectFleetHeartbeat(capabilities, allowedExecutables),
+    softwareVersion: app.getVersion(),
+    logger: console,
+    onExecutionStart: (record) => {
+      persistFleetWorkerQuarantine(record)
+    },
+    onExecutionSettled: () => {
+      clearFleetWorkerQuarantine()
+    },
+    onLeaseAuthorityStart: (record) => {
+      return leaseAuthorityStore.activate(record)
+    },
+    onLeaseAuthorityRenewed: (record) => {
+      return leaseAuthorityStore.renew(record)
+    },
+    onLeaseAuthoritySettled: (record) => {
+      return leaseAuthorityStore.clear(record.leaseId)
+    },
+    onQuarantine: (record) => {
+      persistFleetWorkerQuarantine(record)
+      surfaceFleetWorkerQuarantine(record)
+    },
+  })
+  const currentIdentity = await getFleetIdentityStore().load()
+  if (
+    fleetShutdownStarted ||
+    generation !== fleetNodeInitializationGeneration ||
+    currentIdentity?.deviceId !== identity.deviceId ||
+    currentIdentity?.publicKeyFingerprint !== identity.publicKeyFingerprint ||
+    currentIdentity?.enrollment?.endpoint !== identity.enrollment.endpoint ||
+    currentIdentity?.enrollment?.coordinatorKeyId !==
+      identity.enrollment.coordinatorKeyId ||
+    currentIdentity?.enrollment?.coordinatorPublicKeySpki !==
+      identity.enrollment.coordinatorPublicKeySpki ||
+    currentIdentity?.profile?.role !== identity.profile.role ||
+    currentIdentity?.profile?.workerMode !== identity.profile.workerMode
+  ) {
+    await supervisor.stop()
+    return false
+  }
+  fleetNodeSupervisor = supervisor
+  clearFleetNodeInitializationRetry()
+  supervisor.start()
+  startRemoteSessionHostRuntime(identity, postAction)
+  return true
+}
+
+async function confirmFleetIdentityUse({ message, detail }) {
+  if (!mainWindow || mainWindow.isDestroyed()) return false
+  const result = await dialog.showMessageBox(mainWindow, {
+    type: 'question',
+    title: 'StatsKey Fleet',
+    message,
+    detail,
+    buttons: ['Approve', 'Cancel'],
+    defaultId: 1,
+    cancelId: 1,
+    noLink: true,
+  })
+  return result.response === 0
+}
+
+function fleetPairingConfirmationDetail(receipt) {
+  const label =
+    typeof receipt?.candidate?.label === 'string'
+      ? receipt.candidate.label.trim().slice(0, 80)
+      : 'Unknown device'
+  const workspaces = Array.isArray(receipt?.workspaceIds)
+    ? receipt.workspaceIds
+        .filter((value) => typeof value === 'string')
+        .join(', ')
+    : ''
+  const capabilities = Array.isArray(receipt?.capabilities)
+    ? receipt.capabilities
+        .filter((value) => typeof value === 'string')
+        .join(', ')
+    : ''
+  const repositories = Array.isArray(receipt?.repositoryIdentities)
+    ? receipt.repositoryIdentities
+        .filter((value) => typeof value === 'string')
+        .join(', ')
+    : ''
+  let candidateIdentity = null
+  try {
+    candidateIdentity = deviceIdentityForPublicKey(
+      receipt?.candidate?.publicKeySpki
+    )
+  } catch {
+    // The signing validator will reject malformed key material after denial.
+  }
+  return [
+    `StatsKey account: ${String(receipt?.ownerUid || 'Invalid')}`,
+    `Controller device ID: ${String(receipt?.controllerDeviceId || 'Invalid')}`,
+    `Device: ${label || 'Unknown device'}`,
+    `Device ID: ${candidateIdentity?.deviceId || 'Invalid'}`,
+    `Key fingerprint: ${candidateIdentity?.publicKeyFingerprint || 'Invalid'}`,
+    `Role: ${String(receipt?.candidate?.role || 'Invalid')}`,
+    `Worker mode: ${String(receipt?.candidate?.workerMode || 'Invalid')}`,
+    `Platform: ${String(receipt?.candidate?.platform || 'Invalid')}`,
+    `Maximum concurrent jobs: ${String(
+      receipt?.candidate?.maxConcurrentJobs ?? 'Invalid'
+    )}`,
+    `Workspaces: ${workspaces || 'None'}`,
+    `Repositories: ${repositories || 'None'}`,
+    `Capabilities: ${capabilities || 'None'}`,
+    `Unattended work: ${receipt?.unattended === true ? 'Allowed' : 'Not allowed'}`,
+    ...(Array.isArray(receipt?.capabilities) &&
+    receipt.capabilities.some((capability) =>
+      ['terminal.run', 'windows.build'].includes(capability)
+    )
+      ? [
+          'Host command access: approved programs run as this OS user; use a dedicated worker account.',
+        ]
+      : []),
+    `Grant expires: ${new Date(receipt?.grantExpiresAt).toISOString()}`,
+    `Policy version: ${String(receipt?.policyVersion ?? 'Invalid')}`,
+  ].join('\n')
+}
+
+// Workspace sync IPC: authorized roots come from the runtime's own persisted
+// link-state files, independent of the currently open workspace.
+function getWorkspaceSyncRuntime() {
+  if (!workspaceSyncRuntime) {
+    workspaceSyncRuntime = createWorkspaceSyncRuntime({
+      userDataPath: app.getPath('userData'),
+      ignoredNames: WORKSPACE_IGNORED_NAMES,
+      maxFileBytes: MAX_WORKSPACE_SYNC_FILE_BYTES,
+      onChanges(change) {
+        if (
+          !mainWindow ||
+          mainWindow.isDestroyed() ||
+          mainWindow.webContents.isDestroyed()
+        ) {
+          return
+        }
+        mainWindow.webContents.send(
+          'statskey-desktop:workspace-sync-changed',
+          change
+        )
+      },
+    })
+  }
+  return workspaceSyncRuntime
+}
+
+ipcMain.handle('statskey-desktop:workspace-sync-device-info', (event) => {
+  if (!isMainRenderer(event)) return null
+  return getWorkspaceSyncRuntime().deviceInfo()
+})
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-state-load',
+  (event, syncId) => {
+    if (!isMainRenderer(event) || typeof syncId !== 'string') return null
+    return getWorkspaceSyncRuntime().loadState(syncId)
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-state-save',
+  (event, syncId, state) => {
+    if (!isMainRenderer(event) || typeof syncId !== 'string') return false
+    return getWorkspaceSyncRuntime().saveState(syncId, state)
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-state-remove',
+  (event, syncId) => {
+    if (!isMainRenderer(event) || typeof syncId !== 'string') return false
+    return getWorkspaceSyncRuntime().removeState(syncId)
+  }
+)
+
+ipcMain.handle('statskey-desktop:workspace-sync-state-list', (event) => {
+  if (!isMainRenderer(event)) return []
+  return getWorkspaceSyncRuntime().listStates()
+})
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-scan',
+  async (event, syncId) => {
+    if (!isMainRenderer(event) || typeof syncId !== 'string') {
+      return {
+        ok: false,
+        entries: [],
+        missingRoots: [],
+        skipped: [],
+        error: 'Unavailable.',
+      }
+    }
+    try {
+      return await getWorkspaceSyncRuntime().scan(syncId)
+    } catch {
+      return {
+        ok: false,
+        entries: [],
+        missingRoots: [],
+        skipped: [],
+        error: 'Sync scan failed.',
+      }
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-scan-paths',
+  async (event, syncId, rootId, relPaths) => {
+    if (
+      !isMainRenderer(event) ||
+      typeof syncId !== 'string' ||
+      typeof rootId !== 'string' ||
+      !Array.isArray(relPaths)
+    ) {
+      return { ok: false, entries: [], skipped: [], error: 'Unavailable.' }
+    }
+    try {
+      return await getWorkspaceSyncRuntime().scanPaths(syncId, rootId, relPaths)
+    } catch {
+      return { ok: false, entries: [], skipped: [], error: 'Sync scan failed.' }
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-read',
+  async (event, syncId, rootId, relPath) => {
+    if (
+      !isMainRenderer(event) ||
+      typeof syncId !== 'string' ||
+      typeof rootId !== 'string' ||
+      typeof relPath !== 'string'
+    ) {
+      return { ok: false, error: 'Unavailable.' }
+    }
+    try {
+      return await getWorkspaceSyncRuntime().read(syncId, rootId, relPath)
+    } catch {
+      return { ok: false, error: 'Sync read failed.' }
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-apply',
+  async (event, syncId, rootId, relPath, content) => {
+    if (
+      !isMainRenderer(event) ||
+      typeof syncId !== 'string' ||
+      typeof rootId !== 'string' ||
+      typeof relPath !== 'string' ||
+      content == null ||
+      typeof content !== 'object'
+    ) {
+      return { ok: false, error: 'Unavailable.' }
+    }
+    try {
+      return await getWorkspaceSyncRuntime().apply(syncId, rootId, relPath, {
+        base64: typeof content.base64 === 'string' ? content.base64 : '',
+        executable: content.executable === true,
+      })
+    } catch {
+      return { ok: false, error: 'Sync write failed.' }
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-remove',
+  async (event, syncId, rootId, relPath) => {
+    if (
+      !isMainRenderer(event) ||
+      typeof syncId !== 'string' ||
+      typeof rootId !== 'string' ||
+      typeof relPath !== 'string'
+    ) {
+      return { ok: false, error: 'Unavailable.' }
+    }
+    try {
+      return await getWorkspaceSyncRuntime().remove(syncId, rootId, relPath)
+    } catch {
+      return { ok: false, error: 'Sync delete failed.' }
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-create-root-folder',
+  (event, basePath, name) => {
+    if (!isMainRenderer(event)) return { ok: false, error: 'Unavailable.' }
+    try {
+      const base =
+        typeof basePath === 'string' && basePath
+          ? basePath
+          : path.join(os.homedir(), 'StatsKey Synced')
+      if (!path.isAbsolute(base)) {
+        return { ok: false, error: 'Choose an absolute destination folder.' }
+      }
+      mkdirSync(base, { recursive: true })
+      const resolvedBase = realpathSync(base)
+      const cleaned = String(typeof name === 'string' ? name : '')
+        .replace(/[^A-Za-z0-9._ -]/g, '')
+        .replace(/^[. ]+/, '')
+        .trim()
+        .slice(0, 120)
+        .trim() || 'Synced Workspace'
+      const target = path.join(resolvedBase, cleaned)
+      const relative = path.relative(resolvedBase, target)
+      if (
+        !relative ||
+        relative.startsWith('..') ||
+        path.isAbsolute(relative) ||
+        relative.includes(path.sep)
+      ) {
+        return { ok: false, error: 'Invalid folder name.' }
+      }
+      mkdirSync(target, { recursive: true })
+      return { ok: true, path: target }
+    } catch {
+      return { ok: false, error: 'Could not create the folder.' }
+    }
+  }
+)
+
+ipcMain.handle(
+  'statskey-desktop:workspace-sync-choose-folder',
+  async (event) => {
+    if (!isMainRenderer(event) || !mainWindow) return null
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Choose a destination folder',
+      buttonLabel: 'Choose folder',
+      properties: ['openDirectory', 'createDirectory'],
+      securityScopedBookmarks: process.platform === 'darwin',
+    })
+    if (result.canceled || result.filePaths.length === 0) return null
+    return result.filePaths[0]
   }
 )
 
@@ -4945,7 +6677,8 @@ function spawnWorkspaceCommand(command, cwd) {
   const windows = process.platform === 'win32'
   const executable = windows
     ? process.env.ComSpec || 'cmd.exe'
-    : process.env.SHELL || '/bin/zsh'
+    : process.env.SHELL ||
+      (process.platform === 'linux' ? '/bin/bash' : '/bin/zsh')
   const args = windows ? ['/d', '/s', '/c', command] : ['-lc', command]
   return runBoundedChildProcess({
     executable,
@@ -5298,7 +7031,8 @@ async function spawnHookCommand(command, cwd, payload, timeoutSeconds) {
   const windows = process.platform === 'win32'
   const executable = windows
     ? process.env.ComSpec || 'cmd.exe'
-    : process.env.SHELL || '/bin/zsh'
+    : process.env.SHELL ||
+      (process.platform === 'linux' ? '/bin/bash' : '/bin/zsh')
   const args = windows ? ['/d', '/s', '/c', command] : ['-lc', command]
   const result = await runBoundedChildProcess({
     executable,
@@ -5420,44 +7154,20 @@ function sanitizeDesktopPreferences(input) {
     input != null && typeof input === 'object' && !Array.isArray(input)
       ? input
       : {}
-  const raw =
-    source.modelSettings != null &&
-    typeof source.modelSettings === 'object' &&
-    !Array.isArray(source.modelSettings)
-      ? source.modelSettings
-      : null
-  let modelSettings = null
-  if (raw) {
-    const stringField = (name, maximum = 240) =>
-      typeof raw[name] === 'string' && raw[name].length <= maximum
-        ? raw[name]
-        : undefined
-    const contextWindowTokens = Number(raw.contextWindowTokens)
-    modelSettings = {
-      modelLabel: stringField('modelLabel'),
-      modelId: stringField('modelId'),
-      provider: stringField('provider', 40),
-      directProvider: stringField('directProvider', 40),
-      providerLabel: stringField('providerLabel', 80),
-      dotColor: stringField('dotColor', 40),
-      effort: stringField('effort', 20),
-      executionRoute: stringField('executionRoute', 20),
-      reasoningMode: stringField('reasoningMode', 20),
-      contextWindowTokens:
-        Number.isFinite(contextWindowTokens) &&
-        contextWindowTokens >= 16_000 &&
-        contextWindowTokens <= 2_000_000
-          ? contextWindowTokens
-          : undefined,
-    }
-  }
   return {
     version: 1,
     orchestrationPolicyVersion: 2,
     intelligenceUpdatesPolicyVersion: 2,
-    modelSettings,
+    modelSettings: sanitizeDesktopModelSettings(source.modelSettings),
+    subagentModelSettings: sanitizeDesktopModelSettings(
+      source.subagentModelSettings,
+      { requireIdentity: true }
+    ),
     inlineCompletions: source.inlineCompletions === true,
     agentMode: sanitizeAgentMode(source.agentMode),
+    executePermissionGranted:
+      source.executePermissionGranted === true ||
+      source.approvalMode === 'everything',
     approvalMode:
       source.approvalMode === 'auto' ||
       source.approvalMode === 'everything'
@@ -5948,9 +7658,15 @@ async function testProviderConfiguration(provider, config) {
 }
 
 async function listProviderModels(provider, config) {
-  if (provider === 'aws-bedrock') {
-    return config.model
-      ? [{ id: config.model, label: config.model, createdAt: null }]
+  if (
+    provider === 'aws-bedrock' ||
+    provider === 'azure-openai' ||
+    provider === 'openai-compatible'
+  ) {
+    const configuredModel =
+      provider === 'azure-openai' ? config.deployment : config.model
+    return configuredModel
+      ? [{ id: configuredModel, label: configuredModel, createdAt: null }]
       : []
   }
 
@@ -5984,18 +7700,6 @@ async function listProviderModels(provider, config) {
     response = await fetchProvider(url, {
       headers: { 'x-goog-api-key': config.apiKey },
     })
-  } else if (provider === 'azure-openai') {
-    const url = new URL(providerUrl(config.endpoint, 'openai/deployments'))
-    url.searchParams.set('api-version', config.apiVersion)
-    response = await fetchProvider(url, {
-      headers: { 'api-key': config.apiKey },
-    })
-  } else if (provider === 'openai-compatible') {
-    response = await fetchProvider(providerUrl(config.baseUrl, 'models'), {
-      headers: config.apiKey
-        ? { Authorization: `Bearer ${config.apiKey}` }
-        : {},
-    })
   } else {
     throw new Error('Unsupported provider.')
   }
@@ -6025,35 +7729,7 @@ async function listProviderModels(provider, config) {
   const rawModels = parsed?.data || parsed?.models || parsed?.value || []
   if (!Array.isArray(rawModels)) return []
 
-  const result = []
-  const seen = new Set()
-  for (const raw of rawModels) {
-    let id = String(raw?.id || raw?.name || '').trim()
-    if (provider === 'google' && id.startsWith('models/')) {
-      id = id.slice('models/'.length)
-    }
-    if (
-      !id ||
-      id.length > 240 ||
-      /[\u0000-\u001f\u007f]/.test(id) ||
-      seen.has(id)
-    ) {
-      continue
-    }
-    seen.add(id)
-    const rawLabel = String(raw?.display_name || raw?.displayName || id).trim()
-    const created = Number(raw?.created || raw?.created_at || 0)
-    result.push({
-      id,
-      label: rawLabel && rawLabel.length <= 240 ? rawLabel : id,
-      createdAt:
-        Number.isFinite(created) && created > 0
-          ? new Date(created * 1000).toISOString()
-          : null,
-    })
-    if (result.length >= 250) break
-  }
-  return result
+  return normalizeProviderModelList(provider, rawModels)
 }
 
 function safeProviderError(error) {
@@ -6244,6 +7920,27 @@ async function startBundledWebServer() {
     try {
       const requestUrl = new URL(request.url || '/', `http://${expectedHost || 'localhost'}`)
       let pathname = decodeURIComponent(requestUrl.pathname)
+      if (pathname === DESKTOP_HEALTH_PATH) {
+        const ready = menuRendererReady === true
+        const body = JSON.stringify(
+          desktopHealthPayload({
+            rendererReady: ready,
+            currentVersion: app.getVersion(),
+            platform: process.platform,
+            arch: process.arch,
+            feedRoot: UPDATE_FEED_ROOT,
+          })
+        )
+        response.writeHead(ready ? 200 : 503, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Content-Length': Buffer.byteLength(body),
+          'Cross-Origin-Resource-Policy': 'same-origin',
+          'X-Content-Type-Options': 'nosniff',
+        })
+        response.end(request.method === 'HEAD' ? undefined : body)
+        return
+      }
       if (pathname === '/') {
         response.writeHead(302, { Location: '/app' }).end()
         return

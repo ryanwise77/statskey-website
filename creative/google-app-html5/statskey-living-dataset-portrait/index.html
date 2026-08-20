@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="ad.orientation" content="portrait,landscape">
+  <meta name="ad.size" content="width=320,height=480">
+  <title>StatsKey — Your body is a living dataset</title>
+  <script src="https://tpc.googlesyndication.com/pagead/gadgets/html5/api/exitapi.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050912;
+      --panel: #0d1522;
+      --ink: #f7f9fc;
+      --muted: #9ca9bc;
+      --quiet: #66748a;
+      --line: rgba(255, 255, 255, 0.11);
+      --cyan: #3dd9c7;
+      --cyan-soft: rgba(61, 217, 199, 0.14);
+      --blue: #77a6ff;
+      --coral: #ff8d78;
+      --green: #91dfa2;
+      --violet: #b19af7;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .ad {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      height: 100%;
+      min-width: 240px;
+      min-height: 360px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 83% 16%, rgba(61, 217, 199, 0.13), transparent 30%),
+        radial-gradient(circle at 11% 64%, rgba(119, 166, 255, 0.12), transparent 36%),
+        linear-gradient(158deg, #04070d 0%, #08101c 58%, #050912 100%);
+      color: var(--ink);
+    }
+
+    .ad::before {
+      position: absolute;
+      z-index: -2;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+      background-size: 28px 28px;
+      content: "";
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+
+    .ad::after {
+      position: absolute;
+      z-index: -1;
+      width: 72vw;
+      height: 72vw;
+      right: -31vw;
+      top: 31%;
+      border: 1px solid rgba(61, 217, 199, 0.12);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 9vw rgba(61, 217, 199, 0.022),
+        0 0 0 19vw rgba(119, 166, 255, 0.018);
+      content: "";
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 6;
+      top: clamp(13px, 3.6vh, 24px);
+      left: clamp(14px, 5vw, 30px);
+      right: clamp(14px, 5vw, 30px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      opacity: 0;
+      animation: rise-in 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .app-icon {
+      width: clamp(29px, 9.5vw, 42px);
+      height: clamp(29px, 9.5vw, 42px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.34);
+      object-fit: cover;
+    }
+
+    .wordmark {
+      display: block;
+      font-size: clamp(12px, 3.8vw, 17px);
+      font-weight: 760;
+      letter-spacing: 0.08em;
+      line-height: 1;
+    }
+
+    .category {
+      display: block;
+      margin-top: 4px;
+      color: var(--quiet);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: clamp(6.5px, 1.9vw, 9px);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .private {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: clamp(7px, 2.2vw, 10px);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .private::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px rgba(61, 217, 199, 0.8);
+      content: "";
+    }
+
+    .hero-copy {
+      position: absolute;
+      z-index: 5;
+      top: clamp(62px, 14.5vh, 102px);
+      left: clamp(16px, 5.5vw, 34px);
+      right: clamp(16px, 5.5vw, 34px);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0 0 clamp(5px, 1.1vh, 9px);
+      color: var(--cyan);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: clamp(7px, 2.3vw, 11px);
+      font-weight: 700;
+      letter-spacing: 0.17em;
+      opacity: 0;
+      text-transform: uppercase;
+      animation: rise-in 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s forwards;
+    }
+
+    h1 {
+      max-width: 8.8em;
+      margin: 0;
+      font-size: clamp(27px, 9.1vw, 54px);
+      font-weight: 720;
+      letter-spacing: -0.055em;
+      line-height: 0.94;
+    }
+
+    h1 span {
+      display: block;
+      opacity: 0;
+      transform: translateY(14px);
+      animation: line-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    h1 span:first-child {
+      animation-delay: 0.62s;
+    }
+
+    h1 span:last-child {
+      color: var(--cyan);
+      animation-delay: 0.78s;
+    }
+
+    .subhead {
+      margin: clamp(7px, 1.4vh, 12px) 0 0;
+      color: var(--muted);
+      font-size: clamp(10px, 3.1vw, 16px);
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      opacity: 0;
+      animation: rise-in 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 1.08s forwards;
+    }
+
+    .stage {
+      position: absolute;
+      z-index: 2;
+      top: clamp(164px, 35%, 310px);
+      right: clamp(15px, 5vw, 32px);
+      bottom: clamp(70px, 15.5%, 118px);
+      left: clamp(15px, 5vw, 32px);
+      min-height: 152px;
+    }
+
+    .signal-rail {
+      position: absolute;
+      z-index: 5;
+      top: 7%;
+      bottom: 9%;
+      left: 0;
+      display: flex;
+      width: 43%;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .signal-rail::before {
+      position: absolute;
+      z-index: -1;
+      top: 10%;
+      bottom: 10%;
+      left: clamp(7px, 2.5vw, 12px);
+      width: 1px;
+      background: linear-gradient(
+        to bottom,
+        rgba(61, 217, 199, 0.52),
+        rgba(119, 166, 255, 0.28),
+        rgba(255, 255, 255, 0.08)
+      );
+      content: "";
+      transform: scaleY(0);
+      transform-origin: top;
+      animation: draw-line 1.2s ease 1.55s forwards;
+    }
+
+    .signal {
+      position: relative;
+      display: grid;
+      grid-template-columns: clamp(15px, 5vw, 24px) minmax(0, 1fr);
+      gap: clamp(5px, 1.8vw, 9px);
+      align-items: center;
+      width: 100%;
+      min-height: clamp(29px, 7.2vh, 48px);
+      padding: clamp(4px, 1.2vh, 8px) clamp(5px, 1.8vw, 10px);
+      border: 1px solid transparent;
+      border-radius: clamp(8px, 2.8vw, 14px);
+      outline: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      opacity: 0;
+      text-align: left;
+      transform: translateX(-10px);
+      transition:
+        color 220ms ease,
+        border-color 220ms ease,
+        background 220ms ease,
+        transform 220ms ease;
+      animation: signal-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .signal:nth-child(1) {
+      animation-delay: 1.55s;
+    }
+
+    .signal:nth-child(2) {
+      animation-delay: 1.75s;
+    }
+
+    .signal:nth-child(3) {
+      animation-delay: 1.95s;
+    }
+
+    .signal:nth-child(4) {
+      animation-delay: 2.15s;
+    }
+
+    .signal.active {
+      border-color: rgba(61, 217, 199, 0.28);
+      background: linear-gradient(100deg, rgba(61, 217, 199, 0.13), rgba(61, 217, 199, 0.035));
+      color: var(--ink);
+      transform: translateX(3px);
+    }
+
+    .signal-dot {
+      position: relative;
+      display: grid;
+      width: clamp(15px, 5vw, 24px);
+      height: clamp(15px, 5vw, 24px);
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      color: var(--cyan);
+    }
+
+    .signal-dot::after {
+      width: 35%;
+      height: 35%;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .signal:nth-child(2) .signal-dot {
+      color: var(--blue);
+    }
+
+    .signal:nth-child(3) .signal-dot {
+      color: var(--coral);
+    }
+
+    .signal:nth-child(4) .signal-dot {
+      color: var(--violet);
+    }
+
+    .signal.active .signal-dot {
+      box-shadow: 0 0 16px color-mix(in srgb, currentColor 52%, transparent);
+      animation: finite-pulse 1.6s ease-out 4;
+    }
+
+    .signal-copy strong,
+    .signal-copy small {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .signal-copy strong {
+      font-size: clamp(8px, 2.65vw, 13px);
+      font-weight: 680;
+      letter-spacing: -0.01em;
+    }
+
+    .signal-copy small {
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--quiet);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: clamp(5.8px, 1.75vw, 8.5px);
+      letter-spacing: 0.025em;
+      text-overflow: ellipsis;
+    }
+
+    .connector {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: 45%;
+      left: 39%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(61, 217, 199, 0.1), rgba(61, 217, 199, 0.72));
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: connect 0.8s ease 2.35s forwards;
+    }
+
+    .connector::after {
+      position: absolute;
+      top: -2px;
+      right: -1px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+      content: "";
+    }
+
+    .phone {
+      position: absolute;
+      z-index: 3;
+      top: 0;
+      right: 0;
+      width: 55%;
+      height: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: clamp(18px, 5.8vw, 32px);
+      background: #edf0f5;
+      box-shadow:
+        0 24px 50px rgba(0, 0, 0, 0.46),
+        0 0 0 5px rgba(255, 255, 255, 0.025);
+      opacity: 0;
+      transform: translateY(22px) rotate(2deg) scale(0.96);
+      animation: phone-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
+    }
+
+    .phone::before {
+      position: absolute;
+      z-index: 4;
+      top: clamp(6px, 1.4vh, 10px);
+      left: 50%;
+      width: 34%;
+      height: clamp(7px, 1.5vh, 11px);
+      border-radius: 999px;
+      background: #05080d;
+      content: "";
+      transform: translateX(-50%);
+    }
+
+    .phone img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: saturate(0.96) contrast(1.02);
+    }
+
+    .scan {
+      position: absolute;
+      z-index: 5;
+      top: -12%;
+      right: 0;
+      left: 0;
+      height: 18%;
+      border-bottom: 1px solid rgba(61, 217, 199, 0.7);
+      background: linear-gradient(to bottom, transparent, rgba(61, 217, 199, 0.14));
+      opacity: 0;
+      animation: scan-once 3.1s cubic-bezier(0.4, 0, 0.2, 1) 2.3s forwards;
+    }
+
+    .model-card {
+      position: absolute;
+      z-index: 6;
+      right: 4%;
+      bottom: 5%;
+      width: 48%;
+      min-width: 112px;
+      padding: clamp(7px, 1.7vh, 12px) clamp(8px, 2.6vw, 14px);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: clamp(10px, 3vw, 16px);
+      background: rgba(7, 13, 22, 0.9);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: rise-in 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) 2.65s forwards;
+      backdrop-filter: blur(12px);
+    }
+
+    .model-label {
+      display: block;
+      color: var(--cyan);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: clamp(5.5px, 1.65vw, 8px);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .model-value {
+      display: block;
+      margin-top: 4px;
+      color: var(--ink);
+      font-size: clamp(9px, 2.9vw, 14px);
+      font-weight: 680;
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+    }
+
+    .model-meta {
+      display: block;
+      margin-top: 3px;
+      color: var(--quiet);
+      font-size: clamp(6px, 1.85vw, 9px);
+      line-height: 1.2;
+    }
+
+    .cta {
+      position: absolute;
+      z-index: 10;
+      right: clamp(14px, 5vw, 30px);
+      bottom: clamp(12px, 3.2vh, 25px);
+      left: clamp(14px, 5vw, 30px);
+      display: grid;
+      min-height: clamp(47px, 10.5vh, 64px);
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: clamp(9px, 1.8vh, 13px) clamp(15px, 4.8vw, 28px);
+      border: 1px solid rgba(117, 255, 236, 0.32);
+      border-radius: clamp(13px, 4.3vw, 22px);
+      outline: 0;
+      background:
+        linear-gradient(105deg, rgba(61, 217, 199, 0.96), rgba(62, 187, 192, 0.97));
+      box-shadow:
+        0 15px 36px rgba(2, 170, 154, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.27);
+      color: #02120f;
+      cursor: pointer;
+      opacity: 0;
+      text-align: left;
+      transform: translateY(15px);
+      animation: cta-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 3.1s forwards;
+    }
+
+    .cta-copy strong,
+    .cta-copy small {
+      display: block;
+    }
+
+    .cta-copy strong {
+      font-size: clamp(12px, 4vw, 18px);
+      font-weight: 780;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .cta-copy small {
+      margin-top: 4px;
+      color: rgba(2, 18, 15, 0.67);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: clamp(6.5px, 1.95vw, 9px);
+      font-weight: 650;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .cta-arrow {
+      display: grid;
+      width: clamp(26px, 8vw, 38px);
+      height: clamp(26px, 8vw, 38px);
+      place-items: center;
+      border: 1px solid rgba(2, 18, 15, 0.24);
+      border-radius: 50%;
+      font-size: clamp(15px, 4.8vw, 22px);
+      line-height: 1;
+      transition: transform 180ms ease;
+    }
+
+    .cta:active .cta-arrow {
+      transform: translate(2px, -2px);
+    }
+
+    .tap-hint {
+      position: absolute;
+      z-index: 7;
+      right: 58%;
+      bottom: 1%;
+      color: var(--quiet);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: clamp(5.5px, 1.7vw, 8px);
+      letter-spacing: 0.09em;
+      opacity: 0;
+      text-transform: uppercase;
+      animation: rise-in 0.5s ease 3s forwards;
+    }
+
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(9px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes line-in {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes signal-in {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes phone-in {
+      from {
+        opacity: 0;
+        transform: translateY(22px) rotate(2deg) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotate(0) scale(1);
+      }
+    }
+
+    @keyframes draw-line {
+      to {
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes connect {
+      from {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+
+    @keyframes scan-once {
+      0% {
+        opacity: 0;
+        transform: translateY(0);
+      }
+      12% {
+        opacity: 1;
+      }
+      76% {
+        opacity: 0.9;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(630%);
+      }
+    }
+
+    @keyframes finite-pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(61, 217, 199, 0.3);
+      }
+      100% {
+        box-shadow: 0 0 0 10px rgba(61, 217, 199, 0);
+      }
+    }
+
+    @keyframes cta-in {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-height: 430px) and (max-aspect-ratio: 1 / 1) {
+      .category,
+      .private,
+      .eyebrow,
+      .signal-copy small,
+      .tap-hint {
+        display: none;
+      }
+
+      .hero-copy {
+        top: 56px;
+      }
+
+      .subhead {
+        margin-top: 5px;
+      }
+
+      .stage {
+        top: 145px;
+        bottom: 61px;
+      }
+
+      .signal {
+        min-height: 26px;
+      }
+
+      .cta {
+        min-height: 43px;
+      }
+    }
+
+    /* Squarish portrait (tablets like 768×1024): give the stage more room. */
+    @media (min-aspect-ratio: 3 / 4) and (max-aspect-ratio: 1 / 1) {
+      .hero-copy {
+        top: 15%;
+      }
+
+      .stage {
+        top: 35%;
+      }
+    }
+
+    /* Landscape: two-column layout — copy + CTA left, connected model right. */
+    @media (min-aspect-ratio: 1 / 1) {
+      .hero-copy {
+        top: clamp(52px, 20vh, 130px);
+        left: clamp(16px, 4.5vw, 48px);
+        right: auto;
+        width: 39%;
+      }
+
+      h1 {
+        max-width: none;
+        font-size: clamp(19px, 8.4vmin, 52px);
+      }
+
+      .eyebrow {
+        font-size: clamp(6.5px, 2.1vmin, 10px);
+      }
+
+      .subhead {
+        font-size: clamp(9px, 3.1vmin, 16px);
+      }
+
+      .stage {
+        top: clamp(46px, 13vh, 92px);
+        right: clamp(12px, 3vw, 36px);
+        bottom: clamp(10px, 4.5vh, 30px);
+        left: 44%;
+        min-height: 0;
+      }
+
+      .signal {
+        min-height: clamp(26px, 16vh, 48px);
+      }
+
+      .cta {
+        right: auto;
+        bottom: clamp(12px, 8vh, 40px);
+        left: clamp(16px, 4.5vw, 48px);
+        width: 37%;
+        min-width: 200px;
+        min-height: clamp(40px, 14.5vh, 60px);
+      }
+
+      .cta-copy strong {
+        font-size: clamp(11px, 5vmin, 17px);
+      }
+
+      .cta-copy small {
+        font-size: clamp(6px, 2.1vmin, 9px);
+      }
+
+      .tap-hint {
+        right: auto;
+        bottom: 1.5%;
+        left: 45%;
+      }
+
+      .ad::after {
+        top: 55%;
+        right: -22vw;
+      }
+
+      .app-icon {
+        width: clamp(24px, 11vh, 40px);
+        height: clamp(24px, 11vh, 40px);
+      }
+
+      .cta-copy small {
+        white-space: nowrap;
+      }
+    }
+
+    /* Compact landscape phones (e.g. 480×320, 640×360): declutter. */
+    @media (min-aspect-ratio: 1 / 1) and (max-height: 400px) {
+      .category,
+      .eyebrow,
+      .signal-copy small,
+      .tap-hint {
+        display: none;
+      }
+
+      .hero-copy {
+        top: clamp(56px, 21vh, 78px);
+      }
+
+      h1 {
+        font-size: clamp(18px, 7.6vmin, 30px);
+      }
+
+      .subhead {
+        margin-top: 4px;
+      }
+
+      .signal {
+        min-height: 30px;
+        grid-template-columns: 16px minmax(0, 1fr);
+      }
+
+      .signal-dot {
+        width: 16px;
+        height: 16px;
+      }
+
+      .signal-copy strong {
+        font-size: clamp(9px, 4.2vh, 12px);
+      }
+
+      .cta {
+        gap: 8px;
+        padding: 8px 14px;
+      }
+
+      .cta-arrow {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+      }
+
+      .model-card {
+        padding: 6px 9px;
+      }
+
+      .model-meta {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-delay: 0s !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="ad" id="ad" aria-label="StatsKey personal health intelligence">
+    <header class="topbar">
+      <div class="brand">
+        <img class="app-icon" src="app-icon.jpg" alt="">
+        <div>
+          <span class="wordmark">STATSKEY</span>
+          <span class="category">Personal health intelligence</span>
+        </div>
+      </div>
+      <span class="private">Private</span>
+    </header>
+
+    <section class="hero-copy">
+      <p class="eyebrow">One connected model</p>
+      <h1>
+        <span>Your body is a</span>
+        <span>living dataset.</span>
+      </h1>
+      <p class="subhead">StatsKey makes it legible.</p>
+    </section>
+
+    <section class="stage" aria-label="Explore the connected model">
+      <div class="signal-rail" role="group" aria-label="Connected health signals">
+        <button
+          class="signal active"
+          type="button"
+          data-value="64+ nutrients"
+          data-meta="Sources and confidence included"
+          aria-pressed="true"
+        >
+          <span class="signal-dot"></span>
+          <span class="signal-copy">
+            <strong>Nutrition</strong>
+            <small>intake + micronutrients</small>
+          </span>
+        </button>
+        <button
+          class="signal"
+          type="button"
+          data-value="Load + fueling"
+          data-meta="Training in full context"
+          aria-pressed="false"
+        >
+          <span class="signal-dot"></span>
+          <span class="signal-copy">
+            <strong>Training</strong>
+            <small>work + adaptation</small>
+          </span>
+        </button>
+        <button
+          class="signal"
+          type="button"
+          data-value="Recovery in context"
+          data-meta="Connect night to day"
+          aria-pressed="false"
+        >
+          <span class="signal-dot"></span>
+          <span class="signal-copy">
+            <strong>Sleep</strong>
+            <small>state + recovery</small>
+          </span>
+        </button>
+        <button
+          class="signal"
+          type="button"
+          data-value="Symptoms + energy"
+          data-meta="The whole day, on one timeline"
+          aria-pressed="false"
+        >
+          <span class="signal-dot"></span>
+          <span class="signal-copy">
+            <strong>Wellness</strong>
+            <small>signals in context</small>
+          </span>
+        </button>
+      </div>
+
+      <span class="connector" aria-hidden="true"></span>
+
+      <div class="phone" aria-hidden="true">
+        <img src="connected-model.jpg" alt="">
+        <span class="scan"></span>
+      </div>
+
+      <aside class="model-card" aria-live="polite">
+        <span class="model-label">Your evidence</span>
+        <strong class="model-value" id="model-value">64+ nutrients</strong>
+        <span class="model-meta" id="model-meta">Sources and confidence included</span>
+      </aside>
+
+      <span class="tap-hint">Tap a signal</span>
+    </section>
+
+    <button class="cta" id="install" type="button" aria-label="Get StatsKey, free to start">
+      <span class="cta-copy">
+        <strong>Get StatsKey</strong>
+        <small>Free to start · iPhone</small>
+      </span>
+      <span class="cta-arrow" aria-hidden="true">↗</span>
+    </button>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var signals = Array.prototype.slice.call(document.querySelectorAll(".signal"));
+      var modelValue = document.getElementById("model-value");
+      var modelMeta = document.getElementById("model-meta");
+      var install = document.getElementById("install");
+
+      signals.forEach(function (signal) {
+        signal.addEventListener("click", function () {
+          signals.forEach(function (item) {
+            var isActive = item === signal;
+            item.classList.toggle("active", isActive);
+            item.setAttribute("aria-pressed", isActive ? "true" : "false");
+          });
+
+          modelValue.textContent = signal.getAttribute("data-value");
+          modelMeta.textContent = signal.getAttribute("data-meta");
+        });
+      });
+
+      install.addEventListener("click", function () {
+        if (window.ExitApi && typeof window.ExitApi.exit === "function") {
+          window.ExitApi.exit();
+        }
+      });
+    }());
+  </script>
+</body>
+</html>

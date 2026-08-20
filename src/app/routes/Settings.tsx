@@ -11,11 +11,17 @@ import { checkForDesktopUpdates } from '../components/DesktopUpdater'
 import { IntegrationCenter } from '../components/assistant/IntegrationCenter'
 import { ModelProviders } from './ModelProviders'
 import { Customize } from './Customize'
+import { WorkspaceSyncSettings } from '../components/WorkspaceSyncSettings'
 import './Settings.css'
 
 const SETTINGS_SECTIONS = [
   { path: 'general', label: 'General', hint: 'Rules, skills, hooks & tools' },
   { path: 'models', label: 'Models & keys', hint: 'Your own provider accounts' },
+  {
+    path: 'sync',
+    label: 'Sync & backup',
+    hint: 'Send, back up & live-sync workspaces',
+  },
   {
     path: 'connections',
     label: 'Connections & billing',
@@ -48,6 +54,7 @@ export function Settings() {
         <Route index element={<Navigate to="/settings/general" replace />} />
         <Route path="general" element={<GeneralSection />} />
         <Route path="models" element={<ModelsSection />} />
+        <Route path="sync" element={<SyncSection />} />
         <Route path="connections" element={<ConnectionsSection />} />
         <Route path="about" element={<AboutSection />} />
         <Route path="*" element={<Navigate to="/settings/general" replace />} />
@@ -113,6 +120,18 @@ function ModelsSection() {
         description="Use your own model accounts for direct requests. Credentials are encrypted by this computer’s operating system and never leave it."
       />
       <ModelProviders embedded />
+    </section>
+  )
+}
+
+function SyncSection() {
+  return (
+    <section className="settings-section" aria-label="Sync and backup">
+      <SectionHeader
+        title="Sync & backup"
+        description="Move workspaces between your devices: send once, keep a backup, or stay in sync in real time through your private StatsKey cloud."
+      />
+      <WorkspaceSyncSettings />
     </section>
   )
 }
@@ -195,7 +214,20 @@ function AboutSection() {
           {aboutStatusLine(state, bridge != null, updates != null)}
         </p>
         <div className="settings-card__actions">
-          {updates && state?.status === 'downloaded' ? (
+          {updates &&
+          state?.status === 'disabled' &&
+          bridge?.platform === 'linux' ? (
+            <button
+              className="settings-card__button settings-card__button--primary"
+              onClick={() =>
+                void bridge.openExternal(
+                  'https://statskey.ai/downloads/statskey/#download'
+                )
+              }
+            >
+              Download Ubuntu update
+            </button>
+          ) : updates && state?.status === 'downloaded' ? (
             <button
               className="settings-card__button settings-card__button--primary"
               disabled={busy != null}
@@ -290,7 +322,9 @@ function aboutStatusLine(
         'The last update check did not finish. Your current version is unchanged.'
       )
     case 'disabled':
-      return 'Automatic updates are turned off in this build.'
+      return (
+        state.message || 'Automatic updates are turned off in this build.'
+      )
     default:
       return 'Updates download in the background and appear here and as a banner when ready.'
   }

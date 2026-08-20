@@ -2,10 +2,13 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 const { shouldAutoApprove } = require('./approval-policy.cjs')
 
-test('Run without review suppresses every desktop approval prompt', () => {
+test('independent execution only auto-approves reversible workspace edits', () => {
+  for (const kind of ['write', 'create', 'rename', 'mkdir']) {
+    assert.equal(shouldAutoApprove(kind, 'everything'), true)
+  }
   for (const kind of [
-    'write',
     'delete',
+    'restore',
     'terminal',
     'git',
     'mcp',
@@ -14,7 +17,7 @@ test('Run without review suppresses every desktop approval prompt', () => {
     'application',
     'device',
   ]) {
-    assert.equal(shouldAutoApprove(kind, 'everything'), true)
+    assert.equal(shouldAutoApprove(kind, 'everything'), false)
   }
 })
 

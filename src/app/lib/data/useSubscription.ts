@@ -4,6 +4,7 @@ import { db } from '../firebase'
 
 export interface Subscription {
   tier: string
+  plan: string
   researchTokenLimit?: number
   raw: Record<string, unknown>
 }
@@ -33,7 +34,7 @@ export function useSubscription(uid: string | undefined): SubscriptionState {
       (snap) => {
         if (!snap.exists()) {
           setState({
-            subscription: { tier: 'free', raw: {} },
+            subscription: { tier: 'free', plan: 'free', raw: {} },
             loading: false,
             error: null,
           })
@@ -41,10 +42,13 @@ export function useSubscription(uid: string | undefined): SubscriptionState {
         }
         const raw = snap.data() as Record<string, unknown>
         const tier = typeof raw.subscriptionTier === 'string' ? (raw.subscriptionTier as string) : 'free'
+        const plan = typeof raw.subscriptionPlan === 'string'
+          ? (raw.subscriptionPlan as string)
+          : (tier === 'pro' ? 'pro' : 'free')
         const researchTokenLimit =
           typeof raw.researchTokenLimit === 'number' ? (raw.researchTokenLimit as number) : undefined
         setState({
-          subscription: { tier, researchTokenLimit, raw },
+          subscription: { tier, plan, researchTokenLimit, raw },
           loading: false,
           error: null,
         })

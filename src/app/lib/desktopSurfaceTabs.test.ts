@@ -31,6 +31,8 @@ describe('desktop surface tabs', () => {
           'browser',
           'simulator',
           'github',
+          'fleet',
+          'jobs',
           'unknown',
           'browser',
           'plan',
@@ -40,6 +42,8 @@ describe('desktop surface tabs', () => {
       'browser',
       'simulator',
       'github',
+      'fleet',
+      'jobs',
       'plan',
     ])
   })

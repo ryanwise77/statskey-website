@@ -264,12 +264,14 @@ export function Profile() {
             <div className="flex items-center justify-between text-[14px]">
               <span className="text-text-secondary">Tier</span>
               <span className="text-text-primary font-medium">
-                {subState.subscription?.tier === 'pro' ? 'Pro' : 'Free'}
+                {subState.subscription?.plan === 'proPlus'
+                  ? 'Pro+'
+                  : (subState.subscription?.tier === 'pro' ? 'Pro' : 'Free')}
               </span>
             </div>
             {subState.subscription?.researchTokenLimit != null && subState.subscription.researchTokenLimit > 0 && (
               <div className="flex items-center justify-between text-[14px]">
-                <span className="text-text-secondary">Deep analysis</span>
+                <span className="text-text-secondary">Advanced analysis credits</span>
                 <span className="text-text-primary">Enabled</span>
               </div>
             )}

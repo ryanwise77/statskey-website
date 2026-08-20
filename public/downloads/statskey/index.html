@@ -491,7 +491,7 @@
           </a>
           <a class="button" href="#why">Why StatsKey</a>
         </div>
-        <p class="hero__note">Mac 0.21.5 · signed and Apple notarized · Windows 0.19.1 preview</p>
+        <p class="hero__note">Mac 0.21.10 · signed and Apple notarized · Windows 0.19.1 preview · Ubuntu 0.21.8 preview</p>
       </header>
 
       <section class="shell product-wrap" aria-label="StatsKey in action">
@@ -627,7 +627,7 @@
       <section class="download" id="download">
         <div class="shell">
           <div class="section-heading">
-            <span class="kicker" id="release-status">Mac 0.21.5 · Windows 0.19.1</span>
+            <span class="kicker" id="release-status">Mac 0.21.10 · Windows 0.19.1 · Ubuntu 0.21.8</span>
             <h2>Start with the outcome.</h2>
             <p>Bring a project. Tell StatsKey what finished looks like. Stay in the conversation.</p>
           </div>
@@ -635,18 +635,22 @@
             <a
               class="button button--primary"
               data-target="mac-arm64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.5/StatsKey-0.21.5-mac-arm64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.10/StatsKey-0.21.10-mac-arm64.dmg"
             >Download for Apple Silicon ↓</a>
           </div>
           <div class="download__links">
             <a
               data-target="mac-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.5/StatsKey-0.21.5-mac-x64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.10/StatsKey-0.21.10-mac-x64.dmg"
             >Intel Mac</a>
             <a
               data-target="win-x64"
               href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.1/StatsKey-0.19.1-win-x64.exe"
             >Windows</a>
+            <a
+              data-target="linux-x64"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.8/StatsKey-0.21.8-linux-x64.deb"
+            >Ubuntu 26.04</a>
             <a href="#updates">What’s new</a>
             <a href="/privacy">Privacy</a>
           </div>
@@ -654,6 +658,10 @@
             On Mac, open the DMG and drag StatsKey to Applications. The app and disk image
             are signed and notarized by Apple. On Windows, SmartScreen may require
             <strong>More info → Run anyway</strong> while the Windows preview is unsigned.
+            On Ubuntu 26.04, install the x64 DEB with App Center or
+            <code>sudo apt install ./StatsKey-0.21.8-linux-x64.deb</code>. The Ubuntu
+            preview is unsigned, automatic updates and unattended Fleet jobs are disabled,
+            and protected credentials require GNOME Keyring or KWallet.
           </div>
         </div>
       </section>
@@ -669,18 +677,24 @@
     </footer>
 
     <script>
-      const macVersion = "0.21.5";
+      const macVersion = "0.21.10";
       const windowsVersion = "0.19.1";
+      const linuxVersion = "0.21.8";
       const releaseRoot = (version) =>
         `https://storage.googleapis.com/statskey-workbench-downloads/releases/${version}`;
       const targets = {
         "mac-arm64": { version: macVersion, file: `StatsKey-${macVersion}-mac-arm64.dmg`, label: "Download for Apple Silicon" },
         "mac-x64": { version: macVersion, file: `StatsKey-${macVersion}-mac-x64.dmg`, label: "Download for Intel Mac" },
         "win-x64": { version: windowsVersion, file: `StatsKey-${windowsVersion}-win-x64.exe`, label: "Download for Windows" },
+        "linux-x64": { version: linuxVersion, file: `StatsKey-${linuxVersion}-linux-x64.deb`, label: "Download for Ubuntu 26.04" },
       };
 
       const userAgent = navigator.userAgent.toLowerCase();
-      const preferredTarget = userAgent.includes("windows") ? "win-x64" : "mac-arm64";
+      const preferredTarget = userAgent.includes("windows")
+        ? "win-x64"
+        : userAgent.includes("linux") && !userAgent.includes("android")
+          ? "linux-x64"
+          : "mac-arm64";
       const preferred = targets[preferredTarget];
 
       for (const id of ["primary-download", "nav-download"]) {
@@ -690,7 +704,7 @@
         link.textContent = id === "nav-download" ? "Download" : `${preferred.label} ↓`;
       }
 
-      for (const version of new Set([macVersion, windowsVersion])) {
+      for (const version of new Set([macVersion, windowsVersion, linuxVersion])) {
         fetch(`${releaseRoot(version)}/release-manifest.json`, { cache: "no-store" })
           .then((response) => {
             if (!response.ok) throw new Error("Release manifest unavailable");

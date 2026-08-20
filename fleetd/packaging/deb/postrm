@@ -1,0 +1,97 @@
+#!/bin/sh
+# postrm for statskey-fleetd — see PACKAGING.md.
+#
+# purge semantics:
+#   * /var/lib/statskey-fleet-jobs and /var/lib/statskey-fleetd are removed
+#     ONLY after confirming no statskey-fleet-job-* units exist. If any job
+#     unit is still known to systemd, state is kept and a warning is
+#     printed (purge itself is not failed — a half-purged package is worse;
+#     re-run the drain in PACKAGING.md and purge again).
+#   * /var/lib/statskey-fleet (worker device key + agent state = the device
+#     identity) is KEPT across purges so a reinstall re-attaches to the same
+#     device identity. To destroy the identity too, create the marker file
+#       /etc/statskey/fleetd/.purge-identity
+#     BEFORE running `apt purge statskey-fleetd`.
+#   * The AppArmor profile is unloaded from the kernel (its file is removed
+#     by dpkg during the remove step).
+#   * The statskey-fleet system user is intentionally NOT deleted (standard
+#     practice: deleting UIDs risks ownership confusion on UID reuse).
+set -e
+
+PROFILE_NAME="statskey-fleet-job"
+PURGE_IDENTITY_MARKER="/etc/statskey/fleetd/.purge-identity"
+
+# Remove the profile from the kernel. dpkg has already removed the profile
+# file by the time postrm runs, so prefer the securityfs .remove interface;
+# fall back to apparmor_parser -R only if the file still exists.
+unload_apparmor_profile() {
+  if [ -w /sys/kernel/security/apparmor/.remove ]; then
+    if ! echo "$PROFILE_NAME" > /sys/kernel/security/apparmor/.remove 2>/dev/null; then
+      echo "statskey-fleetd: WARNING: could not unload AppArmor profile" >&2
+      echo "statskey-fleetd: '$PROFILE_NAME' from the kernel" >&2
+    fi
+  elif command -v apparmor_parser >/dev/null 2>&1 && [ -f "/etc/apparmor.d/$PROFILE_NAME" ]; then
+    apparmor_parser -R "/etc/apparmor.d/$PROFILE_NAME" 2>/dev/null || true
+  fi
+}
+
+case "$1" in
+  remove)
+    unload_apparmor_profile
+    if [ -d /run/systemd/system ]; then
+      systemctl daemon-reload
+    fi
+    ;;
+
+  purge)
+    unload_apparmor_profile
+
+    # Confirm no job units exist before touching state directories. When
+    # systemd is not PID 1 nothing can be running, so removal is safe.
+    jobs_exist=0
+    if [ -d /run/systemd/system ]; then
+      if systemctl list-units --all --no-legend --no-pager --plain \
+           'statskey-fleet-job-*' 2>/dev/null \
+           | awk '{print $1}' \
+           | grep -qE '^statskey-fleet-job-'; then
+        jobs_exist=1
+      fi
+    fi
+
+    if [ "$jobs_exist" -eq 1 ]; then
+      echo "statskey-fleetd: WARNING: statskey-fleet-job-* units still exist;" >&2
+      echo "statskey-fleetd: keeping /var/lib/statskey-fleet-jobs and" >&2
+      echo "statskey-fleetd: /var/lib/statskey-fleetd. Drain them and purge again." >&2
+    else
+      rm -rf /var/lib/statskey-fleet-jobs
+      rm -rf /var/lib/statskey-fleetd
+    fi
+
+    # Device identity survives purge unless the administrator pre-created
+    # the marker file (documented in PACKAGING.md).
+    if [ -f "$PURGE_IDENTITY_MARKER" ]; then
+      rm -rf /var/lib/statskey-fleet
+      rm -f "$PURGE_IDENTITY_MARKER"
+    else
+      echo "statskey-fleetd: keeping /var/lib/statskey-fleet (device identity);" >&2
+      echo "statskey-fleetd: touch $PURGE_IDENTITY_MARKER before purge to remove it" >&2
+    fi
+
+    rmdir /run/statskey-fleetd 2>/dev/null || true
+    rmdir --ignore-fail-on-non-empty /etc/statskey/fleetd /etc/statskey 2>/dev/null || true
+
+    if [ -d /run/systemd/system ]; then
+      systemctl daemon-reload
+    fi
+    ;;
+
+  upgrade|disappear|failed-upgrade|abort-install|abort-upgrade)
+    ;;
+
+  *)
+    echo "postrm called with unknown argument '$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

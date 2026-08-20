@@ -1,0 +1,115 @@
+#!/bin/sh
+# prerm for statskey-fleetd — see PACKAGING.md.
+#
+# Removal/upgrade order (design: "upgrades stop and drain every job cgroup
+# before binary replacement"):
+#   1. stop the agent          (no new work can be requested)
+#   2. stop every transient statskey-fleet-job-*.service and wait until
+#      each unit is inactive AND its cgroup is empty (bounded wait)
+#   3. stop the control socket, then the daemon
+#
+# Step 2 FAILS the removal/upgrade when a job cgroup cannot be drained.
+# This is intentional: running work is never stranded. Resolve the stuck
+# cgroup (see PACKAGING.md "Upgrade drain procedure") and retry.
+set -e
+
+# Bounded drain wait in seconds. Job units use TimeoutStopSec=30, so the
+# default leaves ample margin for SIGKILL + cgroup emptying.
+DRAIN_TIMEOUT="${STATSKEY_FLEET_DRAIN_TIMEOUT:-90}"
+
+# Print one unit name per line for every loaded statskey-fleet-job-*.service,
+# including inactive/failed ones (transient units linger while their cgroup
+# is still populated).
+list_job_units() {
+  systemctl list-units --all --no-legend --no-pager --plain \
+    'statskey-fleet-job-*.service' 2>/dev/null \
+    | awk '{print $1}' \
+    | grep -E '^statskey-fleet-job-.+\.service$' \
+    || true
+}
+
+# A job unit is drained when systemd no longer considers it active and its
+# cgroup is gone or reports "populated 0". systemd only transitions a unit
+# to inactive once its cgroup is empty, so the is-active gate plus the
+# cgroup.events check together prove drain (design invariant 8).
+unit_drained() {
+  unit="$1"
+  if systemctl is-active --quiet "$unit"; then
+    return 1
+  fi
+  cgroup="$(systemctl show "$unit" --property=ControlGroup --value 2>/dev/null || true)"
+  events="/sys/fs/cgroup${cgroup}/cgroup.events"
+  if [ -n "$cgroup" ] && [ -f "$events" ]; then
+    if awk '$1 == "populated" && $2 == "1" { found=1 } END { exit !found }' "$events"; then
+      return 1
+    fi
+  fi
+  return 0
+}
+
+case "$1" in
+  remove|upgrade|deconfigure)
+    # Nothing can be running when systemd is not PID 1 (chroots, containers,
+    # installer images); skip the drain in that case.
+    if [ -d /run/systemd/system ]; then
+      # 1. Agent first: it is the only path that can request new job starts.
+      if ! systemctl stop statskey-fleet-agent.service 2>/dev/null; then
+        echo "statskey-fleetd: WARNING: could not stop statskey-fleet-agent.service" >&2
+      fi
+
+      # 2. Stop all job units, then wait for every job cgroup to empty.
+      job_units="$(list_job_units)"
+      if [ -n "$job_units" ]; then
+        # Word splitting of $job_units is intentional: one unit per line,
+        # and unit names contain no whitespace or glob characters.
+        # shellcheck disable=SC2086
+        for unit in $job_units; do
+          systemctl stop "$unit" 2>/dev/null || true
+        done
+
+        waited=0
+        pending=""
+        while [ "$waited" -lt "$DRAIN_TIMEOUT" ]; do
+          pending=""
+          # shellcheck disable=SC2086 # intentional word splitting, see above
+          for unit in $job_units; do
+            if ! unit_drained "$unit"; then
+              pending="$pending $unit"
+            fi
+          done
+          if [ -z "$pending" ]; then
+            break
+          fi
+          sleep 1
+          waited=$((waited + 1))
+        done
+
+        if [ -n "$pending" ]; then
+          echo "statskey-fleetd: ERROR: refusing to proceed: job cgroups not drained" >&2
+          echo "statskey-fleetd: after ${DRAIN_TIMEOUT}s:$pending" >&2
+          echo "statskey-fleetd: inspect /sys/fs/cgroup/system.slice/<unit>/cgroup.procs," >&2
+          echo "statskey-fleetd: write 1 to the cgroup's cgroup.kill if safe, then retry." >&2
+          echo "statskey-fleetd: an uninterruptible remnant means quarantine: no new work." >&2
+          exit 1
+        fi
+      fi
+
+      # 3. Socket before the daemon so no connection can re-activate the
+      #    daemon between the two stops.
+      systemctl stop statskey-fleetd.socket 2>/dev/null || true
+      if ! systemctl stop statskey-fleetd.service 2>/dev/null; then
+        echo "statskey-fleetd: WARNING: statskey-fleetd.service did not stop cleanly" >&2
+      fi
+    fi
+    ;;
+
+  failed-upgrade)
+    ;;
+
+  *)
+    echo "prerm called with unknown argument '$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

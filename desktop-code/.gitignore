@@ -1,0 +1,5 @@
+vendor/
+extensions/statskey-workbench/node_modules/
+extensions/statskey-workbench/out/
+extensions/statskey-workbench/*.vsix
+release/

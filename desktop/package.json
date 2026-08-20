@@ -1,10 +1,15 @@
 {
   "name": "statskey-desktop",
-  "version": "0.21.5",
+  "version": "0.21.10",
   "private": true,
-  "author": "StatsKey",
+  "author": {
+    "name": "StatsKey",
+    "email": "ryanws@statskeybiometrics.com"
+  },
+  "homepage": "https://statskey.ai",
+  "desktopName": "statskey.desktop",
   "license": "UNLICENSED",
-  "description": "StatsKey desktop application for macOS and Windows",
+  "description": "StatsKey desktop application for macOS, Windows, and Ubuntu",
   "main": "main.cjs",
   "scripts": {
     "start": "electron .",
@@ -13,7 +18,12 @@
     "pack": "npm run build:web && electron-builder --dir",
     "dist": "npm run build:web && electron-builder",
     "test:updates": "node --test update-runtime.test.cjs",
-    "test:desktop": "node --test update-runtime.test.cjs release-notes-runtime.test.cjs publish-recovery-runtime.test.cjs release-integrity-runtime.test.cjs windows-release-runtime.test.cjs release-assets-runtime.test.cjs consent-gate-runtime.test.cjs provider-runtime.test.cjs provider-run-guard.test.cjs provider-vault-runtime.test.cjs provider-vault-crypto.test.cjs integration-vault-runtime.test.cjs mcp-oauth-runtime.test.cjs safe-storage-runtime.test.cjs workspace-binding-runtime.test.cjs workspace-cache-key-runtime.test.cjs workspace-checkpoint-runtime.test.cjs workspace-index-worker.test.cjs workspace-file-search-worker.test.cjs workspace-search-runtime.test.cjs window-reveal-runtime.test.cjs control-runtime.test.cjs terminal-runtime.test.cjs child-process-runtime.test.cjs founder-runtime.test.cjs device-control-runtime.test.cjs preload-device-control.test.cjs preload-founder.test.cjs git-runtime.test.cjs approval-policy.test.cjs preferences-runtime.test.cjs self-edit-runtime.test.cjs calendar-feed-runtime.test.cjs workspace-runtime.test.cjs",
+    "test:release": "node --test update-runtime.test.cjs release-notes-runtime.test.cjs prepare-update-runtime.test.cjs mac-release-runtime.test.cjs publish-recovery-runtime.test.cjs release-integrity-runtime.test.cjs windows-release-runtime.test.cjs linux-release-runtime.test.cjs release-assets-runtime.test.cjs",
+    "test:desktop": "node --test update-runtime.test.cjs release-notes-runtime.test.cjs prepare-update-runtime.test.cjs mac-release-runtime.test.cjs publish-recovery-runtime.test.cjs release-integrity-runtime.test.cjs windows-release-runtime.test.cjs linux-release-runtime.test.cjs release-assets-runtime.test.cjs consent-gate-runtime.test.cjs provider-runtime.test.cjs provider-run-guard.test.cjs provider-vault-runtime.test.cjs provider-vault-crypto.test.cjs integration-vault-runtime.test.cjs mcp-oauth-runtime.test.cjs safe-storage-runtime.test.cjs workspace-binding-runtime.test.cjs workspace-cache-key-runtime.test.cjs workspace-checkpoint-runtime.test.cjs workspace-index-worker.test.cjs workspace-file-search-worker.test.cjs workspace-search-runtime.test.cjs window-reveal-runtime.test.cjs control-runtime.test.cjs terminal-runtime.test.cjs child-process-runtime.test.cjs founder-runtime.test.cjs device-control-runtime.test.cjs preload-device-control.test.cjs preload-founder.test.cjs git-runtime.test.cjs approval-policy.test.cjs preferences-runtime.test.cjs self-edit-runtime.test.cjs calendar-feed-runtime.test.cjs workspace-runtime.test.cjs workspace-sync-runtime.test.cjs fleet-runtime.test.cjs fleet-auth-runtime.test.cjs fleet-pairing-runtime.test.cjs fleet-identity-store.test.cjs fleet-node-client.test.cjs fleet-node-supervisor.test.cjs fleet-artifact-uploader.test.cjs fleet-worker-adapters.test.cjs",
+    "prepare:update": "node prepare-update.cjs",
+    "release:local:mac": "node ship-mac-update.cjs --prepare-only",
+    "release:ship:mac": "node ship-mac-update.cjs --confirm-publish",
+    "release:install:mac": "node ship-mac-update.cjs --install-only",
     "publish:update": "node publish-update.cjs --confirm-publish",
     "publish:update:mac": "APPLE_KEYCHAIN_PROFILE=StatsKeyNotary node publish-update.cjs --confirm-publish --mac-only",
     "release:finalize:windows": "node publish-update.cjs --prepare-only --windows-only --finalize-native",
@@ -23,14 +33,18 @@
     "publish:update:preview": "node publish-update.cjs --confirm-publish --preview",
     "release:mac": "npm run build:web && node release-mac.cjs --arm64 --x64",
     "release:mac:arm64": "npm run build:web && node release-mac.cjs --arm64",
-    "release:mac:x64": "npm run build:web && node release-mac.cjs --x64"
+    "release:mac:x64": "npm run build:web && node release-mac.cjs --x64",
+    "build:linux:x64": "npm run build:web && electron-builder --linux deb --x64 --publish never --config.npmRebuild=false",
+    "release:prepare:linux:preview": "node publish-update.cjs --prepare-only --linux-only --preview",
+    "publish:update:linux:preview": "node publish-update.cjs --confirm-publish --linux-only --preview --reuse-build"
   },
   "build": {
     "appId": "ai.statskey.desktop",
     "productName": "StatsKey",
     "asar": true,
     "asarUnpack": [
-      "node_modules/node-pty/**/*"
+      "node_modules/node-pty/**/*",
+      "windows-process-owner.ps1"
     ],
     "afterPack": "after-pack.cjs",
     "files": [
@@ -56,6 +70,7 @@
       "controlled-applications.cjs",
       "terminal-runtime.cjs",
       "child-process-runtime.cjs",
+      "windows-process-owner.ps1",
       "device-control-runtime.cjs",
       "git-runtime.cjs",
       "approval-policy.cjs",
@@ -63,6 +78,18 @@
       "self-edit-runtime.cjs",
       "calendar-feed-runtime.cjs",
       "workspace-runtime.cjs",
+      "workspace-sync-runtime.cjs",
+      "fleet-runtime.cjs",
+      "fleet-auth-runtime.cjs",
+      "fleet-pairing-runtime.cjs",
+      "fleet-identity-store.cjs",
+      "fleet-node-client.cjs",
+      "fleet-node-supervisor.cjs",
+      "fleet-artifact-uploader.cjs",
+      "fleet-worker-adapters.cjs",
+      "remote-session-runtime.cjs",
+      "remote-session-capture-preload.cjs",
+      "remote-session-capture.html",
       "prepare-node-pty.cjs",
       "offline.html",
       "package.json"
@@ -115,6 +142,48 @@
       "icon": "assets/AppIcon-1024.png",
       "target": [
         "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/AppIcon-1024.png",
+      "artifactName": "${productName}-${version}-linux-x64.${ext}",
+      "category": "Development",
+      "maintainer": "StatsKey <ryanws@statskeybiometrics.com>",
+      "vendor": "StatsKey",
+      "synopsis": "StatsKey intelligent desktop workspace",
+      "description": "A desktop workspace for intelligent project work, review, and verification.",
+      "executableName": "statskey",
+      "syncDesktopName": true,
+      "desktop": {
+        "entry": {
+          "Name": "StatsKey",
+          "Comment": "Intelligent project workspace"
+        }
+      }
+    },
+    "deb": {
+      "packageName": "statskey-desktop",
+      "packageCategory": "devel",
+      "priority": "optional",
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libuuid1",
+        "libsecret-1-0",
+        "libasound2t64"
       ]
     },
     "nsis": {

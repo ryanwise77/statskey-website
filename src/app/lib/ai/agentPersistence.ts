@@ -846,6 +846,46 @@ export function fallbackCompletionHandoff(
   ].join('\n')
 }
 
+export function fallbackExternalActionHandoff(
+  steps: PersistenceStep[],
+  terminalReason: CompletionTerminalReason = 'round_limit'
+): string {
+  const actionSteps = steps.filter(
+    (step) =>
+      step.status !== 'running' &&
+      (EXTERNAL_ACTION_TOOLS.has(step.name) || step.name.startsWith('mcp__'))
+  )
+  const completed = actionSteps.filter((step) => step.status === 'done')
+  const failed = actionSteps.filter((step) => step.status === 'error')
+  if (completed.length === 0) {
+    return terminalReason === 'provider_timeout'
+      ? 'I could not complete this Execute run because the provider stopped before any requested action succeeded. The gathered evidence is saved, and no action was left running.'
+      : 'I could not complete this Execute run because no requested action reached a recorded success. The gathered evidence is saved, and no action was left running.'
+  }
+
+  const activity = [...completed, ...failed]
+    .slice(-8)
+    .map(
+      (step) =>
+        `- ${step.status === 'done' ? 'Completed' : 'Failed'}: ${
+          step.summary || step.name
+        }${step.resultMeta ? ` · ${step.resultMeta}` : ''}`
+    )
+    .join('\n')
+  return [
+    failed.length > 0
+      ? 'Needs attention. Some requested actions completed, but a later action failed.'
+      : 'One or more requested actions reached recorded success.',
+    '',
+    'Recorded activity:',
+    activity,
+    '',
+    terminalReason === 'final_synthesis'
+      ? 'The provider did not return its final written summary. StatsKey closed with this local receipt and did not repeat completed actions.'
+      : 'The provider did not return a usable final handoff. StatsKey closed with this local receipt and did not repeat completed actions.',
+  ].join('\n')
+}
+
 /** A stopped run still receives a truthful, reviewable saved-work handoff. */
 export function fallbackStoppedHandoff(
   mode: 'ask' | 'plan' | 'debug' | 'agent',

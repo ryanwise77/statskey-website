@@ -295,6 +295,7 @@ export function EnterpriseWorkbench() {
         contextWindowTokens,
         executionRoute,
         directProvider: model.directProvider,
+        serviceTier: model.serviceTier,
         reasoningMode,
         agentMode: mode === 'apply' ? 'agent' : mode,
         contextScope: 'work',

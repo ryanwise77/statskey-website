@@ -22,8 +22,19 @@ const FORBIDDEN_PUBLIC_MARKERS = Object.freeze([
   'open-mac-screen',
   'ryans-mac-mini.local',
   'RTX workstation',
+  'Remote Access',
+  'MacRemote',
+  'Oil Data workspace',
+  'remoteAgentPrompt',
+  'remoteCommandStarted',
+  'queueRemoteCommand',
+  'heartbeatRemoteExecutor',
+  'claimRemoteCommand',
+  'completeRemoteCommand',
+  'statskey.remote-access',
 ])
-const FORBIDDEN_PUBLIC_PATH = /(?:FounderConsole|founder-runtime|founder-main)/i
+const FORBIDDEN_PUBLIC_PATH =
+  /(?:FounderConsole|founder-runtime|founder-main|RemoteAccess|remote-access)/i
 const SCAN_CHUNK_BYTES = 256 * 1024
 
 function assertPublicDesktopBundle({ appArchivePath, webRoot }) {
@@ -49,6 +60,10 @@ function assertPublicWebBundle(webRoot) {
         pending.push(candidate)
       } else if (entry.isFile()) {
         assertFileHasNoForbiddenMarker(candidate, relativePath)
+      } else {
+        throw new Error(
+          `Public desktop bundle contains a non-regular path: ${relativePath}`
+        )
       }
     }
   }

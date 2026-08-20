@@ -1,5 +1,11 @@
 const DEFAULT_SAFE_STORAGE_DEADLINE_MILLISECONDS = 10_000
 const DEFAULT_SAFE_STORAGE_COOLDOWN_MILLISECONDS = 30_000
+const SECURE_LINUX_STORAGE_BACKENDS = new Set([
+  'gnome_libsecret',
+  'kwallet',
+  'kwallet5',
+  'kwallet6',
+])
 
 class SafeStorageTimeoutError extends Error {
   constructor(operation, milliseconds) {
@@ -28,11 +34,13 @@ class SafeStorageUnavailableError extends Error {
 class SafeStorageCrypto {
   constructor({
     safeStorage,
+    platform = process.platform,
     deadlineMilliseconds = DEFAULT_SAFE_STORAGE_DEADLINE_MILLISECONDS,
     cooldownMilliseconds = DEFAULT_SAFE_STORAGE_COOLDOWN_MILLISECONDS,
     now = () => Date.now(),
   }) {
     this.safeStorage = safeStorage
+    this.platform = platform
     this.deadlineMilliseconds = positiveMilliseconds(
       deadlineMilliseconds,
       DEFAULT_SAFE_STORAGE_DEADLINE_MILLISECONDS
@@ -97,6 +105,13 @@ class SafeStorageCrypto {
   }
 
   async assertAvailable() {
+    const backendError = secureStorageBackendError(
+      this.safeStorage,
+      this.platform
+    )
+    if (backendError) {
+      throw new SafeStorageUnavailableError(backendError)
+    }
     const check = this.safeStorage?.isAsyncEncryptionAvailable
     if (typeof check !== 'function') {
       throw new SafeStorageUnavailableError(
@@ -139,10 +154,39 @@ function positiveMilliseconds(value, fallback) {
   return Number.isFinite(value) && value > 0 ? Math.round(value) : fallback
 }
 
+function secureStorageBackendError(safeStorage, platform = process.platform) {
+  if (platform !== 'linux') return null
+  const selectedBackend = safeStorage?.getSelectedStorageBackend
+  if (typeof selectedBackend !== 'function') {
+    return (
+      'Ubuntu secure storage could not verify its password manager. ' +
+      'Install and unlock GNOME Keyring or KWallet, then reopen StatsKey.'
+    )
+  }
+  let backend
+  try {
+    backend = selectedBackend.call(safeStorage)
+  } catch {
+    return (
+      'Ubuntu secure storage could not read its password manager. ' +
+      'Install and unlock GNOME Keyring or KWallet, then reopen StatsKey.'
+    )
+  }
+  if (!SECURE_LINUX_STORAGE_BACKENDS.has(backend)) {
+    return (
+      'Ubuntu secure storage is using an unprotected basic-text backend. ' +
+      'Install and unlock GNOME Keyring or KWallet, then reopen StatsKey.'
+    )
+  }
+  return null
+}
+
 module.exports = {
   DEFAULT_SAFE_STORAGE_COOLDOWN_MILLISECONDS,
   DEFAULT_SAFE_STORAGE_DEADLINE_MILLISECONDS,
+  SECURE_LINUX_STORAGE_BACKENDS,
   SafeStorageCrypto,
   SafeStorageTimeoutError,
   SafeStorageUnavailableError,
+  secureStorageBackendError,
 }

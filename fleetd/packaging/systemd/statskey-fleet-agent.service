@@ -1,0 +1,45 @@
+[Unit]
+Description=StatsKey Fleet agent (unprivileged worker)
+# The agent cannot function without the daemon's control socket.
+After=network-online.target statskey-fleetd.socket
+Wants=network-online.target
+Requires=statskey-fleetd.socket
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/statskey-fleet-agent
+User=statskey-fleet
+Restart=on-failure
+RestartSec=5s
+
+# Hardened like the job units (FLEETD_DESIGN.md "Job unit properties")
+# minus DynamicUser: the agent is a fixed system account that holds the
+# worker device key. Ticket-derived limits (TasksMax/MemoryMax/CPUQuota/
+# RuntimeMaxSec) and job-only directives (AppArmorProfile, BindsTo,
+# per-job ReadWritePaths, job log redirection) are intentionally absent.
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/statskey-fleet
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictNamespaces=yes
+# The agent polls the coordinator (AF_INET/AF_INET6), talks to the daemon
+# (AF_UNIX), and uses AF_NETLINK via the Go net package.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+DevicePolicy=closed
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,171 @@
+{
+  "name": "statskey-workbench",
+  "displayName": "StatsKey Workbench",
+  "description": "StatsKey Intelligence workbench inside the editor: native session bridge, hybrid index retrieval, and approval-bound actions.",
+  "version": "0.1.0",
+  "publisher": "statskey",
+  "license": "UNLICENSED",
+  "private": true,
+  "files": [
+    "out/**",
+    "resources/**"
+  ],
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onUri",
+    "onView:statskey.workbench",
+    "onCommand:statskey.openWorkbench",
+    "onCommand:statskey.openAgentBrowser",
+    "onCommand:statskey.buyTokens",
+    "onCommand:statskey.ask",
+    "onCommand:statskey.newAgentTask",
+    "onCommand:statskey.reviewApprovals",
+    "onCommand:statskey.signIn",
+    "onCommand:statskey.signOut",
+    "onCommand:statskey.searchIndex"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "statskey",
+          "title": "StatsKey",
+          "icon": "resources/activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "statskey": [
+        {
+          "id": "statskey.workbench",
+          "name": "Workbench",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "statskey.openWorkbench",
+        "title": "Open StatsKey"
+      },
+      {
+        "command": "statskey.openAgentBrowser",
+        "title": "StatsKey: Open Agent Browser"
+      },
+      {
+        "command": "statskey.buyTokens",
+        "title": "StatsKey: Buy or Manage Intelligence Credits"
+      },
+      {
+        "command": "statskey.ask",
+        "title": "Ask StatsKey"
+      },
+      {
+        "command": "statskey.newAgentTask",
+        "title": "Ask StatsKey"
+      },
+      {
+        "command": "statskey.reviewApprovals",
+        "title": "Review What's Waiting"
+      },
+      {
+        "command": "statskey.signIn",
+        "title": "Sign In to StatsKey"
+      },
+      {
+        "command": "statskey.signOut",
+        "title": "Sign Out of StatsKey"
+      },
+      {
+        "command": "statskey.searchIndex",
+        "title": "Search Your Record"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "statskey.ask",
+        "key": "cmd+l",
+        "mac": "cmd+l"
+      },
+      {
+        "command": "statskey.reviewApprovals",
+        "key": "cmd+shift+l",
+        "mac": "cmd+shift+l"
+      }
+    ],
+    "configuration": {
+      "title": "StatsKey Workbench",
+      "properties": {
+        "statskey.workbenchUrl": {
+          "type": "string",
+          "default": "https://statskey.ai/app/flow",
+          "description": "StatsKey surface shown as the main window."
+        },
+        "statskey.agentHome": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open the StatsKey Intelligence surface as the main window on startup."
+        }
+      }
+    },
+    "configurationDefaults": {
+      "chat.agentHost.codexAgent.enabled": true,
+      "chat.editor.codex.preferAgentHost": true,
+      "workbench.browser.dataStorage": "workspace",
+      "workbench.startupEditor": "none",
+      "workbench.tips.enabled": false,
+      "workbench.welcomePage.walkthroughs.openOnInstall": false,
+      "workbench.layoutControl.enabled": false,
+      "workbench.activityBar.location": "hidden",
+      "workbench.statusBar.visible": false,
+      "workbench.editor.showTabs": "none",
+      "workbench.editor.enablePreview": false,
+      "breadcrumbs.enabled": false,
+      "editor.minimap.enabled": false,
+      "explorer.openEditors.visible": 0,
+      "telemetry.telemetryLevel": "off",
+      "update.mode": "none",
+      "update.showReleaseNotes": false,
+      "extensions.autoUpdate": false,
+      "extensions.ignoreRecommendations": true,
+      "chat.commandCenter.enabled": false,
+      "security.workspace.trust.enabled": false,
+      "window.title": "StatsKey",
+      "window.newWindowDimensions": "maximized",
+      "workbench.colorTheme": "Default Dark Modern",
+      "editor.fontSize": 13,
+      "diffEditor.renderSideBySide": true,
+      "chat.artifacts.enabled": true,
+      "chat.editorAssociations": {
+        "*.md": "vscode.markdown.preview.editor",
+        "*.markdown": "vscode.markdown.preview.editor"
+      },
+      "chat.artifacts.rules.byFilePath": {
+        "**/*plan*.md": { "groupName": "Plans" },
+        "**/*.{pdf,md,markdown,txt,rtf,doc,docx,odt,pages}": { "groupName": "Documents" },
+        "**/*.{csv,tsv,xls,xlsx,ods,numbers}": { "groupName": "Spreadsheets" },
+        "**/*.{ppt,pptx,odp,key}": { "groupName": "Presentations" },
+        "**/*.{html,htm}": { "groupName": "Web previews" },
+        "**/*.{png,jpg,jpeg,gif,webp,avif,bmp,svg,mp3,wav,ogg,oga,mp4,webm,mov}": { "groupName": "Media" },
+        "**/*.{zip,tar,gz,tgz,7z}": { "groupName": "Archives" }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "npm run compile && npx --yes @vscode/vsce package --no-dependencies --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "@types/vscode": "^1.125.0",
+    "typescript": "^7.0.2"
+  }
+}

@@ -9,6 +9,7 @@ const {
   assertExactRemoteObject,
   describeLocalObject,
   ensureImmutableRemote,
+  fetchWithRetry,
   remoteObjectMismatches,
 } = require('./publish-recovery-runtime.cjs')
 
@@ -154,4 +155,50 @@ test('preserves the upload error when no object exists after failure', async () 
     }),
     (error) => error === failure
   )
+})
+
+test('retries transient responses and request timeouts with bounded backoff', async () => {
+  const waits = []
+  const warnings = []
+  let attempts = 0
+  const response = await fetchWithRetry(
+    async () => {
+      attempts += 1
+      if (attempts === 1) throw new Error('request timed out')
+      if (attempts === 2) {
+        return {
+          status: 503,
+          body: { cancel: async () => {} },
+        }
+      }
+      return { status: 200 }
+    },
+    'release object inspection',
+    {
+      wait: async (milliseconds) => waits.push(milliseconds),
+      warn: (message) => warnings.push(message),
+    }
+  )
+  assert.equal(response.status, 200)
+  assert.equal(attempts, 3)
+  assert.deepEqual(waits, [1_000, 2_000])
+  assert.equal(warnings.length, 2)
+})
+
+test('does not retry definitive authorization failures', async () => {
+  let attempts = 0
+  const response = await fetchWithRetry(
+    async () => {
+      attempts += 1
+      return { status: 403 }
+    },
+    'release object inspection',
+    {
+      wait: async () => {
+        throw new Error('should not wait')
+      },
+    }
+  )
+  assert.equal(response.status, 403)
+  assert.equal(attempts, 1)
 })

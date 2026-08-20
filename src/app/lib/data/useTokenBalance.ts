@@ -4,6 +4,9 @@ import { db } from '../firebase'
 
 export interface TokenBalance {
   balance: number
+  ledgerVersion: number
+  includedBalance: number
+  purchasedBalance: number
   lifetimeUsed: number
   currentMonth?: string
   lastStripeCheckoutSessionId?: string
@@ -31,7 +34,14 @@ export function useTokenBalance(uid: string | undefined): TokenBalanceState {
       (snap) => {
         if (!snap.exists()) {
           setState({
-            tokens: { balance: 0, lifetimeUsed: 0, raw: {} },
+            tokens: {
+              balance: 0,
+              ledgerVersion: 2,
+              includedBalance: 0,
+              purchasedBalance: 0,
+              lifetimeUsed: 0,
+              raw: {},
+            },
             loading: false,
             error: null,
           })
@@ -39,9 +49,14 @@ export function useTokenBalance(uid: string | undefined): TokenBalanceState {
         }
 
         const raw = snap.data() as Record<string, unknown>
+        const balance = toNumber(raw.balance)
+        const ledgerVersion = toNumber(raw.ledgerVersion)
         setState({
           tokens: {
-            balance: toNumber(raw.balance),
+            balance,
+            ledgerVersion,
+            includedBalance: ledgerVersion >= 2 ? toNumber(raw.includedBalance) : balance,
+            purchasedBalance: ledgerVersion >= 2 ? toNumber(raw.purchasedBalance) : 0,
             lifetimeUsed: toNumber(raw.lifetimeUsed),
             currentMonth: typeof raw.currentMonth === 'string' ? raw.currentMonth : undefined,
             lastStripeCheckoutSessionId:

@@ -1,4 +1,11 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { useFollowOutput } from '../lib/useFollowOutput'
@@ -16,7 +23,21 @@ import {
   type ChatModelOption,
   type ReasoningEffort,
 } from '../lib/ai/providers'
-import { runAgentTurn, type AgentStep } from '../lib/ai/agent'
+import {
+  runAgentTurn,
+  type AgentStep,
+} from '../lib/ai/agent'
+import {
+  availableSubagentModelChoices,
+  hasRestorableModelIdentity,
+  restoredDirectModel,
+  subagentModelChoiceKey,
+  subagentModelChoiceLabel,
+  subagentModelValue,
+  subagentRoute,
+  supportsHelperControls,
+  toAgentSubagentModel,
+} from '../lib/ai/subagentModel'
 import {
   agentModeForPrompt,
   agentTaskExpectationForPrompt,
@@ -33,6 +54,8 @@ import {
   AGENT_MODE_OPTIONS,
   agentModeCanAct,
   agentModeLabel,
+  anchoredPanelPlacement,
+  type AnchoredPanelPlacement,
   resolvedModeNeedsActionPermission,
 } from '../lib/ai/agentModePresentation'
 import { drainSteeringBatch } from '../lib/ai/agentLifecycle'
@@ -42,6 +65,7 @@ import { Markdown } from '../components/Markdown'
 import { ActionInbox } from '../components/assistant/ActionInbox'
 import {
   ModelControls,
+  modelSelectionValue,
   type ModelControlsValue,
 } from '../components/assistant/ModelControls'
 import {
@@ -64,11 +88,6 @@ import {
   type DesktopProviderStatus,
   type DesktopWorkspaceInstructions,
 } from '../lib/desktop'
-import {
-  completeRemoteCommand,
-  remoteAgentPrompt,
-  takeRemoteAgentCommand,
-} from '../lib/remoteAccess'
 import { desktopAgentExecutionContext } from '../lib/desktopExecutionContext'
 import {
   announceWorkspaceMutation,
@@ -224,6 +243,7 @@ const SUGGESTIONS: Array<{
 ]
 
 const MODEL_PREFERENCE_KEY = 'statskey.flow.model-settings.v2'
+const SUBAGENT_MODEL_PREFERENCE_KEY = 'statskey.flow.subagent-model.v1'
 const APPROVAL_PREFERENCE_KEY = 'statskey.flow.approval-mode.v1'
 const ORCHESTRATION_PREFERENCE_KEY = 'statskey.flow.orchestration-mode.v1'
 const ORCHESTRATION_POLICY_PREFERENCE_KEY =
@@ -401,11 +421,17 @@ export function Flow({
   const [reasoningMode, setReasoningMode] = useState<'standard' | 'pro'>(
     () => loadModelSettings().reasoningMode
   )
+  const [subagentModel, setSubagentModel] = useState<ModelControlsValue | null>(
+    loadSubagentModelSettings
+  )
   const [agentMode, setAgentMode] = useState<AgentModeSelection>('auto')
   const [executionSettingsOpen, setExecutionSettingsOpen] = useState(false)
+  const [executionSettingsPlacement, setExecutionSettingsPlacement] =
+    useState<AnchoredPanelPlacement | null>(null)
   const [approvalMode, setApprovalMode] = useState<DesktopApprovalMode>(
     loadApprovalMode
   )
+  const [executePermissionGranted, setExecutePermissionGranted] = useState(false)
   const [orchestrationMode, setOrchestrationMode] =
     useState<OrchestrationMode>(loadOrchestrationMode)
   const [intelligenceUpdates, setIntelligenceUpdates] =
@@ -494,6 +520,7 @@ export function Flow({
   const workbenchRef = useRef<HTMLDivElement>(null)
   const chatSearchRef = useRef<HTMLInputElement>(null)
   const executionSettingsRef = useRef<HTMLDivElement>(null)
+  const executionSettingsTriggerRef = useRef<HTMLButtonElement>(null)
   const runningMoreRef = useRef<HTMLDetailsElement>(null)
   const executePermissionRequestRef = useRef<
     Promise<DesktopApprovalMode | null> | null
@@ -574,6 +601,35 @@ export function Flow({
     workContext,
     workspaceSessionReady,
   ])
+  useLayoutEffect(() => {
+    if (!executionSettingsOpen) return
+
+    const placePanel = () => {
+      const trigger = executionSettingsTriggerRef.current
+      if (!trigger) return
+      const anchor = trigger.getBoundingClientRect()
+      setExecutionSettingsPlacement(
+        anchoredPanelPlacement({
+          anchorBottom: anchor.bottom,
+          anchorRight: anchor.right,
+          viewportHeight: window.innerHeight,
+          viewportWidth: window.innerWidth,
+        })
+      )
+    }
+
+    placePanel()
+    window.addEventListener('resize', placePanel)
+    window.addEventListener('scroll', placePanel, true)
+    window.visualViewport?.addEventListener('resize', placePanel)
+    window.visualViewport?.addEventListener('scroll', placePanel)
+    return () => {
+      window.removeEventListener('resize', placePanel)
+      window.removeEventListener('scroll', placePanel, true)
+      window.visualViewport?.removeEventListener('resize', placePanel)
+      window.visualViewport?.removeEventListener('scroll', placePanel)
+    }
+  }, [executionSettingsOpen])
   useEffect(() => {
     const closeOutside = (event: PointerEvent) => {
       if (!(event.target instanceof Node)) return
@@ -630,7 +686,6 @@ export function Flow({
   const activeCancel = useRef<(() => void) | null>(null)
   const sessionHookStarted = useRef(false)
   const sendInFlight = useRef(false)
-  const remoteCommandStarted = useRef<string | null>(null)
   const localStateSaveTimer = useRef<number | null>(null)
   const runHeartbeatAt = useRef(0)
   const steeringQueueRef = useRef<AgentRunSteeringMessage[]>([])
@@ -718,69 +773,6 @@ export function Flow({
       window.removeEventListener(AGENT_PREFILL_EVENT, onPrefill)
     }
   }, [])
-
-  useEffect(() => {
-    if (!composerStateReady || !workContext) return
-    const pending = takeRemoteAgentCommand(sessionId)
-    if (!pending || remoteCommandStarted.current === pending.commandId) return
-    remoteCommandStarted.current = pending.commandId
-
-    void (async () => {
-      const messageCountBeforeRun = messagesRef.current.length
-      try {
-        await send(
-          remoteAgentPrompt(pending.target, pending.prompt),
-          undefined,
-          'ask'
-        )
-        const response = messagesRef.current
-          .slice(messageCountBeforeRun)
-          .reverse()
-          .find(
-            (message) =>
-              message.role === 'model' &&
-              typeof message.content === 'string' &&
-              message.content.trim().length > 0
-          )
-        if (!response) {
-          throw new Error(
-            'The Desktop agent did not return a result for this remote request.'
-          )
-        }
-        await completeRemoteCommand({
-          commandId: pending.commandId,
-          executorId: pending.executorId,
-          claimToken: pending.claimToken,
-          status: 'succeeded',
-          summary: response.content.trim().slice(0, 8_000),
-          sessionId: pending.sessionId,
-        })
-        getDesktopBridge()?.notify({
-          title: 'Remote request complete',
-          body:
-            pending.target === 'mac-mini'
-              ? 'The Mac mini request finished.'
-              : 'The data center request finished.',
-        })
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'The remote request could not be completed.'
-        await completeRemoteCommand({
-          commandId: pending.commandId,
-          executorId: pending.executorId,
-          claimToken: pending.claimToken,
-          status: 'failed',
-          summary: message.slice(0, 8_000),
-          errorCode: 'agent_execution_failed',
-        }).catch(() => {})
-      }
-    })()
-    // `send` intentionally remains bound to this restored session. The staged
-    // command is removed before execution, and the command id guards rerenders.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [composerStateReady, sessionId, workContext])
 
   useEffect(() => {
     const refresh = () => setBackgroundRuns(getActiveAgentRuns())
@@ -929,7 +921,13 @@ export function Flow({
         setContextWindowTokens(next.contextWindowTokens)
         setExecutionRoute(next.executionRoute)
         setReasoningMode(next.reasoningMode)
+        setSubagentModel(
+          decodeSubagentModelSettings(preferences.subagentModelSettings)
+        )
         setAgentMode(preferences.agentMode ?? 'auto')
+        setExecutePermissionGranted(
+          preferences.executePermissionGranted === true
+        )
         setApprovalMode(preferences.approvalMode)
         setOrchestrationMode(preferences.orchestrationMode ?? 'adaptive')
         setIntelligenceUpdates(preferences.intelligenceUpdates ?? 'narrated')
@@ -1067,11 +1065,34 @@ export function Flow({
       }
       if ((event.metaKey || event.ctrlKey) && event.key === '/') {
         event.preventDefault()
-        if (availableModels.length === 0) return
-        const index = availableModels.findIndex(
-          (candidate) => candidate.label === model.label
+        const quickModels = availableModels.filter(
+          (candidate) =>
+            candidate.managedAvailable ||
+            providerStatuses.some(
+              (status) =>
+                status.configured &&
+                status.provider === candidate.directProvider
+            )
         )
-        setModel(availableModels[(index + 1) % availableModels.length])
+        if (quickModels.length === 0) return
+        const index = quickModels.findIndex(
+          (candidate) => candidate.id === model.id
+        )
+        const next = modelSelectionValue(
+          {
+            model,
+            effort: reasoningEffort,
+            contextWindowTokens,
+            executionRoute,
+            reasoningMode,
+          },
+          quickModels[(index + 1) % quickModels.length]
+        )
+        setModel(next.model)
+        setReasoningEffort(next.effort)
+        setContextWindowTokens(next.contextWindowTokens)
+        setExecutionRoute(next.executionRoute)
+        setReasoningMode(next.reasoningMode)
         return
       }
       if (event.key === 'Escape' && chatSearchOpen) {
@@ -1081,7 +1102,18 @@ export function Flow({
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [availableModels, chatSearchOpen, embedded, model.label, navigate])
+  }, [
+    availableModels,
+    chatSearchOpen,
+    contextWindowTokens,
+    embedded,
+    executionRoute,
+    model,
+    navigate,
+    providerStatuses,
+    reasoningEffort,
+    reasoningMode,
+  ])
 
   useEffect(() => {
     if (!modelPreferencesLoaded) return
@@ -1095,13 +1127,18 @@ export function Flow({
     if (desktopBridge) {
       void desktopBridge.preferences.save({
         modelSettings: serializeModelSettings(next),
+        subagentModelSettings: subagentModel
+          ? serializeModelSettings(subagentModel)
+          : null,
         agentMode,
+        executePermissionGranted,
         approvalMode,
         orchestrationMode,
         intelligenceUpdates,
       })
     } else {
       saveModelSettings(next)
+      saveSubagentModelSettings(subagentModel)
       saveApprovalMode(approvalMode)
       saveOrchestrationMode(orchestrationMode)
       saveIntelligenceUpdates(intelligenceUpdates)
@@ -1112,9 +1149,11 @@ export function Flow({
     contextWindowTokens,
     executionRoute,
     reasoningMode,
+    subagentModel,
     modelPreferencesLoaded,
     desktopBridge,
     agentMode,
+    executePermissionGranted,
     approvalMode,
     orchestrationMode,
     intelligenceUpdates,
@@ -1281,6 +1320,31 @@ export function Flow({
       ),
     [providerStatuses]
   )
+  const availableSubagentChoices = useMemo(
+    () =>
+      availableSubagentModelChoices(
+        availableModels,
+        configuredProviders,
+        subagentModel
+      ),
+    [availableModels, configuredProviders, subagentModel]
+  )
+  const selectedSubagentModel = useMemo(
+    () =>
+      subagentModel &&
+      subagentRoute(subagentModel, configuredProviders) != null
+        ? subagentModel
+        : null,
+    [configuredProviders, subagentModel]
+  )
+  const subagentChoiceKey = subagentModel
+    ? subagentModelChoiceKey(
+        subagentModel.model,
+        subagentModel.executionRoute
+      )
+    : 'inherit'
+  const unavailableSubagentChoice =
+    subagentModel != null && selectedSubagentModel == null
   const firstName = profile?.name?.trim().split(/\s+/)[0]
   const chatSearchMatches = useMemo(() => {
     const needle = chatSearchQuery.trim().toLocaleLowerCase()
@@ -1887,6 +1951,15 @@ ${
       : 'Complete the requested work using local file and terminal tools when useful. Keep changes scoped, reviewable, and verified.'
 }
 ${
+  (executePermissionGranted || turnApprovalMode === 'everything') &&
+  (turnAgentMode === 'agent' || turnAgentMode === 'debug')
+    ? `Standing Execute permission is active for this Mac.
+- Use any relevant available workspace, terminal, Git, browser, application, development-device, hook, or connected-service tool without asking in chat whether to attempt it. The desktop will surface exact operation review when policy requires it; wait for that review rather than bypassing it.
+- Resolve ordinary reversible implementation details with safe defaults, recover from one failed tool path, and continue through the multi-step task until the requested outcome is verified or a genuine blocker is proven.
+- Reversible workspace writes may run automatically. Delete, restore, terminal, Git, hook, connected-tool, browser-effect, app, device, credential, and communication boundaries remain reviewable.`
+    : ''
+}
+${
   turnTaskExpectation === 'workspace-change'
     ? `Execute completion contract:
 - Before the first edit, identify the coherent change set. Make related multi-file edits in one uninterrupted implementation pass rather than bouncing back into broad investigation.
@@ -2030,6 +2103,12 @@ ${evidenceContext}
         includePersonalHealth,
         approvalMode: turnApprovalMode,
         orchestrationMode,
+        subagentModel: selectedSubagentModel
+          ? toAgentSubagentModel(
+              selectedSubagentModel,
+              configuredProviders
+            )
+          : undefined,
         systemPrompt: operatingPrompt,
         priorTurns,
         userText: userTextWithContext,
@@ -3019,7 +3098,7 @@ ${evidenceContext}
 
   async function ensureExecutePermissions(): Promise<DesktopApprovalMode | null> {
     if (!desktopBridge) return approvalMode
-    if (approvalMode === 'everything') return 'everything'
+    if (executePermissionGranted) return approvalMode
     if (executePermissionRequestRef.current) {
       return executePermissionRequestRef.current
     }
@@ -3027,13 +3106,16 @@ ${evidenceContext}
     const request = (async (): Promise<DesktopApprovalMode | null> => {
       const proceed = await confirmDialog({
         title: 'Approve Execute mode permissions on this Mac?',
-        body: 'StatsKey may read, change, create, rename, and delete files in the open workspace; run terminal and Git commands; use configured connected tools; control its isolated browser; and operate permitted apps and development devices without another action prompt. Workspace boundaries, credentials, private-network access, sensitive apps, and sending communications remain protected. This approval is saved on this Mac.',
+        body: 'StatsKey may work independently in the open workspace and apply reversible, checkpointed file changes without repeated prompts. It may propose terminal, Git, connected-tool, browser, app, device, delete, and restore actions, but those higher-risk operations still pause for exact review. Terminal commands are not a sandbox and always show their exact command before running. Provider keys stay in secure storage; private-network browser access, sensitive apps, and sending communications remain protected. This approval is saved on this Mac.',
         confirmLabel: 'Approve & remember',
         cancelLabel: 'Not now',
       })
       if (!proceed) return null
       const saved = await desktopBridge.preferences
-        .save({ approvalMode: 'everything' })
+        .save({
+          executePermissionGranted: true,
+          approvalMode: 'everything',
+        })
         .catch(() => false)
       if (!saved) {
         setError(
@@ -3041,6 +3123,7 @@ ${evidenceContext}
         )
         return null
       }
+      setExecutePermissionGranted(true)
       setApprovalMode('everything')
       setError(null)
       showToast('Execute permissions approved and saved on this Mac.', {
@@ -3078,7 +3161,7 @@ ${evidenceContext}
   }
 
   async function changeApprovalMode(mode: DesktopApprovalMode) {
-    if (mode === 'everything') {
+    if (mode === 'everything' && !executePermissionGranted) {
       await ensureExecutePermissions()
       return
     }
@@ -3093,6 +3176,25 @@ ${evidenceContext}
     }
     setApprovalMode(mode)
     setError(null)
+  }
+
+  async function revokeExecutePermissions() {
+    if (desktopBridge) {
+      const saved = await desktopBridge.preferences
+        .save({
+          executePermissionGranted: false,
+          approvalMode: 'review',
+        })
+        .catch(() => false)
+      if (!saved) {
+        setError('StatsKey could not revoke the Execute permission.')
+        return
+      }
+    }
+    setExecutePermissionGranted(false)
+    setApprovalMode('review')
+    setError(null)
+    showToast('Execute permission revoked on this Mac.')
   }
 
   async function startForkConversation() {
@@ -3679,7 +3781,10 @@ ${evidenceContext}
       (!embedded || command.id !== 'workspace')
   )
   const actionCapableMode = agentModeCanAct(agentMode)
-  const executePermissionsApproved = approvalMode === 'everything'
+  const helperControlsAvailable = supportsHelperControls(agentMode)
+  const selectedModeNeedsActionPermission =
+    agentMode !== 'auto' && resolvedModeNeedsActionPermission(agentMode)
+  const executePermissionsApproved = executePermissionGranted
 
   return (
     <div
@@ -3804,6 +3909,24 @@ ${evidenceContext}
               Canvases {visiblePlanCanvases.length}
             </button>
           )}
+          <ModelControls
+            value={{
+              model,
+              effort: reasoningEffort,
+              contextWindowTokens,
+              executionRoute,
+              reasoningMode,
+            }}
+            models={availableModels}
+            configuredProviders={configuredProviders}
+            onChange={(next) => {
+              setModel(next.model)
+              setReasoningEffort(next.effort)
+              setContextWindowTokens(next.contextWindowTokens)
+              setExecutionRoute(next.executionRoute)
+              setReasoningMode(next.reasoningMode)
+            }}
+          />
           <div
             ref={executionSettingsRef}
             className={`flow-execution-settings${
@@ -3811,6 +3934,7 @@ ${evidenceContext}
             }`}
           >
             <button
+              ref={executionSettingsTriggerRef}
               type="button"
               className="flow-execution-settings__trigger"
               title="Choose how Intelligence handles your request"
@@ -3826,114 +3950,146 @@ ${evidenceContext}
                 className="flow-execution-settings__panel"
                 role="dialog"
                 aria-label="Choose an Intelligence mode"
+                style={executionSettingsPlacement ?? undefined}
               >
-              <header>
-                <div>
-                  <b>Choose a mode</b>
-                  <small>
-                    One clear behavior for this and future chats.
-                  </small>
-                </div>
-              </header>
-              <div className="flow-execution-settings__controls">
-                <div
-                  className="flow-agent-mode"
-                  role="radiogroup"
-                  aria-label="How Intelligence should work"
-                >
-                  {AGENT_MODE_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      role="radio"
-                      aria-checked={agentMode === option.value}
-                      className={agentMode === option.value ? 'active' : ''}
-                      onClick={() => void chooseAgentMode(option.value)}
-                    >
-                      <span>
-                        <b>{option.label}</b>
-                        <small>{option.description}</small>
-                      </span>
-                      <i aria-hidden="true">
-                        {agentMode === option.value ? '✓' : ''}
-                      </i>
-                    </button>
-                  ))}
-                </div>
-                {desktopBridge && actionCapableMode && (
-                  <div
-                    className="flow-execute-permissions"
-                    data-approved={executePermissionsApproved}
-                  >
-                    <i aria-hidden="true">
-                      {executePermissionsApproved ? '✓' : '◇'}
-                    </i>
-                    <span>
-                      <b>
-                        {executePermissionsApproved
-                          ? 'Action permissions approved'
-                          : 'Approve action permissions'}
-                      </b>
-                      <small>
-                        {executePermissionsApproved
-                          ? 'Execute and Fix can use the approved workspace tools without repeated prompts.'
-                          : 'Required before Execute or Fix starts. The choice is saved on this Mac.'}
-                      </small>
-                    </span>
-                    {executePermissionsApproved ? (
-                      <strong>Saved</strong>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => void ensureExecutePermissions()}
-                      >
-                        Approve & remember
-                      </button>
-                    )}
-                  </div>
-                )}
-                <details className="flow-mode-settings">
-                  <summary>
-                    <span>Model, context & controls</span>
-                    <b aria-hidden="true">›</b>
-                  </summary>
+                <header>
                   <div>
-                    {workContext && (
-                      <div className="flow-execution-context">
-                        <span>
-                          <b>Personal health</b>
-                          <small>
-                            {!uid
-                              ? 'Sign in to optionally include health context. Calendar, inbox, and personal memory stay separate.'
-                              : !projectBinding
-                                ? 'Open a workspace before including health context.'
-                                : 'Optional for this workspace. Calendar, inbox, and personal memory stay separate.'}
-                          </small>
-                        </span>
+                    <b>What should StatsKey do?</b>
+                    <small>
+                      Automatic is recommended. You can change this anytime.
+                    </small>
+                  </div>
+                  <button
+                    type="button"
+                    className="flow-execution-settings__close"
+                    aria-label="Close mode chooser"
+                    onClick={() => {
+                      setExecutionSettingsOpen(false)
+                      window.requestAnimationFrame(() =>
+                        executionSettingsTriggerRef.current?.focus()
+                      )
+                    }}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </header>
+                <div className="flow-execution-settings__controls">
+                  <div
+                    className="flow-agent-mode"
+                    role="radiogroup"
+                    aria-label="How Intelligence should work"
+                  >
+                    {AGENT_MODE_OPTIONS.map((option, index) => (
+                      <Fragment key={option.value}>
+                        {index === 1 && (
+                          <div className="flow-agent-mode__divider">
+                            Or choose directly
+                          </div>
+                        )}
                         <button
                           type="button"
-                          role="switch"
-                          aria-checked={includePersonalHealth}
-                          className={`flow-context-toggle${
-                            includePersonalHealth
-                              ? ' flow-context-toggle--active'
-                              : ''
-                          }`}
-                          disabled={!uid || !projectBinding}
-                          onClick={togglePersonalHealthContext}
+                          role="radio"
+                          aria-checked={agentMode === option.value}
+                          className={agentMode === option.value ? 'active' : ''}
+                          data-recommended={option.value === 'auto'}
+                          onClick={() => void chooseAgentMode(option.value)}
                         >
-                          <i aria-hidden="true" />
                           <span>
-                            {includePersonalHealth ? 'Included' : 'Off'}
+                            <span className="flow-agent-mode__label">
+                              <b>{option.label}</b>
+                              {option.value === 'auto' && <em>Recommended</em>}
+                            </span>
+                            <small>{option.description}</small>
                           </span>
+                          <i aria-hidden="true">
+                            {agentMode === option.value ? '✓' : ''}
+                          </i>
                         </button>
-                      </div>
-                    )}
+                      </Fragment>
+                    ))}
+                  </div>
+                  {desktopBridge && selectedModeNeedsActionPermission && (
+                    <div
+                      className="flow-execute-permissions"
+                      data-approved={executePermissionsApproved}
+                    >
+                      <i aria-hidden="true">
+                        {executePermissionsApproved ? '✓' : '◇'}
+                      </i>
+                      <span>
+                        <b>
+                          {executePermissionsApproved
+                            ? 'Independent work is allowed'
+                            : 'Allow changes on this Mac'}
+                        </b>
+                        <small>
+                          {executePermissionsApproved
+                            ? 'Reversible workspace edits run automatically; higher-risk actions still ask.'
+                            : 'Required before Execute or Fix can make changes.'}
+                        </small>
+                      </span>
+                      {executePermissionsApproved ? (
+                        <button
+                          type="button"
+                          onClick={() => void revokeExecutePermissions()}
+                        >
+                          Revoke
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void ensureExecutePermissions()}
+                        >
+                          Review & approve
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <details className="flow-mode-settings">
+                    <summary>
+                      <span>
+                        <b>Advanced settings</b>
+                        <small>Context, permissions and helper controls</small>
+                      </span>
+                      <b aria-hidden="true">›</b>
+                    </summary>
+                    <div>
+                      {workContext && (
+                        <div className="flow-execution-context">
+                          <span>
+                            <b>Personal health</b>
+                            <small>
+                              {!uid
+                                ? 'Sign in to optionally include health context. Calendar, inbox, and personal memory stay separate.'
+                                : !projectBinding
+                                  ? 'Open a workspace before including health context.'
+                                  : 'Optional for this workspace. Calendar, inbox, and personal memory stay separate.'}
+                            </small>
+                          </span>
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={includePersonalHealth}
+                            className={`flow-context-toggle${
+                              includePersonalHealth
+                                ? ' flow-context-toggle--active'
+                                : ''
+                            }`}
+                            disabled={!uid || !projectBinding}
+                            onClick={togglePersonalHealthContext}
+                          >
+                            <i aria-hidden="true" />
+                            <span>
+                              {includePersonalHealth ? 'Included' : 'Off'}
+                            </span>
+                          </button>
+                        </div>
+                      )}
                     {actionCapableMode && (
                       <label className="flow-run-preference">
                         <span>
                           <b>Action review</b>
-                          <small>Change or revoke the saved standing permission.</small>
+                          <small>Choose which operations pause for review.</small>
                         </span>
                         <select
                           className={`flow-run-mode flow-run-mode--${approvalMode}`}
@@ -3947,38 +4103,14 @@ ${evidenceContext}
                         >
                           <option value="review">Ask before every action</option>
                           <option value="auto">Apply file changes automatically</option>
-                          <option value="everything">Approved for this Mac</option>
+                          <option value="everything">Work independently; review risky actions</option>
                         </select>
                       </label>
                     )}
-                    <div className="flow-model-choice">
-                      <span>
-                        <b>Model</b>
-                        <small>Use the recommended model or choose another.</small>
-                      </span>
-                      <ModelControls
-                        value={{
-                          model,
-                          effort: reasoningEffort,
-                          contextWindowTokens,
-                          executionRoute,
-                          reasoningMode,
-                        }}
-                        models={availableModels}
-                        configuredProviders={configuredProviders}
-                        onChange={(next) => {
-                          setModel(next.model)
-                          setReasoningEffort(next.effort)
-                          setContextWindowTokens(next.contextWindowTokens)
-                          setExecutionRoute(next.executionRoute)
-                          setReasoningMode(next.reasoningMode)
-                        }}
-                      />
-                    </div>
                     <details className="flow-technical-settings">
                       <summary>Advanced technical options</summary>
                       <div>
-                        {actionCapableMode && (
+                        {helperControlsAvailable && (
                           <label
                             className={`flow-orchestration-tier flow-orchestration-tier--${orchestrationMode}`}
                             title={orchestrationDescription(orchestrationMode)}
@@ -3999,6 +4131,62 @@ ${evidenceContext}
                             </select>
                           </label>
                         )}
+                        {helperControlsAvailable &&
+                          orchestrationMode !== 'focused' && (
+                            <label
+                              className="flow-orchestration-tier"
+                              title="Helpers follow this chat by default. Choose another model only when you want a specialized investigator."
+                            >
+                              <span>Helper model</span>
+                              <select
+                                value={subagentChoiceKey}
+                                onChange={(event) => {
+                                  if (event.target.value === 'inherit') {
+                                    setSubagentModel(null)
+                                    return
+                                  }
+                                  const choice =
+                                    availableSubagentChoices.find(
+                                      (item) =>
+                                        item.key === event.target.value
+                                    )
+                                  if (!choice) return
+                                  setSubagentModel(
+                                    subagentModelValue(
+                                      choice.model,
+                                      choice.executionRoute
+                                    )
+                                  )
+                                }}
+                                aria-label="Helper model"
+                              >
+                                <option value="inherit">
+                                  Same as this chat (recommended)
+                                </option>
+                                {unavailableSubagentChoice &&
+                                  subagentModel && (
+                                    <option
+                                      value={subagentChoiceKey}
+                                      disabled
+                                    >
+                                      {subagentModelChoiceLabel(
+                                        subagentModel.model,
+                                        subagentModel.executionRoute
+                                      )}{' '}
+                                      (unavailable — using this chat)
+                                    </option>
+                                  )}
+                                {availableSubagentChoices.map((choice) => (
+                                  <option
+                                    key={choice.key}
+                                    value={choice.key}
+                                  >
+                                    {choice.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          )}
                         {actionCapableMode && (
                           <label
                             className={`flow-intelligence-updates flow-intelligence-updates--${intelligenceUpdates}`}
@@ -7009,39 +7197,6 @@ function directOnlyModel({
   }
 }
 
-function restoredDirectModel({
-  provider,
-  providerId,
-  modelId,
-  label,
-  providerLabel,
-  dotColor,
-}: {
-  provider: ChatModelOption['provider']
-  providerId: DesktopProviderId
-  modelId: string
-  label: string
-  providerLabel: string
-  dotColor: string
-}): ChatModelOption {
-  return {
-    id: `custom:${providerId}:${modelId}`,
-    provider,
-    modelId,
-    label,
-    providerLabel,
-    agentic: true,
-    dotColor,
-    description: 'Exact model ID saved on this computer.',
-    maxContextTokens: 1_000_000,
-    contextOptions: [64_000, 128_000, 272_000, 1_000_000],
-    effortOptions: ['low', 'medium', 'high', 'xhigh', 'max'],
-    defaultEffort: 'medium',
-    directProvider: providerId,
-    managedAvailable: false,
-  }
-}
-
 function isDesktopProviderId(value: unknown): value is DesktopProviderId {
   return [
     'anthropic',
@@ -7069,7 +7224,27 @@ function loadModelSettings(): ModelControlsValue {
   }
 }
 
-function decodeModelSettings(input: unknown): ModelControlsValue {
+function loadSubagentModelSettings(): ModelControlsValue | null {
+  try {
+    const stored = localStorage.getItem(SUBAGENT_MODEL_PREFERENCE_KEY)
+    return stored ? decodeSubagentModelSettings(JSON.parse(stored)) : null
+  } catch {
+    return null
+  }
+}
+
+function decodeSubagentModelSettings(
+  input: unknown
+): ModelControlsValue | null {
+  return hasRestorableModelIdentity(input, CHAT_MODELS)
+    ? decodeModelSettings(input, { preserveRoute: true })
+    : null
+}
+
+function decodeModelSettings(
+  input: unknown,
+  { preserveRoute = false }: { preserveRoute?: boolean } = {}
+): ModelControlsValue {
   const fallbackModel = CHAT_MODELS[0]
   const fallback: ModelControlsValue = {
     model: fallbackModel,
@@ -7105,6 +7280,8 @@ function decodeModelSettings(input: unknown): ModelControlsValue {
       typeof raw.modelLabel === 'string' &&
       isDesktopProviderId(raw.directProvider)
         ? restoredDirectModel({
+            modelKey:
+              typeof raw.modelKey === 'string' ? raw.modelKey : undefined,
             modelId: raw.modelId,
             label: raw.modelLabel,
             providerId: raw.directProvider,
@@ -7143,8 +7320,9 @@ function decodeModelSettings(input: unknown): ModelControlsValue {
       model,
       effort,
       contextWindowTokens,
-      executionRoute:
-        executionRoute === 'managed' && !model.managedAvailable
+      executionRoute: preserveRoute
+        ? executionRoute
+        : executionRoute === 'managed' && !model.managedAvailable
           ? 'direct'
           : executionRoute,
       reasoningMode,
@@ -7162,6 +7340,21 @@ function saveModelSettings(value: ModelControlsValue) {
     )
   } catch {
     // Preference persistence is optional.
+  }
+}
+
+function saveSubagentModelSettings(value: ModelControlsValue | null) {
+  try {
+    if (!value) {
+      localStorage.removeItem(SUBAGENT_MODEL_PREFERENCE_KEY)
+      return
+    }
+    localStorage.setItem(
+      SUBAGENT_MODEL_PREFERENCE_KEY,
+      JSON.stringify(serializeModelSettings(value))
+    )
+  } catch {
+    // Preference persistence is optional outside the desktop app.
   }
 }
 

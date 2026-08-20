@@ -11,6 +11,70 @@ function workspaceOperationBinding(value) {
   }
 }
 
+function workspaceSyncLinkState(value) {
+  if (!value || typeof value !== 'object') return null
+  if (!Array.isArray(value.rootMappings)) return null
+  const rootMappings = []
+  for (const entry of value.rootMappings.slice(0, 64)) {
+    if (
+      !entry || typeof entry !== 'object' ||
+      typeof entry.rootId !== 'string' || typeof entry.path !== 'string'
+    ) {
+      return null
+    }
+    rootMappings.push({
+      rootId: entry.rootId.slice(0, 80),
+      path: entry.path.slice(0, 4_000),
+    })
+  }
+  const lastSynced = {}
+  if (value.lastSynced && typeof value.lastSynced === 'object') {
+    for (const [key, entry] of Object.entries(value.lastSynced)) {
+      if (
+        !entry || typeof entry !== 'object' ||
+        typeof entry.hash !== 'string' ||
+        !Number.isFinite(entry.rev) ||
+        !Number.isFinite(entry.mtimeMs) ||
+        !Number.isFinite(entry.size)
+      ) {
+        continue
+      }
+      lastSynced[key.slice(0, 1_200)] = {
+        hash: entry.hash.slice(0, 128),
+        rev: entry.rev,
+        mtimeMs: entry.mtimeMs,
+        size: entry.size,
+      }
+    }
+  }
+  return {
+    version: 1,
+    syncId: typeof value.syncId === 'string' ? value.syncId.slice(0, 40) : '',
+    name: typeof value.name === 'string' ? value.name.slice(0, 160) : '',
+    ownerUid:
+      typeof value.ownerUid === 'string'
+        ? value.ownerUid.slice(0, 128)
+        : null,
+    paused: value.paused === true,
+    rootMappings,
+    lastSynced,
+  }
+}
+
+function boundedFleetObject(value, maximumBytes = 128 * 1024) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  try {
+    const encoded = JSON.stringify(value)
+    if (Buffer.byteLength(encoded, 'utf8') > maximumBytes) return null
+    const decoded = JSON.parse(encoded)
+    return decoded && typeof decoded === 'object' && !Array.isArray(decoded)
+      ? decoded
+      : null
+  } catch {
+    return null
+  }
+}
+
 const DEVICE_PLATFORMS = new Set(['ios', 'android'])
 const DEVICE_ACTIONS = new Set([
   'boot', 'install', 'launch', 'inspect', 'screenshot', 'tap', 'type',
@@ -27,7 +91,8 @@ function terminalShellDescriptor() {
   const environment = process.env || {}
   const candidate = windows
     ? environment.ComSpec || environment.COMSPEC || 'cmd.exe'
-    : environment.SHELL || (process.platform === 'darwin' ? '/bin/zsh' : '/bin/sh')
+    : environment.SHELL ||
+      (process.platform === 'darwin' ? '/bin/zsh' : '/bin/bash')
   const executable = String(candidate)
     .split(/[\\/]/)
     .filter(Boolean)
@@ -41,7 +106,7 @@ function terminalShellDescriptor() {
           ? 'cmd.exe'
           : process.platform === 'darwin'
             ? 'zsh'
-            : 'sh',
+            : 'bash',
   })
 }
 
@@ -929,6 +994,327 @@ contextBridge.exposeInMainWorld(
           operationId,
           approved === true
         )
+      },
+    }),
+    fleet: Object.freeze({
+      identityState() {
+        return ipcRenderer.invoke('statskey-desktop:fleet-identity-state')
+      },
+      ensureIdentity(profile) {
+        const cleaned = boundedFleetObject(profile, 8 * 1024)
+        if (!cleaned) return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-identity-ensure',
+          cleaned
+        )
+      },
+      replaceIdentity() {
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-identity-replace'
+        )
+      },
+      createBootstrap(input) {
+        const cleaned = boundedFleetObject(input, 4 * 1024)
+        if (!cleaned) return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-bootstrap-create',
+          cleaned
+        )
+      },
+      createControllerRecovery(input) {
+        const cleaned = boundedFleetObject(input, 8 * 1024)
+        if (!cleaned) return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-controller-recovery-create',
+          cleaned
+        )
+      },
+      createPairingReceipt(input) {
+        const cleaned = boundedFleetObject(input)
+        if (!cleaned) return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-pairing-create-receipt',
+          cleaned
+        )
+      },
+      createLocalGrant(input) {
+        const cleaned = boundedFleetObject(input, 32 * 1024)
+        if (!cleaned) return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-local-grant-create',
+          cleaned
+        )
+      },
+      authorizeJob(input) {
+        const cleaned = boundedFleetObject(input, 128 * 1024)
+        if (!cleaned) return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-job-authorize',
+          cleaned
+        )
+      },
+      signPairing(receipt, action) {
+        const cleaned = boundedFleetObject(receipt)
+        if (
+          !cleaned ||
+          !['pairing.candidate', 'pairing.approve'].includes(action)
+        ) {
+          return Promise.resolve(null)
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-pairing-sign',
+          cleaned,
+          action
+        )
+      },
+      downloadArtifact(grant) {
+        const cleaned = boundedFleetObject(grant, 8 * 1024)
+        if (!cleaned) return Promise.resolve(false)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-artifact-download',
+          cleaned
+        )
+      },
+      listRetainedArtifacts() {
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-artifact-spool-list'
+        )
+      },
+      revealRetainedArtifact(input) {
+        const cleaned = boundedFleetObject(input, 2 * 1024)
+        if (!cleaned) return Promise.resolve(false)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-artifact-spool-reveal',
+          cleaned
+        )
+      },
+      purgeRetainedArtifact(input) {
+        const cleaned = boundedFleetObject(input, 2 * 1024)
+        if (!cleaned) return Promise.resolve(false)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-artifact-spool-purge',
+          cleaned
+        )
+      },
+      markEnrolled(enrollment) {
+        const cleaned = boundedFleetObject(enrollment, 8 * 1024)
+        if (!cleaned) return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:fleet-identity-mark-enrolled',
+          cleaned
+        )
+      },
+    }),
+    remoteSession: Object.freeze({
+      prepareRequest() {
+        return ipcRenderer.invoke(
+          'statskey-desktop:remote-session-prepare-request'
+        )
+      },
+      connect(input) {
+        const cleaned = boundedFleetObject(input, 8 * 1024)
+        if (!cleaned) {
+          return Promise.resolve({ ok: false, error: 'Invalid remote session.' })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:remote-session-connect',
+          cleaned
+        )
+      },
+      sendInput(sessionId, event) {
+        if (typeof sessionId !== 'string') {
+          return Promise.resolve({ ok: false, error: 'Invalid remote session.' })
+        }
+        const cleaned = boundedFleetObject(event, 4 * 1024)
+        if (!cleaned) {
+          return Promise.resolve({ ok: false, error: 'Invalid input event.' })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:remote-session-input',
+          sessionId.slice(0, 40),
+          cleaned
+        )
+      },
+      end(sessionId) {
+        if (typeof sessionId !== 'string') return Promise.resolve(false)
+        return ipcRenderer.invoke(
+          'statskey-desktop:remote-session-end',
+          sessionId.slice(0, 40)
+        )
+      },
+      getState(sessionId) {
+        if (typeof sessionId !== 'string') return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:remote-session-state',
+          sessionId.slice(0, 40)
+        )
+      },
+      onFrame(listener) {
+        if (typeof listener !== 'function') return () => {}
+        const handler = (_event, payload) => listener(payload)
+        ipcRenderer.on('statskey-desktop:remote-session-frame', handler)
+        return () =>
+          ipcRenderer.removeListener(
+            'statskey-desktop:remote-session-frame',
+            handler
+          )
+      },
+      onState(listener) {
+        if (typeof listener !== 'function') return () => {}
+        const handler = (_event, payload) => listener(payload)
+        ipcRenderer.on('statskey-desktop:remote-session-state', handler)
+        return () =>
+          ipcRenderer.removeListener(
+            'statskey-desktop:remote-session-state',
+            handler
+          )
+      },
+    }),
+    workspaceSync: Object.freeze({
+      deviceInfo() {
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-device-info'
+        )
+      },
+      loadState(syncId) {
+        if (typeof syncId !== 'string') return Promise.resolve(null)
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-state-load',
+          syncId.slice(0, 40)
+        )
+      },
+      saveState(syncId, state) {
+        const cleaned = workspaceSyncLinkState(state)
+        if (typeof syncId !== 'string' || !cleaned) {
+          return Promise.resolve(false)
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-state-save',
+          syncId.slice(0, 40),
+          cleaned
+        )
+      },
+      removeState(syncId) {
+        if (typeof syncId !== 'string') return Promise.resolve(false)
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-state-remove',
+          syncId.slice(0, 40)
+        )
+      },
+      listStates() {
+        return ipcRenderer.invoke('statskey-desktop:workspace-sync-state-list')
+      },
+      scan(syncId) {
+        if (typeof syncId !== 'string') {
+          return Promise.resolve({
+            ok: false,
+            entries: [],
+            missingRoots: [],
+            skipped: [],
+            error: 'Invalid sync workspace.',
+          })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-scan',
+          syncId.slice(0, 40)
+        )
+      },
+      scanPaths(syncId, rootId, relPaths) {
+        if (
+          typeof syncId !== 'string' ||
+          typeof rootId !== 'string' ||
+          !Array.isArray(relPaths)
+        ) {
+          return Promise.resolve({
+            ok: false,
+            entries: [],
+            skipped: [],
+            error: 'Invalid sync paths.',
+          })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-scan-paths',
+          syncId.slice(0, 40),
+          rootId.slice(0, 80),
+          relPaths
+            .filter((value) => typeof value === 'string')
+            .slice(0, 20_000)
+            .map((value) => value.slice(0, 2_000))
+        )
+      },
+      read(syncId, rootId, relPath) {
+        if (
+          typeof syncId !== 'string' ||
+          typeof rootId !== 'string' ||
+          typeof relPath !== 'string'
+        ) {
+          return Promise.resolve({ ok: false, error: 'Invalid sync path.' })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-read',
+          syncId.slice(0, 40),
+          rootId.slice(0, 80),
+          relPath.slice(0, 2_000)
+        )
+      },
+      apply(syncId, rootId, relPath, content) {
+        if (
+          typeof syncId !== 'string' ||
+          typeof rootId !== 'string' ||
+          typeof relPath !== 'string' ||
+          content == null ||
+          typeof content !== 'object' ||
+          typeof content.base64 !== 'string'
+        ) {
+          return Promise.resolve({ ok: false, error: 'Invalid sync write.' })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-apply',
+          syncId.slice(0, 40),
+          rootId.slice(0, 80),
+          relPath.slice(0, 2_000),
+          { base64: content.base64, executable: content.executable === true }
+        )
+      },
+      remove(syncId, rootId, relPath) {
+        if (
+          typeof syncId !== 'string' ||
+          typeof rootId !== 'string' ||
+          typeof relPath !== 'string'
+        ) {
+          return Promise.resolve({ ok: false, error: 'Invalid sync path.' })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-remove',
+          syncId.slice(0, 40),
+          rootId.slice(0, 80),
+          relPath.slice(0, 2_000)
+        )
+      },
+      createRootFolder(basePath, name) {
+        if (typeof basePath !== 'string' || typeof name !== 'string') {
+          return Promise.resolve({ ok: false, error: 'Invalid folder.' })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-create-root-folder',
+          basePath.slice(0, 4_000),
+          name.slice(0, 200)
+        )
+      },
+      chooseFolder() {
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-sync-choose-folder'
+        )
+      },
+      onChanges(listener) {
+        if (typeof listener !== 'function') return () => {}
+        const handler = (_event, change) => listener(change)
+        ipcRenderer.on('statskey-desktop:workspace-sync-changed', handler)
+        return () =>
+          ipcRenderer.removeListener(
+            'statskey-desktop:workspace-sync-changed',
+            handler
+          )
       },
     }),
     providers: Object.freeze({

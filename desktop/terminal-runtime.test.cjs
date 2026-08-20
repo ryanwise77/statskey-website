@@ -6,6 +6,7 @@ const path = require('node:path')
 const {
   TerminalRuntime,
   normalizeTerminalEnvironmentOverrides,
+  shellInvocation,
 } = require('./terminal-runtime.cjs')
 
 test('terminal runtime streams output before process exit', async () => {
@@ -120,6 +121,36 @@ test('terminal environment override normalization rejects loader and shell injec
   )
 })
 
+test('Ubuntu uses bash when SHELL is absent or cannot provide pipefail', () => {
+  assert.deepEqual(
+    shellInvocation('printf ok', {
+      platform: 'linux',
+      environment: {},
+    }),
+    {
+      executable: '/bin/bash',
+      args: ['-lc', 'printf ok'],
+    }
+  )
+  const guarded = shellInvocation('first\nsecond', {
+    failClosed: true,
+    platform: 'linux',
+    environment: { SHELL: '/bin/sh' },
+  })
+  assert.equal(guarded.executable, '/bin/bash')
+  assert.match(guarded.args[1], /^set -e\nset -o pipefail\n/)
+})
+
+test('manual Ubuntu terminals still honor an explicitly configured shell', () => {
+  assert.equal(
+    shellInvocation('printf ok', {
+      platform: 'linux',
+      environment: { SHELL: '/usr/bin/fish' },
+    }).executable,
+    '/usr/bin/fish'
+  )
+})
+
 test('terminal runtime cancels only renderer-owned agent sessions', () => {
   const children = []
   const runtime = new TerminalRuntime({
@@ -154,7 +185,9 @@ test('terminal runtime cancels only renderer-owned agent sessions', () => {
     runtime.list().find((session) => session.id === manual.id)?.status,
     'running'
   )
-  assert.deepEqual(children[0].killSignals, ['SIGTERM'])
+  assert.deepEqual(children[0].killSignals, [
+    process.platform === 'win32' ? undefined : 'SIGTERM',
+  ])
   assert.deepEqual(children[1].killSignals, [])
   runtime.closeAll()
 })

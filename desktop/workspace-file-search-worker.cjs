@@ -128,13 +128,15 @@ function searchFileNames(message) {
         continue
       }
       entries.sort((left, right) => scanEntryOrder(left, right, query))
-      for (const entry of entries) {
-        queue.push({
+      queue.splice(
+        queueIndex,
+        0,
+        ...entries.map((entry) => ({
           candidate: path.join(resolved, entry.name),
           root: item.root,
           patterns: item.patterns,
-        })
-      }
+        }))
+      )
       continue
     }
     if (!stats.isFile()) continue
@@ -338,8 +340,25 @@ function scanEntryOrder(left, right, query) {
   const leftMatch = fileNameMatch(left.name, left.name, query)?.score ?? 0
   const rightMatch = fileNameMatch(right.name, right.name, query)?.score ?? 0
   if (leftMatch !== rightMatch) return rightMatch - leftMatch
-  const leftKind = left.isFile() ? 0 : left.isDirectory() ? 1 : 2
-  const rightKind = right.isFile() ? 0 : right.isDirectory() ? 1 : 2
+  const directoriesFirst = Boolean(String(query || '').trim())
+  const leftKind = left.isDirectory()
+    ? directoriesFirst
+      ? 0
+      : 1
+    : left.isFile()
+      ? directoriesFirst
+        ? 1
+        : 0
+      : 2
+  const rightKind = right.isDirectory()
+    ? directoriesFirst
+      ? 0
+      : 1
+    : right.isFile()
+      ? directoriesFirst
+        ? 1
+        : 0
+      : 2
   if (leftKind !== rightKind) return leftKind - rightKind
   return left.name.localeCompare(right.name)
 }

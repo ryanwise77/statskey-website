@@ -11,8 +11,10 @@ function normalizeApprovalMode(value) {
 
 function shouldAutoApprove(kind, approvalMode) {
   const mode = normalizeApprovalMode(approvalMode)
-  if (mode === 'everything') return true
-  return mode === 'auto' && AUTO_APPROVED_KINDS.has(kind)
+  return (
+    (mode === 'auto' || mode === 'everything') &&
+    AUTO_APPROVED_KINDS.has(kind)
+  )
 }
 
 module.exports = {

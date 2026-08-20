@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   MANAGED_TOKEN_PACKS,
   MODEL_PRICING,
+  formatUsdPerMillion,
   managedCoverageTokens,
   managedCreditsForProviderCost,
   tokenPackFullRedemptionMargin,
@@ -23,6 +24,12 @@ describe('model economics', () => {
       (standard.cachedInputUsdPer1M ?? 0) * 2
     )
     expect(fast.outputUsdPer1M).toBe(standard.outputUsdPer1M * 2)
+  })
+
+  it('does not round away sub-cent cached-input rates', () => {
+    expect(formatUsdPerMillion(0.075)).toBe('$0.075')
+    expect(formatUsdPerMillion(0.5)).toBe('$0.50')
+    expect(formatUsdPerMillion(10)).toBe('$10')
   })
 
   it('keeps every Stripe token pack above a 70% full-redemption margin', () => {

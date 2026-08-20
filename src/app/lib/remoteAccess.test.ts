@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   decodeRemoteAccessPreferences,
   decodeRemoteCommand,
@@ -8,6 +8,26 @@ import {
   stageRemoteAgentCommand,
   takeRemoteAgentCommand,
 } from './remoteAccess'
+
+beforeEach(() => {
+  const values = new Map<string, string>()
+  vi.stubGlobal('sessionStorage', {
+    clear: () => values.clear(),
+    getItem: (key: string) => values.get(key) ?? null,
+    key: (index: number) => Array.from(values.keys())[index] ?? null,
+    get length() {
+      return values.size
+    },
+    removeItem: (key: string) => {
+      values.delete(key)
+    },
+    setItem: (key: string, value: string) => values.set(key, String(value)),
+  })
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('remote access decoders', () => {
   it('defaults to explicit opt-out and confirmation', () => {

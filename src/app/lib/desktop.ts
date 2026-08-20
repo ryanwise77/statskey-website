@@ -876,8 +876,11 @@ export interface DesktopPreferences {
   orchestrationPolicyVersion: 2
   intelligenceUpdatesPolicyVersion: 2
   modelSettings: Record<string, unknown> | null
+  /** Null keeps investigators on the current parent model and route. */
+  subagentModelSettings: Record<string, unknown> | null
   inlineCompletions: boolean
   agentMode: 'auto' | 'ask' | 'plan' | 'debug' | 'agent'
+  executePermissionGranted: boolean
   approvalMode: DesktopApprovalMode
   orchestrationMode: 'focused' | 'adaptive' | 'parallel'
   intelligenceUpdates: 'quiet' | 'live' | 'narrated'
@@ -1034,6 +1037,153 @@ export interface DesktopFounderBridge {
   perform(action: DesktopFounderAction): Promise<DesktopFounderResult>
 }
 
+export interface DesktopFleetIdentityProfile {
+  label: string
+  role: 'controller' | 'worker' | 'hybrid'
+  workerMode: 'dedicated' | 'opt-in' | 'disabled'
+  platform: 'darwin' | 'win32' | 'linux' | 'ios' | 'android'
+  maxConcurrentJobs: number
+}
+
+export interface DesktopFleetIdentityState {
+  deviceId: `dev_${string}`
+  publicKeyFingerprint: string
+  publicKeySpki: string
+  profile: DesktopFleetIdentityProfile
+  enrollment?: {
+    ownerUid: string
+    endpoint: string
+    coordinatorKeyId: string
+    coordinatorPublicKeySpki: string
+    enrolledAt: string
+  } | null
+}
+
+export interface DesktopFleetRetainedArtifact {
+  spoolId: string
+  jobId: `job_${string}`
+  leaseId: `lease_${string}`
+  attempt: number
+  kind: string
+  reasonCode: string
+  createdAt: string
+  sizeBytes: number
+  contentHash: string | null
+  integrity: 'recorded' | 'unverified'
+}
+
+export interface DesktopFleetBridge {
+  identityState(): Promise<DesktopFleetIdentityState | null>
+  ensureIdentity(
+    profile: DesktopFleetIdentityProfile
+  ): Promise<DesktopFleetIdentityState | null>
+  replaceIdentity(): Promise<DesktopFleetIdentityState | null>
+  createBootstrap(input: { ownerUid: string }): Promise<
+    import('./fleet/types').BootstrapFleetDeviceInput | null
+  >
+  createControllerRecovery(input: {
+    ownerUid: string
+    expectedControllerDeviceId: `dev_${string}`
+  }): Promise<import('./fleet/types').RecoverFleetControllerInput | null>
+  createPairingReceipt(
+    input:
+      | (Omit<
+          import('./fleet/types').PairFleetDeviceInput['receipt'],
+          'controllerDeviceId' | 'pairingNonce' | 'candidate' | 'ownerUid'
+        > & {
+          candidate: DesktopFleetIdentityState
+          pairingNonce?: string
+        })
+      // Controller-only candidates (hybrid with worker mode disabled, such
+      // as a phone) pair without execution scope; the main process builds
+      // the controller receipt variant.
+      | { candidate: DesktopFleetIdentityState }
+  ): Promise<import('./fleet/types').PairFleetDeviceInput['receipt'] | null>
+  createLocalGrant(input: {
+    workspaceIds: string[]
+    repositoryIdentities: string[]
+    capabilities: import('./fleet/types').FleetCapability[]
+    unattended: boolean
+    expiresAt: number | string
+    policyVersion: number
+  }): Promise<import('./fleet/types').CreateLocalFleetGrantInput | null>
+  authorizeJob(
+    input: Omit<
+      import('./fleet/types').CreateFleetJobInput,
+      'controllerAuthorization'
+    >
+  ): Promise<
+    import('./fleet/types').CreateFleetJobInput['controllerAuthorization'] | null
+  >
+  signPairing(
+    receipt: import('./fleet/types').PairFleetDeviceInput['receipt'],
+    action: 'pairing.candidate' | 'pairing.approve'
+  ): Promise<import('./fleet/types').FleetSignedDeviceEnvelope | null>
+  downloadArtifact(grant: {
+    artifactId: `artifact_${string}`
+    url: string
+    expiresAt: string
+  }): Promise<boolean>
+  listRetainedArtifacts(): Promise<DesktopFleetRetainedArtifact[]>
+  revealRetainedArtifact(input: {
+    spoolId: string
+    kind: string
+  }): Promise<boolean>
+  purgeRetainedArtifact(input: { spoolId: string }): Promise<boolean>
+  markEnrolled(enrollment: {
+    ownerUid: string
+    endpoint: string
+    coordinatorKeyId: string
+    coordinatorPublicKeySpki: string
+  }): Promise<DesktopFleetIdentityState | null>
+}
+
+export interface DesktopRemoteSessionHeader {
+  width: number
+  height: number
+  scale: number
+  hostname: string
+  platform: string
+}
+
+export interface DesktopRemoteSessionState {
+  sessionId: string
+  state: 'connecting' | 'waiting' | 'active' | 'closed' | 'failed'
+  paired: boolean
+  header: DesktopRemoteSessionHeader | null
+  error: string | null
+}
+
+export interface DesktopRemoteSessionFrame {
+  sessionId: string
+  jpeg: Uint8Array
+}
+
+export type DesktopRemoteInputEvent =
+  | { type: 'mousemove'; x: number; y: number }
+  | { type: 'mousedown' | 'mouseup'; x: number; y: number; button: 'left' | 'middle' | 'right' }
+  | { type: 'wheel'; x: number; y: number; deltaY: number; deltaX?: number }
+  | { type: 'keydown' | 'keyup'; key: string }
+
+export interface DesktopRemoteSessionBridge {
+  prepareRequest(): Promise<{ controllerEphemeralKey: string } | null>
+  connect(input: {
+    sessionId: string
+    relayEndpoint: string
+    sessionKey: string
+    controllerEphemeralKey: string
+    capabilities: string[]
+  }): Promise<{ ok: boolean; error?: string }>
+  sendInput(
+    sessionId: string,
+    event: DesktopRemoteInputEvent
+  ): Promise<{ ok: boolean; error?: string }>
+  end(sessionId: string): Promise<boolean>
+  getState(sessionId: string): Promise<DesktopRemoteSessionState | null>
+  onFrame(listener: (frame: DesktopRemoteSessionFrame) => void): () => void
+  onState(listener: (state: DesktopRemoteSessionState) => void): () => void
+}
+
 export interface StatsKeyDesktopBridge {
   platform: string
   terminalShell?: {
@@ -1068,6 +1218,17 @@ export interface StatsKeyDesktopBridge {
   }>
   calendarFeeds?: DesktopCalendarFeedsBridge
   workspace: DesktopWorkspaceBridge
+  /**
+   * Workspace Sync & Backup runtime (direct send, backups, live sync).
+   * Optional so older packaged preloads keep working.
+   */
+  workspaceSync?: import('./sync/types').DesktopWorkspaceSyncBridge
+  fleet?: DesktopFleetBridge
+  /**
+   * Fleet Remote Session relay channel. Optional so older packaged preloads
+   * keep working.
+   */
+  remoteSession?: DesktopRemoteSessionBridge
   providers: DesktopProviderBridge
   integrations?: DesktopIntegrationBridge
   preferences: DesktopPreferencesBridge

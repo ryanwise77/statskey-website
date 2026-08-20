@@ -95,6 +95,48 @@ async function ensureImmutableRemote({
   )
 }
 
+async function fetchWithRetry(
+  request,
+  label,
+  {
+    maximumAttempts = 5,
+    wait = (milliseconds) =>
+      new Promise((resolve) => setTimeout(resolve, milliseconds)),
+    warn = (message) => console.warn(message),
+  } = {}
+) {
+  let lastError = null
+  for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
+    try {
+      const response = await request()
+      if (!isRetryableResponse(response) || attempt === maximumAttempts) {
+        return response
+      }
+      lastError = new Error(`${label} returned ${response.status}.`)
+      try {
+        await response.body?.cancel()
+      } catch {
+        // The bounded retry remains safe if a failed body cannot close.
+      }
+    } catch (error) {
+      lastError = error
+      if (attempt === maximumAttempts) throw error
+    }
+    warn(`Retrying ${label} (attempt ${attempt + 1}/${maximumAttempts}).`)
+    await wait(Math.min(8_000, 1_000 * 2 ** (attempt - 1)))
+  }
+  throw lastError ?? new Error(`${label} failed.`)
+}
+
+function isRetryableResponse(response) {
+  return (
+    response.status === 408 ||
+    response.status === 425 ||
+    response.status === 429 ||
+    response.status >= 500
+  )
+}
+
 module.exports = {
   IMMUTABLE_CACHE_CONTROL,
   MUTABLE_CACHE_CONTROL,
@@ -103,5 +145,7 @@ module.exports = {
   assertExactRemoteObject,
   describeLocalObject,
   ensureImmutableRemote,
+  fetchWithRetry,
+  isRetryableResponse,
   remoteObjectMismatches,
 }

@@ -9,7 +9,16 @@
     "build:desktop": "vite build --mode desktop",
     "test:health": "vitest run src/app/lib/healthInsights.test.ts src/app/lib/data/useSleepSessions.test.ts src/app/lib/assistant/calendarIcs.test.ts src/app/lib/agentLocalState.test.ts",
     "preview": "vite preview",
-    "check:deploy": "node scripts/check-deploy-ready.mjs"
+    "check:deploy": "node scripts/check-deploy-ready.mjs",
+    "release:desktop:prepare": "node desktop/prepare-update.cjs",
+    "release:desktop:local": "npm --prefix desktop run release:local:mac",
+    "release:desktop:ship": "node desktop/ship-mac-update.cjs --confirm-publish",
+    "release:desktop:install": "node desktop/ship-mac-update.cjs --install-only",
+    "release:desktop:publish:windows-preview": "node desktop/publish-update.cjs --confirm-publish --windows-only --preview --reuse-build",
+    "build:desktop:linux:x64": "npm --prefix desktop run build:linux:x64",
+    "release:desktop:prepare:linux-preview": "node desktop/publish-update.cjs --prepare-only --linux-only --preview",
+    "release:desktop:publish:linux-preview": "node desktop/publish-update.cjs --confirm-publish --linux-only --preview --reuse-build",
+    "test:desktop:release": "vitest run src/app/lib/ai/agentRoundTools.test.ts src/app/lib/ai/subagentModel.test.ts src/app/lib/ai/providerRequest.test.ts src/app/lib/ai/providerWatchdog.test.ts src/app/lib/ai/agentRevealAnswer.test.ts"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.0",

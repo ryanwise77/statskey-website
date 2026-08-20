@@ -1,0 +1,14 @@
+[Unit]
+Description=StatsKey Fleet daemon control socket (socket activation)
+
+[Socket]
+# Root-owned control socket, group-writable by the unprivileged agent
+# account. The daemon additionally enforces SO_PEERCRED uid ==
+# statskey-fleet on every connection (design: "Local IPC").
+ListenStream=/run/statskey-fleetd/control.sock
+SocketUser=root
+SocketGroup=statskey-fleet
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

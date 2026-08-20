@@ -80,6 +80,7 @@ const {
   assertExactRemoteObject,
   describeLocalObject,
   ensureImmutableRemote,
+  fetchWithRetry,
 } = require(path.join(desktopRoot, 'publish-recovery-runtime.cjs'))
 const {
   WINDOWS_NATIVE_VERIFICATION_FILE,
@@ -93,6 +94,12 @@ const {
   nativeCommandInvocation,
   selectReleaseTargets,
 } = require(path.join(desktopRoot, 'windows-release-runtime.cjs'))
+const {
+  LINUX_NATIVE_VERIFICATION_FILE,
+  assertLinuxNativeVerification,
+  inspectLinuxUnpacked,
+  recordLinuxNativeVerification,
+} = require(path.join(desktopRoot, 'linux-release-runtime.cjs'))
 
 dns.setDefaultResultOrder('ipv4first')
 
@@ -106,6 +113,14 @@ const preview = args.has('--preview')
 const reuseBuild = args.has('--reuse-build')
 const macOnly = args.has('--mac-only')
 const windowsOnly = args.has('--windows-only')
+const linuxOnly = args.has('--linux-only')
+const nativeArchOnly = args.has('--native-arch-only')
+if (nativeArchOnly && !prepareOnly) {
+  fail('--native-arch-only is limited to local --prepare-only builds.')
+}
+if (nativeArchOnly && process.platform !== 'darwin') {
+  fail('--native-arch-only currently supports macOS release preparation.')
+}
 
 const allTargets = [
   {
@@ -116,6 +131,7 @@ const allTargets = [
     contentType: 'application/zip',
     downloadArtifact: `StatsKey-${version}-mac-arm64.dmg`,
     downloadContentType: 'application/x-apple-diskimage',
+    sidecars: [`StatsKey-${version}-mac-arm64.zip.blockmap`],
   },
   {
     channel: 'mac-x64',
@@ -125,6 +141,7 @@ const allTargets = [
     contentType: 'application/zip',
     downloadArtifact: `StatsKey-${version}-mac-x64.dmg`,
     downloadContentType: 'application/x-apple-diskimage',
+    sidecars: [`StatsKey-${version}-mac-x64.zip.blockmap`],
   },
   {
     channel: 'win-x64',
@@ -132,11 +149,32 @@ const allTargets = [
     metadata: 'latest.yml',
     artifact: `StatsKey-${version}-win-x64.exe`,
     contentType: 'application/vnd.microsoft.portable-executable',
+    sidecars: [`StatsKey-${version}-win-x64.exe.blockmap`],
+  },
+  {
+    channel: 'linux-x64',
+    builder: ['--linux', 'deb', '--x64'],
+    metadata: 'latest-linux.yml',
+    artifact: `StatsKey-${version}-linux-x64.deb`,
+    contentType: 'application/vnd.debian.binary-package',
+    sidecars: [],
   },
 ]
 let targets
 try {
-  targets = selectReleaseTargets(allTargets, { macOnly, windowsOnly })
+  targets = selectReleaseTargets(allTargets, {
+    macOnly,
+    windowsOnly,
+    linuxOnly,
+  })
+  if (nativeArchOnly) {
+    targets = targets.filter(
+      (target) => target.channel === `mac-${process.arch}`
+    )
+    if (targets.length !== 1) {
+      fail(`No native Mac release target exists for ${process.arch}.`)
+    }
+  }
 } catch (error) {
   fail(error instanceof Error ? error.message : String(error))
 }
@@ -187,6 +225,28 @@ async function main() {
       version,
     })
   }
+  if (
+    preview &&
+    targets.some((target) => target.channel === 'linux-x64')
+  ) {
+    assertUnsignedLinuxPreviewDisclosure({
+      historyPath: path.join(
+        sourceRoot,
+        'public',
+        'downloads',
+        'statskey',
+        'updates.json'
+      ),
+      pagePath: path.join(
+        sourceRoot,
+        'public',
+        'downloads',
+        'statskey',
+        'index.html'
+      ),
+      version,
+    })
+  }
   const outputRoot = path.join(desktopRoot, `release-update-${version}`)
   const manifestPath = path.join(outputRoot, 'release-manifest.json')
   if (existsSync(outputRoot) && !reuseBuild && !finalizeNative) {
@@ -206,15 +266,22 @@ async function main() {
 
   const publishedFeeds = await inspectPublishedFeeds()
   verifySigningPrerequisites()
+  const preflightToken = prepareOnly
+    ? null
+    : await verifyPublishingAccess(accessToken())
 
   if (!reuseBuild && !finalizeNative) {
     // A release snapshot starts without ignored dependency trees. Recreate
     // both installs from their committed lockfiles before compiling anything.
     run('npm', ['--prefix', '..', 'ci', '--no-audit', '--no-fund'])
     run('npm', ['ci', '--no-audit', '--no-fund'])
+    run('npm', ['run', 'test:release'])
+    run('npm', ['--prefix', '..', 'run', 'test:desktop:release'])
     if (
-      process.platform === 'win32' &&
-      targets.some((target) => target.channel === 'win-x64')
+      (process.platform === 'win32' &&
+        targets.some((target) => target.channel === 'win-x64')) ||
+      (process.platform === 'linux' &&
+        targets.some((target) => target.channel === 'linux-x64'))
     ) {
       run('npm', ['run', 'test:desktop'])
       nativeDesktopTestsPassed = true
@@ -264,6 +331,7 @@ async function main() {
       allowWrite: !reuseBuild && !finalizeNative,
     })
     validateBuild(target)
+    prepareLinuxNativeVerification(target)
   }
 
   assertReleaseSourceUnchanged(sourceContext)
@@ -276,6 +344,15 @@ async function main() {
     summary: releaseEntry.summary,
     notes: releaseEntry.highlights,
     notesUrl: 'https://statskey.ai/downloads/statskey/#updates',
+    releaseVerification: {
+      passed: true,
+      rendererHealthEndpoint:
+        '/.well-known/statskey-desktop-health',
+      tests: [
+        'npm --prefix desktop run test:release',
+        'npm run test:desktop:release',
+      ],
+    },
     artifacts: {},
     downloads: {},
   }
@@ -305,6 +382,16 @@ async function main() {
       deepSmoke,
     }
   }
+  const linuxTarget = targets.find((target) => target.channel === 'linux-x64')
+  if (linuxTarget) {
+    manifestBase.linuxRelease = {
+      mode: 'unsigned-preview',
+      supportedDistribution: 'Ubuntu 26.04 LTS',
+      verification: publicLinuxVerification(linuxTarget),
+      automaticUpdates: false,
+      fleetWorkerExecution: false,
+    }
+  }
   writeOrReuseReleaseManifest({
     manifestPath,
     manifestBase,
@@ -319,6 +406,11 @@ async function main() {
     console.log(`Release manifest: ${manifestPath}`)
     return
   }
+  if (!preflightToken) {
+    fail('Google Cloud publishing credentials disappeared after preflight.')
+  }
+  // Builds and notarization can outlive an OAuth access token. Reacquire one
+  // immediately before publication while retaining the early permission gate.
   const token = accessToken()
   await verifyEqualPublishedFeeds(token, publishedFeeds)
   for (const target of targets) {
@@ -345,13 +437,15 @@ async function main() {
       target.contentType,
       true
     )
-    await uploadImmutable(
-      token,
-      path.join(target.output, `${target.artifact}.blockmap`),
-      `updates/${target.channel}/${target.artifact}.blockmap`,
-      'application/octet-stream',
-      false
-    )
+    for (const sidecar of target.sidecars || []) {
+      await uploadImmutable(
+        token,
+        path.join(target.output, sidecar),
+        `updates/${target.channel}/${sidecar}`,
+        'application/octet-stream',
+        false
+      )
+    }
     if (target.channel === 'win-x64') {
       await uploadImmutable(
         token,
@@ -368,6 +462,15 @@ async function main() {
         false
       )
     }
+    if (target.channel === 'linux-x64') {
+      await uploadImmutable(
+        token,
+        linuxVerificationPath(target),
+        `releases/${version}/${LINUX_NATIVE_VERIFICATION_FILE}`,
+        'application/json',
+        false
+      )
+    }
   }
   assertReleaseSourceUnchanged(sourceContext)
   await uploadImmutable(
@@ -379,7 +482,7 @@ async function main() {
   )
 
   // Metadata is deliberately published last. Clients cannot discover a build
-  // until every referenced artifact and differential block map is available.
+  // until every referenced artifact and target-specific sidecar is available.
   for (const target of targets) {
     assertReleaseSourceUnchanged(sourceContext)
     if (publishedFeeds.get(target.channel)?.status === 'equal') {
@@ -410,8 +513,8 @@ async function main() {
   )
   if (preview) {
     console.warn(
-      'Preview mode was used. The notarized Mac release is trusted; the ' +
-        'unsigned Windows installer may still display a SmartScreen warning.'
+      'Preview mode was used. The notarized Mac release is trusted; Windows ' +
+        'and Ubuntu preview installers remain explicitly unsigned.'
     )
   }
 }
@@ -420,7 +523,14 @@ async function inspectPublishedFeeds() {
   const publishedFeeds = new Map()
   for (const target of targets) {
     const url = `${FEED_ROOT}/${target.channel}/${target.metadata}`
-    const response = await fetch(url, { cache: 'no-store' })
+    const response = await fetchWithRetry(
+      () =>
+        fetch(url, {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(30 * 1000),
+        }),
+      `${target.channel} feed inspection`
+    )
     if (response.status === 404) {
       publishedFeeds.set(target.channel, { status: 'missing' })
       continue
@@ -458,6 +568,28 @@ async function inspectPublishedFeeds() {
   return publishedFeeds
 }
 
+function assertUnsignedLinuxPreviewDisclosure({
+  historyPath,
+  pagePath,
+  version: releaseVersion,
+}) {
+  const history = JSON.parse(readFileSync(historyPath, 'utf8'))
+  const release = history?.releases?.find(
+    (candidate) => candidate?.version === releaseVersion
+  )
+  const page = readFileSync(pagePath, 'utf8')
+  if (
+    !release?.platforms?.includes('Linux') ||
+    release.linuxSigning !== 'unsigned-preview' ||
+    !page.includes(`Ubuntu ${releaseVersion} preview`) ||
+    !/Ubuntu[\s\S]{0,320}unsigned|unsigned[\s\S]{0,320}Ubuntu/i.test(page)
+  ) {
+    fail(
+      `Public metadata must explicitly disclose Ubuntu ${releaseVersion} as an unsigned preview.`
+    )
+  }
+}
+
 function verifySigningPrerequisites() {
   let identities = ''
   try {
@@ -478,9 +610,22 @@ function verifySigningPrerequisites() {
   const publishesWindows = targets.some(
     (target) => target.channel === 'win-x64'
   )
+  const publishesLinux = targets.some(
+    (target) => target.channel === 'linux-x64'
+  )
   if (publishesWindows && !reuseBuild && process.platform !== 'win32') {
     fail(
       'Windows release preparation must run on native Windows. Transfer its complete pinned output and use --windows-only --reuse-build to publish without rebuilding.'
+    )
+  }
+  if (publishesLinux && !reuseBuild && process.platform !== 'linux') {
+    fail(
+      'Ubuntu release preparation must run on native Ubuntu 26.04 x64. Transfer its complete pinned output and use --linux-only --preview --reuse-build to publish without rebuilding.'
+    )
+  }
+  if (publishesLinux && !preview) {
+    fail(
+      'Ubuntu publication is currently an explicitly disclosed unsigned preview. Re-run with --linux-only --preview, or implement and verify the release-signing trust path first.'
     )
   }
   if (!developerId && publishesMac) {
@@ -506,6 +651,8 @@ function verifySigningPrerequisites() {
     console.warn(
       targets.some((target) => target.channel === 'win-x64')
         ? 'Publishing an explicitly disclosed unsigned Windows preview.'
+        : publishesLinux
+          ? 'Publishing an explicitly disclosed unsigned Ubuntu preview.'
         : 'Publishing a Developer ID-signed preview.'
     )
     return
@@ -584,7 +731,7 @@ function verifyDeveloperIdPrivateKey(identity) {
 function validateBuild(target) {
   for (const file of [
     target.artifact,
-    `${target.artifact}.blockmap`,
+    ...(target.sidecars || []),
     target.metadata,
     ...(target.downloadArtifact ? [target.downloadArtifact] : []),
   ]) {
@@ -628,6 +775,10 @@ function validateBuild(target) {
     validateDmg(target, appDirectory)
   } else if (target.channel === 'win-x64') {
     validateWindowsBuild(target)
+  } else if (target.channel === 'linux-x64') {
+    const appDirectory = path.join(target.output, 'linux-unpacked')
+    const unpacked = inspectLinuxUnpacked(appDirectory)
+    validatePublicDesktopSurface(unpacked.resources)
   }
 }
 
@@ -686,6 +837,16 @@ function windowsVerificationPath(target) {
   return path.join(target.output, WINDOWS_NATIVE_VERIFICATION_FILE)
 }
 
+function windowsProcessOwnerPath(target) {
+  return path.join(
+    target.output,
+    'win-unpacked',
+    'resources',
+    'app.asar.unpacked',
+    'windows-process-owner.ps1'
+  )
+}
+
 function windowsDeepSmokePath(outputRoot) {
   return path.join(outputRoot, WINDOWS_DEEP_SMOKE_FILE)
 }
@@ -698,17 +859,20 @@ function prepareWindowsNativeVerification(target) {
     'win-unpacked',
     'StatsKey.exe'
   )
+  const processOwnerPath = windowsProcessOwnerPath(target)
   const recordPath = windowsVerificationPath(target)
   if (finalizeNative) {
     const nativeTests = runNativeWindowsReleaseSmokeTests({
       installerPath,
       executablePath,
+      processOwnerPath,
       desktopTestsPassed: nativeDesktopTestsPassed,
     })
     recordWindowsNativeVerification({
       recordPath,
       installerPath,
       executablePath,
+      processOwnerPath,
       version,
       sourceCommit: sourceContext.sourceCommit,
       nativeTests,
@@ -720,12 +884,14 @@ function prepareWindowsNativeVerification(target) {
     const nativeTests = runNativeWindowsReleaseSmokeTests({
       installerPath,
       executablePath,
+      processOwnerPath,
       desktopTestsPassed: nativeDesktopTestsPassed,
     })
     recordWindowsNativeVerification({
       recordPath,
       installerPath,
       executablePath,
+      processOwnerPath,
       version,
       sourceCommit: sourceContext.sourceCommit,
       nativeTests,
@@ -737,6 +903,7 @@ function prepareWindowsNativeVerification(target) {
     recordPath,
     installerPath,
     executablePath,
+    processOwnerPath,
     version,
     sourceCommit: sourceContext.sourceCommit,
     unsignedPreview: preview,
@@ -771,6 +938,7 @@ function publicWindowsVerification(target) {
       'win-unpacked',
       'StatsKey.exe'
     ),
+    processOwnerPath: windowsProcessOwnerPath(target),
     version,
     sourceCommit: sourceContext.sourceCommit,
     unsignedPreview: preview,
@@ -788,6 +956,58 @@ function publicWindowsVerification(target) {
           signerThumbprint: record.authenticode.installer.thumbprint,
         }),
     nativeTests: record.nativeTests,
+  }
+}
+
+function linuxVerificationPath(target) {
+  return path.join(target.output, LINUX_NATIVE_VERIFICATION_FILE)
+}
+
+function prepareLinuxNativeVerification(target) {
+  if (target.channel !== 'linux-x64') return
+  const artifactPath = path.join(target.output, target.artifact)
+  const metadataPath = path.join(target.output, target.metadata)
+  const recordPath = linuxVerificationPath(target)
+  if (!reuseBuild) {
+    recordLinuxNativeVerification({
+      recordPath,
+      artifactPath,
+      metadataPath,
+      appDirectory: path.join(target.output, 'linux-unpacked'),
+      version,
+      sourceCommit: sourceContext.sourceCommit,
+      desktopTestsPassed: nativeDesktopTestsPassed,
+      publicBoundaryPassed: true,
+    })
+    return
+  }
+  assertLinuxNativeVerification({
+    recordPath,
+    artifactPath,
+    metadataPath,
+    version,
+    sourceCommit: sourceContext.sourceCommit,
+  })
+}
+
+function publicLinuxVerification(target) {
+  const record = assertLinuxNativeVerification({
+    recordPath: linuxVerificationPath(target),
+    artifactPath: path.join(target.output, target.artifact),
+    metadataPath: path.join(target.output, target.metadata),
+    version,
+    sourceCommit: sourceContext.sourceCommit,
+  })
+  return {
+    file: LINUX_NATIVE_VERIFICATION_FILE,
+    bytes: statSync(linuxVerificationPath(target)).size,
+    sha256: sha256File(linuxVerificationPath(target)),
+    recordedAt: record.recordedAt,
+    distribution: record.target.distribution,
+    distributionVersion: record.target.distributionVersion,
+    architecture: record.target.architecture,
+    package: record.package,
+    checks: record.checks,
   }
 }
 
@@ -839,13 +1059,15 @@ async function verifyEqualPublishedFeeds(token, publishedFeeds) {
       target.contentType,
       { immutable: true, attachment: true }
     )
-    await assertStoredObjectExact(
-      token,
-      path.join(target.output, `${target.artifact}.blockmap`),
-      `updates/${target.channel}/${target.artifact}.blockmap`,
-      'application/octet-stream',
-      { immutable: true, attachment: false }
-    )
+    for (const sidecar of target.sidecars || []) {
+      await assertStoredObjectExact(
+        token,
+        path.join(target.output, sidecar),
+        `updates/${target.channel}/${sidecar}`,
+        'application/octet-stream',
+        { immutable: true, attachment: false }
+      )
+    }
   }
 }
 
@@ -853,7 +1075,7 @@ function hasCompleteTargetOutput(target) {
   if (!target.output) return false
   const required = [
     target.artifact,
-    `${target.artifact}.blockmap`,
+    ...(target.sidecars || []),
     target.metadata,
     ...(target.downloadArtifact ? [target.downloadArtifact] : []),
   ]
@@ -864,6 +1086,9 @@ function hasCompleteTargetOutput(target) {
         path.relative(target.output, windowsDeepSmokePath(path.dirname(target.output)))
       )
     }
+  }
+  if (target.channel === 'linux-x64') {
+    required.push(LINUX_NATIVE_VERIFICATION_FILE)
   }
   return required.every((file) => {
     const candidate = path.resolve(target.output, file)
@@ -1043,7 +1268,8 @@ async function uploadFile(
       expected,
       inspect: () => storedObject(token, objectName),
       upload: () =>
-        uploadWithGcloud(
+        uploadResumable(
+          token,
           filePath,
           objectName,
           expected,
@@ -1061,7 +1287,8 @@ async function uploadFile(
     return
   }
 
-  await uploadWithGcloud(
+  await uploadResumable(
+    token,
     filePath,
     objectName,
     expected,
@@ -1076,39 +1303,6 @@ async function uploadFile(
     { immutable, attachment }
   )
   console.log(`Published ${objectName}`)
-}
-
-async function uploadWithGcloud(
-  filePath,
-  objectName,
-  expected,
-  immutable,
-  attachment
-) {
-  const commandArgs = [
-    'storage',
-    'cp',
-    filePath,
-    `gs://${BUCKET}/${objectName}`,
-    `--content-type=${expected.contentType}`,
-    `--content-md5=${expected.md5Hash}`,
-    `--cache-control=${expected.cacheControl}`,
-    `--custom-metadata=${SHA256_METADATA_KEY}=${expected.sha256}`,
-    ...(attachment
-      ? [`--content-disposition=attachment; filename="${path.basename(filePath)}"`]
-      : []),
-    ...(immutable ? ['--if-generation-match=0'] : []),
-  ]
-  const result = spawnSync('gcloud', commandArgs, {
-    cwd: desktopRoot,
-    env: process.env,
-    stdio: 'inherit',
-  })
-  if (result.status !== 0) {
-    throw new Error(
-      `gcloud upload failed for ${objectName} with exit code ${result.status || 1}.`
-    )
-  }
 }
 
 async function storedObject(token, objectName) {
@@ -1129,11 +1323,17 @@ async function storedObject(token, objectName) {
       'metadata',
     ].join(',')
   )
-  const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(30 * 1000),
-  })
+  const { response } = await fetchWithTokenRefresh(token, (currentToken) =>
+    fetchWithRetry(
+      () =>
+        fetch(endpoint, {
+          headers: { Authorization: `Bearer ${currentToken}` },
+          cache: 'no-store',
+          signal: AbortSignal.timeout(30 * 1000),
+        }),
+      `${objectName} inspection`
+    )
+  )
   if (response.status === 404) return null
   if (!response.ok) {
     throw new Error(
@@ -1156,63 +1356,56 @@ async function assertStoredObjectExact(
   assertExactRemoteObject(remote, expected, objectName)
 }
 
-async function uploadMedia(
-  token,
-  filePath,
-  objectName,
-  contentType,
-  immutable
-) {
-  const endpoint = new URL(
-    `https://storage.googleapis.com/upload/storage/v1/b/${BUCKET}/o`
-  )
-  endpoint.searchParams.set('uploadType', 'media')
-  endpoint.searchParams.set('name', objectName)
-  if (immutable) endpoint.searchParams.set('ifGenerationMatch', '0')
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': contentType,
-      'Content-Length': String(statSync(filePath).size),
-    },
-    body: createReadStream(filePath),
-    duplex: 'half',
-    signal: AbortSignal.timeout(60 * 1000),
-  })
-  if (!response.ok) {
-    throw new Error(
-      `${objectName} upload failed (${response.status}): ` +
-        (await response.text()).slice(0, 500)
-    )
-  }
-}
-
 async function uploadResumable(
   token,
   filePath,
   objectName,
-  contentType,
-  immutable
+  expected,
+  immutable,
+  attachment
 ) {
   const size = statSync(filePath).size
+  const metadata = JSON.stringify({
+    contentType: expected.contentType,
+    cacheControl: expected.cacheControl,
+    md5Hash: expected.md5Hash,
+    metadata: { [SHA256_METADATA_KEY]: expected.sha256 },
+    ...(attachment
+      ? {
+          contentDisposition:
+            `attachment; filename="${path.basename(filePath)}"`,
+        }
+      : {}),
+  })
   const endpoint = new URL(
     `https://storage.googleapis.com/upload/storage/v1/b/${BUCKET}/o`
   )
   endpoint.searchParams.set('uploadType', 'resumable')
   endpoint.searchParams.set('name', objectName)
   if (immutable) endpoint.searchParams.set('ifGenerationMatch', '0')
-  const started = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'X-Upload-Content-Type': contentType,
-      'X-Upload-Content-Length': String(size),
-    },
-    body: '{}',
-    signal: AbortSignal.timeout(60 * 1000),
-  })
+  let currentToken = token
+  const startedRequest = await fetchWithTokenRefresh(
+    currentToken,
+    (authorizationToken) =>
+      fetchWithRetry(
+        () =>
+          fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${authorizationToken}`,
+              'Content-Type': 'application/json',
+              'Content-Length': String(Buffer.byteLength(metadata)),
+              'X-Upload-Content-Type': expected.contentType,
+              'X-Upload-Content-Length': String(size),
+            },
+            body: metadata,
+            signal: AbortSignal.timeout(60 * 1000),
+          }),
+        `${objectName} upload session`
+      )
+  )
+  const started = startedRequest.response
+  currentToken = startedRequest.token
   if (!started.ok) {
     throw new Error(
       `${objectName} upload session failed (${started.status}): ` +
@@ -1224,26 +1417,36 @@ async function uploadResumable(
     throw new Error(`${objectName} returned an invalid upload location.`)
   }
 
-  // Keep chunks small enough to make forward progress on slower release
-  // connections while remaining aligned to GCS's 256 KiB requirement.
-  const chunkSize = 2 * 1024 * 1024
+  // Eight MiB is Google's recommended minimum and remains small enough to
+  // make bounded progress on a slow release connection.
+  const chunkSize = 8 * 1024 * 1024
   let offset = 0
   let failures = 0
   while (offset < size) {
     const end = Math.min(size - 1, offset + chunkSize - 1)
     try {
-      const response = await fetch(location, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': contentType,
-          'Content-Length': String(end - offset + 1),
-          'Content-Range': `bytes ${offset}-${end}/${size}`,
-        },
-        body: createReadStream(filePath, { start: offset, end }),
-        duplex: 'half',
-        signal: AbortSignal.timeout(5 * 60 * 1000),
-      })
+      const chunkStart = offset
+      const chunkRequest = await fetchWithTokenRefresh(
+        currentToken,
+        (authorizationToken) =>
+          fetch(location, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${authorizationToken}`,
+              'Content-Type': expected.contentType,
+              'Content-Length': String(end - chunkStart + 1),
+              'Content-Range': `bytes ${chunkStart}-${end}/${size}`,
+              ...(end === size - 1
+                ? { 'X-Goog-Hash': `md5=${expected.md5Hash}` }
+                : {}),
+            },
+            body: createReadStream(filePath, { start: chunkStart, end }),
+            duplex: 'half',
+            signal: AbortSignal.timeout(5 * 60 * 1000),
+          })
+      )
+      const response = chunkRequest.response
+      currentToken = chunkRequest.token
       if (response.ok) return
       if (response.status !== 308) {
         throw new Error(
@@ -1252,7 +1455,26 @@ async function uploadResumable(
         )
       }
       const acknowledged = uploadedOffset(response.headers.get('range'))
-      offset = acknowledged > offset ? acknowledged : end + 1
+      if (acknowledged < chunkStart || acknowledged > end + 1) {
+        throw new Error(
+          `${objectName} returned an invalid resumable upload range.`
+        )
+      }
+      if (acknowledged === chunkStart) {
+        failures += 1
+        if (failures >= 5) {
+          throw new Error(
+            `${objectName} made no upload progress after five attempts.`
+          )
+        }
+        console.warn(
+          `Retrying ${objectName} from byte ${offset} ` +
+            `(attempt ${failures + 1}/5).`
+        )
+        await delay(failures * 1000)
+        continue
+      }
+      offset = acknowledged
       failures = 0
       if (
         offset < size &&
@@ -1266,7 +1488,15 @@ async function uploadResumable(
       failures += 1
       if (failures >= 5) throw error
       try {
-        offset = await queryUploadOffset(token, location, size)
+        const resumed = await queryUploadOffset(
+          currentToken,
+          location,
+          size
+        )
+        currentToken = resumed.token
+        if (resumed.offset < offset || resumed.offset > size) throw error
+        if (resumed.offset > offset) failures = 0
+        offset = resumed.offset
       } catch {
         throw error
       }
@@ -1281,67 +1511,51 @@ async function uploadResumable(
 }
 
 async function queryUploadOffset(token, location, size) {
-  const response = await fetch(location, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Length': '0',
-      'Content-Range': `bytes */${size}`,
-    },
-    signal: AbortSignal.timeout(60 * 1000),
-  })
-  if (response.ok) return size
+  const result = await fetchWithTokenRefresh(token, (currentToken) =>
+    fetchWithRetry(
+      () =>
+        fetch(location, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${currentToken}`,
+            'Content-Length': '0',
+            'Content-Range': `bytes */${size}`,
+          },
+          signal: AbortSignal.timeout(60 * 1000),
+        }),
+      'resumable upload status check'
+    )
+  )
+  const response = result.response
+  if (response.ok) return { offset: size, token: result.token }
   if (response.status !== 308) {
     throw new Error(`Could not resume upload (${response.status}).`)
   }
-  return uploadedOffset(response.headers.get('range'))
+  return {
+    offset: uploadedOffset(response.headers.get('range')),
+    token: result.token,
+  }
 }
 
-async function patchObjectMetadata(
-  token,
-  filePath,
-  objectName,
-  { immutable, attachment }
-) {
-  const metadataUrl =
-    `https://storage.googleapis.com/storage/v1/b/${BUCKET}/o/` +
-    encodeURIComponent(objectName)
-  const metadata = {
-    cacheControl: immutable
-      ? 'public, max-age=31536000, immutable'
-      : 'no-store, max-age=0',
-    ...(attachment
-      ? {
-          contentDisposition:
-            `attachment; filename="${path.basename(filePath)}"`,
-        }
-      : {}),
+async function fetchWithTokenRefresh(token, request) {
+  let currentToken = token
+  let response = await request(currentToken)
+  if (response.status === 401) {
+    currentToken = accessToken()
+    response = await request(currentToken)
   }
-  const patched = await fetch(metadataUrl, {
-    method: 'PATCH',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(metadata),
-    signal: AbortSignal.timeout(60 * 1000),
-  })
-  if (!patched.ok) {
-    throw new Error(
-      `${objectName} metadata failed (${patched.status}): ` +
-        (await patched.text()).slice(0, 500)
-    )
-  }
+  return { response, token: currentToken }
 }
 
 async function verifyPublicObject(objectName) {
-  const response = await fetch(
-    `https://storage.googleapis.com/${BUCKET}/${objectName}`,
-    {
-      method: 'HEAD',
-      cache: 'no-store',
-      signal: AbortSignal.timeout(30 * 1000),
-    }
+  const response = await fetchWithRetry(
+    () =>
+      fetch(`https://storage.googleapis.com/${BUCKET}/${objectName}`, {
+        method: 'HEAD',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(30 * 1000),
+      }),
+    `${objectName} public verification`
   )
   if (!response.ok) {
     throw new Error(
@@ -1350,11 +1564,59 @@ async function verifyPublicObject(objectName) {
   }
 }
 
+async function verifyPublishingAccess(token) {
+  const endpoint = new URL(
+    `https://storage.googleapis.com/storage/v1/b/${BUCKET}/iam/testPermissions`
+  )
+  const requiredPermissions = [
+    'storage.objects.create',
+    'storage.objects.delete',
+    'storage.objects.get',
+  ]
+  for (const permission of requiredPermissions) {
+    endpoint.searchParams.append('permissions', permission)
+  }
+  const result = await fetchWithTokenRefresh(token, (currentToken) =>
+    fetchWithRetry(
+      () =>
+        fetch(endpoint, {
+          headers: { Authorization: `Bearer ${currentToken}` },
+          cache: 'no-store',
+          signal: AbortSignal.timeout(30_000),
+        }),
+      'Google Cloud release permission preflight'
+    )
+  )
+  const response = result.response
+  if (!response.ok) {
+    throw new Error(
+      `Could not verify Google Cloud release permissions (${response.status}).`
+    )
+  }
+  const body = await response.json()
+  const granted = new Set(
+    Array.isArray(body?.permissions) ? body.permissions : []
+  )
+  const missing = requiredPermissions.filter(
+    (permission) => !granted.has(permission)
+  )
+  if (missing.length > 0) {
+    throw new Error(
+      `Google Cloud release permissions are missing: ${missing.join(', ')}.`
+    )
+  }
+  return result.token
+}
+
 function accessToken() {
   try {
-    return execFileSync('gcloud', ['auth', 'print-access-token'], {
+    const token = execFileSync('gcloud', ['auth', 'print-access-token'], {
       encoding: 'utf8',
+      timeout: 2 * 60 * 1000,
+      killSignal: 'SIGKILL',
     }).trim()
+    if (!token) throw new Error('Google Cloud returned an empty access token.')
+    return token
   } catch {
     fail('Google Cloud authentication is required to publish updates.')
   }

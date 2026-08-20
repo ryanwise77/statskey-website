@@ -30,7 +30,9 @@ import {
 import { adaptiveDelegationAllowed } from './orchestration'
 import {
   completionHandoffPrompt,
+  externalActionReadyForHandoff,
   fallbackCompletionHandoff,
+  fallbackExternalActionHandoff,
   fallbackStoppedHandoff,
   hasReviewableWorkspaceChange,
   hasOutstandingFileMutationFailure,
@@ -43,6 +45,7 @@ import {
   providerTimeoutRecoveryPrompt,
   workspaceChangeExpected,
   workspaceWriteRecoveryReadNeeded,
+  type CompletionTerminalReason,
   type AgentTaskExpectation,
 } from './agentPersistence'
 import {
@@ -125,6 +128,14 @@ export interface AgentTurnResult {
   terminalReason?: 'provider_timeout'
 }
 
+export interface AgentSubagentModel {
+  provider: ChatProvider
+  modelId: string
+  executionRoute: 'managed' | 'direct'
+  directProvider: DesktopProviderId
+  serviceTier?: 'fast'
+}
+
 export interface AgentTurnParams {
   uid: string
   provider: ChatProvider
@@ -142,6 +153,8 @@ export interface AgentTurnParams {
   includePersonalHealth?: boolean
   approvalMode: DesktopApprovalMode
   orchestrationMode: 'focused' | 'adaptive' | 'parallel'
+  /** Omitted by default so each investigator inherits its parent model. */
+  subagentModel?: AgentSubagentModel
   systemPrompt: string
   /** Prior conversation turns as plain text. */
   priorTurns: Array<{ role: 'user' | 'assistant'; content: string }>
@@ -196,7 +209,6 @@ export interface AgentTurnParams {
 
 const MAX_ROUNDS = 16
 const SUBAGENT_MAX_ROUNDS = 7
-const DIRECT_FINAL_HANDOFF_TIMEOUT_MS = 60_000
 const MANAGED_PROVIDER_ROUND_TIMEOUT_MS = 5 * 60_000
 
 interface SteeringMessage {
@@ -404,13 +416,37 @@ function completionModeForTurn(
       : 'ask'
 }
 
+function fallbackTurnHandoff(
+  params: AgentTurnParams,
+  steps: AgentStep[],
+  terminalReason: CompletionTerminalReason = 'round_limit'
+): string {
+  if (hasSuccessfulFileChange(steps) || hasReviewableWorkspaceChange(steps)) {
+    const mode =
+      params.agentMode === 'debug' || params.agentMode === 'agent'
+        ? params.agentMode
+        : 'agent'
+    return fallbackCompletionHandoff(mode, steps, terminalReason)
+  }
+  if (
+    params.taskExpectation === 'external-action' ||
+    ((params.agentMode === 'debug' || params.agentMode === 'agent') &&
+      externalActionReadyForHandoff('external-action', steps))
+  ) {
+    return fallbackExternalActionHandoff(steps, terminalReason)
+  }
+  return fallbackCompletionHandoff(
+    completionModeForTurn(params),
+    steps,
+    terminalReason
+  )
+}
+
 function implementationRecoveryUpdate(steps: AgentStep[]): string {
   return hasSuccessfulFileChange(steps) || hasReviewableWorkspaceChange(steps)
     ? 'The change set is present, but that pass tried to finish before verification. I’m running the smallest relevant check before I call the task complete.'
     : 'That pass tried to finish without implementing a file change. I’m continuing through the direct safe edit path before I call the task complete.'
 }
-
-class FinalHandoffTimeoutError extends Error {}
 
 function providerWatchdogSignal(
   event: { type: 'queued' | 'open' | 'text' | 'activity' }
@@ -426,24 +462,16 @@ export function isProviderRoundTimeout(error: unknown): boolean {
   )
 }
 
-async function withFinalHandoffTimeout<T>(
-  promise: Promise<T>,
+/**
+ * Final synthesis shares the direct provider's liveness watchdog. A healthy
+ * provider may reason for longer than one minute, so this path must not add a
+ * shorter wall-clock deadline on top of provider heartbeats.
+ */
+export function runDirectFinalHandoff<T>(
+  start: (markAlive: (signal: ProviderWatchdogSignal) => void) => Promise<T>,
   onTimeout?: () => void
 ): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<T>((_, reject) => {
-        timer = setTimeout(() => {
-          onTimeout?.()
-          reject(new FinalHandoffTimeoutError('Final handoff timed out.'))
-        }, DIRECT_FINAL_HANDOFF_TIMEOUT_MS)
-      }),
-    ])
-  } finally {
-    if (timer) clearTimeout(timer)
-  }
+  return withProviderRoundWatchdog(start, { onTimeout })
 }
 
 function runManagedProviderRound<T>(
@@ -458,7 +486,28 @@ function runManagedProviderRound<T>(
     cancellationKey: `managed-provider-${crypto.randomUUID()}`,
   })
 }
-const SUBAGENT_MODEL: ClaudeModel = 'claude-sonnet-5'
+
+export function resolvedSubagentModel(
+  params: Pick<
+    AgentTurnParams,
+    | 'provider'
+    | 'modelId'
+    | 'executionRoute'
+    | 'directProvider'
+    | 'serviceTier'
+    | 'subagentModel'
+  >
+): AgentSubagentModel {
+  return (
+    params.subagentModel ?? {
+      provider: params.provider,
+      modelId: params.modelId,
+      executionRoute: params.executionRoute,
+      directProvider: params.directProvider,
+      ...(params.serviceTier ? { serviceTier: params.serviceTier } : {}),
+    }
+  )
+}
 
 const PERSONAL_TOOL_NAMES = new Set([
   'index_manifest',
@@ -944,10 +993,7 @@ export async function runAgentTurn(params: AgentTurnParams): Promise<AgentTurnRe
           : decision.reason === 'global_cap'
           ? {
               ...result,
-              content: fallbackCompletionHandoff(
-                completionModeForTurn(params),
-                result.steps
-              ),
+              content: fallbackTurnHandoff(params, result.steps),
             }
           : result
       }
@@ -1455,8 +1501,8 @@ async function runDirectProviderTurn(
           round -= 1
           continue
         }
-        const content = fallbackCompletionHandoff(
-          completionModeForTurn(params),
+        const content = fallbackTurnHandoff(
+          params,
           log.steps,
           'provider_timeout'
         )
@@ -1542,11 +1588,7 @@ async function runDirectProviderTurn(
       const content =
         text.trim() ||
         preambles.join('\n\n').trim() ||
-        fallbackCompletionHandoff(
-          completionModeForTurn(params),
-          log.steps,
-          'empty_response'
-        )
+        fallbackTurnHandoff(params, log.steps, 'empty_response')
       if (!streamedText && content) params.onText?.(content)
       return {
         content,
@@ -1670,66 +1712,58 @@ async function runDirectProviderTurn(
     webSearch: false,
   })
   try {
-    const response = await withFinalHandoffTimeout(
-      withProviderRoundWatchdog(
-        (markAlive) =>
-          bridge.providers.run(
+    const response = await runDirectFinalHandoff(
+      (markAlive) =>
+        bridge.providers.run(
           requestId,
           params.directProvider,
           finalRequest,
           (event) => {
-        if (!acceptProviderEvents) return
-        markAlive(providerWatchdogSignal(event))
-        if (event.type === 'queued') {
-          params.onStatus?.({
-            phase: 'queued',
-            message: `Waiting for provider slot${event.position ? ` · #${event.position}` : ''}`,
-            queuePosition: event.position,
-            round: roundLimit + 1,
-          })
-          return
-        }
-        if (event.type === 'open') {
-          params.onStatus?.({
-            phase: 'finishing',
-            message: 'Writing the final summary',
-            round: roundLimit + 1,
-          })
-          return
-        }
-        if (event.type === 'activity') {
-          params.onStatus?.({
-            phase: streamedText ? 'responding' : 'finishing',
-            message: streamedText
-              ? 'Writing final response · provider request is active'
-              : `Provider is still synthesizing${
-                  typeof event.elapsedMs === 'number'
-                    ? ` · ${providerElapsed(event.elapsedMs)}`
-                    : ''
-                }`,
-            round: roundLimit + 1,
-          })
-          return
-        }
-        if (event.type !== 'text' || !event.text) return
-        if (!streamedText) {
-          params.onStatus?.({
-            phase: 'responding',
-            message: 'Writing final response',
-            round: roundLimit + 1,
-          })
-        }
-        streamedText += event.text
-        params.onText?.(streamedText)
+            if (!acceptProviderEvents) return
+            markAlive(providerWatchdogSignal(event))
+            if (event.type === 'queued') {
+              params.onStatus?.({
+                phase: 'queued',
+                message: `Waiting for provider slot${event.position ? ` · #${event.position}` : ''}`,
+                queuePosition: event.position,
+                round: roundLimit + 1,
+              })
+              return
+            }
+            if (event.type === 'open') {
+              params.onStatus?.({
+                phase: 'finishing',
+                message: 'Writing the final summary',
+                round: roundLimit + 1,
+              })
+              return
+            }
+            if (event.type === 'activity') {
+              params.onStatus?.({
+                phase: streamedText ? 'responding' : 'finishing',
+                message: streamedText
+                  ? 'Writing final response · provider request is active'
+                  : `Provider is still synthesizing${
+                      typeof event.elapsedMs === 'number'
+                        ? ` · ${providerElapsed(event.elapsedMs)}`
+                        : ''
+                    }`,
+                round: roundLimit + 1,
+              })
+              return
+            }
+            if (event.type !== 'text' || !event.text) return
+            if (!streamedText) {
+              params.onStatus?.({
+                phase: 'responding',
+                message: 'Writing final response',
+                round: roundLimit + 1,
+              })
+            }
+            streamedText += event.text
+            params.onText?.(streamedText)
           }
-          ),
-        {
-          onTimeout: () => {
-            acceptProviderEvents = false
-            bridge.providers.cancel(requestId)
-          },
-        },
-      ),
+        ),
       () => {
         acceptProviderEvents = false
         bridge.providers.cancel(requestId)
@@ -1753,13 +1787,9 @@ async function runDirectProviderTurn(
     const content =
       (response.content || streamedText).trim() ||
       (isWorkspaceChangeTurn(params)
-        ? fallbackCompletionHandoff(completionModeForTurn(params), log.steps)
+        ? fallbackTurnHandoff(params, log.steps)
         : preambles.join('\n\n').trim() ||
-          fallbackCompletionHandoff(
-            completionModeForTurn(params),
-            log.steps,
-            'empty_response'
-          ))
+          fallbackTurnHandoff(params, log.steps, 'empty_response'))
     log.close(synthesisId, 'final response completed', false)
     if (!streamedText) params.onText?.(content)
     return {
@@ -1773,8 +1803,8 @@ async function runDirectProviderTurn(
     log.close(synthesisId, 'final synthesis failed', true)
     const content = params.shouldStop?.()
       ? fallbackStoppedHandoff(completionModeForTurn(params), log.steps)
-      : fallbackCompletionHandoff(
-          completionModeForTurn(params),
+      : fallbackTurnHandoff(
+          params,
           log.steps,
           isProviderRoundTimeout(error) ? 'provider_timeout' : 'final_synthesis'
         )
@@ -1936,8 +1966,8 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
         }
       }
       if (isProviderRoundTimeout(error)) {
-        const content = fallbackCompletionHandoff(
-          completionModeForTurn(params),
+        const content = fallbackTurnHandoff(
+          params,
           log.steps,
           'provider_timeout'
         )
@@ -2065,11 +2095,7 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
       const content =
         text.trim() ||
         preambles.join('\n\n').trim() ||
-        fallbackCompletionHandoff(
-          completionModeForTurn(params),
-          log.steps,
-          'empty_response'
-        )
+        fallbackTurnHandoff(params, log.steps, 'empty_response')
       await revealAnswer(content, onText, shouldStop)
       if (shouldStop?.()) {
         return {
@@ -2216,13 +2242,9 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
     const content =
       finalResponse.content?.trim() ||
       (isWorkspaceChangeTurn(params)
-        ? fallbackCompletionHandoff(completionModeForTurn(params), log.steps)
+        ? fallbackTurnHandoff(params, log.steps)
         : preambles.join('\n\n').trim() ||
-          fallbackCompletionHandoff(
-            completionModeForTurn(params),
-            log.steps,
-            'empty_response'
-          ))
+          fallbackTurnHandoff(params, log.steps, 'empty_response'))
     log.close(synthesisId, 'final response completed', false)
     await revealAnswer(content, onText, shouldStop)
     if (shouldStop?.()) {
@@ -2247,11 +2269,7 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
     log.close(synthesisId, 'final synthesis failed; local handoff used', true)
     const content = params.shouldStop?.()
       ? fallbackStoppedHandoff(completionModeForTurn(params), log.steps)
-      : fallbackCompletionHandoff(
-          completionModeForTurn(params),
-          log.steps,
-          'final_synthesis'
-        )
+      : fallbackTurnHandoff(params, log.steps, 'final_synthesis')
     await revealAnswer(content, onText, shouldStop)
     return {
       content,
@@ -2442,8 +2460,8 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
         }
       }
       if (!isProviderRoundTimeout(error)) throw error
-      const content = fallbackCompletionHandoff(
-        completionModeForTurn(params),
+      const content = fallbackTurnHandoff(
+        params,
         log.steps,
         'provider_timeout'
       )
@@ -2557,11 +2575,7 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
       const content =
         text.trim() ||
         preambles.join('\n\n').trim() ||
-        fallbackCompletionHandoff(
-          completionModeForTurn(params),
-          log.steps,
-          'empty_response'
-        )
+        fallbackTurnHandoff(params, log.steps, 'empty_response')
       await revealAnswer(content, onText, shouldStop)
       if (shouldStop?.()) {
         return {
@@ -2719,13 +2733,9 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
     const content =
       finalData.choices?.[0]?.message?.content?.trim() ||
       (isWorkspaceChangeTurn(params)
-        ? fallbackCompletionHandoff(completionModeForTurn(params), log.steps)
+        ? fallbackTurnHandoff(params, log.steps)
         : preambles.join('\n\n').trim() ||
-          fallbackCompletionHandoff(
-            completionModeForTurn(params),
-            log.steps,
-            'empty_response'
-          ))
+          fallbackTurnHandoff(params, log.steps, 'empty_response'))
     log.close(synthesisId, 'final response completed', false)
     await revealAnswer(content, onText, shouldStop)
     if (shouldStop?.()) {
@@ -2750,11 +2760,7 @@ async function runOpenAIStyleTurn(params: AgentTurnParams): Promise<AgentTurnRes
     log.close(synthesisId, 'final synthesis failed; local handoff used', true)
     const content = params.shouldStop?.()
       ? fallbackStoppedHandoff(completionModeForTurn(params), log.steps)
-      : fallbackCompletionHandoff(
-          completionModeForTurn(params),
-          log.steps,
-          'final_synthesis'
-        )
+      : fallbackTurnHandoff(params, log.steps, 'final_synthesis')
     await revealAnswer(content, onText, shouldStop)
     return {
       content,
@@ -2947,25 +2953,16 @@ async function runSubagent(context: {
   ].join('\n')
 
   const messages: AnthropicMessage[] = [{ role: 'user', content: `Objective: ${objective}` }]
+  const model = resolvedSubagentModel(params)
   let credits = 0
 
   try {
     for (let round = 0; round < SUBAGENT_MAX_ROUNDS; round++) {
       if (params.shouldStop?.()) throw new Error('Stopped.')
       const resp =
-        params.executionRoute === 'direct'
-          ? await runDirectSubagentRound(params, messages, systemPrompt)
-          : await runManagedProviderRound(params, () =>
-              anthropicChat({
-                messages,
-                systemPrompt,
-                model: SUBAGENT_MODEL,
-                tools: subagentToolsForScope(params),
-                reasoning_effort: 'low',
-                max_output_tokens: 3000,
-            billingClient: 'statskey-desktop',
-              })
-            )
+        model.executionRoute === 'direct'
+          ? await runDirectSubagentRound(params, model, messages, systemPrompt)
+          : await runManagedSubagentRound(params, model, messages, systemPrompt)
       credits += resp.creditsCharged ?? 0
 
       const toolUses = (resp.toolUse ?? []) as AnthropicToolUseBlock[]
@@ -3019,8 +3016,174 @@ async function runSubagent(context: {
   }
 }
 
+function isAnthropicTextBlock(
+  block: AnthropicContentBlock
+): block is AnthropicContentBlock & { type: 'text'; text: string } {
+  return (
+    block.type === 'text' &&
+    typeof (block as { text?: unknown }).text === 'string'
+  )
+}
+
+function isAnthropicToolUseBlock(
+  block: AnthropicContentBlock
+): block is AnthropicToolUseBlock {
+  const candidate = block as Partial<AnthropicToolUseBlock>
+  return (
+    block.type === 'tool_use' &&
+    typeof candidate.id === 'string' &&
+    typeof candidate.name === 'string' &&
+    candidate.input != null &&
+    typeof candidate.input === 'object'
+  )
+}
+
+export function openAIStyleSubagentMessages(
+  systemPrompt: string,
+  messages: AnthropicMessage[]
+): OpenAIStyleMessage[] {
+  const converted: OpenAIStyleMessage[] = [
+    { role: 'system', content: systemPrompt },
+  ]
+  for (const message of messages) {
+    if (typeof message.content === 'string') {
+      converted.push({ role: message.role, content: message.content })
+      continue
+    }
+    if (message.role === 'assistant') {
+      const text = message.content
+        .filter(isAnthropicTextBlock)
+        .map((block) => block.text)
+        .join('\n')
+      const toolCalls: OpenAIStyleToolCall[] = message.content
+        .filter(isAnthropicToolUseBlock)
+        .map((block) => ({
+          id: block.id,
+          type: 'function',
+          function: {
+            name: block.name,
+            arguments: JSON.stringify(block.input),
+          },
+        }))
+      converted.push({
+        role: 'assistant',
+        ...(text ? { content: text } : {}),
+        ...(toolCalls.length > 0 ? { tool_calls: toolCalls } : {}),
+      })
+      continue
+    }
+
+    const text = message.content
+      .filter(isAnthropicTextBlock)
+      .map((block) => block.text)
+      .join('\n')
+    if (text) converted.push({ role: 'user', content: text })
+    for (const block of message.content) {
+      if (
+        block.type !== 'tool_result' ||
+        typeof block.tool_use_id !== 'string'
+      ) {
+        continue
+      }
+      converted.push({
+        role: 'tool',
+        tool_call_id: block.tool_use_id,
+        content:
+          typeof block.content === 'string'
+            ? block.content
+            : JSON.stringify(block.content ?? ''),
+      })
+    }
+  }
+  return converted
+}
+
+async function runManagedSubagentRound(
+  params: AgentTurnParams,
+  model: AgentSubagentModel,
+  messages: AnthropicMessage[],
+  systemPrompt: string
+) {
+  const tools = subagentToolsForScope(params)
+  if (model.provider === 'claude') {
+    return await runManagedProviderRound(params, () =>
+      anthropicChat({
+        messages,
+        systemPrompt,
+        model: model.modelId as ClaudeModel,
+        tools,
+        reasoning_effort: 'low',
+        max_output_tokens: 3_000,
+        billingClient: 'statskey-desktop',
+      })
+    )
+  }
+
+  const call =
+    model.provider === 'chatgpt'
+      ? openAICall
+      : model.provider === 'grok'
+        ? grokCall
+        : model.provider === 'kimi'
+          ? kimiCall
+          : null
+  if (!call) {
+    throw new Error(
+      `${model.provider} investigators require a configured direct provider.`
+    )
+  }
+  const request = withProviderTools(
+    {
+      messages: openAIStyleSubagentMessages(systemPrompt, messages),
+      model: model.modelId,
+      ...(model.serviceTier === 'fast' ? { service_tier: 'fast' } : {}),
+      reasoning_effort: 'low',
+      max_output_tokens: 3_000,
+      billingClient: 'statskey-desktop',
+    },
+    openAIStyleTools(tools)
+  )
+  const { data } = await runManagedProviderRound(params, () => call(request))
+  const choice = data.choices?.[0]
+  const response = choice?.message
+  const content =
+    typeof response?.content === 'string' ? response.content : ''
+  const toolUse: AnthropicToolUseBlock[] = (response?.tool_calls ?? []).map(
+    (toolCall) => {
+      let input: Record<string, unknown> = {}
+      try {
+        input = JSON.parse(
+          toolCall.function.arguments || '{}'
+        ) as Record<string, unknown>
+      } catch {
+        // The tool will return its own validation error for malformed input.
+      }
+      return {
+        type: 'tool_use',
+        id: toolCall.id,
+        name: toolCall.function.name,
+        input,
+      }
+    }
+  )
+  return {
+    content,
+    contentBlocks: [
+      ...(content
+        ? ([{ type: 'text', text: content }] as AnthropicContentBlock[])
+        : []),
+      ...toolUse,
+    ],
+    toolUse,
+    stopReason:
+      toolUse.length > 0 ? 'tool_use' : choice?.finish_reason ?? 'end_turn',
+    creditsCharged: data.creditsCharged ?? 0,
+  }
+}
+
 async function runDirectSubagentRound(
   params: AgentTurnParams,
+  model: AgentSubagentModel,
   messages: AnthropicMessage[],
   systemPrompt: string
 ) {
@@ -3036,9 +3199,9 @@ async function runDirectSubagentRound(
       (markAlive) =>
         bridge.providers.run(
           requestId,
-          params.directProvider,
+          model.directProvider,
           {
-            model: params.modelId,
+            model: model.modelId,
             systemPrompt,
             messages: messages as Array<{
               role: 'user' | 'assistant'
@@ -3048,7 +3211,7 @@ async function runDirectSubagentRound(
               Record<string, unknown>
             >,
             effort: 'low',
-            serviceTier: params.serviceTier,
+            serviceTier: model.serviceTier,
             reasoningMode: 'standard',
             maxOutputTokens: 4_000,
             webSearch: false,

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>StatsKey Workbench</title>
+    <meta
+      name="description"
+      content="StatsKey Workbench is the Code OSS-based Intelligence desktop for record-grounded agent work, hybrid indexing, and approval-bound actions."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg0: #071019;
+        --bg1: #102033;
+        --text: #edf3ff;
+        --muted: #9fb0c9;
+        --line: rgba(255, 255, 255, 0.12);
+        --accent: #20b99b;
+        --accent-2: #6ea8ff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        font-family: "IBM Plex Sans", sans-serif;
+        background:
+          radial-gradient(1000px 520px at 12% -10%, rgba(32, 185, 155, 0.22), transparent 55%),
+          radial-gradient(900px 480px at 90% 0%, rgba(110, 168, 255, 0.18), transparent 50%),
+          linear-gradient(160deg, var(--bg0), var(--bg1));
+      }
+      .shell { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 64px 0 80px; }
+      .brand {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(42px, 8vw, 72px);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        margin: 0;
+      }
+      h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(28px, 4vw, 40px);
+        line-height: 1.1;
+        margin: 22px 0 12px;
+        max-width: 16ch;
+      }
+      p { color: var(--muted); max-width: 58ch; line-height: 1.55; }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+      a.button {
+        text-decoration: none;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-weight: 600;
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+      a.button--primary {
+        background: var(--accent);
+        color: #04140f;
+        border-color: transparent;
+      }
+      .meta {
+        margin-top: 40px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+        display: grid;
+        gap: 14px;
+      }
+      .meta strong { display: block; color: var(--text); margin-bottom: 4px; }
+      .note {
+        margin-top: 18px;
+        color: var(--accent-2);
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <p class="brand">StatsKey</p>
+      <h1>Workbench for health Intelligence.</h1>
+      <p>
+        A separate Code OSS desktop track with native session bridge, hybrid record
+        indexing, and exact-approval calendar/email actions. This is not the standard
+        StatsKey Electron app.
+      </p>
+      <div class="actions">
+        <a class="button button--primary" id="mac-download" href="#private-builds">macOS Workbench</a>
+        <a class="button" id="win-download" href="#private-builds">Windows Workbench</a>
+        <a class="button" href="/app/enterprise">Open web workbench</a>
+      </div>
+      <p class="note" id="status">
+        Private builds only for now. Installers publish here when the fork package
+        pipeline finishes notarization/signing.
+      </p>
+      <div class="meta" id="private-builds">
+        <div>
+          <strong>Artifact pattern</strong>
+          <span>StatsKey-Workbench-&lt;version&gt;-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt;</span>
+        </div>
+        <div>
+          <strong>Bundle / protocol</strong>
+          <span>ai.statskey.workbench · statskey-workbench://</span>
+        </div>
+        <div>
+          <strong>Local build</strong>
+          <span>desktop-code → CODE_OSS_REF=1.131.0 npm run setup && npm run build && npm run package</span>
+        </div>
+      </div>
+    </main>
+    <script>
+      const mac = document.getElementById('mac-download')
+      const win = document.getElementById('win-download')
+      const status = document.getElementById('status')
+      const candidates = [
+        ['mac', '/downloads/statskey-workbench/StatsKey-Workbench-0.1.0-mac-arm64.dmg'],
+        ['mac', '/downloads/statskey-workbench/StatsKey-Workbench-0.1.0-mac-x64.dmg'],
+        ['win', '/downloads/statskey-workbench/StatsKey-Workbench-0.1.0-win-x64.exe'],
+      ]
+      Promise.all(
+        candidates.map(async ([kind, href]) => {
+          try {
+            const res = await fetch(href, { method: 'HEAD' })
+            return res.ok ? { kind, href } : null
+          } catch {
+            return null
+          }
+        })
+      ).then((results) => {
+        const ready = results.filter(Boolean)
+        if (!ready.length) return
+        status.textContent = 'Workbench installers are available for this environment.'
+        for (const item of ready) {
+          if (item.kind === 'mac') mac.href = item.href
+          if (item.kind === 'win') win.href = item.href
+        }
+      })
+    </script>
+  </body>
+</html>

@@ -112,6 +112,33 @@ test('sync-only safeStorage is rejected instead of risking the main thread', asy
   )
 })
 
+test('Ubuntu provider credentials require a protected keyring backend', async () => {
+  const insecure = new ProviderVaultCrypto({
+    platform: 'linux',
+    safeStorage: fakeStorage({
+      getSelectedStorageBackend: () => 'basic_text',
+    }),
+  })
+  await assert.rejects(
+    insecure.encryptString('{"apiKey":"secret"}'),
+    (error) =>
+      error instanceof ProviderVaultCryptoUnavailableError &&
+      error.message.includes('basic-text')
+  )
+
+  const secure = new ProviderVaultCrypto({
+    platform: 'linux',
+    safeStorage: fakeStorage({
+      getSelectedStorageBackend: () => 'gnome_libsecret',
+      encryptStringAsync: async () => Buffer.from('protected'),
+    }),
+  })
+  assert.equal(
+    (await secure.encryptString('{"apiKey":"secret"}')).toString('utf8'),
+    'protected'
+  )
+})
+
 test('provider save, test, model-list, and run paths use only the awaited async vault boundary', () => {
   const main = readFileSync(path.join(__dirname, 'main.cjs'), 'utf8')
   const handlers = sourceBetween(

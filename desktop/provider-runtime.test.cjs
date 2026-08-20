@@ -2,9 +2,65 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 const http = require('node:http')
 const {
+  normalizeProviderModelList,
   runProviderRound,
   withProviderToolCatalog,
 } = require('./provider-runtime.cjs')
+
+test('provider catalogs automatically include new agentic text models', () => {
+  const models = normalizeProviderModelList('openai', [
+    { id: 'gpt-5.7-new', created: 1_700_000_000 },
+    { id: 'text-embedding-4-large', created: 1_700_000_001 },
+    { id: 'gpt-image-2', created: 1_700_000_002 },
+    { id: 'gpt-5.7-new', created: 1_700_000_003 },
+  ])
+
+  assert.deepEqual(models, [
+    {
+      id: 'gpt-5.7-new',
+      label: 'gpt-5.7-new',
+      createdAt: '2023-11-14T22:13:20.000Z',
+    },
+  ])
+})
+
+test('Google discovery requires a generate-content capability when supplied', () => {
+  const models = normalizeProviderModelList('google', [
+    {
+      name: 'models/gemini-3.7-flash',
+      displayName: 'Gemini 3.7 Flash',
+      createTime: '2026-08-13T12:00:00Z',
+      supportedGenerationMethods: ['generateContent', 'countTokens'],
+    },
+    {
+      name: 'models/gemini-embedding-002',
+      supportedGenerationMethods: ['embedContent'],
+    },
+  ])
+
+  assert.deepEqual(models, [
+    {
+      id: 'gemini-3.7-flash',
+      label: 'Gemini 3.7 Flash',
+      createdAt: '2026-08-13T12:00:00.000Z',
+    },
+  ])
+})
+
+test('unknown-compatible catalogs stay manual without capability metadata', () => {
+  assert.deepEqual(
+    normalizeProviderModelList('openai-compatible', [
+      { id: 'vendor-model-v1' },
+    ]),
+    []
+  )
+  assert.deepEqual(
+    normalizeProviderModelList('azure-openai', [
+      { id: 'production-deployment' },
+    ]),
+    []
+  )
+})
 
 test('direct final handoff omits an empty provider tool catalog', () => {
   const request = withProviderToolCatalog(

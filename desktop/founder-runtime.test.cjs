@@ -11,6 +11,10 @@ const {
   validateFounderConfiguration,
 } = require('./founder-runtime.cjs')
 
+function portablePath(value) {
+  return value.replaceAll(path.sep, '/')
+}
+
 test('founder defaults contain only explicit local infrastructure endpoints', () => {
   const configuration = defaultFounderConfiguration('/Users/founder')
   validateFounderConfiguration(configuration)
@@ -19,7 +23,7 @@ test('founder defaults contain only explicit local infrastructure endpoints', ()
   assert.equal(configuration.macMini.host, 'ryans-mac-mini.local')
   assert.equal(configuration.gpu.host, '')
   assert.equal(
-    configuration.macRemote.configPath,
+    portablePath(configuration.macRemote.configPath),
     '/Users/founder/Library/Application Support/MacRemote/config.json'
   )
 })
@@ -92,7 +96,7 @@ test('oil diagnostic executes the fixed storage module with NAS environment', as
   const result = await runtime.runCheck('oil-storage')
   assert.equal(result.ok, true)
   assert.equal(
-    invocation.executable,
+    portablePath(invocation.executable),
     '/Users/founder/Projects/Oil Data/oilfield-pipeline/.venv/bin/python'
   )
   assert.deepEqual(invocation.args, [
@@ -103,7 +107,7 @@ test('oil diagnostic executes the fixed storage module with NAS environment', as
   ])
   assert.equal(invocation.env.OILPIPE_DATA_DIR, '/Volumes/StatsKey-Oil')
   assert.equal(
-    invocation.env.PYTHONPATH,
+    portablePath(invocation.env.PYTHONPATH),
     '/Users/founder/Projects/Oil Data/oilfield-pipeline/src'
   )
 })
@@ -125,10 +129,10 @@ test('MacRemote connectivity executes only the fixed encrypted SSH probe', async
   const result = await runtime.runCheck('macremote-connectivity')
   assert.equal(result.ok, true)
   assert.equal(
-    invocation.executable,
+    portablePath(invocation.executable),
     '/Users/founder/Projects/MacRemote/.build/release/macremote'
   )
-  assert.deepEqual(invocation.args, [
+  assert.deepEqual(invocation.args.map(portablePath), [
     'ssh',
     '/Users/founder/Library/Application Support/MacRemote/config.json',
     '--',

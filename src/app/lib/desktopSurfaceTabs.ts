@@ -9,6 +9,8 @@ export type DesktopSurfaceId =
   | 'github'
   | 'plan'
   | 'calendar'
+  | 'fleet'
+  | 'jobs'
 
 export interface DesktopOpenSurfaceSummary {
   id: DesktopSurfaceId
@@ -48,6 +50,8 @@ const ALLOWED_DESKTOP_SURFACES = new Set<DesktopSurfaceId>([
   'github',
   'plan',
   'calendar',
+  'fleet',
+  'jobs',
 ])
 
 export function loadDesktopSurfaceTabs(

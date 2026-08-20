@@ -243,6 +243,10 @@ export default async function handler(req, res) {
     res.status(405).json({ error: 'method_not_allowed' });
     return;
   }
+  if (process.env.PUBLIC_HEALTH_TOOLS_ENABLED !== 'true') {
+    res.status(503).json({ error: 'feature_unavailable' });
+    return;
+  }
   const body = await readJsonBody(req);
   const email = body && typeof body.email === 'string' ? body.email.trim() : '';
   const password = body && typeof body.password === 'string' ? body.password : '';

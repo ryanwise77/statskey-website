@@ -1,0 +1,25 @@
+Package: statskey-fleetd
+Version: 0.1.0-2
+Section: admin
+Priority: optional
+Architecture: amd64
+Maintainer: StatsKey Engineering <engineering@statskey.com>
+Homepage: https://statskey.com
+Depends: systemd (>= 255), apparmor, git | git-core, adduser, ca-certificates
+Description: privileged Fleet execution service for StatsKey workers
+ statskey-fleetd is the privileged Linux Fleet execution service. It is the
+ only component permitted to execute Fleet jobs on Ubuntu machines: a small
+ root daemon that owns helper attestation, coordinator-signed execution
+ tickets, lease timers, and every job cgroup, plus an unprivileged agent
+ that polls the coordinator and requests job starts over a root-owned
+ control socket.
+ .
+ All repository-controlled code runs as a per-job DynamicUser inside a
+ non-delegated cgroup with an enforcing AppArmor profile; even a
+ compromised controller or coordinator can authorize only an unprivileged
+ sandbox, never root execution.
+ .
+ Services stay dormant after installation: the package enables but does not
+ start any unit, and nothing executes until the device is paired
+ (statskey-fleet-enroll) and helper attestation succeeds against
+ coordinator policy.

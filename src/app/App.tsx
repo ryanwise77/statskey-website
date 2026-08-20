@@ -61,6 +61,21 @@ const Calendar = lazy(() =>
     default: module.Calendar,
   }))
 )
+const Fleet = lazy(() =>
+  import('./routes/Fleet').then((module) => ({
+    default: module.Fleet,
+  }))
+)
+const FleetRemote = lazy(() =>
+  import('./routes/FleetRemote').then((module) => ({
+    default: module.FleetRemote,
+  }))
+)
+const Jobs = lazy(() =>
+  import('./routes/Fleet').then((module) => ({
+    default: module.Jobs,
+  }))
+)
 const Settings = lazy(() =>
   import('./routes/Settings').then((module) => ({
     default: module.Settings,
@@ -222,6 +237,9 @@ export function App() {
         <Route path="github" element={<GitHubWorkspace />} />
         <Route path="plan" element={<Planning />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="fleet" element={<Fleet />} />
+        <Route path="fleet/remote" element={<FleetRemote />} />
+        <Route path="jobs" element={<Jobs />} />
         <Route path="settings/*" element={<Settings />} />
         {/* Old scattered settings routes stay reachable (deep links and the
             Cmd+, menu command on older builds) as redirects into Settings. */}

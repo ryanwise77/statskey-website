@@ -1,0 +1,2753 @@
+diff --git a/build/gulpfile.extensions.ts b/build/gulpfile.extensions.ts
+index dafca7f2add..7d39e947503 100644
+--- a/build/gulpfile.extensions.ts
++++ b/build/gulpfile.extensions.ts
+@@ -83,6 +83,7 @@ const compilations = [
+ 	'extensions/references-view/tsconfig.json',
+ 	'extensions/search-result/tsconfig.json',
+ 	'extensions/simple-browser/tsconfig.json',
++	'extensions/statskey-workbench/tsconfig.json',
+ 	'extensions/tunnel-forwarding/tsconfig.json',
+ 	'extensions/typescript-language-features/web/tsconfig.json',
+ 	'extensions/typescript-language-features/tsconfig.json',
+diff --git a/build/npm/dirs.ts b/build/npm/dirs.ts
+index 289a469754a..a30e003aa84 100644
+--- a/build/npm/dirs.ts
++++ b/build/npm/dirs.ts
+@@ -46,6 +46,7 @@ export const dirs = [
+ 	'extensions/references-view',
+ 	'extensions/search-result',
+ 	'extensions/simple-browser',
++	'extensions/statskey-workbench',
+ 	'extensions/tunnel-forwarding',
+ 	'extensions/terminal-suggest',
+ 	'extensions/typescript-language-features',
+diff --git a/src/vs/platform/agentHost/browser/nullAgentHostService.ts b/src/vs/platform/agentHost/browser/nullAgentHostService.ts
+index 6c2e9965493..3ea89e8af84 100644
+--- a/src/vs/platform/agentHost/browser/nullAgentHostService.ts
++++ b/src/vs/platform/agentHost/browser/nullAgentHostService.ts
+@@ -7,7 +7,7 @@ import { Event } from '../../../base/common/event.js';
+ import { IReference } from '../../../base/common/lifecycle.js';
+ import { constObservable, IObservable } from '../../../base/common/observable.js';
+ import { URI } from '../../../base/common/uri.js';
+-import type { IAgentCreateSessionConfig, IAgentHostInspectInfo, IAgentHostManagedSettingsDiagnostics, IAgentHostNetworkDiagnosticsInfo, IAgentHostNetworkFetchResult, IAgentHostService, IAgentHostSocketInfo, IAgentResolveSessionConfigParams, IAgentSessionConfigCompletionsParams, IAgentSessionMetadata, AuthenticateParams, AuthenticateResult } from '../common/agentService.js';
++import type { AgentProvider, IAgentCreateSessionConfig, IAgentHostInspectInfo, IAgentHostManagedSettingsDiagnostics, IAgentHostNetworkDiagnosticsInfo, IAgentHostNetworkFetchResult, IAgentHostService, IAgentHostSocketInfo, IAgentProviderAccountLoginResult, IAgentProviderAccountState, IAgentResolveSessionConfigParams, IAgentSessionConfigCompletionsParams, IAgentSessionMetadata, AuthenticateParams, AuthenticateResult } from '../common/agentService.js';
+ import type { IActiveSubscriptionInfo, IAgentSubscription } from '../common/state/agentSubscription.js';
+ import type { CompletionsParams, CompletionsResult, CreateTerminalParams, ResolveSessionConfigResult, SessionConfigCompletionsResult } from '../common/state/protocol/commands.js';
+ import type { InitializeResult } from '../common/state/protocol/common/commands.js';
+@@ -48,6 +48,11 @@ export class NullAgentHostService implements IAgentHostService {
+ 
+ 	async restartAgentHost(): Promise<void> { notSupported(); }
+ 	async authenticate(_params: AuthenticateParams): Promise<AuthenticateResult> { return notSupported(); }
++	async getProviderAccount(_provider: AgentProvider): Promise<IAgentProviderAccountState> { return notSupported(); }
++	async activateProviderAccount(_provider: AgentProvider): Promise<void> { return notSupported(); }
++	async startProviderAccountLogin(_provider: AgentProvider): Promise<IAgentProviderAccountLoginResult> { return notSupported(); }
++	async cancelProviderAccountLogin(_provider: AgentProvider, _loginId: string): Promise<void> { return notSupported(); }
++	async logoutProviderAccount(_provider: AgentProvider): Promise<void> { return notSupported(); }
+ 	async getNetworkDiagnosticsInfo(): Promise<IAgentHostNetworkDiagnosticsInfo> { return notSupported(); }
+ 	async getManagedSettingsDiagnostics(): Promise<readonly IAgentHostManagedSettingsDiagnostics[]> { return []; }
+ 	async diagnosticsFetch(_url: string): Promise<IAgentHostNetworkFetchResult> { return notSupported(); }
+diff --git a/src/vs/platform/agentHost/common/agentHostCustomizationConfig.ts b/src/vs/platform/agentHost/common/agentHostCustomizationConfig.ts
+index f68af531ae1..99630805ce2 100644
+--- a/src/vs/platform/agentHost/common/agentHostCustomizationConfig.ts
++++ b/src/vs/platform/agentHost/common/agentHostCustomizationConfig.ts
+@@ -102,7 +102,7 @@ export const agentHostCustomizationConfigSchema = createSchema({
+ 	[AgentHostConfigKey.CodexUsageSource]: schemaProperty<CodexUsageSource>({
+ 		type: 'string',
+ 		title: localize('agentHost.config.codexUsageSource.title', "Codex Usage Source"),
+-		description: localize('agentHost.config.codexUsageSource.description', "Choose whether Codex usage is routed through GitHub Copilot or uses an existing Codex OpenAI login. VS Code does not provide the OpenAI sign-in flow; authenticate Codex separately before selecting OpenAI."),
++		description: localize('agentHost.config.codexUsageSource.description', "Choose whether Codex usage is routed through GitHub Copilot or your OpenAI account. You can sign in with ChatGPT from the Codex account controls before selecting OpenAI."),
+ 		default: 'copilot',
+ 		enum: [...codexUsageSources],
+ 	}),
+diff --git a/src/vs/platform/agentHost/common/agentHostEnablementService.ts b/src/vs/platform/agentHost/common/agentHostEnablementService.ts
+index e58cc0da7c9..b48ce25bdbc 100644
+--- a/src/vs/platform/agentHost/common/agentHostEnablementService.ts
++++ b/src/vs/platform/agentHost/common/agentHostEnablementService.ts
+@@ -42,7 +42,7 @@ configurationRegistry.registerConfiguration({
+ 		[agentHostEnabledSettingId]: {
+ 			type: 'boolean',
+ 			description: nls.localize('chat.agentHost.enabled', "When enabled, some agents run in a separate agent host process."),
+-			default: !isWeb && product.quality !== 'stable',
++			default: !isWeb && (product.nameShort === 'StatsKey Workbench' || product.quality !== 'stable'),
+ 			tags: ['experimental', 'advanced'],
+ 			experiment: { mode: 'startup' },
+ 		},
+diff --git a/src/vs/platform/agentHost/common/agentHostStarter.config.contribution.ts b/src/vs/platform/agentHost/common/agentHostStarter.config.contribution.ts
+index ed2dcd7e20e..f2a318f0b5c 100644
+--- a/src/vs/platform/agentHost/common/agentHostStarter.config.contribution.ts
++++ b/src/vs/platform/agentHost/common/agentHostStarter.config.contribution.ts
+@@ -125,7 +125,7 @@ configurationRegistry.registerConfiguration({
+ 		[AgentHostCodexAgentEnabledSettingId]: {
+ 			type: 'boolean',
+ 			description: nls.localize('chat.agentHost.codexAgent.enabled', "When enabled, the agent host registers the Codex provider (subject to the Codex SDK being reachable). Requires `#chat.agentHost.enabled#`. The agent host process must be restarted for changes to take effect."),
+-			default: false,
++			default: product.nameShort === 'StatsKey Workbench',
+ 			tags: ['experimental', 'advanced'],
+ 			// Allow the default to be overridden by an experiment. Uses `startup`
+ 			// (matching the sibling agent-host settings) since the agent host
+diff --git a/src/vs/platform/agentHost/common/agentService.ts b/src/vs/platform/agentHost/common/agentService.ts
+index b2152eb681c..22d7031d1a8 100644
+--- a/src/vs/platform/agentHost/common/agentService.ts
++++ b/src/vs/platform/agentHost/common/agentService.ts
+@@ -694,8 +694,9 @@ export interface IConnectionTrackerService {
+ }
+ 
+ /**
+- * Narrow renderer-to-local-agent-host control surface. All stateful agent
+- * operations travel over {@link AgentHostIpcChannels.Protocol}.
++ * Narrow renderer-to-local-agent-host control surface. Session state travels
++ * over {@link AgentHostIpcChannels.Protocol}; ambient process controls and
++ * provider-owned account operations use this local management channel.
+  */
+ export interface IAgentHostManagementService {
+ 	readonly _serviceBrand: undefined;
+@@ -710,6 +711,11 @@ export interface IAgentHostManagementService {
+ 	 * `createChat` (`title` and `model`).
+ 	 */
+ 	createChatWithExtensions(session: URI, chat: URI, options: IAgentCreateChatOptions): Promise<void>;
++	getProviderAccount(provider: AgentProvider): Promise<IAgentProviderAccountState>;
++	activateProviderAccount(provider: AgentProvider): Promise<void>;
++	startProviderAccountLogin(provider: AgentProvider): Promise<IAgentProviderAccountLoginResult>;
++	cancelProviderAccountLogin(provider: AgentProvider, loginId: string): Promise<void>;
++	logoutProviderAccount(provider: AgentProvider): Promise<void>;
+ 	shutdown(): Promise<void>;
+ 	getNetworkDiagnosticsInfo(): Promise<IAgentHostNetworkDiagnosticsInfo>;
+ 	getManagedSettingsDiagnostics(): Promise<readonly IAgentHostManagedSettingsDiagnostics[]>;
+@@ -795,6 +801,23 @@ export interface IAgentMaterializeSessionEvent {
+ 
+ export type AgentProvider = string;
+ 
++/** Account state owned and refreshed by an agent provider's native runtime. */
++export interface IAgentProviderAccountState {
++	readonly provider: AgentProvider;
++	readonly status: 'signedIn' | 'signedOut' | 'error';
++	/** Whether this account currently supplies usage for new sessions. */
++	readonly active: boolean;
++	readonly authType?: 'subscription' | 'apiKey' | 'other';
++	readonly planType?: string;
++	readonly error?: string;
++}
++
++/** Browser handoff returned when a provider starts its native account login flow. */
++export interface IAgentProviderAccountLoginResult {
++	readonly loginId: string;
++	readonly authUrl: string;
++}
++
+ /** Well-known agent provider id for the Claude agent-host backend. */
+ export const CLAUDE_AGENT_PROVIDER_ID = 'claude' as const;
+ 
+@@ -1708,6 +1731,21 @@ export interface IAgent {
+ 	 */
+ 	authenticate(resource: string, token: string): Promise<boolean>;
+ 
++	/** Read the provider-owned account used for direct subscription access. */
++	getAccountState?(): Promise<IAgentProviderAccountState>;
++
++	/** Route new provider sessions through an already authenticated account. */
++	activateAccount?(): Promise<void>;
++
++	/** Start a provider-owned browser login flow. */
++	startAccountLogin?(): Promise<IAgentProviderAccountLoginResult>;
++
++	/** Cancel a provider-owned browser login flow. */
++	cancelAccountLogin?(loginId: string): Promise<void>;
++
++	/** Sign out of the provider-owned account. */
++	logoutAccount?(): Promise<void>;
++
+ 	/**
+ 	 * Optional hook for provider-owned session resources that are not advertised
+ 	 * as root agent protected resources, such as MCP server OAuth challenges.
+@@ -1845,6 +1883,12 @@ export interface IAgentService {
+ 	 */
+ 	authenticate(params: AuthenticateParams): Promise<AuthenticateResult>;
+ 
++	getProviderAccount?(provider: AgentProvider): Promise<IAgentProviderAccountState>;
++	activateProviderAccount?(provider: AgentProvider): Promise<void>;
++	startProviderAccountLogin?(provider: AgentProvider): Promise<IAgentProviderAccountLoginResult>;
++	cancelProviderAccountLogin?(provider: AgentProvider, loginId: string): Promise<void>;
++	logoutProviderAccount?(provider: AgentProvider): Promise<void>;
++
+ 	/** Return a bearer token previously supplied via {@link authenticate}. */
+ 	getAuthToken(request: IAgentHostAuthTokenRequest): string | undefined;
+ 
+@@ -2257,6 +2301,12 @@ export interface IAgentHostService extends IAgentConnection {
+ 	/** Update {@link authenticationPending}. Internal — only the auth driver should call this. */
+ 	setAuthenticationPending(pending: boolean): void;
+ 
++	getProviderAccount?(provider: AgentProvider): Promise<IAgentProviderAccountState>;
++	activateProviderAccount?(provider: AgentProvider): Promise<void>;
++	startProviderAccountLogin?(provider: AgentProvider): Promise<IAgentProviderAccountLoginResult>;
++	cancelProviderAccountLogin?(provider: AgentProvider, loginId: string): Promise<void>;
++	logoutProviderAccount?(provider: AgentProvider): Promise<void>;
++
+ 	restartAgentHost(): Promise<void>;
+ 
+ 	startWebSocketServer(): Promise<IAgentHostSocketInfo>;
+diff --git a/src/vs/platform/agentHost/electron-browser/localAgentHostService.ts b/src/vs/platform/agentHost/electron-browser/localAgentHostService.ts
+index 74acff2d812..76f427c125a 100644
+--- a/src/vs/platform/agentHost/electron-browser/localAgentHostService.ts
++++ b/src/vs/platform/agentHost/electron-browser/localAgentHostService.ts
+@@ -38,11 +38,14 @@ import {
+ 	IAgentHostNetworkFetchResult,
+ 	IAgentHostService,
+ 	IAgentHostSocketInfo,
++	IAgentProviderAccountLoginResult,
++	IAgentProviderAccountState,
+ 	IAgentResolveSessionConfigParams,
+ 	IAgentSessionConfigCompletionsParams,
+ 	IAgentSessionMetadata,
+ 	AuthenticateParams,
+ 	AuthenticateResult,
++	AgentProvider,
+ 	IMcpNotification,
+ 	readAgentHostOTelPolicySettings,
+ } from '../common/agentService.js';
+@@ -221,6 +224,26 @@ export class LocalAgentHostServiceClient extends Disposable implements IAgentHos
+ 		return this._requireClient().authenticate(params);
+ 	}
+ 
++	getProviderAccount(provider: AgentProvider): Promise<IAgentProviderAccountState> {
++		return this._management.getProviderAccount(provider);
++	}
++
++	activateProviderAccount(provider: AgentProvider): Promise<void> {
++		return this._management.activateProviderAccount(provider);
++	}
++
++	startProviderAccountLogin(provider: AgentProvider): Promise<IAgentProviderAccountLoginResult> {
++		return this._management.startProviderAccountLogin(provider);
++	}
++
++	cancelProviderAccountLogin(provider: AgentProvider, loginId: string): Promise<void> {
++		return this._management.cancelProviderAccountLogin(provider, loginId);
++	}
++
++	logoutProviderAccount(provider: AgentProvider): Promise<void> {
++		return this._management.logoutProviderAccount(provider);
++	}
++
+ 	listSessions(): Promise<IAgentSessionMetadata[]> {
+ 		return this._requireClient().listSessions();
+ 	}
+diff --git a/src/vs/platform/agentHost/node/agentHostManagementService.ts b/src/vs/platform/agentHost/node/agentHostManagementService.ts
+index 72b0077dcc5..0564b2620e7 100644
+--- a/src/vs/platform/agentHost/node/agentHostManagementService.ts
++++ b/src/vs/platform/agentHost/node/agentHostManagementService.ts
+@@ -4,7 +4,7 @@
+  *--------------------------------------------------------------------------------------------*/
+ 
+ import { URI } from '../../../base/common/uri.js';
+-import { IAgentCreateChatOptions, IAgentCreateSessionConfig, IAgentHostInspectInfo, IAgentHostManagedSettingsDiagnostics, IAgentHostManagementService, IAgentHostNetworkDiagnosticsInfo, IAgentHostNetworkFetchResult, IAgentHostSocketInfo, IAgentService, IConnectionTrackerService } from '../common/agentService.js';
++import { AgentProvider, IAgentCreateChatOptions, IAgentCreateSessionConfig, IAgentHostInspectInfo, IAgentHostManagedSettingsDiagnostics, IAgentHostManagementService, IAgentHostNetworkDiagnosticsInfo, IAgentHostNetworkFetchResult, IAgentHostSocketInfo, IAgentProviderAccountLoginResult, IAgentProviderAccountState, IAgentService, IConnectionTrackerService } from '../common/agentService.js';
+ 
+ export class AgentHostManagementService implements IAgentHostManagementService {
+ 	declare readonly _serviceBrand: undefined;
+@@ -22,6 +22,41 @@ export class AgentHostManagementService implements IAgentHostManagementService {
+ 		return this._agentService.createChat(session, chat, options);
+ 	}
+ 
++	getProviderAccount(provider: AgentProvider): Promise<IAgentProviderAccountState> {
++		if (!this._agentService.getProviderAccount) {
++			throw new Error('Provider account management is unavailable.');
++		}
++		return this._agentService.getProviderAccount(provider);
++	}
++
++	activateProviderAccount(provider: AgentProvider): Promise<void> {
++		if (!this._agentService.activateProviderAccount) {
++			throw new Error('Provider account activation is unavailable.');
++		}
++		return this._agentService.activateProviderAccount(provider);
++	}
++
++	startProviderAccountLogin(provider: AgentProvider): Promise<IAgentProviderAccountLoginResult> {
++		if (!this._agentService.startProviderAccountLogin) {
++			throw new Error('Provider account login is unavailable.');
++		}
++		return this._agentService.startProviderAccountLogin(provider);
++	}
++
++	cancelProviderAccountLogin(provider: AgentProvider, loginId: string): Promise<void> {
++		if (!this._agentService.cancelProviderAccountLogin) {
++			throw new Error('Provider account login cancellation is unavailable.');
++		}
++		return this._agentService.cancelProviderAccountLogin(provider, loginId);
++	}
++
++	logoutProviderAccount(provider: AgentProvider): Promise<void> {
++		if (!this._agentService.logoutProviderAccount) {
++			throw new Error('Provider account logout is unavailable.');
++		}
++		return this._agentService.logoutProviderAccount(provider);
++	}
++
+ 	shutdown(): Promise<void> {
+ 		return this._agentService.shutdown();
+ 	}
+diff --git a/src/vs/platform/agentHost/node/agentService.ts b/src/vs/platform/agentHost/node/agentService.ts
+index 8553b228d85..2f9e66eeee3 100644
+--- a/src/vs/platform/agentHost/node/agentService.ts
++++ b/src/vs/platform/agentHost/node/agentService.ts
+@@ -22,7 +22,7 @@ import { FileChangeType, FileOperationResult, IFileChange, IFileService, toFileO
+ import { InstantiationService } from '../../instantiation/common/instantiationService.js';
+ import { ServiceCollection } from '../../instantiation/common/serviceCollection.js';
+ import { ILogService } from '../../log/common/log.js';
+-import { AgentProvider, AgentSession, AgentSignal, AgentHostSessionReleaseGraceMsEnvVar, IAgent, IAgentChatDataChange, IAgentCreateChatOptions, IAgentCreateChatResult, IAgentCreateChatSideChatSelection, IAgentCreateChatSideChatSource, IAgentCreateSessionConfig, IAgentCreateSessionResult, IAgentHostAuthTokenRequest, IAgentHostManagedSettingsDiagnostics, IAgentHostNetworkDiagnosticsInfo, IAgentHostNetworkEndpoint, IAgentHostNetworkFetchResult, IAgentMaterializeSessionEvent, IAgentModelInfo, IAgentResolveSessionConfigParams, IAgentService, IAgentSessionConfigCompletionsParams, IAgentSessionMetadata, IAgentSpawnChatEvent, AuthenticateParams, AuthenticateResult, IMcpNotification, IRestoredSubagentSession, SubagentChatSignal } from '../common/agentService.js';
++import { AgentProvider, AgentSession, AgentSignal, AgentHostSessionReleaseGraceMsEnvVar, IAgent, IAgentChatDataChange, IAgentCreateChatOptions, IAgentCreateChatResult, IAgentCreateChatSideChatSelection, IAgentCreateChatSideChatSource, IAgentCreateSessionConfig, IAgentCreateSessionResult, IAgentHostAuthTokenRequest, IAgentHostManagedSettingsDiagnostics, IAgentHostNetworkDiagnosticsInfo, IAgentHostNetworkEndpoint, IAgentHostNetworkFetchResult, IAgentMaterializeSessionEvent, IAgentModelInfo, IAgentProviderAccountLoginResult, IAgentProviderAccountState, IAgentResolveSessionConfigParams, IAgentService, IAgentSessionConfigCompletionsParams, IAgentSessionMetadata, IAgentSpawnChatEvent, AuthenticateParams, AuthenticateResult, IMcpNotification, IRestoredSubagentSession, SubagentChatSignal } from '../common/agentService.js';
+ import { ISessionDataService, SESSION_ATTACHMENTS_DIRNAME } from '../common/sessionDataService.js';
+ import { SessionConfigKey } from '../common/sessionConfigKeys.js';
+ import type { IAgentCustomizationSettingsRegistration } from '../common/agentCustomizationSettings.js';
+@@ -685,6 +685,46 @@ export class AgentService extends Disposable implements IAgentService {
+ 		return this._authService.authenticate(params, this._providers.values());
+ 	}
+ 
++	async getProviderAccount(providerId: AgentProvider): Promise<IAgentProviderAccountState> {
++		const provider = this._providers.get(providerId);
++		if (!provider?.getAccountState) {
++			throw new Error(`Agent provider '${providerId}' does not support account management.`);
++		}
++		return provider.getAccountState();
++	}
++
++	async activateProviderAccount(providerId: AgentProvider): Promise<void> {
++		const provider = this._providers.get(providerId);
++		if (!provider?.activateAccount) {
++			throw new Error(`Agent provider '${providerId}' does not support account activation.`);
++		}
++		await provider.activateAccount();
++	}
++
++	async startProviderAccountLogin(providerId: AgentProvider): Promise<IAgentProviderAccountLoginResult> {
++		const provider = this._providers.get(providerId);
++		if (!provider?.startAccountLogin) {
++			throw new Error(`Agent provider '${providerId}' does not support account login.`);
++		}
++		return provider.startAccountLogin();
++	}
++
++	async cancelProviderAccountLogin(providerId: AgentProvider, loginId: string): Promise<void> {
++		const provider = this._providers.get(providerId);
++		if (!provider?.cancelAccountLogin) {
++			throw new Error(`Agent provider '${providerId}' does not support account login cancellation.`);
++		}
++		await provider.cancelAccountLogin(loginId);
++	}
++
++	async logoutProviderAccount(providerId: AgentProvider): Promise<void> {
++		const provider = this._providers.get(providerId);
++		if (!provider?.logoutAccount) {
++			throw new Error(`Agent provider '${providerId}' does not support account logout.`);
++		}
++		await provider.logoutAccount();
++	}
++
+ 	getAuthToken(request: IAgentHostAuthTokenRequest): string | undefined {
+ 		return this._authService.getAuthToken(request);
+ 	}
+diff --git a/src/vs/platform/agentHost/node/codex/codexAccountState.ts b/src/vs/platform/agentHost/node/codex/codexAccountState.ts
+index af8bf4eea1e..73560ea343f 100644
+--- a/src/vs/platform/agentHost/node/codex/codexAccountState.ts
++++ b/src/vs/platform/agentHost/node/codex/codexAccountState.ts
+@@ -5,8 +5,11 @@
+ 
+ import type { ProtectedResourceMetadata } from '../../common/state/protocol/common/state.js';
+ import type { CodexUsageSource } from '../../common/agentHostCustomizationConfig.js';
++import type { AgentProvider, IAgentProviderAccountState } from '../../common/agentService.js';
+ import type { GetAccountResponse } from './protocol/generated/v2/GetAccountResponse.js';
+ 
++const CODEX_PROVIDER_ACCOUNT_ERROR = 'Codex account status is unavailable.';
++
+ export interface ICodexAccountState {
+ 	readonly usageSource: 'openai' | 'copilot';
+ 	readonly status: 'signedIn' | 'signedOut' | 'error';
+@@ -32,6 +35,26 @@ export function resolveCodexUsageSourceAfterAccountRead(source: CodexUsageSource
+ 	return source === 'openai' && account.status === 'signedOut' ? 'copilot' : source;
+ }
+ 
++/**
++ * Convert the native account response into the deliberately small state that
++ * may cross the agent-host boundary. In particular, email addresses, tokens,
++ * and provider error details never leave this process.
++ */
++export function codexProviderAccountState(provider: AgentProvider, state: ICodexAccountState, active: boolean): IAgentProviderAccountState {
++	return {
++		provider,
++		status: state.status,
++		active,
++		...(state.authType ? { authType: state.authType === 'chatgpt' ? 'subscription' as const : state.authType } : {}),
++		...(state.planType ? { planType: state.planType } : {}),
++		...(state.status === 'error' ? { error: CODEX_PROVIDER_ACCOUNT_ERROR } : {}),
++	};
++}
++
++export function isMatchingCodexAccountLogin(pendingLoginId: string, completedLoginId: string | null): boolean {
++	return completedLoginId !== null && pendingLoginId === completedLoginId;
++}
++
+ export function codexAccountStateForUsageSource(source: CodexUsageSource, openAIAccount: ICodexAccountState): ICodexAccountState {
+ 	return source === 'openai' ? openAIAccount : { ...openAIAccount, usageSource: 'copilot' };
+ }
+diff --git a/src/vs/platform/agentHost/node/codex/codexAgent.ts b/src/vs/platform/agentHost/node/codex/codexAgent.ts
+index 94ad2a420f7..860935e5d11 100644
+--- a/src/vs/platform/agentHost/node/codex/codexAgent.ts
++++ b/src/vs/platform/agentHost/node/codex/codexAgent.ts
+@@ -25,7 +25,7 @@ import { createSchema, platformRootSchema, platformSessionSchema, schemaProperty
+ import { createPricingMetaFromBilling, normalizeCAPIBilling } from '../../common/agentModelPricing.js';
+ import { AgentHostConfigKey, agentHostCustomizationConfigSchema, type CodexUsageSource } from '../../common/agentHostCustomizationConfig.js';
+ import { getReasoningEffortDescription, getReasoningEffortLabel } from '../../common/reasoningEffort.js';
+-import { AgentHostCodexAgentBinaryArgsEnvVar, AgentHostCodexAgentCodexHomeEnvVar, AgentHostCodexAgentSdkRootEnvVar, AgentSession, AgentSignal, CODEX_AGENT_PROVIDER_ID, IActiveClient, IAgent, IAgentChats, IAgentCreateChatForkSource, IAgentCreateChatResult, IAgentCreateChatOptions, IAgentCreateSessionConfig, IAgentCreateSessionResult, IAgentDescriptor, IAgentMaterializeSessionEvent, IAgentModelInfo, IAgentResolveSessionConfigParams, IAgentSessionConfigCompletionsParams, IAgentSessionMetadata, IMcpNotification, type AgentProvider, type AuthenticateParams } from '../../common/agentService.js';
++import { AgentHostCodexAgentBinaryArgsEnvVar, AgentHostCodexAgentCodexHomeEnvVar, AgentHostCodexAgentSdkRootEnvVar, AgentSession, AgentSignal, CODEX_AGENT_PROVIDER_ID, IActiveClient, IAgent, IAgentChats, IAgentCreateChatForkSource, IAgentCreateChatResult, IAgentCreateChatOptions, IAgentCreateSessionConfig, IAgentCreateSessionResult, IAgentDescriptor, IAgentMaterializeSessionEvent, IAgentModelInfo, IAgentProviderAccountLoginResult, IAgentProviderAccountState, IAgentResolveSessionConfigParams, IAgentSessionConfigCompletionsParams, IAgentSessionMetadata, IMcpNotification, type AgentProvider, type AuthenticateParams } from '../../common/agentService.js';
+ import { SessionConfigKey } from '../../common/sessionConfigKeys.js';
+ import { AHP_AUTH_REQUIRED, ProtocolError } from '../../common/state/sessionProtocol.js';
+ import { ActionType, isChatAction, type SessionAction, type ChatAction } from '../../common/state/sessionActions.js';
+@@ -62,7 +62,7 @@ import { buildUserInputRequest, emptyUserInputResponse, userInputResponseFromAns
+ import { replayThreadToTurns } from './codexReplayMapper.js';
+ import { CodexSessionMetadataStore } from './codexSessionMetadataStore.js';
+ import { buildCodexLaunchConfig, buildCodexResumeParams, isCodexThreadProviderCompatible } from './codexLaunchConfig.js';
+-import { codexAccountStateForUsageSource, codexAccountStateFromResponse, codexProtectedResourcesForUsageSource, resolveCodexUsageSourceAfterAccountRead, type ICodexAccountState } from './codexAccountState.js';
++import { codexAccountStateForUsageSource, codexAccountStateFromResponse, codexProtectedResourcesForUsageSource, codexProviderAccountState, isMatchingCodexAccountLogin, resolveCodexUsageSourceAfterAccountRead, type ICodexAccountState } from './codexAccountState.js';
+ import { CodexSessionConfigKey, CODEX_DEFAULT_PERMISSIONS_PRESET, CODEX_PERMISSIONS_PRESETS, collaborationModeKind, migrateCodexPermissionValues, narrowAdditionalDirectories, narrowBoolean, narrowPersonality, narrowReasoningEffort, narrowReasoningSummary, narrowWebSearchMode, resolveCodexPermissions, type CodexApprovalPolicy, type CodexPermissionsPreset, type ICodexResolvedPermissions } from './codexSessionConfigKeys.js';
+ import type { ReasoningEffort } from './protocol/generated/ReasoningEffort.js';
+ import type { ReasoningSummary } from './protocol/generated/ReasoningSummary.js';
+@@ -87,6 +87,8 @@ import type { ToolRequestUserInputQuestion } from './protocol/generated/v2/ToolR
+ import type { ToolRequestUserInputResponse } from './protocol/generated/v2/ToolRequestUserInputResponse.js';
+ import type { JsonValue } from './protocol/generated/serde_json/JsonValue.js';
+ import type { GetAccountResponse } from './protocol/generated/v2/GetAccountResponse.js';
++import type { LoginAccountResponse } from './protocol/generated/v2/LoginAccountResponse.js';
++import type { AccountLoginCompletedNotification } from './protocol/generated/v2/AccountLoginCompletedNotification.js';
+ import type { ModelListResponse } from './protocol/generated/v2/ModelListResponse.js';
+ import type { Thread } from './protocol/generated/v2/Thread.js';
+ import type { ThreadListResponse } from './protocol/generated/v2/ThreadListResponse.js';
+@@ -123,6 +125,8 @@ const CLIENT_INFO = {
+ };
+ 
+ const CODEX_THINKING_LEVEL_KEY = 'thinkingLevel';
++const ACCOUNT_LOGIN_TIMEOUT_MS = 10 * 60 * 1000;
++const ACCOUNT_LOGIN_CANCEL_TIMEOUT_MS = 5_000;
+ 
+ /**
+  * User-agent prefix applied to the Codex agent's outbound CAPI calls (e.g. the
+@@ -563,6 +567,16 @@ interface IConnectionReady {
+ 	readonly child: ChildProcessWithoutNullStreams;
+ }
+ 
++interface IPendingAccountLogin {
++	readonly loginId: string;
++	readonly connection: IConnectionReady;
++	readonly ownsConnection: boolean;
++	readonly previousAccountState: ICodexAccountState;
++	timeout: ReturnType<typeof setTimeout> | undefined;
++	cancelling: boolean;
++	completing: boolean;
++}
++
+ /**
+  * `IAgent` implementation backed by `codex app-server`.
+  *
+@@ -706,6 +720,9 @@ export class CodexAgent extends Disposable implements IAgent {
+ 	private readonly _models = observableValue<readonly IAgentModelInfo[]>(this, []);
+ 	readonly models: IObservable<readonly IAgentModelInfo[]> = this._models;
+ 	private _openAIAccountState: ICodexAccountState = { usageSource: 'openai', status: 'signedOut' };
++	private _pendingAccountLogin: IPendingAccountLogin | undefined;
++	private _accountLoginStarting = false;
++	private _accountLoginError: ICodexAccountState | undefined;
+ 	private _providerConfigurationValues: Record<string, unknown> = {};
+ 	private _providerConfigurationWrite = Promise.resolve();
+ 	private _providerConfigurationReady = false;
+@@ -901,6 +918,303 @@ export class CodexAgent extends Disposable implements IAgent {
+ 
+ 	// #region Auth
+ 
++	async getAccountState(): Promise<IAgentProviderAccountState> {
++		if (this._accountLoginError) {
++			return codexProviderAccountState(this.id, this._accountLoginError, false);
++		}
++		let state = this._openAIAccountState;
++		const pendingLogin = this._pendingAccountLogin;
++		if (pendingLogin) {
++			state = await this._refreshAccount(pendingLogin.connection.client);
++		} else if (this._usageSource === 'openai') {
++			const connection = this._connection.kind === 'ready' && this._connection.usageSource === 'openai'
++				? this._connection
++				: await this._ensureConnection(true);
++			state = await this._refreshAccount(connection.client);
++		} else {
++			const connection = await this._startConnection('openai', undefined, true);
++			try {
++				state = await this._refreshAccount(connection.client);
++			} finally {
++				this._disposeAccountConnection(connection);
++			}
++		}
++		return codexProviderAccountState(this.id, state, this._usageSource === 'openai');
++	}
++
++	async activateAccount(): Promise<void> {
++		if (this._accountLoginStarting || this._pendingAccountLogin) {
++			throw new Error('Finish the pending ChatGPT sign-in before changing the Codex usage source.');
++		}
++		if (this._hasActiveTurns()) {
++			throw new Error('Finish the active Codex turn before using the OpenAI account.');
++		}
++		if (this._usageSource === 'openai') {
++			return;
++		}
++
++		const connection = await this._startConnection('openai', undefined, true);
++		let state: ICodexAccountState;
++		try {
++			state = await this._refreshAccount(connection.client);
++		} finally {
++			this._disposeAccountConnection(connection);
++		}
++		if (state.status !== 'signedIn') {
++			throw new Error('Sign in to ChatGPT before using the OpenAI account for Codex.');
++		}
++
++		this._accountLoginError = undefined;
++		this._configurationService.updateRootConfig({ [AgentHostConfigKey.CodexUsageSource]: 'openai' });
++		await this._configurationService.whenIdle();
++	}
++
++	async startAccountLogin(): Promise<IAgentProviderAccountLoginResult> {
++		if (this._accountLoginStarting || this._pendingAccountLogin) {
++			throw new Error('A Codex sign-in is already in progress.');
++		}
++		if (this._hasActiveTurns()) {
++			throw new Error('Finish the active Codex turn before signing in with ChatGPT.');
++		}
++
++		this._accountLoginStarting = true;
++		this._accountLoginError = undefined;
++		let previousAccountState = this._openAIAccountState;
++		let connection: IConnectionReady | undefined;
++		let ownsConnection = false;
++		let loginStarted = false;
++		try {
++			if (this._usageSource === 'openai') {
++				let validation = this._usageSourceValidation;
++				await validation;
++				while (validation !== this._usageSourceValidation) {
++					validation = this._usageSourceValidation;
++					await validation;
++				}
++				if (this._hasActiveTurns()) {
++					throw new Error('A Codex turn started while ChatGPT sign-in was preparing.');
++				}
++			}
++			previousAccountState = this._openAIAccountState;
++			if (this._usageSource === 'openai') {
++				connection = await this._ensureConnection(true);
++			} else {
++				connection = await this._startConnection('openai', undefined, true);
++				ownsConnection = true;
++			}
++			const response = await connection.client.request<'account/login/start', LoginAccountResponse>('account/login/start', {
++				type: 'chatgpt',
++				codexStreamlinedLogin: true,
++			});
++			if (response.type !== 'chatgpt' || !response.loginId || !response.authUrl) {
++				throw new Error('Unexpected Codex account login response.');
++			}
++			const pendingLogin: IPendingAccountLogin = {
++				loginId: response.loginId,
++				connection,
++				ownsConnection,
++				previousAccountState,
++				timeout: undefined,
++				cancelling: false,
++				completing: false,
++			};
++			this._pendingAccountLogin = pendingLogin;
++			pendingLogin.timeout = setTimeout(() => { void this._expireAccountLogin(pendingLogin); }, ACCOUNT_LOGIN_TIMEOUT_MS);
++			(pendingLogin.timeout as unknown as { unref?(): void }).unref?.();
++			loginStarted = true;
++			return { loginId: response.loginId, authUrl: response.authUrl };
++		} catch {
++			if (connection && ownsConnection && !loginStarted) {
++				this._disposeAccountConnection(connection);
++			}
++			if (previousAccountState.status !== 'signedIn') {
++				this._accountLoginError = { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in could not be started.' };
++				this._setOpenAIAccountState(this._accountLoginError);
++			}
++			throw new Error('Codex could not start ChatGPT sign-in. Try again.');
++		} finally {
++			this._accountLoginStarting = false;
++		}
++	}
++
++	async cancelAccountLogin(loginId: string): Promise<void> {
++		const pendingLogin = this._pendingAccountLogin;
++		if (!pendingLogin || !isMatchingCodexAccountLogin(pendingLogin.loginId, loginId) || pendingLogin.cancelling || pendingLogin.completing) {
++			return;
++		}
++		pendingLogin.cancelling = true;
++		let state: ICodexAccountState | undefined;
++		try {
++			state = await raceTimeout((async () => {
++				await pendingLogin.connection.client.request<'account/login/cancel'>('account/login/cancel', { loginId });
++				return this._refreshAccount(pendingLogin.connection.client);
++			})(), ACCOUNT_LOGIN_CANCEL_TIMEOUT_MS);
++			if (!state) {
++				throw new Error('Codex account cancellation timed out.');
++			}
++		} catch {
++			if (this._pendingAccountLogin === pendingLogin) {
++				this._accountLoginError = { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in could not be cancelled.' };
++				this._setOpenAIAccountState(this._accountLoginError);
++				this._clearPendingAccountLogin(pendingLogin);
++			}
++			throw new Error('Codex could not cancel ChatGPT sign-in. Try again.');
++		}
++		this._clearPendingAccountLogin(pendingLogin);
++		this._accountLoginError = undefined;
++		if (state.status === 'signedOut' && this._usageSource === 'openai') {
++			this._configurationService.updateRootConfig({ [AgentHostConfigKey.CodexUsageSource]: 'copilot' });
++			await this._configurationService.whenIdle();
++		}
++	}
++
++	async logoutAccount(): Promise<void> {
++		if (this._accountLoginStarting || this._pendingAccountLogin) {
++			throw new Error('Cancel the pending ChatGPT sign-in before signing out.');
++		}
++		if (this._hasActiveTurns()) {
++			throw new Error('Finish the active Codex turn before signing out.');
++		}
++
++		let connection: IConnectionReady | undefined;
++		let ownsConnection = false;
++		try {
++			if (this._usageSource === 'openai') {
++				connection = await this._ensureConnection(true);
++			} else {
++				connection = await this._startConnection('openai', undefined, true);
++				ownsConnection = true;
++			}
++			await connection.client.request<'account/logout'>('account/logout', undefined);
++			const state = await this._refreshAccount(connection.client);
++			if (state.status !== 'signedOut') {
++				throw new Error('OpenAI account remained signed in after logout.');
++			}
++		} catch {
++			this._accountLoginError = { usageSource: 'openai', status: 'error', error: 'OpenAI sign-out failed.' };
++			this._setOpenAIAccountState(this._accountLoginError);
++			throw new Error('Codex could not sign out of ChatGPT. Try again.');
++		} finally {
++			if (connection && ownsConnection) {
++				this._disposeAccountConnection(connection);
++			}
++		}
++
++		this._accountLoginError = undefined;
++		this._setOpenAIAccountState({ usageSource: 'openai', status: 'signedOut' });
++		if (this._usageSource === 'openai') {
++			this._configurationService.updateRootConfig({ [AgentHostConfigKey.CodexUsageSource]: 'copilot' });
++			await this._configurationService.whenIdle();
++		}
++	}
++
++	private async _handleAccountLoginCompleted(client: ICodexAppServerClient, notification: AccountLoginCompletedNotification): Promise<void> {
++		const pendingLogin = this._pendingAccountLogin;
++		if (!pendingLogin || pendingLogin.connection.client !== client || !isMatchingCodexAccountLogin(pendingLogin.loginId, notification.loginId) || pendingLogin.cancelling || pendingLogin.completing) {
++			return;
++		}
++		pendingLogin.completing = true;
++		try {
++			if (!notification.success) {
++				const state: ICodexAccountState = pendingLogin.previousAccountState.status === 'signedIn'
++					? pendingLogin.previousAccountState
++					: { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in failed.' };
++				this._accountLoginError = state.status === 'error' ? state : undefined;
++				this._setOpenAIAccountState(state);
++				return;
++			}
++
++			const state = await this._refreshAccount(client);
++			if (this._pendingAccountLogin !== pendingLogin) {
++				return;
++			}
++			if (pendingLogin.cancelling) {
++				const timeoutState: ICodexAccountState = pendingLogin.previousAccountState.status === 'signedIn'
++					? pendingLogin.previousAccountState
++					: { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in timed out.' };
++				this._accountLoginError = timeoutState.status === 'error' ? timeoutState : undefined;
++				this._setOpenAIAccountState(timeoutState);
++				return;
++			}
++			if (state.status !== 'signedIn' || state.authType !== 'chatgpt') {
++				this._accountLoginError = { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in could not be verified.' };
++				this._setOpenAIAccountState(this._accountLoginError);
++				return;
++			}
++			this._accountLoginError = undefined;
++
++			// Persist the source switch only after account/read confirms that Codex
++			// owns a valid ChatGPT session. Credentials never leave app-server.
++			this._configurationService.updateRootConfig({ [AgentHostConfigKey.CodexUsageSource]: 'openai' });
++			await this._configurationService.whenIdle();
++			this._queueModelRefresh();
++		} catch {
++			const state: ICodexAccountState = pendingLogin.previousAccountState.status === 'signedIn'
++				? pendingLogin.previousAccountState
++				: { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in could not be verified.' };
++			this._accountLoginError = state.status === 'error' ? state : undefined;
++			this._setOpenAIAccountState(state);
++		} finally {
++			this._clearPendingAccountLogin(pendingLogin);
++		}
++	}
++
++	private async _expireAccountLogin(pendingLogin: IPendingAccountLogin): Promise<void> {
++		if (this._pendingAccountLogin !== pendingLogin || pendingLogin.cancelling) {
++			return;
++		}
++		pendingLogin.cancelling = true;
++		const state: ICodexAccountState = pendingLogin.previousAccountState.status === 'signedIn'
++			? pendingLogin.previousAccountState
++			: { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in timed out.' };
++		this._accountLoginError = state.status === 'error' ? state : undefined;
++		this._setOpenAIAccountState(state);
++		try {
++			await raceTimeout(
++				pendingLogin.connection.client.request<'account/login/cancel'>('account/login/cancel', { loginId: pendingLogin.loginId }),
++				ACCOUNT_LOGIN_CANCEL_TIMEOUT_MS,
++			);
++		} catch {
++			// Cleanup below remains authoritative even if app-server has exited.
++		}
++		if (this._pendingAccountLogin === pendingLogin) {
++			this._clearPendingAccountLogin(pendingLogin);
++		}
++	}
++
++	private _handleAccountConnectionLost(client: ICodexAppServerClient): void {
++		const pendingLogin = this._pendingAccountLogin;
++		if (!pendingLogin || pendingLogin.connection.client !== client) {
++			return;
++		}
++		const state: ICodexAccountState = pendingLogin.previousAccountState.status === 'signedIn'
++			? pendingLogin.previousAccountState
++			: { usageSource: 'openai', status: 'error', error: 'OpenAI sign-in was interrupted.' };
++		this._accountLoginError = state.status === 'error' ? state : undefined;
++		this._setOpenAIAccountState(state);
++		this._clearPendingAccountLogin(pendingLogin);
++	}
++
++	private _clearPendingAccountLogin(pendingLogin: IPendingAccountLogin): void {
++		if (this._pendingAccountLogin !== pendingLogin) {
++			return;
++		}
++		this._pendingAccountLogin = undefined;
++		if (pendingLogin.timeout !== undefined) {
++			clearTimeout(pendingLogin.timeout);
++			pendingLogin.timeout = undefined;
++		}
++		if (pendingLogin.ownsConnection) {
++			this._disposeAccountConnection(pendingLogin.connection);
++		}
++	}
++
++	private _disposeAccountConnection(connection: IConnectionReady): void {
++		try { connection.client.dispose(); } catch { /* ignore */ }
++		try { connection.proxyHandle?.dispose(); } catch { /* ignore */ }
++		try { connection.child.kill('SIGKILL'); } catch { /* already dead */ }
++	}
++
+ 	getProtectedResources(): ProtectedResourceMetadata[] {
+ 		return codexProtectedResourcesForUsageSource(
+ 			this._usageSource,
+@@ -1361,7 +1675,7 @@ export class CodexAgent extends Disposable implements IAgent {
+ 		return this._agentSdkDownloader.loadSdkRoot(CodexSdkPackage, CancellationToken.None);
+ 	}
+ 
+-	private async _startConnection(usageSource: CodexUsageSource, token: string | undefined): Promise<IConnectionReady> {
++	private async _startConnection(usageSource: CodexUsageSource, token: string | undefined, accountConnectionOnly = false): Promise<IConnectionReady> {
+ 		// Resolve the Codex SDK root: dev override / product download via the
+ 		// downloader, or this repo's `node_modules` in a source checkout (see
+ 		// `_resolveSdkRoot`). We spawn the native codex binary inside the
+@@ -1411,21 +1725,37 @@ export class CodexAgent extends Disposable implements IAgent {
+ 		// Surface stderr to the log channel — codex writes useful startup
+ 		// diagnostics there. Mirror Claude's pattern.
+ 		child.stderr.setEncoding('utf8');
+-		child.stderr.on('data', chunk => this._logService.info(`[Codex stderr] ${String(chunk).trimEnd()}`));
++		child.stderr.on('data', chunk => {
++			// OAuth callback diagnostics can contain authentication metadata. Do
++			// not mirror account-flow stderr into the application log.
++			if (accountConnectionOnly || (this._accountLoginStarting && usageSource === 'openai') || this._pendingAccountLogin?.connection.child === child) {
++				return;
++			}
++			this._logService.info(`[Codex stderr] ${String(chunk).trimEnd()}`);
++		});
+ 
+ 		const transport = transportFromChildProcess(child);
+-		const client = new CodexAppServerClient(transport, (level, msg) => {
++		const client = new CodexAppServerClient(transport, accountConnectionOnly ? undefined : (level, msg) => {
+ 			this._logService.info(`[CodexClient ${level}] ${msg}`);
+ 		});
+ 
+ 		// Tear everything down if the child dies on its own.
+ 		client.onExit(e => {
+ 			this._logService.warn(`[Codex] app-server exited code=${e.code} signal=${e.signal}`);
+-			this._handleConnectionLost();
++			if (accountConnectionOnly) {
++				this._handleAccountConnectionLost(client);
++			} else {
++				this._handleConnectionLost();
++			}
+ 		});
+ 		client.onTransportError(err => {
+-			this._logService.error(`[Codex] transport error: ${err.message}`);
+-			this._handleConnectionLost();
++			if (accountConnectionOnly) {
++				this._logService.error('[Codex] account app-server transport error');
++				this._handleAccountConnectionLost(client);
++			} else {
++				this._logService.error(`[Codex] transport error: ${err.message}`);
++				this._handleConnectionLost();
++			}
+ 		});
+ 
+ 		// Initialize handshake. Failure here is fatal for the connection.
+@@ -1446,7 +1776,7 @@ export class CodexAgent extends Disposable implements IAgent {
+ 					apiKey: proxyHandle.nonce,
+ 				});
+ 			}
+-			if (usageSource === 'openai') {
++			if (usageSource === 'openai' && !accountConnectionOnly) {
+ 				void this._refreshAccount(client);
+ 			}
+ 		} catch (err) {
+@@ -1456,13 +1786,28 @@ export class CodexAgent extends Disposable implements IAgent {
+ 			throw err;
+ 		}
+ 
++		if (accountConnectionOnly) {
++			client.onNotification('account/login/completed', params => { void this._handleAccountLoginCompleted(client, params); });
++			client.onNotification('account/updated', () => { /* completion is verified with an explicit account/read */ });
++			return { client, usageSource, proxyHandle, child };
++		}
++
+ 		// Wire global notification → SessionAction dispatch.
+ 		this._registerIgnoredNotifications(client);
+-		this._register(client.onNotification('account/login/completed', () => { /* sign-in is managed outside VS Code */ }));
++		this._register(client.onNotification('account/login/completed', params => { void this._handleAccountLoginCompleted(client, params); }));
+ 		this._register(client.onNotification('account/updated', () => {
+ 			if (this._usageSource === 'openai' && this._connection.kind === 'ready' && this._connection.client === client) {
+-				void this._refreshAccount(client);
+-				this._queueModelRefresh();
++				void this._refreshAccount(client).then(state => {
++					if (this._usageSource !== 'openai' || this._connection.kind !== 'ready' || this._connection.client !== client) {
++						return;
++					}
++					if (state.status === 'signedIn') {
++						this._accountLoginError = undefined;
++						this._queueModelRefresh();
++					} else {
++						this._models.set([], undefined);
++					}
++				});
+ 			}
+ 		}));
+ 		this._register(client.onNotification('turn/started', params => this._dispatchByThread(params.threadId, s => this._handleTurnStartedNotification(s, params))));
+@@ -1963,7 +2308,9 @@ export class CodexAgent extends Disposable implements IAgent {
+ 			return state;
+ 		} catch (err) {
+ 			const message = err instanceof Error ? err.message : String(err);
+-			this._logService.warn(`[Codex] account/read failed: ${message}`);
++			// Keep native authentication errors out of logs and the cross-process
++			// account state; they may include provider or callback metadata.
++			this._logService.warn('[Codex] account/read failed');
+ 			const state: ICodexAccountState = { usageSource: 'openai', status: 'error', error: message };
+ 			this._setOpenAIAccountState(state, publish);
+ 			return state;
+@@ -2541,6 +2888,7 @@ export class CodexAgent extends Disposable implements IAgent {
+ 		if (conn.kind !== 'ready') {
+ 			return;
+ 		}
++		this._handleAccountConnectionLost(conn.client);
+ 		this._connection = { kind: 'idle' };
+ 		// Notify every known session with a single ChatError + complete
+ 		// pair so the UI surfaces "agent disconnected" cleanly.
+@@ -2600,6 +2948,7 @@ export class CodexAgent extends Disposable implements IAgent {
+ 		if (connection.kind !== 'ready') {
+ 			return;
+ 		}
++		this._handleAccountConnectionLost(connection.client);
+ 		try { connection.client.dispose(); } catch { /* ignore */ }
+ 		try { connection.proxyHandle?.dispose(); } catch { /* ignore */ }
+ 		try { connection.child.kill('SIGKILL'); } catch { /* already dead */ }
+@@ -4245,6 +4594,9 @@ export class CodexAgent extends Disposable implements IAgent {
+ 	}
+ 
+ 	async shutdown(): Promise<void> {
++		if (this._pendingAccountLogin) {
++			this._clearPendingAccountLogin(this._pendingAccountLogin);
++		}
+ 		this._disposeConnection();
+ 		for (const s of this._sessions.values()) {
+ 			s.pendingCommandApprovals.denyAll('decline');
+@@ -4323,6 +4675,9 @@ export class CodexAgent extends Disposable implements IAgent {
+ 	}
+ 
+ 	override dispose(): void {
++		if (this._pendingAccountLogin) {
++			this._clearPendingAccountLogin(this._pendingAccountLogin);
++		}
+ 		this._disposeConnection();
+ 		for (const s of this._sessions.values()) {
+ 			s.pendingCommandApprovals.denyAll('decline');
+diff --git a/src/vs/platform/agentHost/test/node/codex/codexAccountState.test.ts b/src/vs/platform/agentHost/test/node/codex/codexAccountState.test.ts
+index 3f77f5a41ed..f8c8da42856 100644
+--- a/src/vs/platform/agentHost/test/node/codex/codexAccountState.test.ts
++++ b/src/vs/platform/agentHost/test/node/codex/codexAccountState.test.ts
+@@ -5,7 +5,7 @@
+ 
+ import * as assert from 'assert';
+ import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../base/test/common/utils.js';
+-import { codexAccountStateForUsageSource, codexAccountStateFromResponse, codexProtectedResourcesForUsageSource, resolveCodexUsageSourceAfterAccountRead } from '../../../node/codex/codexAccountState.js';
++import { codexAccountStateForUsageSource, codexAccountStateFromResponse, codexProtectedResourcesForUsageSource, codexProviderAccountState, isMatchingCodexAccountLogin, resolveCodexUsageSourceAfterAccountRead } from '../../../node/codex/codexAccountState.js';
+ 
+ suite('CodexAccountState', () => {
+ 	ensureNoDisposablesAreLeakedInTestSuite();
+@@ -49,6 +49,24 @@ suite('CodexAccountState', () => {
+ 		]);
+ 	});
+ 
++	test('publishes only safe provider account metadata', () => {
++		assert.deepStrictEqual([
++			codexProviderAccountState('codex', { usageSource: 'openai', status: 'signedIn', authType: 'chatgpt', planType: 'plus' }, true),
++			codexProviderAccountState('codex', { usageSource: 'openai', status: 'signedIn', authType: 'apiKey' }, false),
++			codexProviderAccountState('codex', { usageSource: 'openai', status: 'error', error: 'private provider detail' }, false),
++		], [
++			{ provider: 'codex', status: 'signedIn', active: true, authType: 'subscription', planType: 'plus' },
++			{ provider: 'codex', status: 'signedIn', active: false, authType: 'apiKey' },
++			{ provider: 'codex', status: 'error', active: false, error: 'Codex account status is unavailable.' },
++		]);
++	});
++
++	test('correlates browser login completion by non-null login id', () => {
++		assert.strictEqual(isMatchingCodexAccountLogin('login-1', 'login-1'), true);
++		assert.strictEqual(isMatchingCodexAccountLogin('login-1', 'login-2'), false);
++		assert.strictEqual(isMatchingCodexAccountLogin('login-1', null), false);
++	});
++
+ 	test('preloads an optional Copilot token while OpenAI is active', () => {
+ 		const copilot = { resource: 'https://api.github.com', required: true };
+ 		const repo = { resource: 'https://api.github.com/repos', required: false };
+diff --git a/src/vs/platform/browserView/common/browserView.ts b/src/vs/platform/browserView/common/browserView.ts
+index 92db79754a4..ec5627ef9ea 100644
+--- a/src/vs/platform/browserView/common/browserView.ts
++++ b/src/vs/platform/browserView/common/browserView.ts
+@@ -19,6 +19,7 @@ export enum BrowserViewCommandId {
+ 	OpenOrList = `${commandPrefix}.openOrList`,
+ 	CloseAll = `${commandPrefix}.closeAll`,
+ 	CloseAllInGroup = `${commandPrefix}.closeAllInGroup`,
++	CloseMatching = `${commandPrefix}.closeMatching`,
+ 
+ 	// Navigation
+ 	GoBack = `${commandPrefix}.goBack`,
+diff --git a/src/vs/workbench/contrib/browserView/common/browserEditorInput.ts b/src/vs/workbench/contrib/browserView/common/browserEditorInput.ts
+index 7d3e23e29b1..ed9a7f42b3e 100644
+--- a/src/vs/workbench/contrib/browserView/common/browserEditorInput.ts
++++ b/src/vs/workbench/contrib/browserView/common/browserEditorInput.ts
+@@ -165,6 +165,10 @@ export class BrowserEditorInput extends EditorInput {
+ 		return this._model ? this._model.favicon : this._initialData.favicon;
+ 	}
+ 
++	get storageScope() {
++		return this._model?.storageScope ?? this._initialData.storageScope;
++	}
++
+ 	/**
+ 	 * Whether this editor was opened via a default localhost link open (setting
+ 	 * not explicitly configured by the user). Transient — not serialized.
+@@ -185,7 +189,8 @@ export class BrowserEditorInput extends EditorInput {
+ 			// If the model isn't created yet, update the initial data so that the URL is correct when the model is created
+ 			this._initialData = {
+ 				id: this._id,
+-				url: destination
++				url: destination,
++				storageScope: this.storageScope,
+ 			};
+ 			this._onDidChangeLabel.fire();
+ 		}
+@@ -326,7 +331,8 @@ export class BrowserEditorInput extends EditorInput {
+ 			return browserViewWorkbenchService.getOrCreateLazy(generateUuid(), {
+ 				url: this.url,
+ 				title: this.title,
+-				favicon: this.favicon
++				favicon: this.favicon,
++				storageScope: this.storageScope,
+ 			});
+ 		});
+ 	}
+@@ -335,7 +341,8 @@ export class BrowserEditorInput extends EditorInput {
+ 		const viewState: IBrowserEditorViewState = {
+ 			url: this.url,
+ 			title: this.title,
+-			favicon: this.favicon
++			favicon: this.favicon,
++			storageScope: this.storageScope,
+ 		};
+ 		return {
+ 			resource: this.resource,
+@@ -362,7 +369,8 @@ export class BrowserEditorInput extends EditorInput {
+ 				id: this._id,
+ 				url: this._model.url,
+ 				title: this._model.title,
+-				favicon: this._model.favicon
++				favicon: this._model.favicon,
++				storageScope: this._model.storageScope,
+ 			};
+ 			this._model.dispose();
+ 			this._model = undefined;
+@@ -374,7 +382,8 @@ export class BrowserEditorInput extends EditorInput {
+ 			id: this._id,
+ 			url: this.url,
+ 			title: this.title,
+-			favicon: this.favicon
++			favicon: this.favicon,
++			storageScope: this.storageScope,
+ 		};
+ 	}
+ }
+diff --git a/src/vs/workbench/contrib/browserView/common/browserView.ts b/src/vs/workbench/contrib/browserView/common/browserView.ts
+index 06bd576537e..667ae36b780 100644
+--- a/src/vs/workbench/contrib/browserView/common/browserView.ts
++++ b/src/vs/workbench/contrib/browserView/common/browserView.ts
+@@ -167,6 +167,8 @@ export interface IBrowserEditorViewState {
+ 	readonly url?: string;
+ 	readonly title?: string;
+ 	readonly favicon?: string;
++	/** Optional per-tab override. Ephemeral tabs discard cookies and storage when closed. */
++	readonly storageScope?: BrowserViewStorageScope;
+ 
+ 	/**
+ 	 * When true, indicates that this browser tab was opened via the localhost
+diff --git a/src/vs/workbench/contrib/browserView/electron-browser/browserViewWorkbenchService.ts b/src/vs/workbench/contrib/browserView/electron-browser/browserViewWorkbenchService.ts
+index 9084813d496..844514ea8b2 100644
+--- a/src/vs/workbench/contrib/browserView/electron-browser/browserViewWorkbenchService.ts
++++ b/src/vs/workbench/contrib/browserView/electron-browser/browserViewWorkbenchService.ts
+@@ -328,7 +328,7 @@ export class BrowserViewWorkbenchService extends Disposable implements IBrowserV
+ 					{
+ 						owner: this._getDefaultOwner(),
+ 						sessionOptions: {
+-							scope: await this._resolveStorageScope()
++							scope: initialState?.storageScope ?? await this._resolveStorageScope()
+ 						},
+ 						initialState: {
+ 							url: initialState?.url,
+diff --git a/src/vs/workbench/contrib/browserView/electron-browser/features/browserTabManagementFeatures.ts b/src/vs/workbench/contrib/browserView/electron-browser/features/browserTabManagementFeatures.ts
+index 8c0dfd27b3b..80ea2c3b8ed 100644
+--- a/src/vs/workbench/contrib/browserView/electron-browser/features/browserTabManagementFeatures.ts
++++ b/src/vs/workbench/contrib/browserView/electron-browser/features/browserTabManagementFeatures.ts
+@@ -22,7 +22,7 @@ import { generateUuid } from '../../../../../base/common/uuid.js';
+ import { BrowserEditorInput } from '../../common/browserEditorInput.js';
+ import { logBrowserOpen } from '../../../../../platform/browserView/common/browserViewTelemetry.js';
+ import { ContextKeyExpr, IContextKeyService, RawContextKey } from '../../../../../platform/contextkey/common/contextkey.js';
+-import { BrowserViewCommandId } from '../../../../../platform/browserView/common/browserView.js';
++import { BrowserViewCommandId, BrowserViewStorageScope } from '../../../../../platform/browserView/common/browserView.js';
+ import { IWorkbenchContribution, registerWorkbenchContribution2, WorkbenchPhase } from '../../../../common/contributions.js';
+ import { IBrowserViewModel, IBrowserViewWorkbenchService } from '../../common/browserView.js';
+ import { BrowserNewTabPlacementSettingId } from '../browserViewWorkbenchService.js';
+@@ -261,6 +261,7 @@ class QuickOpenBrowserAction extends Action2 {
+ interface IOpenBrowserOptions {
+ 	url?: string;
+ 	openToSide?: boolean;
++	storageScope?: BrowserViewStorageScope;
+ 
+ 	/**
+ 	 * If set, the first existing tab with a URL matching this glob pattern will be reused / focused instead of opening a new tab.
+@@ -292,29 +293,10 @@ class OpenIntegratedBrowserAction extends Action2 {
+ 		const group = await browserViewService.getPreferredGroup(options.openToSide ? SIDE_GROUP : undefined);
+ 
+ 		if (options.reuseUrlFilter) {
+-			const filterUri = URI.parse(options.reuseUrlFilter);
+-			const matchingEditor = [...browserViewService.getContextualBrowserViews().values()].find((e) => {
+-				const editorUri = URI.parse(e.url || '');
+-				// URIs default to putting "file" scheme. Check that the scheme is really in the filter.
+-				if (filterUri.scheme && options.reuseUrlFilter!.startsWith(`${filterUri.scheme}:`) && filterUri.scheme !== editorUri.scheme) {
+-					return false;
+-				}
+-				if (filterUri.authority && !match(filterUri.authority, editorUri.authority)) {
+-					return false;
+-				}
+-				if (filterUri.path && !match(filterUri.path, editorUri.path)) {
+-					return false;
+-				}
+-				if (filterUri.query) {
+-					const filterParams = new URLSearchParams(filterUri.query);
+-					const editorParams = new URLSearchParams(editorUri.query);
+-					if (![...filterParams].every(([key, value]) => match(value, editorParams.get(key) ?? ''))) {
+-						return false;
+-					}
+-				}
+-
+-				return true;
+-			});
++			const matchingEditor = [...browserViewService.getContextualBrowserViews().values()].find(e =>
++				matchesBrowserUrlFilter(e.url, options.reuseUrlFilter!) &&
++				(!options.storageScope || e.storageScope === options.storageScope)
++			);
+ 			if (matchingEditor) {
+ 				if (options.url) {
+ 					matchingEditor.navigate(options.url);
+@@ -329,7 +311,7 @@ class OpenIntegratedBrowserAction extends Action2 {
+ 
+ 		logBrowserOpen(telemetryService, options.url ? 'commandWithUrl' : 'commandWithoutUrl');
+ 
+-		const editorPane = await editorService.openEditor({ resource, options: { viewState: { url: options.url } } }, group);
++		const editorPane = await editorService.openEditor({ resource, options: { viewState: { url: options.url, storageScope: options.storageScope } } }, group);
+ 
+ 		// Lock the group when opening to the side
+ 		if (options.openToSide && editorPane?.group) {
+@@ -474,6 +456,137 @@ class CloseAllBrowserTabsInGroupAction extends Action2 {
+ 	}
+ }
+ 
++interface ICloseMatchingBrowserTabsOptions {
++	urlFilter: string;
++	navigateTo?: string;
++	waitForUrlFilter?: string;
++	timeoutMs?: number;
++}
++
++interface ICloseMatchingBrowserTabsResult {
++	closed: number;
++	failed: number;
++}
++
++class CloseMatchingBrowserTabsAction extends Action2 {
++	constructor() {
++		super({
++			id: BrowserViewCommandId.CloseMatching,
++			title: localize2('browser.closeMatching', "Close Matching Browser Tabs"),
++			category: BrowserActionCategory,
++			f1: false,
++		});
++	}
++
++	async run(accessor: ServicesAccessor, input?: string | ICloseMatchingBrowserTabsOptions): Promise<ICloseMatchingBrowserTabsResult> {
++		const options: ICloseMatchingBrowserTabsOptions | undefined = typeof input === 'string'
++			? { urlFilter: input }
++			: input;
++		if (!options?.urlFilter) {
++			return { closed: 0, failed: 0 };
++		}
++		const editorGroupsService = accessor.get(IEditorGroupsService);
++		const matches: Array<{ group: IEditorGroup; editor: BrowserEditorInput }> = [];
++		for (const group of editorGroupsService.getGroups(GroupsOrder.GRID_APPEARANCE)) {
++			for (const editor of group.getEditors(EditorsOrder.SEQUENTIAL)) {
++				if (editor instanceof BrowserEditorInput && matchesBrowserUrlFilter(editor.url, options.urlFilter)) {
++					matches.push({ group, editor });
++				}
++			}
++		}
++
++		const safeToClose = new Set<BrowserEditorInput>();
++		await Promise.all(matches.map(async ({ editor }) => {
++			// Closing an ephemeral session destroys its cookies and origin storage,
++			// so it is safe even when the logout page is unavailable. Persistent
++			// sessions must acknowledge same-origin logout before being closed.
++			if (!options.navigateTo || editor.storageScope === BrowserViewStorageScope.Ephemeral) {
++				safeToClose.add(editor);
++				return;
++			}
++			const acknowledged = await navigateBrowserEditorAndWait(
++				editor,
++				options.navigateTo,
++				options.waitForUrlFilter ?? options.navigateTo,
++				Math.min(Math.max(options.timeoutMs ?? 10_000, 1_000), 30_000),
++			);
++			if (acknowledged) {
++				safeToClose.add(editor);
++			}
++		}));
++
++		let closed = 0;
++		for (const group of editorGroupsService.getGroups(GroupsOrder.GRID_APPEARANCE)) {
++			const browserEditors = matches
++				.filter(match => match.group === group && safeToClose.has(match.editor))
++				.map(match => match.editor);
++			if (browserEditors.length) {
++				await group.closeEditors(browserEditors);
++				closed += browserEditors.length;
++			}
++		}
++		return { closed, failed: matches.length - closed };
++	}
++}
++
++async function navigateBrowserEditorAndWait(editor: BrowserEditorInput, target: string, acknowledgmentFilter: string, timeoutMs: number): Promise<boolean> {
++	try {
++		const model = await editor.resolve();
++		if (matchesBrowserUrlFilter(model.url, acknowledgmentFilter)) {
++			return true;
++		}
++		return await new Promise<boolean>(resolve => {
++			const store = new DisposableStore();
++			let settled = false;
++			const finish = (acknowledged: boolean) => {
++				if (settled) {
++					return;
++				}
++				settled = true;
++				store.dispose();
++				resolve(acknowledged);
++			};
++			store.add(model.onDidNavigate(event => {
++				if (matchesBrowserUrlFilter(event.url, acknowledgmentFilter)) {
++					finish(true);
++				}
++			}));
++			store.add(disposableTimeout(() => finish(false), timeoutMs));
++			editor.navigate(target);
++		});
++	} catch {
++		return false;
++	}
++}
++
++function matchesBrowserUrlFilter(browserUrl: string | undefined, urlFilter: string): boolean {
++	try {
++		const filterUri = URI.parse(urlFilter);
++		const editorUri = URI.parse(browserUrl || '');
++		// URI parsing invents a file scheme for schemeless input. Only compare a
++		// scheme when the caller explicitly supplied one.
++		if (filterUri.scheme && urlFilter.startsWith(`${filterUri.scheme}:`) && filterUri.scheme !== editorUri.scheme) {
++			return false;
++		}
++		if (filterUri.authority && !match(filterUri.authority, editorUri.authority)) {
++			return false;
++		}
++		if (filterUri.path && !match(filterUri.path, editorUri.path)) {
++			return false;
++		}
++		if (filterUri.query) {
++			const filterParams = new URLSearchParams(filterUri.query);
++			const editorParams = new URLSearchParams(editorUri.query);
++			if (![...filterParams].every(([key, value]) => match(value, editorParams.get(key) ?? ''))) {
++				return false;
++			}
++		}
++		return true;
++	} catch {
++		return false;
++	}
++}
++
+ class OpenOrListBrowsersAction extends Action2 {
+ 	constructor() {
+ 		super({
+@@ -549,6 +662,7 @@ registerAction2(OpenOrListBrowsersAction);
+ registerAction2(NewTabAction);
+ registerAction2(CloseAllBrowserTabsAction);
+ registerAction2(CloseAllBrowserTabsInGroupAction);
++registerAction2(CloseMatchingBrowserTabsAction);
+ 
+ registerAction2(class ToggleBrowserTitleBarButton extends ToggleTitleBarConfigAction {
+ 	constructor() {
+diff --git a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostChatContribution.ts b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostChatContribution.ts
+index 7d980d949ca..17169e202fe 100644
+--- a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostChatContribution.ts
++++ b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostChatContribution.ts
+@@ -8,7 +8,7 @@ import { Event } from '../../../../../../base/common/event.js';
+ import { Disposable, DisposableMap, DisposableStore, toDisposable } from '../../../../../../base/common/lifecycle.js';
+ import { ThemeIcon } from '../../../../../../base/common/themables.js';
+ import { localize } from '../../../../../../nls.js';
+-import { affectsAgentHostProviderPreference, IAgentHostService, shouldSurfaceLocalAgentHostProvider, type AgentProvider } from '../../../../../../platform/agentHost/common/agentService.js';
++import { affectsAgentHostProviderPreference, CODEX_AGENT_PROVIDER_ID, IAgentHostService, shouldSurfaceLocalAgentHostProvider, type AgentProvider } from '../../../../../../platform/agentHost/common/agentService.js';
+ import { IAgentHostEnablementService } from '../../../../../../platform/agentHost/common/agentHostEnablementService.js';
+ import { type ProtectedResourceMetadata } from '../../../../../../platform/agentHost/common/state/protocol/state.js';
+ import { NotificationType } from '../../../../../../platform/agentHost/common/state/sessionActions.js';
+@@ -231,7 +231,7 @@ export class AgentHostContribution extends Disposable implements IWorkbenchContr
+ 			canDelegate: true,
+ 			requiresCustomModels: true,
+ 			supportsAutoModel: agentHostProviderSupportsAutoModel(agent.provider),
+-			requiresCopilotSignIn: true,
++			requiresCopilotSignIn: agent.provider !== CODEX_AGENT_PROVIDER_ID,
+ 			agentHostProviderId: agent.provider,
+ 			supportsDelegation: true,
+ 			capabilities: {
+diff --git a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts
+index a3b21f38005..60a372e016f 100644
+--- a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts
++++ b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts
+@@ -96,7 +96,7 @@ import { buildHostLocalEventsPath } from '../../copilotCliEventsUri.js';
+ import { toolDataToDefinition } from './agentHostToolUtils.js';
+ import { IAgentHostUntitledProvisionalSessionService } from './agentHostUntitledProvisionalSessionService.js';
+ import { IAgentHostImportConversationStore } from './agentHostImportConversationStore.js';
+-import { activeTurnToProgress, BOOLEAN_TRUE_OPTION_ID, completedToolCallToEditParts, completedToolCallToSerialized, convertProtocolAnswers, convertProtocolPlanReviewResult, createInputRequestCarousel, createInputRequestPlanReview, finalizeToolInvocation, formatTurnResponseDetails, getTerminalContent, getUrlInputRequestPresentation, isSubagentTool, makeAhpTerminalToolSessionId, messageAttachmentsToVariableData, messageToVariableData, parseAhpTerminalToolSessionId, rewriteAgentHostLinkTarget, stringOrMarkdownToString, systemNotificationToChatPart, toolCallAuthenticationServer, toolCallConfirmationMessages, toolCallStateToInvocation, toolCallStateToPreparedInvocation, toolCallStateToStreamingInvocation, turnsToHistory, updateRunningToolSpecificData, usageInfoToAutoModeResolution, usageInfoToChatUsage, usageInfoToQuotas, type IAgentHostToolInvocationOptions, type IToolCallFileEdit, type TurnModelLookup } from './stateToProgressAdapter.js';
++import { activeTurnToProgress, BOOLEAN_TRUE_OPTION_ID, completedToolCallToEditParts, completedToolCallToSerialized, convertProtocolAnswers, convertProtocolPlanReviewResult, createInputRequestCarousel, createInputRequestPlanReview, finalizeToolInvocation, formatTurnResponseDetails, getTerminalContent, getUrlInputRequestPresentation, isSubagentTool, makeAhpTerminalToolSessionId, messageAttachmentsToVariableData, messageToVariableData, parseAhpTerminalToolSessionId, rewriteAgentHostLinkTarget, rewriteAgentHostRelativeFileLinkTarget, stringOrMarkdownToString, systemNotificationToChatPart, toolCallAuthenticationServer, toolCallConfirmationMessages, toolCallStateToInvocation, toolCallStateToPreparedInvocation, toolCallStateToStreamingInvocation, turnsToHistory, updateRunningToolSpecificData, usageInfoToAutoModeResolution, usageInfoToChatUsage, usageInfoToQuotas, type IAgentHostToolInvocationOptions, type IToolCallFileEdit, type TurnModelLookup } from './stateToProgressAdapter.js';
+ import { resolveMcpServerAuthentication, agentHostMcpServerId } from './agentHostAuth.js';
+ export { toolDataToDefinition };
+ 
+@@ -5121,8 +5121,23 @@ export class AgentHostSessionHandler extends Disposable implements IChatSessionC
+ 			: this._ensureAdditionalChatSubscription(chatUri);
+ 	}
+ 
+-	resolveChatResponseUri(_sessionResource: URI, href: string, _kind: 'link' | 'image'): string {
+-		return rewriteAgentHostLinkTarget(href, this._config.connectionAuthority);
++	resolveChatResponseUri(sessionResource: URI, href: string, _kind: 'link' | 'image'): string {
++		const rewritten = rewriteAgentHostLinkTarget(href, this._config.connectionAuthority);
++		if (rewritten !== href) {
++			return rewritten;
++		}
++
++		let workingDirectory: URI | undefined;
++		try {
++			const resolvedSession = this._resolveSessionUri(sessionResource);
++			const rawWorkingDirectory = this._getSessionState(resolvedSession.toString())?.workingDirectories?.[0];
++			workingDirectory = typeof rawWorkingDirectory === 'string' ? URI.parse(rawWorkingDirectory) : rawWorkingDirectory;
++		} catch {
++			// A provisional session may not have a resolved backend session yet.
++		}
++		workingDirectory ??= this._resolveRequestedWorkingDirectory(sessionResource);
++
++		return rewriteAgentHostRelativeFileLinkTarget(href, workingDirectory, this._config.connectionAuthority);
+ 	}
+ 
+ 	/**
+diff --git a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSettings.contribution.ts b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSettings.contribution.ts
+index a748e987686..c70c7dbb165 100644
+--- a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSettings.contribution.ts
++++ b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSettings.contribution.ts
+@@ -3,17 +3,28 @@
+  *  Licensed under the MIT License. See License.txt in the project root for license information.
+  *--------------------------------------------------------------------------------------------*/
+ 
++import { timeout } from '../../../../../../base/common/async.js';
++import { CancellationTokenSource } from '../../../../../../base/common/cancellation.js';
++import { isCancellationError } from '../../../../../../base/common/errors.js';
+ import { Disposable } from '../../../../../../base/common/lifecycle.js';
+ import { localize, localize2 } from '../../../../../../nls.js';
+ import { Action2, MenuId, registerAction2 } from '../../../../../../platform/actions/common/actions.js';
+ import { AGENT_HOST_ENABLED_CONTEXT_KEY } from '../../../../../../platform/agentHost/common/agentHostEnablementService.js';
++import { AgentHostCodexAgentEnabledSettingId, CODEX_AGENT_PROVIDER_ID, IAgentHostService, type IAgentProviderAccountState } from '../../../../../../platform/agentHost/common/agentService.js';
++import { ICommandService } from '../../../../../../platform/commands/common/commands.js';
+ import { ContextKeyExpr } from '../../../../../../platform/contextkey/common/contextkey.js';
++import { IDialogService } from '../../../../../../platform/dialogs/common/dialogs.js';
+ import { IFileService } from '../../../../../../platform/files/common/files.js';
+ import { IInstantiationService, ServicesAccessor } from '../../../../../../platform/instantiation/common/instantiation.js';
+ import { ILabelService } from '../../../../../../platform/label/common/label.js';
++import { INotificationService } from '../../../../../../platform/notification/common/notification.js';
++import { IProgressService, ProgressLocation } from '../../../../../../platform/progress/common/progress.js';
++import { IQuickInputService, type IQuickPickItem } from '../../../../../../platform/quickinput/common/quickInput.js';
+ import { IWorkbenchContribution, registerWorkbenchContribution2, WorkbenchPhase } from '../../../../../common/contributions.js';
++import { RemoteNameContext } from '../../../../../common/contextkeys.js';
+ import { IEditorService } from '../../../../../services/editor/common/editorService.js';
+ import { ChatContextKeys } from '../../../common/actions/chatContextKeys.js';
++import { CodexAccountCommandId, type ICodexAccountLoginCommandResult } from '../../../common/codexAccountCommands.js';
+ import { agentHostSettingsUri, AGENT_HOST_SETTINGS_SCHEME, AgentHostSettingsFileSystemProvider, AgentHostSettingsSchemaRegistrar } from './agentHostSettingsFileSystemProvider.js';
+ 
+ /**
+@@ -52,12 +63,19 @@ registerWorkbenchContribution2(AgentHostSettingsContribution.ID, AgentHostSettin
+ 
+ /** Matches local agent-host session types (e.g. `agent-host-copilotcli`), excluding `remote-*` targets which this ambient-only command does not support. */
+ const LOCAL_AGENT_HOST_SESSION_TYPE_RE = /^agent-host-/;
++const LOCAL_CODEX_SESSION_TYPE_RE = /^agent-host-codex$/;
+ 
+ const agentHostSettingsPrecondition = ContextKeyExpr.and(
+ 	ChatContextKeys.enabled,
+ 	AGENT_HOST_ENABLED_CONTEXT_KEY,
+ );
+ 
++const codexAccountPrecondition = ContextKeyExpr.and(
++	agentHostSettingsPrecondition,
++	ContextKeyExpr.equals(`config.${AgentHostCodexAgentEnabledSettingId}`, true),
++	RemoteNameContext.isEqualTo(''),
++);
++
+ registerAction2(class OpenAgentHostSettingsAction extends Action2 {
+ 	constructor() {
+ 		super({
+@@ -82,3 +100,158 @@ registerAction2(class OpenAgentHostSettingsAction extends Action2 {
+ 		await editorService.openEditor({ resource: agentHostSettingsUri(), options: { pinned: true } });
+ 	}
+ });
++
++interface ICodexAccountAction extends IQuickPickItem {
++	readonly id: 'activate' | 'signOut';
++}
++
++registerAction2(class ManageCodexOpenAIAccountAction extends Action2 {
++	constructor() {
++		super({
++			id: 'workbench.action.chat.manageCodexOpenAIAccount',
++			title: localize2('manageCodexOpenAIAccount', "Manage Codex OpenAI Account..."),
++			f1: true,
++			precondition: codexAccountPrecondition,
++			menu: [{
++				id: MenuId.AgentSessionsContext,
++				group: '3_settings',
++				order: 2,
++				when: ContextKeyExpr.and(
++					codexAccountPrecondition,
++					ContextKeyExpr.regex(ChatContextKeys.agentSessionType.key, LOCAL_CODEX_SESSION_TYPE_RE),
++				),
++			}, {
++				id: MenuId.AccountsContext,
++				group: '2_copilot',
++				order: 50,
++				when: codexAccountPrecondition,
++			}],
++		});
++	}
++
++	async run(accessor: ServicesAccessor): Promise<void> {
++		const agentHostService = accessor.get(IAgentHostService);
++		const notificationService = accessor.get(INotificationService);
++		const commandService = accessor.get(ICommandService);
++		const dialogService = accessor.get(IDialogService);
++		const progressService = accessor.get(IProgressService);
++		const quickInputService = accessor.get(IQuickInputService);
++		try {
++			if (!agentHostService.getProviderAccount) {
++				throw new Error(localize('codexOpenAIAccount.unavailable', "OpenAI account management is unavailable for this agent host."));
++			}
++			const account = await agentHostService.getProviderAccount(CODEX_AGENT_PROVIDER_ID);
++			if (account.status === 'signedIn') {
++				await this._showSignedInAccount(agentHostService, notificationService, quickInputService, dialogService, account);
++				return;
++			}
++			await this._signIn(agentHostService, notificationService, commandService, progressService);
++		} catch (error) {
++			if (!isCancellationError(error)) {
++				notificationService.error(error);
++			}
++		}
++	}
++
++	private async _showSignedInAccount(agentHostService: IAgentHostService, notificationService: INotificationService, quickInputService: IQuickInputService, dialogService: IDialogService, account: IAgentProviderAccountState): Promise<void> {
++		const plan = account.authType === 'subscription'
++			? account.planType ? localize('codexOpenAIAccount.plan', "ChatGPT {0}", account.planType) : localize('codexOpenAIAccount.subscription', "ChatGPT subscription")
++			: account.authType === 'apiKey' ? localize('codexOpenAIAccount.apiKey', "OpenAI API key") : localize('codexOpenAIAccount.other', "OpenAI account");
++			const actions: ICodexAccountAction[] = [];
++			if (!account.active) {
++				actions.push({
++					id: 'activate',
++					label: account.authType === 'subscription'
++						? localize('codexOpenAIAccount.useSubscription', "Use ChatGPT for Codex")
++						: localize('codexOpenAIAccount.useAccount', "Use This OpenAI Account"),
++					description: localize('codexOpenAIAccount.useDescription', "Route new Codex work through this account"),
++				});
++			}
++			actions.push({
++				id: 'signOut',
++				label: localize('codexOpenAIAccount.signOut', "Sign Out"),
++				description: plan,
++			});
++			const choice = await quickInputService.pick<ICodexAccountAction>(actions, {
++				title: localize('codexOpenAIAccount.title', "Codex OpenAI Account"),
++				placeHolder: account.active
++					? localize('codexOpenAIAccount.active', "Using {0}", plan)
++					: localize('codexOpenAIAccount.inactive', "Signed in with {0}; Codex is using another source", plan),
++			});
++			if (choice?.id === 'activate') {
++				if (!agentHostService.activateProviderAccount) {
++					throw new Error(localize('codexOpenAIAccount.activationUnavailable', "OpenAI account activation is unavailable for this agent host."));
++				}
++				await agentHostService.activateProviderAccount(CODEX_AGENT_PROVIDER_ID);
++				notificationService.info(localize('codexOpenAIAccount.activated', "Codex will use this OpenAI account for new work."));
++				return;
++			}
++			if (choice?.id !== 'signOut') {
++			return;
++		}
++		const confirmation = await dialogService.confirm({
++			type: 'warning',
++			message: localize('codexOpenAIAccount.confirmSignOut', "Log out of Codex?"),
++			detail: localize('codexOpenAIAccount.confirmSignOutDetail', "This removes the OpenAI account from the local Codex credential store. Other local Codex clients that share this store may also require sign-in again."),
++			primaryButton: localize({ key: 'codexOpenAIAccount.confirmSignOutButton', comment: ['&& denotes a mnemonic'] }, "&&Log Out"),
++		});
++		if (!confirmation.confirmed) {
++			return;
++		}
++		if (!agentHostService.logoutProviderAccount) {
++			throw new Error(localize('codexOpenAIAccount.logoutUnavailable', "OpenAI account logout is unavailable for this agent host."));
++		}
++		await agentHostService.logoutProviderAccount(CODEX_AGENT_PROVIDER_ID);
++		notificationService.info(localize('codexOpenAIAccount.signedOut', "Signed out of the OpenAI account used by Codex."));
++	}
++
++	private async _signIn(agentHostService: IAgentHostService, notificationService: INotificationService, commandService: ICommandService, progressService: IProgressService): Promise<void> {
++		if (!agentHostService.getProviderAccount || !agentHostService.cancelProviderAccountLogin) {
++			throw new Error(localize('codexOpenAIAccount.loginUnavailable', "OpenAI account login is unavailable for this agent host."));
++		}
++		const getAccount = agentHostService.getProviderAccount.bind(agentHostService);
++		const cancelLogin = agentHostService.cancelProviderAccountLogin.bind(agentHostService);
++		const login = await commandService.executeCommand<ICodexAccountLoginCommandResult>(CodexAccountCommandId.Login);
++		if (!login) {
++			throw new Error(localize('codexOpenAIAccount.loginFailedToStart', "OpenAI sign-in could not be started."));
++		}
++
++		const cancellation = new CancellationTokenSource();
++		let signedIn = false;
++		try {
++			await progressService.withProgress({
++				location: ProgressLocation.Notification,
++				title: localize('codexOpenAIAccount.waiting', "Complete OpenAI sign-in in your browser"),
++				cancellable: true,
++			}, async () => {
++				const deadline = Date.now() + 10 * 60 * 1000;
++				while (!cancellation.token.isCancellationRequested && Date.now() < deadline) {
++					const account = await getAccount(CODEX_AGENT_PROVIDER_ID);
++						if (account.status === 'signedIn' && account.active) {
++						signedIn = true;
++						return;
++					}
++					if (account.status === 'error') {
++						throw new Error(account.error ?? localize('codexOpenAIAccount.failed', "OpenAI sign-in failed."));
++					}
++					await timeout(1000, cancellation.token);
++				}
++				if (!cancellation.token.isCancellationRequested) {
++					throw new Error(localize('codexOpenAIAccount.timedOut', "OpenAI sign-in timed out. Run the account command to try again."));
++				}
++			}, () => cancellation.cancel());
++		} finally {
++			cancellation.dispose();
++			if (!signedIn) {
++				try {
++					await cancelLogin(CODEX_AGENT_PROVIDER_ID, login.loginId);
++				} catch {
++					// Preserve the original failure or cancellation shown to the user.
++				}
++			}
++		}
++		if (signedIn) {
++			notificationService.info(localize('codexOpenAIAccount.complete', "Signed in to OpenAI. Codex will use the models and limits included with your ChatGPT plan."));
++		}
++	}
++});
+diff --git a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts
+index c158d16f83a..a7364c3e8d7 100644
+--- a/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts
++++ b/src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts
+@@ -17,7 +17,7 @@ import type { ChatInputRequestWithPlanReview, IAgentHostPlanReview } from '../..
+ import { getToolKind } from '../../../../../../platform/agentHost/common/state/sessionReducers.js';
+ import { readToolCallMeta } from '../../../../../../platform/agentHost/common/meta/agentToolCallMeta.js';
+ import { getChatErrorDetailsFromMeta, IChatErrorContext } from '../../../common/chatErrorMessages.js';
+-import { AGENT_HOST_SCHEME, toAgentHostUri } from '../../../../../../platform/agentHost/common/agentHostUri.js';
++import { AGENT_HOST_SCHEME, fromAgentHostUri, toAgentHostUri } from '../../../../../../platform/agentHost/common/agentHostUri.js';
+ import { AgentHostElementAttachmentDisplayKind } from '../../../../../../platform/agentHost/common/meta/agentElementAttachments.js';
+ import { getAgentFeedbackAttachmentMetadata, isAgentFeedbackAnnotationsAttachment, isAgentFeedbackAttachment } from '../../../../../../platform/agentHost/common/meta/agentFeedbackAttachments.js';
+ import { getBrowserViewAttachmentMetadata, isBrowserViewAttachment } from '../../../../../../platform/agentHost/common/meta/browserViewAttachments.js';
+@@ -1954,6 +1954,61 @@ export function rewriteAgentHostLinkTarget(href: string, connectionAuthority: st
+ 	return agentHostUri.toString();
+ }
+ 
++/**
++ * Resolves a schemeless file link against an Agent Host session's working
++ * directory and wraps it for the owning connection. Parent-directory
++ * traversal is intentionally rejected: relative response links must stay
++ * rooted in the session directory, while absolute links continue to be
++ * handled by {@link rewriteAgentHostLinkTarget}.
++ */
++export function rewriteAgentHostRelativeFileLinkTarget(href: string, workingDirectory: URI | undefined, connectionAuthority: string): string {
++	if (!workingDirectory) {
++		return href;
++	}
++
++	const fragmentIndex = href.indexOf('#');
++	const rawPath = fragmentIndex >= 0 ? href.substring(0, fragmentIndex) : href;
++	if (!rawPath || rawPath.includes('?')) {
++		return href;
++	}
++
++	const existingFragment = fragmentIndex >= 0 ? href.substring(fragmentIndex + 1) : '';
++	const parsedPath = existingFragment ? { path: rawPath } : parseFileLocation(rawPath);
++
++	// Anything with a URI scheme (including Windows drive-relative paths such
++	// as C:foo) is not a working-directory-relative file target. Check after
++	// removing a :line[:column] suffix so `README.md:12` stays relative. A
++	// regex is used here because valid relative file names may contain spaces,
++	// which strict URI parsing rejects.
++	if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(parsedPath.path)) {
++		return href;
++	}
++
++	let decodedPath: string;
++	try {
++		decodedPath = decodeURIComponent(parsedPath.path).replaceAll('\\', '/');
++	} catch {
++		return href;
++	}
++
++	if (posix.isAbsolute(decodedPath) || win32.isAbsolute(decodedPath)) {
++		return href;
++	}
++
++	const segments = decodedPath.split('/').filter(segment => segment.length > 0 && segment !== '.');
++	if (segments.length === 0 || segments.some(segment => segment === '..')) {
++		return href;
++	}
++
++	const selectionFragment = formatLocationFragment(parsedPath);
++	try {
++		const hostWorkingDirectory = workingDirectory.scheme === AGENT_HOST_SCHEME ? fromAgentHostUri(workingDirectory) : workingDirectory;
++		return toAgentHostUri(URI.joinPath(hostWorkingDirectory, ...segments).with({ fragment: existingFragment || selectionFragment }), connectionAuthority).toString();
++	} catch {
++		return href;
++	}
++}
++
+ /**
+  * Converts a protocol `StringOrMarkdown` value to a chat-layer `IMarkdownString`.
+  *
+diff --git a/src/vs/workbench/contrib/chat/browser/agentSessions/agentSessions.ts b/src/vs/workbench/contrib/chat/browser/agentSessions/agentSessions.ts
+index d9bf3b171aa..298697c2b93 100644
+--- a/src/vs/workbench/contrib/chat/browser/agentSessions/agentSessions.ts
++++ b/src/vs/workbench/contrib/chat/browser/agentSessions/agentSessions.ts
+@@ -188,7 +188,7 @@ export function getAgentSessionProviderDescription(provider: AgentSessionTarget)
+ 		case AgentSessionProviders.Codex:
+ 			return localize('chat.session.providerDescription.codex', "Open a new Codex session using the Codex extension from OpenAI. Codex sessions can be managed from the chat sessions view.");
+ 		case AgentSessionProviders.AgentHostCodex:
+-			return localize('chat.session.providerDescription.agentHostCodex', "Delegate tasks to the Codex App Server using the Codex models included in your GitHub Copilot subscription. The agent iterates via chat and works interactively to implement changes on your main workspace.");
++			return localize('chat.session.providerDescription.agentHostCodex', "Delegate tasks to the Codex App Server using a ChatGPT subscription or GitHub Copilot. The agent iterates via chat and works interactively to implement changes on your main workspace.");
+ 		case AgentSessionProviders.Growth:
+ 			return localize('chat.session.providerDescription.growth', "Learn about Copilot features.");
+ 		case AgentSessionProviders.AgentHostCopilot:
+diff --git a/src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts b/src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts
+index ee8a02fdd55..f1e39f75af0 100644
+--- a/src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts
++++ b/src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts
+@@ -503,6 +503,12 @@ configurationRegistry.registerConfiguration({
+ 				type: 'string'
+ 			},
+ 			default: {
++			},
++			agentsWindow: {
++				default: {
++					'*.md': 'vscode.markdown.preview.editor',
++					'*.markdown': 'vscode.markdown.preview.editor',
++				}
+ 			}
+ 		},
+ 		[ChatConfiguration.NotifyWindowOnConfirmation]: {
+@@ -740,6 +746,7 @@ configurationRegistry.registerConfiguration({
+ 		},
+ 		[ChatConfiguration.ArtifactsEnabled]: {
+ 			default: false,
++			agentsWindow: { default: true },
+ 			description: nls.localize('chat.artifacts.enabled', "Controls whether the artifacts view is available in chat."),
+ 			type: 'boolean',
+ 			tags: ['experimental']
+@@ -764,6 +771,17 @@ configurationRegistry.registerConfiguration({
+ 			default: {
+ 				'**/*plan*.md': { groupName: 'Plans' }
+ 			},
++			agentsWindow: {
++				default: {
++					'**/*plan*.md': { groupName: 'Plans' },
++					'**/*.{pdf,md,markdown,txt,rtf,doc,docx,odt,pages}': { groupName: 'Documents' },
++					'**/*.{csv,tsv,xls,xlsx,ods,numbers}': { groupName: 'Spreadsheets' },
++					'**/*.{ppt,pptx,odp,key}': { groupName: 'Presentations' },
++					'**/*.{html,htm}': { groupName: 'Web previews' },
++					'**/*.{png,jpg,jpeg,gif,webp,avif,bmp,svg,mp3,wav,ogg,oga,mp4,webm,mov}': { groupName: 'Media' },
++					'**/*.{zip,tar,gz,tgz,7z}': { groupName: 'Archives' },
++				}
++			},
+ 			description: nls.localize('chat.artifacts.rules.byFilePath', "Rules for extracting artifacts from written files by file path pattern. Maps glob patterns to group configuration."),
+ 			type: 'object',
+ 			additionalProperties: {
+@@ -866,7 +884,7 @@ configurationRegistry.registerConfiguration({
+ 		[CodexPreferAgentHostEditorSettingId]: {
+ 			type: 'boolean',
+ 			markdownDescription: nls.localize('chat.editor.codex.preferAgentHost', "When enabled, Codex sessions opened from the regular workbench (sidebar chat) run inside the agent host process using the Codex App Server instead of the OpenAI extension. Only one Codex implementation surfaces per window. Requires `#chat.agentHost.enabled#` and `#chat.agentHost.codexAgent.enabled#`."),
+-			default: false,
++			default: product.nameShort === 'StatsKey Workbench',
+ 			tags: ['experimental'],
+ 			experiment: { mode: 'startup' },
+ 		},
+diff --git a/src/vs/workbench/contrib/chat/browser/widget/chatArtifactsWidget.ts b/src/vs/workbench/contrib/chat/browser/widget/chatArtifactsWidget.ts
+index ce96986e5f4..a7f53be9419 100644
+--- a/src/vs/workbench/contrib/chat/browser/widget/chatArtifactsWidget.ts
++++ b/src/vs/workbench/contrib/chat/browser/widget/chatArtifactsWidget.ts
+@@ -23,11 +23,12 @@ import { IInstantiationService } from '../../../../../platform/instantiation/com
+ import { IListAccessibilityProvider } from '../../../../../base/browser/ui/list/listWidget.js';
+ import { WorkbenchObjectTree } from '../../../../../platform/list/browser/listService.js';
+ import { IOpenerService } from '../../../../../platform/opener/common/opener.js';
++import { INotificationService } from '../../../../../platform/notification/common/notification.js';
+ import { ChatConfiguration } from '../../common/constants.js';
+ import { ChatMemoryFileResource } from '../../common/chatArtifactExtraction.js';
+ import { IChatArtifact, IChatArtifactsService, IArtifactSourceGroup, ArtifactSource } from '../../common/tools/chatArtifactsService.js';
+ import { IChatImageCarouselService } from '../chatImageCarouselService.js';
+-import { getEditorOverrideForChatResource } from './chatContentParts/chatInlineAnchorWidget.js';
++import { getEditorOverrideForChatResource, openChatResourceInIntegratedBrowser } from './chatContentParts/chatInlineAnchorWidget.js';
+ 
+ const ARTIFACT_TYPE_ICONS: Record<string, ThemeIcon> = {
+ 	devServer: Codicon.globe,
+@@ -110,6 +111,7 @@ export class ChatArtifactsWidget extends Disposable {
+ 		@ICommandService private readonly _commandService: ICommandService,
+ 		@IFileService private readonly _fileService: IFileService,
+ 		@IFileDialogService private readonly _fileDialogService: IFileDialogService,
++		@INotificationService private readonly _notificationService: INotificationService,
+ 		@IChatImageCarouselService private readonly _chatImageCarouselService: IChatImageCarouselService,
+ 	) {
+ 		super();
+@@ -169,7 +171,7 @@ export class ChatArtifactsWidget extends Disposable {
+ 						this._openGroupInCarousel(e.element);
+ 					}
+ 				} else if (isLeafNode(e.element)) {
+-					this._openLeafArtifact(e.element.artifact);
++					void this._openLeafArtifact(e.element.artifact);
+ 				}
+ 			}));
+ 
+@@ -217,16 +219,18 @@ export class ChatArtifactsWidget extends Disposable {
+ 		}
+ 	}
+ 
+-	private _openLeafArtifact(artifact: IChatArtifact): void {
++	private async _openLeafArtifact(artifact: IChatArtifact): Promise<void> {
+ 		if (artifact.type === 'screenshot' && this._configurationService.getValue<boolean>(ChatConfiguration.ImageCarouselEnabled)) {
+-			this._openScreenshotInCarousel(artifact);
++			await this._openScreenshotInCarousel(artifact);
+ 		} else if (artifact.uri) {
+ 			const uri = URI.parse(artifact.uri);
+ 			if (ChatMemoryFileResource.isChatMemoryFileUri(uri)) {
+-				this._openMemoryFileArtifact(uri);
++				await this._openMemoryFileArtifact(uri);
++			} else if (await openChatResourceInIntegratedBrowser(uri, this._commandService)) {
++				return;
+ 			} else {
+ 				const editorOverride = getEditorOverrideForChatResource(uri, this._configurationService);
+-				this._openerService.open(uri, {
++				await this._openerService.open(uri, {
+ 					fromUserGesture: true,
+ 					editorOptions: { override: editorOverride },
+ 				});
+@@ -249,8 +253,11 @@ export class ChatArtifactsWidget extends Disposable {
+ 		);
+ 		if (resolvedUriStr) {
+ 			const resolvedUri = URI.parse(resolvedUriStr);
++			if (await openChatResourceInIntegratedBrowser(resolvedUri, this._commandService)) {
++				return;
++			}
+ 			const editorOverride = getEditorOverrideForChatResource(resolvedUri, this._configurationService);
+-			this._openerService.open(resolvedUri, {
++			await this._openerService.open(resolvedUri, {
+ 				fromUserGesture: true,
+ 				editorOptions: { override: editorOverride },
+ 			});
+@@ -273,7 +280,26 @@ export class ChatArtifactsWidget extends Disposable {
+ 	}
+ 
+ 	private async _saveArtifact(artifact: IChatArtifact): Promise<void> {
+-		const sourceUri = URI.parse(artifact.uri);
++		let sourceUri = URI.parse(artifact.uri);
++		if (ChatMemoryFileResource.isChatMemoryFileUri(sourceUri)) {
++			const { memoryPath, sessionResource } = ChatMemoryFileResource.parse(sourceUri);
++			let resolvedUri: string | undefined;
++			try {
++				resolvedUri = await this._commandService.executeCommand(
++					'github.copilot.chat.tools.memory.resolveMemoryFileUri',
++					memoryPath,
++					sessionResource,
++				);
++			} catch (error) {
++				this._notificationService.error(localize('chat.artifacts.resolveSaveException', "Failed to resolve {0} for saving: {1}", artifact.label, error));
++				return;
++			}
++			if (!resolvedUri) {
++				this._notificationService.error(localize('chat.artifacts.resolveSaveError', "Failed to resolve {0} for saving.", artifact.label));
++				return;
++			}
++			sourceUri = URI.parse(resolvedUri);
++		}
+ 		const defaultFileName = sourceUri.path.split('/').pop() ?? artifact.label;
+ 		const defaultPath = await this._fileDialogService.defaultFilePath();
+ 		const defaultUri = URI.joinPath(defaultPath, defaultFileName);
+@@ -284,8 +310,11 @@ export class ChatArtifactsWidget extends Disposable {
+ 		});
+ 
+ 		if (targetUri) {
+-			const content = await this._fileService.readFile(sourceUri);
+-			await this._fileService.writeFile(targetUri, content.value);
++			try {
++				await this._fileService.copy(sourceUri.with({ fragment: '' }), targetUri, true);
++			} catch (error) {
++				this._notificationService.error(localize('chat.artifacts.saveError', "Failed to save {0}: {1}", artifact.label, error));
++			}
+ 		}
+ 	}
+ }
+@@ -529,12 +558,14 @@ class ChatArtifactLeafRenderer implements ITreeRenderer<ArtifactTreeElement, voi
+ 				run: () => clearFn(),
+ 			}));
+ 		}
+-		actions.push(toAction({
+-			id: 'chatArtifacts.save',
+-			label: localize('chat.artifacts.save', "Save artifact"),
+-			class: ThemeIcon.asClassName(Codicon.save),
+-			run: () => this._onSave(artifact),
+-		}));
++		if (artifact.type !== 'devServer') {
++			actions.push(toAction({
++				id: 'chatArtifacts.save',
++				label: localize('chat.artifacts.save', "Save As..."),
++				class: ThemeIcon.asClassName(Codicon.cloudDownload),
++				run: () => this._onSave(artifact),
++			}));
++		}
+ 		templateData.actionBar.push(actions, { icon: true, label: false });
+ 	}
+ 
+diff --git a/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatInlineAnchorWidget.ts b/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatInlineAnchorWidget.ts
+index fb870f4e1cf..d254c343ed5 100644
+--- a/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatInlineAnchorWidget.ts
++++ b/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatInlineAnchorWidget.ts
+@@ -9,6 +9,7 @@ import { StandardMouseEvent } from '../../../../../../base/browser/mouseEvent.js
+ import { getDefaultHoverDelegate } from '../../../../../../base/browser/ui/hover/hoverDelegateFactory.js';
+ import { KeyCode, KeyMod } from '../../../../../../base/common/keyCodes.js';
+ import { Disposable, DisposableStore } from '../../../../../../base/common/lifecycle.js';
++import { basename, extname } from '../../../../../../base/common/resources.js';
+ import { URI } from '../../../../../../base/common/uri.js';
+ import { ICodeEditorService } from '../../../../../../editor/browser/services/codeEditorService.js';
+ import { IRange } from '../../../../../../editor/common/core/range.js';
+@@ -25,6 +26,7 @@ import { IClipboardService } from '../../../../../../platform/clipboard/common/c
+ import { ICommandService } from '../../../../../../platform/commands/common/commands.js';
+ import { IContextKey, IContextKeyService } from '../../../../../../platform/contextkey/common/contextkey.js';
+ import { IContextMenuService } from '../../../../../../platform/contextview/browser/contextView.js';
++import { IFileDialogService } from '../../../../../../platform/dialogs/common/dialogs.js';
+ import { IResourceStat } from '../../../../../../platform/dnd/browser/dnd.js';
+ import { ITextEditorOptions, ITextResourceEditorInput } from '../../../../../../platform/editor/common/editor.js';
+ import { FileKind, IFileService } from '../../../../../../platform/files/common/files.js';
+@@ -40,6 +42,7 @@ import { StaticResourceContextKey } from '../../../../../common/contextkeys.js';
+ import { IEditorService, SIDE_GROUP } from '../../../../../services/editor/common/editorService.js';
+ import { globMatchesResource } from '../../../../../services/editor/common/editorResolverService.js';
+ import { INotebookDocumentService } from '../../../../../services/notebook/common/notebookDocumentService.js';
++import { INotificationService } from '../../../../../../platform/notification/common/notification.js';
+ import { ExplorerFolderContext } from '../../../../files/common/files.js';
+ import { IWorkspaceSymbol } from '../../../../search/common/search.js';
+ import { IChatContentInlineReference } from '../../../common/chatService/chatService.js';
+@@ -54,6 +57,7 @@ import { Schemas } from '../../../../../../base/common/network.js';
+ import { Codicon } from '../../../../../../base/common/codicons.js';
+ import { ThemeIcon } from '../../../../../../base/common/themables.js';
+ import { BrowserEditorInput } from '../../../../browserView/common/browserEditorInput.js';
++import { BrowserViewCommandId } from '../../../../../../platform/browserView/common/browserView.js';
+ 
+ /**
+  * Returns the editor ID to use when opening a resource from chat pills (inline anchors), based on the
+@@ -71,6 +75,26 @@ export function getEditorOverrideForChatResource(resource: URI, configurationSer
+ 	return undefined;
+ }
+ 
++const INTEGRATED_BROWSER_PREVIEW_EXTENSIONS = new Set(['.pdf', '.html', '.htm']);
++
++/** Returns whether the integrated browser provides a stronger local preview than the text editor. */
++export function shouldOpenChatResourceInIntegratedBrowser(resource: URI): boolean {
++	return resource.scheme === Schemas.file && INTEGRATED_BROWSER_PREVIEW_EXTENSIONS.has(extname(resource).toLowerCase());
++}
++
++/** Opens supported local resources in the integrated browser, falling back cleanly when it is unavailable. */
++export async function openChatResourceInIntegratedBrowser(resource: URI, commandService: ICommandService): Promise<boolean> {
++	if (!shouldOpenChatResourceInIntegratedBrowser(resource)) {
++		return false;
++	}
++	try {
++		await commandService.executeCommand(BrowserViewCommandId.Open, { url: resource.toString(), openToSide: true });
++		return true;
++	} catch {
++		return false;
++	}
++}
++
+ type ContentRefData =
+ 	| { readonly kind: 'symbol'; readonly symbol: IWorkspaceSymbol }
+ 	| {
+@@ -148,6 +172,7 @@ export class InlineAnchorWidget extends Disposable {
+ 		private readonly metadata: InlineAnchorWidgetMetadata | undefined,
+ 		private readonly options: IRenderFileWidgetsOptions | undefined,
+ 		@IChatImageCarouselService private readonly chatImageCarouselService: IChatImageCarouselService,
++		@ICommandService private readonly commandService: ICommandService,
+ 		@IConfigurationService private readonly configurationService: IConfigurationService,
+ 		@IContextKeyService originalContextKeyService: IContextKeyService,
+ 		@IContextMenuService contextMenuService: IContextMenuService,
+@@ -327,6 +352,9 @@ export class InlineAnchorWidget extends Disposable {
+ 				await this.chatImageCarouselService.openCarouselAtResource(location.uri);
+ 				return;
+ 			}
++			if (await openChatResourceInIntegratedBrowser(location.uri, this.commandService)) {
++				return;
++			}
+ 
+ 			await this.openerService.open(location.uri, {
+ 				fromUserGesture: true,
+@@ -376,6 +404,49 @@ registerAction2(class AddFileToChatAction extends Action2 {
+ 	}
+ });
+ 
++registerAction2(class SaveResourceAsAction extends Action2 {
++
++	static readonly id = 'chat.inlineResourceAnchor.saveAs';
++
++	constructor() {
++		super({
++			id: SaveResourceAsAction.id,
++			title: nls.localize2('chat.inlineResourceAnchor.saveAs', "Save As..."),
++			icon: Codicon.cloudDownload,
++			menu: [{
++				id: MenuId.ChatInlineResourceAnchorContext,
++				group: 'navigation',
++				order: 2,
++				when: ExplorerFolderContext.negate(),
++			}]
++		});
++	}
++
++	override async run(accessor: ServicesAccessor, resource: URI): Promise<void> {
++		if (!URI.isUri(resource)) {
++			return;
++		}
++
++		const fileDialogService = accessor.get(IFileDialogService);
++		const fileService = accessor.get(IFileService);
++		const notificationService = accessor.get(INotificationService);
++		const defaultUri = URI.joinPath(await fileDialogService.defaultFilePath(), basename(resource));
++		const target = await fileDialogService.showSaveDialog({
++			defaultUri,
++			title: nls.localize('chat.inlineResourceAnchor.saveAsDialog', "Save File As"),
++		});
++		if (!target) {
++			return;
++		}
++
++		try {
++			await fileService.copy(resource.with({ fragment: '' }), target, true);
++		} catch (error) {
++			notificationService.error(nls.localize('chat.inlineResourceAnchor.saveAsError', "Failed to save {0}: {1}", basename(resource), error));
++		}
++	}
++});
++
+ //#endregion
+ 
+ //#region Resource keybindings
+diff --git a/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatMarkdownContentPart.ts b/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatMarkdownContentPart.ts
+index a9ddd487ae6..5f722178b58 100644
+--- a/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatMarkdownContentPart.ts
++++ b/src/vs/workbench/contrib/chat/browser/widget/chatContentParts/chatMarkdownContentPart.ts
+@@ -35,6 +35,7 @@ import { IConfigurationService } from '../../../../../../platform/configuration/
+ import { IContextKeyService } from '../../../../../../platform/contextkey/common/contextkey.js';
+ import { IContextMenuService } from '../../../../../../platform/contextview/browser/contextView.js';
+ import { IOpenEditorOptions } from '../../../../../../platform/editor/browser/editor.js';
++import { IFileService } from '../../../../../../platform/files/common/files.js';
+ import { IHoverService } from '../../../../../../platform/hover/browser/hover.js';
+ import { IInstantiationService } from '../../../../../../platform/instantiation/common/instantiation.js';
+ import { ILabelService } from '../../../../../../platform/label/common/label.js';
+@@ -66,6 +67,8 @@ import { ChatExtensionsContentPart } from './chatExtensionsContentPart.js';
+ import { ChatProgressSubPart } from './chatProgressContentPart.js';
+ import { IncrementalDOMMorpher } from './chatIncrementalRendering/chatIncrementalRendering.js';
+ import { IChatOutputPartStateCache, IOutputPartState } from './chatOutputPartStateCache.js';
++import { IChatMarkdownAnchorService } from './chatMarkdownAnchorService.js';
++import { renderFileWidgets } from './chatInlineAnchorWidget.js';
+ import './media/chatMarkdownPart.css';
+ 
+ const $ = dom.$;
+@@ -87,6 +90,156 @@ interface IMarkdownPartCodeBlockInfo extends IChatCodeBlockInfo {
+ 	isStreamingEdit: boolean;
+ }
+ 
++/**
++ * Inline code is commonly used by agents as a compatibility fallback when
++ * returning file paths. Keep the heuristic deliberately narrow; candidates
++ * are still resolved through the session and verified with IFileService
++ * before the DOM is changed.
++ */
++export function isLikelyInlineFilePath(value: string): boolean {
++	if (!value || value.length > 4096 || /[\r\n\0?]/.test(value)) {
++		return false;
++	}
++
++	const target = value.trim();
++	if (!target || target !== value) {
++		return false;
++	}
++
++	const isWindowsAbsolutePath = /^[a-zA-Z]:[\\/]/.test(target) || target.startsWith('\\\\');
++	const scheme = /^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(target)?.[1]?.toLowerCase();
++	if (scheme && !isWindowsAbsolutePath && scheme !== 'file' && scheme !== 'vscode-agent-host') {
++		return false;
++	}
++
++	if (target.includes('/') || target.includes('\\')) {
++		return true;
++	}
++
++	const withoutLocation = target.replace(/:\d+(?::\d+)?$/, '').split('#', 1)[0];
++	const extensionIndex = withoutLocation.lastIndexOf('.');
++	return extensionIndex > 0
++		&& extensionIndex < withoutLocation.length - 1
++		&& /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,15}$/.test(withoutLocation.substring(extensionIndex + 1));
++}
++
++function getDescendantElementsByTagName<K extends keyof HTMLElementTagNameMap>(element: HTMLElement, tagName: K): HTMLElementTagNameMap[K][] {
++	const matches: HTMLElementTagNameMap[K][] = [];
++	const walker = element.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_ELEMENT);
++	while (walker.nextNode()) {
++		const candidate = walker.currentNode as Element;
++		if (candidate.localName === tagName) {
++			matches.push(candidate as HTMLElementTagNameMap[K]);
++		}
++	}
++	return matches;
++}
++
++/**
++ * Turns verified inline-code file paths into rich resource anchors. This is
++ * intentionally asynchronous so nonexistent paths, folders, and unresolved
++ * relative targets stay as ordinary code.
++ */
++export async function decorateInlineFileCodeSpans(element: HTMLElement, sessionResource: URI, chatSessionsService: IChatSessionsService, fileService: IFileService): Promise<number> {
++	const candidates = getDescendantElementsByTagName(element, 'code')
++		.filter(code => !code.closest('pre, a'))
++		.slice(0, 32);
++
++	let decorated = 0;
++	await Promise.all(candidates.map(async code => {
++		const target = code.textContent ?? '';
++		if (!isLikelyInlineFilePath(target)) {
++			return;
++		}
++
++		let resource: URI;
++		try {
++			const resolved = chatSessionsService.resolveChatResponseUri(sessionResource, target, 'link');
++			resource = URI.parse(resolved, true);
++		} catch {
++			return;
++		}
++
++		if (resource.scheme !== 'file' && resource.scheme !== 'vscode-agent-host') {
++			return;
++		}
++		if (new URLSearchParams(resource.query).has('vscodeLinkType')) {
++			return;
++		}
++
++		try {
++			const stat = await fileService.stat(resource.with({ fragment: '' }));
++			if (stat.isDirectory) {
++				return;
++			}
++		} catch {
++			return;
++		}
++
++		if (!element.contains(code)) {
++			return;
++		}
++
++		const query = new URLSearchParams(resource.query);
++		query.set('vscodeLinkType', 'file');
++		const anchor = dom.$('a');
++		anchor.textContent = target;
++		anchor.setAttribute('data-href', resource.with({ query: query.toString() }).toString());
++		code.replaceWith(anchor);
++		decorated++;
++	}));
++
++	return decorated;
++}
++
++/** Adds rich-file metadata to existing Markdown links after verifying their targets. */
++export async function decorateResponseFileAnchors(element: HTMLElement, fileService: IFileService): Promise<number> {
++	const candidates = getDescendantElementsByTagName(element, 'a')
++		.filter(anchor => anchor.hasAttribute('data-href') && !anchor.classList.contains('chat-inline-anchor-widget'))
++		.slice(0, 32);
++
++	let decorated = 0;
++	await Promise.all(candidates.map(async anchor => {
++		const href = anchor.getAttribute('data-href');
++		if (!href) {
++			return;
++		}
++
++		let resource: URI;
++		try {
++			resource = URI.parse(href, true);
++		} catch {
++			return;
++		}
++		if (resource.scheme !== 'file' && resource.scheme !== 'vscode-agent-host') {
++			return;
++		}
++		if (new URLSearchParams(resource.query).has('vscodeLinkType')) {
++			return;
++		}
++
++		try {
++			const stat = await fileService.stat(resource.with({ fragment: '' }));
++			if (stat.isDirectory) {
++				return;
++			}
++		} catch {
++			return;
++		}
++
++		if (!element.contains(anchor)) {
++			return;
++		}
++
++		const query = new URLSearchParams(resource.query);
++		query.set('vscodeLinkType', 'file');
++		anchor.setAttribute('data-href', resource.with({ query: query.toString() }).toString());
++		decorated++;
++	}));
++
++	return decorated;
++}
++
+ export class ChatMarkdownContentPart extends Disposable implements IChatContentPart {
+ 
+ 	private static ID_POOL = 0;
+@@ -133,6 +286,8 @@ export class ChatMarkdownContentPart extends Disposable implements IChatContentP
+ 		@IAiEditTelemetryService private readonly aiEditTelemetryService: IAiEditTelemetryService,
+ 		@IChatOutputRendererService private readonly chatOutputRendererService: IChatOutputRendererService,
+ 		@IChatSessionsService private readonly chatSessionsService: IChatSessionsService,
++		@IChatMarkdownAnchorService private readonly chatMarkdownAnchorService: IChatMarkdownAnchorService,
++		@IFileService private readonly fileService: IFileService,
+ 	) {
+ 		super();
+ 
+@@ -386,6 +541,19 @@ export class ChatMarkdownContentPart extends Disposable implements IChatContentP
+ 
+ 			const markdownDecorationsRenderer = instantiationService.createInstance(ChatMarkdownDecorationsRenderer);
+ 			store.add(markdownDecorationsRenderer.walkTreeAndAnnotateReferenceLinks(this.markdown, result.element));
++			renderFileWidgets(result.element, this.instantiationService, this.chatMarkdownAnchorService, store);
++
++			if (isResponseVM(element) && (!fillInIncompleteTokens || element.isComplete)) {
++				void decorateInlineFileCodeSpans(result.element, element.sessionResource, this.chatSessionsService, this.fileService).then(async codeSpanCount => {
++					const anchorCount = await decorateResponseFileAnchors(result.element, this.fileService);
++					const count = codeSpanCount + anchorCount;
++					if (count === 0 || store.isDisposed || this._store.isDisposed) {
++						return;
++					}
++					renderFileWidgets(result.element, this.instantiationService, this.chatMarkdownAnchorService, store);
++					this._onDidChangeHeight.fire();
++				});
++			}
+ 
+ 			const layoutParticipants = new Lazy(() => {
+ 				const observer = store.add(new dom.DisposableResizeObserver('ChatMarkdownContentPart.mathLayout', () => this.mathLayoutParticipants.forEach(layout => layout())));
+diff --git a/src/vs/workbench/contrib/chat/common/tools/builtinTools/setArtifactsTool.ts b/src/vs/workbench/contrib/chat/common/tools/builtinTools/setArtifactsTool.ts
+index 8d03b0298c0..3309299078e 100644
+--- a/src/vs/workbench/contrib/chat/common/tools/builtinTools/setArtifactsTool.ts
++++ b/src/vs/workbench/contrib/chat/common/tools/builtinTools/setArtifactsTool.ts
+@@ -21,6 +21,8 @@ import {
+ import { IChatArtifact, IChatArtifactsService } from '../chatArtifactsService.js';
+ import { MarkdownString } from '../../../../../../base/common/htmlContent.js';
+ import { IChatService } from '../../chatService/chatService.js';
++import { ChatResponseResource } from '../../model/chatModel.js';
++import { IChatSessionsService } from '../../chatSessionsService.js';
+ 
+ export const SetArtifactsToolId = 'setArtifacts';
+ 
+@@ -39,7 +41,16 @@ const inputSchema: IJSONSchema & { properties: IJSONSchemaMap } = {
+ 					},
+ 					uri: {
+ 						type: 'string',
+-						description: 'Fully qualified URI of the artifact (e.g. https://localhost:3000 or file:///path/to/file). Must include the scheme.'
++						description: 'Fully qualified URI of the artifact (e.g. https://localhost:3000 or file:///path/to/file). Use this or toolCallId + dataPartIndex.'
++					},
++					toolCallId: {
++						type: 'string',
++						description: 'Tool call containing an embedded artifact. Must be paired with dataPartIndex.'
++					},
++					dataPartIndex: {
++						type: 'number',
++						minimum: 0,
++						description: 'Zero-based embedded data index within toolCallId. Must be paired with toolCallId.'
+ 					},
+ 					type: {
+ 						type: 'string',
+@@ -65,8 +76,16 @@ export const SetArtifactsToolData: IToolData = {
+ 	inputSchema
+ };
+ 
++interface ISetArtifactInput {
++	readonly label: string;
++	readonly uri?: string;
++	readonly toolCallId?: string;
++	readonly dataPartIndex?: number;
++	readonly type?: IChatArtifact['type'];
++}
++
+ interface ISetArtifactsToolInput {
+-	artifacts: IChatArtifact[];
++	artifacts: ISetArtifactInput[];
+ }
+ 
+ export class SetArtifactsTool implements IToolImpl {
+@@ -75,6 +94,7 @@ export class SetArtifactsTool implements IToolImpl {
+ 		@IChatArtifactsService private readonly _chatArtifactsService: IChatArtifactsService,
+ 		@IFileService private readonly _fileService: IFileService,
+ 		@IChatService private readonly _chatService: IChatService,
++		@IChatSessionsService private readonly _chatSessionsService: IChatSessionsService,
+ 	) { }
+ 
+ 	async prepareToolInvocation(_context: IToolInvocationPreparationContext, _token: CancellationToken): Promise<IPreparedToolInvocation | undefined> {
+@@ -95,21 +115,21 @@ export class SetArtifactsTool implements IToolImpl {
+ 
+ 		const artifacts: IChatArtifact[] = [];
+ 		for (const a of args.artifacts ?? []) {
+-			let uri = a.uri;
+-			if (!uri) {
+-				uri = '';
+-			}
+-
+-			if (uri) {
++			let uri: string;
++			if (a.uri) {
++				uri = this._chatSessionsService.resolveChatResponseUri(chatSessionResource, a.uri, 'link');
+ 				const parsed = URI.parse(uri);
+-				if (parsed.scheme !== 'http' && parsed.scheme !== 'https') {
+-					if (!await this._fileService.exists(parsed)) {
+-						throw new Error(localize('tool.setArtifacts.uriNotFound', "Artifact URI does not exist: {0}", uri));
+-					}
++				if (parsed.scheme !== 'http' && parsed.scheme !== 'https' && !await this._fileService.exists(parsed.with({ fragment: '' }))) {
++					throw new Error(localize('tool.setArtifacts.uriNotFound', "Artifact URI does not exist: {0}", a.uri));
+ 				}
++			} else if (a.toolCallId && typeof a.dataPartIndex === 'number' && Number.isInteger(a.dataPartIndex) && a.dataPartIndex >= 0) {
++				const safeLabel = a.label.replaceAll('/', '-').replaceAll('\\', '-');
++				uri = ChatResponseResource.createUri(chatSessionResource, a.toolCallId, a.dataPartIndex, safeLabel).toString();
++			} else {
++				throw new Error(localize('tool.setArtifacts.missingResource', "Artifact {0} must include a URI or a toolCallId with dataPartIndex.", a.label));
+ 			}
+ 
+-			artifacts.push({ label: a.label, uri, type: a.type });
++			artifacts.push({ label: a.label, uri, type: a.type, toolCallId: a.toolCallId, dataPartIndex: a.dataPartIndex });
+ 		}
+ 
+ 		const chatArtifacts = this._chatArtifactsService.getArtifacts(chatSessionResource);
+diff --git a/src/vs/workbench/contrib/chat/common/tools/builtinTools/tools.ts b/src/vs/workbench/contrib/chat/common/tools/builtinTools/tools.ts
+index 4a711c404fa..5fac69efa39 100644
+--- a/src/vs/workbench/contrib/chat/common/tools/builtinTools/tools.ts
++++ b/src/vs/workbench/contrib/chat/common/tools/builtinTools/tools.ts
+@@ -59,6 +59,8 @@ export class BuiltinToolsContribution extends Disposable implements IWorkbenchCo
+ 		const setArtifactRulesTool = instantiationService.createInstance(SetArtifactRulesTool);
+ 		const setArtifactsRegistration = this._register(new MutableDisposable());
+ 		const setArtifactRulesRegistration = this._register(new MutableDisposable());
++		const setArtifactsToolSetRegistration = this._register(new MutableDisposable());
++		const setArtifactRulesToolSetRegistration = this._register(new MutableDisposable());
+ 		const updateArtifactsRegistration = () => {
+ 			if (configurationService.getValue<boolean>(ChatConfiguration.ArtifactsEnabled)) {
+ 				if (!setArtifactsRegistration.value) {
+@@ -67,9 +69,17 @@ export class BuiltinToolsContribution extends Disposable implements IWorkbenchCo
+ 				if (!setArtifactRulesRegistration.value) {
+ 					setArtifactRulesRegistration.value = toolsService.registerTool(SetArtifactRulesToolData, setArtifactRulesTool);
+ 				}
++				if (!setArtifactsToolSetRegistration.value) {
++					setArtifactsToolSetRegistration.value = toolsService.agentToolSet.addTool(SetArtifactsToolData);
++				}
++				if (!setArtifactRulesToolSetRegistration.value) {
++					setArtifactRulesToolSetRegistration.value = toolsService.agentToolSet.addTool(SetArtifactRulesToolData);
++				}
+ 			} else {
+ 				setArtifactsRegistration.clear();
+ 				setArtifactRulesRegistration.clear();
++				setArtifactsToolSetRegistration.clear();
++				setArtifactRulesToolSetRegistration.clear();
+ 			}
+ 		};
+ 		updateArtifactsRegistration();
+diff --git a/src/vs/workbench/contrib/chat/electron-browser/codexCustomizationSettings.contribution.ts b/src/vs/workbench/contrib/chat/electron-browser/codexCustomizationSettings.contribution.ts
+index bd30a1e3083..30238e49f1d 100644
+--- a/src/vs/workbench/contrib/chat/electron-browser/codexCustomizationSettings.contribution.ts
++++ b/src/vs/workbench/contrib/chat/electron-browser/codexCustomizationSettings.contribution.ts
+@@ -5,14 +5,98 @@
+ 
+ import { Codicon } from '../../../../base/common/codicons.js';
+ import { observableValue } from '../../../../base/common/observable.js';
++import { URI } from '../../../../base/common/uri.js';
+ import { localize } from '../../../../nls.js';
+ import { CODEX_AGENT_PROVIDER_ID, IAgentHostService } from '../../../../platform/agentHost/common/agentService.js';
+ import { ActionType } from '../../../../platform/agentHost/common/state/sessionActions.js';
++import { CommandsRegistry } from '../../../../platform/commands/common/commands.js';
++import { ServicesAccessor } from '../../../../platform/instantiation/common/instantiation.js';
++import { IOpenerService } from '../../../../platform/opener/common/opener.js';
+ import { aiCustomizationManagementSectionRegistry } from '../browser/aiCustomization/aiCustomizationManagementSectionRegistry.js';
+ import { AHPAgentSettingsWidget, type IAgentGlobalConfigurationSettingsTarget } from '../browser/aiCustomization/agentGlobalConfigurationSettingsWidget.js';
+ import { AICustomizationManagementSection } from '../common/aiCustomizationWorkspaceService.js';
++import { CodexAccountCommandId, type ICodexAccountLoginCommandResult, normalizeTrustedCodexAuthUrl } from '../common/codexAccountCommands.js';
+ import { SessionType } from '../common/chatSessionsService.js';
+ 
++async function cancelCodexLoginBestEffort(agentHostService: IAgentHostService, loginId: string): Promise<void> {
++	const cancelLogin = agentHostService.cancelProviderAccountLogin;
++	if (!cancelLogin) {
++		return;
++	}
++	try {
++		await cancelLogin.call(agentHostService, CODEX_AGENT_PROVIDER_ID, loginId);
++	} catch {
++		// The original, sanitized browser handoff error is more useful to callers.
++	}
++}
++
++CommandsRegistry.registerCommand(CodexAccountCommandId.Read, (accessor: ServicesAccessor) => {
++	const agentHostService = accessor.get(IAgentHostService);
++	const getAccount = agentHostService.getProviderAccount;
++	if (!getAccount) {
++		throw new Error(localize('codexAccount.managementUnavailable', "Codex account management is unavailable for this agent host."));
++	}
++	return getAccount.call(agentHostService, CODEX_AGENT_PROVIDER_ID);
++});
++
++CommandsRegistry.registerCommand(CodexAccountCommandId.Activate, async (accessor: ServicesAccessor): Promise<void> => {
++	const agentHostService = accessor.get(IAgentHostService);
++	const activateAccount = agentHostService.activateProviderAccount;
++	if (!activateAccount) {
++		throw new Error(localize('codexAccount.activationUnavailable', "Codex account activation is unavailable for this agent host."));
++	}
++	await activateAccount.call(agentHostService, CODEX_AGENT_PROVIDER_ID);
++});
++
++CommandsRegistry.registerCommand(CodexAccountCommandId.Login, async (accessor: ServicesAccessor): Promise<ICodexAccountLoginCommandResult> => {
++	const agentHostService = accessor.get(IAgentHostService);
++	const openerService = accessor.get(IOpenerService);
++	const startLogin = agentHostService.startProviderAccountLogin;
++	if (!startLogin) {
++		throw new Error(localize('codexAccount.loginUnavailable', "Codex account login is unavailable for this agent host."));
++	}
++	const login = await startLogin.call(agentHostService, CODEX_AGENT_PROVIDER_ID);
++	const trustedAuthUrl = normalizeTrustedCodexAuthUrl(login.authUrl);
++	if (!trustedAuthUrl) {
++		await cancelCodexLoginBestEffort(agentHostService, login.loginId);
++		throw new Error(localize('codexAccount.invalidAuthUrl', "Codex returned an invalid OpenAI sign-in address."));
++	}
++
++	let opened = false;
++	try {
++		opened = await openerService.open(URI.parse(trustedAuthUrl), { openExternal: true });
++	} catch {
++		// Do not surface an opener error that may include the private OAuth URL.
++	}
++	if (!opened) {
++		await cancelCodexLoginBestEffort(agentHostService, login.loginId);
++		throw new Error(localize('codexAccount.browserFailed', "The OpenAI sign-in page could not be opened."));
++	}
++
++	return { loginId: login.loginId };
++});
++
++CommandsRegistry.registerCommand(CodexAccountCommandId.Cancel, async (accessor: ServicesAccessor, loginId: string): Promise<void> => {
++	if (typeof loginId !== 'string' || loginId.length === 0) {
++		throw new Error(localize('codexAccount.invalidLoginId', "A Codex sign-in identifier is required."));
++	}
++	const agentHostService = accessor.get(IAgentHostService);
++	const cancelLogin = agentHostService.cancelProviderAccountLogin;
++	if (!cancelLogin) {
++		throw new Error(localize('codexAccount.loginUnavailable', "Codex account login is unavailable for this agent host."));
++	}
++	await cancelLogin.call(agentHostService, CODEX_AGENT_PROVIDER_ID, loginId);
++});
++
++CommandsRegistry.registerCommand(CodexAccountCommandId.Logout, (accessor: ServicesAccessor): Promise<void> => {
++	const agentHostService = accessor.get(IAgentHostService);
++	const logout = agentHostService.logoutProviderAccount;
++	if (!logout) {
++		throw new Error(localize('codexAccount.logoutUnavailable', "Codex account logout is unavailable for this agent host."));
++	}
++	return logout.call(agentHostService, CODEX_AGENT_PROVIDER_ID);
++});
++
+ aiCustomizationManagementSectionRegistry.register({
+ 	id: AICustomizationManagementSection.HarnessSettings,
+ 	label: localize('codexCustomizationSettings.navigationLabel', "Codex Settings"),
+diff --git a/src/vs/workbench/contrib/chat/test/browser/agentSessions/stateToProgressAdapter.test.ts b/src/vs/workbench/contrib/chat/test/browser/agentSessions/stateToProgressAdapter.test.ts
+index b69b3bafcdb..2dfbd56a6bd 100644
+--- a/src/vs/workbench/contrib/chat/test/browser/agentSessions/stateToProgressAdapter.test.ts
++++ b/src/vs/workbench/contrib/chat/test/browser/agentSessions/stateToProgressAdapter.test.ts
+@@ -14,7 +14,7 @@ import { fromAgentHostUri, toAgentHostUri } from '../../../../../../platform/age
+ import { buildSubagentChatUri, MessageKind, ToolCallContributorKind, ToolCallRiskAssessmentKind, ToolCallRiskAssessmentStatus, ToolCallStatus, ToolCallConfirmationReason, ToolResultContentType, TurnState, ResponsePartKind, readUsageInfoMeta, type ActiveTurn, type ICompletedToolCall, type ToolCallPendingConfirmationState, type ToolCallRunningState, type Turn, type ToolCallResponsePart, ToolCallCancellationReason, type Message, type ToolResultContent } from '../../../../../../platform/agentHost/common/state/sessionState.js';
+ import { IChatToolInvocation, IChatToolInvocationSerialized, ToolConfirmKind, type IChatMarkdownContent, type IChatTerminalToolInvocationData, type IChatThinkingPart, type IChatUsage } from '../../../common/chatService/chatService.js';
+ import { isToolResultInputOutputDetails, type IToolResultInputOutputDetails, ToolDataSource, ToolInvocationPresentation } from '../../../common/tools/languageModelToolsService.js';
+-import { turnsToHistory as rawTurnsToHistory, activeTurnToProgress as rawActiveTurnToProgress, completedToolCallToSerialized, toolCallStateToInvocation as rawToolCallStateToInvocation, toolCallStateToPreparedInvocation as rawToolCallStateToPreparedInvocation, toolCallStateToStreamingInvocation, finalizeToolInvocation as rawFinalizeToolInvocation, updateRunningToolSpecificData as rawUpdateRunningToolSpecificData, usageInfoToAutoModeResolution, usageInfoToQuotas, formatTurnResponseDetails, rewriteAgentHostLinkTarget, rewriteMarkdownLinks, type TurnModelLookup } from '../../../browser/agentSessions/agentHost/stateToProgressAdapter.js';
++import { turnsToHistory as rawTurnsToHistory, activeTurnToProgress as rawActiveTurnToProgress, completedToolCallToSerialized, toolCallStateToInvocation as rawToolCallStateToInvocation, toolCallStateToPreparedInvocation as rawToolCallStateToPreparedInvocation, toolCallStateToStreamingInvocation, finalizeToolInvocation as rawFinalizeToolInvocation, updateRunningToolSpecificData as rawUpdateRunningToolSpecificData, usageInfoToAutoModeResolution, usageInfoToQuotas, formatTurnResponseDetails, rewriteAgentHostLinkTarget, rewriteAgentHostRelativeFileLinkTarget, rewriteMarkdownLinks, type TurnModelLookup } from '../../../browser/agentSessions/agentHost/stateToProgressAdapter.js';
+ 
+ // ---- Helper factories -------------------------------------------------------
+ 
+@@ -179,6 +179,34 @@ suite('stateToProgressAdapter', () => {
+ 				],
+ 			);
+ 		});
++
++		test('resolves relative files against the session working directory', () => {
++			const workingDirectory = URI.file('/workspace/project');
++			const unwrap = (href: string) => fromAgentHostUri(URI.parse(rewriteAgentHostRelativeFileLinkTarget(href, workingDirectory, 'my-host'))).toString();
++			assert.deepStrictEqual(
++				[
++					unwrap('StatsKey Research/First United/report.pdf'),
++					unwrap('./notes/final.md:42:7'),
++					unwrap('notes\\windows.md#L9'),
++				],
++				[
++					URI.file('/workspace/project/StatsKey Research/First United/report.pdf').toString(),
++					URI.file('/workspace/project/notes/final.md').with({ fragment: 'L42,7' }).toString(),
++					URI.file('/workspace/project/notes/windows.md').with({ fragment: 'L9' }).toString(),
++				],
++			);
++
++			const wrappedWorkingDirectory = toAgentHostUri(workingDirectory, 'my-host');
++			const wrappedTarget = rewriteAgentHostRelativeFileLinkTarget('exports/report.pdf', wrappedWorkingDirectory, 'my-host');
++			assert.strictEqual(fromAgentHostUri(URI.parse(wrappedTarget)).toString(), URI.file('/workspace/project/exports/report.pdf').toString());
++		});
++
++		test('rejects traversal and non-file relative targets', () => {
++			const workingDirectory = URI.file('/workspace/project');
++			for (const href of ['../secret.txt', 'docs/%2E%2E/secret.txt', '#heading', 'https://example.com/file.pdf', 'C:relative.txt']) {
++				assert.strictEqual(rewriteAgentHostRelativeFileLinkTarget(href, workingDirectory, 'my-host'), href);
++			}
++		});
+ 	});
+ 
+ 	suite('turnsToHistory', () => {
+diff --git a/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatInlineAnchorWidget.test.ts b/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatInlineAnchorWidget.test.ts
+index c024062226e..96830ef80df 100644
+--- a/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatInlineAnchorWidget.test.ts
++++ b/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatInlineAnchorWidget.test.ts
+@@ -7,7 +7,7 @@ import assert from 'assert';
+ import { DeferredPromise } from '../../../../../../../base/common/async.js';
+ import { URI } from '../../../../../../../base/common/uri.js';
+ import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../../../base/test/common/utils.js';
+-import { renderFileWidgets } from '../../../../browser/widget/chatContentParts/chatInlineAnchorWidget.js';
++import { renderFileWidgets, shouldOpenChatResourceInIntegratedBrowser } from '../../../../browser/widget/chatContentParts/chatInlineAnchorWidget.js';
+ import { mainWindow } from '../../../../../../../base/browser/window.js';
+ import { workbenchInstantiationService } from '../../../../../../test/browser/workbenchTestServices.js';
+ import { DisposableStore } from '../../../../../../../base/common/lifecycle.js';
+@@ -54,6 +54,13 @@ suite('ChatInlineAnchorWidget Metadata Validation', () => {
+ 		assert.ok(widget, 'Widget should be rendered for link with vscodeLinkType query parameter');
+ 	});
+ 
++	test('uses the integrated browser for local PDF and HTML previews only', () => {
++		assert.strictEqual(shouldOpenChatResourceInIntegratedBrowser(URI.file('/workspace/report.pdf')), true);
++		assert.strictEqual(shouldOpenChatResourceInIntegratedBrowser(URI.file('/workspace/report.HTML')), true);
++		assert.strictEqual(shouldOpenChatResourceInIntegratedBrowser(URI.file('/workspace/report.md')), false);
++		assert.strictEqual(shouldOpenChatResourceInIntegratedBrowser(URI.parse('vscode-agent-host://remote/workspace/report.pdf')), false);
++	});
++
+ 	test('renders widget for empty link text', () => {
+ 		const element = createTestElement('');
+ 		renderFileWidgets(element, instantiationService, mockAnchorService, disposables);
+diff --git a/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatMarkdownContentPart.test.ts b/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatMarkdownContentPart.test.ts
+index 511d5da8bcf..88d3a7905b9 100644
+--- a/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatMarkdownContentPart.test.ts
++++ b/src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatMarkdownContentPart.test.ts
+@@ -16,11 +16,12 @@ import { SymbolKind, SymbolTag } from '../../../../../../../editor/common/langua
+ import { IHoverService } from '../../../../../../../platform/hover/browser/hover.js';
+ import { IConfigurationService } from '../../../../../../../platform/configuration/common/configuration.js';
+ import { TestConfigurationService } from '../../../../../../../platform/configuration/test/common/testConfigurationService.js';
++import { IFileService } from '../../../../../../../platform/files/common/files.js';
+ import { IMarkdownRenderer } from '../../../../../../../platform/markdown/browser/markdownRenderer.js';
+ import { toAgentHostUri } from '../../../../../../../platform/agentHost/common/agentHostUri.js';
+ import { workbenchInstantiationService } from '../../../../../../test/browser/workbenchTestServices.js';
+ import { IChatContentPartRenderContext } from '../../../../browser/widget/chatContentParts/chatContentParts.js';
+-import { ChatMarkdownContentPart } from '../../../../browser/widget/chatContentParts/chatMarkdownContentPart.js';
++import { ChatMarkdownContentPart, decorateInlineFileCodeSpans, decorateResponseFileAnchors, isLikelyInlineFilePath } from '../../../../browser/widget/chatContentParts/chatMarkdownContentPart.js';
+ import { ChatContentMarkdownRenderer } from '../../../../browser/widget/chatContentMarkdownRenderer.js';
+ import { EditorPool, DiffEditorPool } from '../../../../browser/widget/chatContentParts/chatContentCodePools.js';
+ import { CodeBlockPart, ICodeBlockData } from '../../../../browser/widget/chatContentParts/codeBlockPart.js';
+@@ -35,6 +36,7 @@ import { IAiEditTelemetryService } from '../../../../../editTelemetry/browser/te
+ import { IViewDescriptorService } from '../../../../../../common/views.js';
+ import { IDisposableReference } from '../../../../browser/widget/chatContentParts/chatCollections.js';
+ import { MockChatSessionsService } from '../../../common/mockChatSessionsService.js';
++import { IChatMarkdownAnchorService } from '../../../../browser/widget/chatContentParts/chatMarkdownAnchorService.js';
+ 
+ suite('ChatMarkdownContentPart', () => {
+ 	const store = ensureNoDisposablesAreLeakedInTestSuite();
+@@ -143,6 +145,11 @@ suite('ChatMarkdownContentPart', () => {
+ 		instantiationService = workbenchInstantiationService(undefined, disposables);
+ 		chatSessionsService = new MockChatSessionsService();
+ 		instantiationService.stub(IChatSessionsService, chatSessionsService);
++		instantiationService.stub(IChatMarkdownAnchorService, {
++			_serviceBrand: undefined,
++			register: () => ({ dispose: () => { } }),
++			lastFocusedAnchor: undefined,
++		});
+ 		renderedCodeBlocks.length = 0;
+ 		renderedCodeBlockOutputs.length = 0;
+ 		outputStateCache = new Map<string, IOutputPartState>();
+@@ -250,7 +257,7 @@ suite('ChatMarkdownContentPart', () => {
+ 					{ text: 'column.ts', href: toAgentHostUri(URI.file('/remote/column.ts').with({ fragment: 'L42,7' }), 'my-host').toString() },
+ 					{ text: 'windows.ts', href: toAgentHostUri(URI.file('C:/remote/windows.ts').with({ fragment: 'L42' }), 'my-host').toString() },
+ 					{ text: 'unc.ts', href: toAgentHostUri(URI.file('//server/share/unc.ts').with({ fragment: 'L42' }), 'my-host').toString() },
+-					{ text: 'skill', href: skillUri.with({ query: `${skillUri.query}&vscodeLinkType=skill` }).toString() },
++					{ text: 'skill', href: skillUri.toString() },
+ 					{ text: 'file-uri.ts', href: toAgentHostUri(URI.file('/remote/file-uri.ts').with({ fragment: 'L42' }), 'my-host').toString() },
+ 				],
+ 				imageSource: null,
+@@ -258,6 +265,71 @@ suite('ChatMarkdownContentPart', () => {
+ 		);
+ 	});
+ 
++	test('recognizes path-like inline code without treating commands and web URLs as files', () => {
++		assert.strictEqual(isLikelyInlineFilePath('StatsKey Research/First United/report.pdf'), true);
++		assert.strictEqual(isLikelyInlineFilePath('report.pdf'), true);
++		assert.strictEqual(isLikelyInlineFilePath('C:\\reports\\report.pdf:12'), true);
++		assert.strictEqual(isLikelyInlineFilePath('npm run compile'), false);
++		assert.strictEqual(isLikelyInlineFilePath('https://example.com/report.pdf'), false);
++		assert.strictEqual(isLikelyInlineFilePath('report.pdf?download=1'), false);
++	});
++
++	test('decorates only existing inline-code files resolved by the session', async () => {
++		disposables.add(chatSessionsService.registerChatSessionContentProvider('chat-session', {
++			provideChatSessionContent: async () => { throw new Error('Unexpected session resolution'); },
++			resolveChatResponseUri: (_resource, href) => href === 'reports/final report.pdf'
++				? URI.file('/workspace/reports/final report.pdf').toString()
++				: href,
++		}));
++
++		const container = mainWindow.document.createElement('div');
++		const existing = mainWindow.document.createElement('code');
++		existing.textContent = 'reports/final report.pdf';
++		const missing = mainWindow.document.createElement('code');
++		missing.textContent = 'reports/missing.pdf';
++		const fenced = mainWindow.document.createElement('pre');
++		const fencedCode = mainWindow.document.createElement('code');
++		fencedCode.textContent = 'reports/final report.pdf';
++		fenced.appendChild(fencedCode);
++		container.append(existing, missing, fenced);
++
++		const fileService = {
++			stat: async (resource: URI) => {
++				if (resource.path === '/workspace/reports/final report.pdf') {
++					return { isDirectory: false };
++				}
++				throw new Error('missing');
++			},
++		} as unknown as IFileService;
++
++		const count = await decorateInlineFileCodeSpans(container, URI.parse('chat-session://test/session1'), chatSessionsService, fileService);
++		assert.strictEqual(count, 1);
++		const anchor = container.querySelector('a');
++		assert.strictEqual(anchor?.textContent, 'reports/final report.pdf');
++		assert.strictEqual(URI.parse(anchor?.dataset.href ?? '').path, '/workspace/reports/final report.pdf');
++		assert.strictEqual(new URLSearchParams(URI.parse(anchor?.dataset.href ?? '').query).get('vscodeLinkType'), 'file');
++		assert.strictEqual(missing.parentElement, container);
++		assert.strictEqual(fencedCode.parentElement, fenced);
++	});
++
++	test('upgrades existing Markdown file links for rich open and Save As actions', async () => {
++		const container = mainWindow.document.createElement('div');
++		const fileAnchor = mainWindow.document.createElement('a');
++		fileAnchor.textContent = 'Send-ready PDF';
++		fileAnchor.setAttribute('data-href', URI.file('/workspace/report.pdf').toString());
++		const webAnchor = mainWindow.document.createElement('a');
++		webAnchor.textContent = 'Website';
++		webAnchor.setAttribute('data-href', 'https://example.com');
++		container.append(fileAnchor, webAnchor);
++
++		const fileService = {
++			stat: async () => ({ isDirectory: false }),
++		} as unknown as IFileService;
++		assert.strictEqual(await decorateResponseFileAnchors(container, fileService), 1);
++		assert.strictEqual(new URLSearchParams(URI.parse(fileAnchor.dataset.href ?? '').query).get('vscodeLinkType'), 'file');
++		assert.strictEqual(webAnchor.dataset.href, 'https://example.com');
++	});
++
+ 	test('renders plain markdown without code blocks', () => {
+ 		const part = createMarkdownPart('Hello, world!');
+ 
+
+diff --git a/src/vs/workbench/contrib/browserView/test/common/browserEditorInput.test.ts b/src/vs/workbench/contrib/browserView/test/common/browserEditorInput.test.ts
+new file mode 100644
+index 00000000000..d6a445b0ac4
+--- /dev/null
++++ b/src/vs/workbench/contrib/browserView/test/common/browserEditorInput.test.ts
+@@ -0,0 +1,75 @@
++/*---------------------------------------------------------------------------------------------
++ *  Copyright (c) Microsoft Corporation. All rights reserved.
++ *  Licensed under the MIT License. See License.txt in the project root for license information.
++ *--------------------------------------------------------------------------------------------*/
++
++import assert from 'assert';
++import { Event } from '../../../../../base/common/event.js';
++import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../base/test/common/utils.js';
++import { BrowserViewStorageScope } from '../../../../../platform/browserView/common/browserView.js';
++import { BrowserEditorInput, BrowserEditorSerializer, IBrowserEditorInputData } from '../../common/browserEditorInput.js';
++
++suite('BrowserEditorInput', () => {
++	ensureNoDisposablesAreLeakedInTestSuite();
++
++	test('preserves ephemeral storage through lazy navigation and state projections', () => {
++		const copiedStates: IBrowserEditorInputData[] = [];
++		let input: BrowserEditorInput;
++		const instantiationService = {
++			invokeFunction: (callback: (accessor: { get: () => unknown }) => unknown) => callback({
++				get: () => ({
++					getOrCreateLazy: (_id: string, state: IBrowserEditorInputData) => {
++						copiedStates.push(state);
++						return input;
++					},
++				}),
++			}),
++		};
++		input = new BrowserEditorInput(
++			{
++				id: 'private-browser',
++				url: 'https://statskey.ai/app/enterprise',
++				storageScope: BrowserViewStorageScope.Ephemeral,
++			},
++			async () => { throw new Error('model should remain lazy'); },
++			{} as never,
++			instantiationService as never,
++			{ publicLog2() { } } as never,
++			{} as never,
++		);
++
++		input.navigate('https://statskey.ai/app/tokens');
++		assert.strictEqual(input.storageScope, BrowserViewStorageScope.Ephemeral);
++		assert.strictEqual(input.serialize().storageScope, BrowserViewStorageScope.Ephemeral);
++		assert.strictEqual(
++			(input.toUntyped().options?.viewState as IBrowserEditorInputData).storageScope,
++			BrowserViewStorageScope.Ephemeral,
++		);
++
++		input.copy();
++		assert.strictEqual(copiedStates[0].storageScope, BrowserViewStorageScope.Ephemeral);
++
++		const serialized = new BrowserEditorSerializer().serialize(input);
++		assert.ok(serialized);
++		assert.strictEqual(
++			(JSON.parse(serialized) as IBrowserEditorInputData).storageScope,
++			BrowserViewStorageScope.Ephemeral,
++		);
++
++		input.model = {
++			url: 'https://statskey.ai/app/tokens',
++			title: 'Credits',
++			favicon: undefined,
++			storageScope: BrowserViewStorageScope.Ephemeral,
++			onWillDispose: Event.None,
++			onDidClose: Event.None,
++			onDidChangeTitle: Event.None,
++			onDidChangeFavicon: Event.None,
++			onDidChangeLoadingState: Event.None,
++			onDidNavigate: Event.None,
++			dispose() { },
++		} as never;
++		input.dispose();
++		assert.strictEqual(input.serialize().storageScope, BrowserViewStorageScope.Ephemeral);
++	});
++});
+
+diff --git a/src/vs/workbench/contrib/chat/common/codexAccountCommands.ts b/src/vs/workbench/contrib/chat/common/codexAccountCommands.ts
+new file mode 100644
+index 00000000000..075a0a43be9
+--- /dev/null
++++ b/src/vs/workbench/contrib/chat/common/codexAccountCommands.ts
+@@ -0,0 +1,43 @@
++/*---------------------------------------------------------------------------------------------
++ *  Copyright (c) Microsoft Corporation. All rights reserved.
++ *  Licensed under the MIT License. See License.txt in the project root for license information.
++ *--------------------------------------------------------------------------------------------*/
++
++export const CodexAccountCommandId = {
++	Read: 'workbench.action.codex.account.read',
++	Activate: 'workbench.action.codex.account.activate',
++	Login: 'workbench.action.codex.account.login',
++	Cancel: 'workbench.action.codex.account.cancel',
++	Logout: 'workbench.action.codex.account.logout',
++} as const;
++
++export interface ICodexAccountLoginCommandResult {
++	readonly loginId: string;
++}
++
++/**
++ * Codex App Server owns the OAuth flow and returns the page that should be
++ * opened in the user's browser. Restrict that handoff to HTTPS origins owned
++ * by OpenAI so a compromised or incompatible runtime cannot redirect account
++ * credentials to another site.
++ */
++export function normalizeTrustedCodexAuthUrl(value: string): string | undefined {
++	try {
++		const url = new URL(value);
++		const hostname = url.hostname.toLowerCase();
++		const isOpenAIHost = hostname === 'openai.com' || hostname.endsWith('.openai.com');
++		const isChatGPTDomain = hostname === 'chatgpt.com' || hostname.endsWith('.chatgpt.com');
++		const trusted = url.protocol === 'https:'
++			&& (url.port === '' || url.port === '443')
++			&& url.username === ''
++			&& url.password === ''
++			&& (isOpenAIHost || isChatGPTDomain);
++		return trusted ? url.href : undefined;
++	} catch {
++		return undefined;
++	}
++}
++
++export function isTrustedCodexAuthUrl(value: string): boolean {
++	return normalizeTrustedCodexAuthUrl(value) !== undefined;
++}
+
+diff --git a/src/vs/workbench/contrib/chat/test/common/codexAccountCommands.test.ts b/src/vs/workbench/contrib/chat/test/common/codexAccountCommands.test.ts
+new file mode 100644
+index 00000000000..487735001f5
+--- /dev/null
++++ b/src/vs/workbench/contrib/chat/test/common/codexAccountCommands.test.ts
+@@ -0,0 +1,57 @@
++/*---------------------------------------------------------------------------------------------
++ *  Copyright (c) Microsoft Corporation. All rights reserved.
++ *  Licensed under the MIT License. See License.txt in the project root for license information.
++ *--------------------------------------------------------------------------------------------*/
++
++import assert from 'assert';
++import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../base/test/common/utils.js';
++import { CodexAccountCommandId, isTrustedCodexAuthUrl, normalizeTrustedCodexAuthUrl } from '../../common/codexAccountCommands.js';
++
++suite('Codex account commands', () => {
++
++	ensureNoDisposablesAreLeakedInTestSuite();
++
++	test('uses stable internal command identifiers', () => {
++		assert.deepStrictEqual(CodexAccountCommandId, {
++			Read: 'workbench.action.codex.account.read',
++			Activate: 'workbench.action.codex.account.activate',
++			Login: 'workbench.action.codex.account.login',
++			Cancel: 'workbench.action.codex.account.cancel',
++			Logout: 'workbench.action.codex.account.logout',
++		});
++	});
++
++	test('accepts HTTPS OpenAI and ChatGPT authentication origins', () => {
++		for (const value of [
++			'https://auth.openai.com/oauth/authorize?client_id=codex',
++			'https://platform.openai.com/',
++			'https://chatgpt.com/auth/callback',
++			'https://auth.chatgpt.com:443/oauth/authorize',
++		]) {
++			assert.strictEqual(isTrustedCodexAuthUrl(value), true, value);
++		}
++	});
++
++	test('opens the same normalized URL that passed origin validation', () => {
++		assert.strictEqual(
++			normalizeTrustedCodexAuthUrl('https://auth.openai.com\\@evil.example/path'),
++			'https://auth.openai.com/@evil.example/path',
++		);
++	});
++
++	test('rejects non-HTTPS, misleading, credentialed, and nonstandard-port origins', () => {
++		for (const value of [
++			'http://auth.openai.com/oauth/authorize',
++			'https://auth.openai.com:8443/oauth/authorize',
++			'https://openai.com.evil.example/oauth/authorize',
++			'https://evilopenai.com/oauth/authorize',
++			'https://chatgpt.com@evil.example/oauth/authorize',
++			'https://user:password@auth.openai.com/oauth/authorize',
++			'https://localhost/oauth/authorize',
++			'javascript:alert(1)',
++			'not a URL',
++		]) {
++			assert.strictEqual(isTrustedCodexAuthUrl(value), false, value);
++		}
++	});
++});

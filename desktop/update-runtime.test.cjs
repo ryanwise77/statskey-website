@@ -3,6 +3,7 @@ const assert = require('node:assert/strict')
 const { EventEmitter } = require('node:events')
 const {
   DesktopUpdateRuntime,
+  desktopHealthPayload,
   updateFeedUrl,
   safeVersion,
 } = require('./update-runtime.cjs')
@@ -58,6 +59,56 @@ test('architecture-specific feeds stay on the trusted HTTPS bucket', () => {
   assert.equal(updateFeedUrl('http://example.com', 'darwin', 'arm64'), null)
   assert.equal(updateFeedUrl(root, 'linux', 'x64'), null)
   assert.equal(safeVersion('../../bad'), null)
+})
+
+test('desktop health waits for the renderer and identifies its update feed', () => {
+  const feedRoot =
+    'https://storage.googleapis.com/statskey-workbench-downloads/updates'
+  assert.deepEqual(
+    desktopHealthPayload({
+      rendererReady: true,
+      currentVersion: '0.21.8',
+      platform: 'darwin',
+      arch: 'arm64',
+      feedRoot,
+    }),
+    {
+      status: 'ready',
+      version: '0.21.8',
+      architecture: 'arm64',
+      updateFeed: `${feedRoot}/mac-arm64`,
+    }
+  )
+  assert.equal(
+    desktopHealthPayload({
+      rendererReady: false,
+      currentVersion: 'invalid',
+      platform: 'linux',
+      arch: 'x64',
+      feedRoot,
+    }).status,
+    'starting'
+  )
+})
+
+test('packaged Ubuntu previews fail closed to manual package updates', () => {
+  const updater = new FakeUpdater()
+  const runtime = new DesktopUpdateRuntime({
+    updater,
+    currentVersion: '0.21.7',
+    platform: 'linux',
+    arch: 'x64',
+    isPackaged: true,
+    feedRoot:
+      'https://storage.googleapis.com/statskey-workbench-downloads/updates',
+    logger: { error() {} },
+  })
+  const state = runtime.initialize()
+  assert.equal(state.status, 'disabled')
+  assert.match(state.message, /installed manually/)
+  assert.equal(updater.feed, null)
+  assert.equal(updater.listenerCount('update-downloaded'), 0)
+  assert.equal(runtime.install(), false)
 })
 
 test('manual checks expose an available update and remember Later', async () => {

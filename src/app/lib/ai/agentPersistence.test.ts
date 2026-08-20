@@ -6,6 +6,7 @@ import {
   completionHandoffPrompt,
   externalActionReadyForHandoff,
   fallbackCompletionHandoff,
+  fallbackExternalActionHandoff,
   fallbackStoppedHandoff,
   hasReviewableWorkspaceChange,
   hasOutstandingFileMutationFailure,
@@ -1267,6 +1268,25 @@ describe('agent implementation persistence', () => {
         { name: 'application_open', status: 'done' },
       ])
     ).toBe(true)
+  })
+
+  it('keeps a local action receipt when final synthesis fails', () => {
+    const handoff = fallbackExternalActionHandoff(
+      [
+        {
+          name: 'run_terminal',
+          summary: 'Ran focused tests',
+          resultMeta: 'exit 0 · tests passed',
+          status: 'done',
+        },
+      ],
+      'final_synthesis'
+    )
+
+    expect(handoff).toContain('requested actions reached recorded success')
+    expect(handoff).toContain('Ran focused tests · exit 0 · tests passed')
+    expect(handoff).toContain('did not repeat completed actions')
+    expect(handoff).not.toContain('No files were changed')
   })
 
   it('marks a timed-out post-edit handoff as needing attention until verified', () => {

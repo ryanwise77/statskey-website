@@ -47,6 +47,14 @@ class DesktopUpdateRuntime {
       this.platform,
       this.arch
     )
+    if (this.isPackaged && this.platform === 'linux') {
+      this.setState({
+        status: 'disabled',
+        message:
+          'Ubuntu preview updates are installed manually from statskey.ai/download until signed package updates are available.',
+      })
+      return this.getState()
+    }
     if (!this.isPackaged || !feedUrl) {
       this.setState({
         status: 'disabled',
@@ -216,7 +224,7 @@ class DesktopUpdateRuntime {
       this.manualCheck = true
       this.setDismissedVersion(null)
     }
-    this.updater.autoInstallOnAppQuit = true
+    this.updater.autoInstallOnAppQuit = this.platform !== 'linux'
     this.setState({
       status: 'downloading',
       percent: 0,
@@ -299,6 +307,21 @@ function updateFeedUrl(root, platform, arch) {
   return null
 }
 
+function desktopHealthPayload({
+  rendererReady,
+  currentVersion,
+  platform,
+  arch,
+  feedRoot,
+}) {
+  return {
+    status: rendererReady === true ? 'ready' : 'starting',
+    version: safeVersion(currentVersion) || '0.0.0',
+    architecture: arch,
+    updateFeed: updateFeedUrl(feedRoot, platform, arch),
+  }
+}
+
 function safeVersion(value) {
   if (typeof value !== 'string') return null
   const version = value.trim()
@@ -354,6 +377,7 @@ function clampPercent(value) {
 
 module.exports = {
   DesktopUpdateRuntime,
+  desktopHealthPayload,
   updateFeedUrl,
   safeVersion,
   _test: {

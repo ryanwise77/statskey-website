@@ -23,6 +23,7 @@ import {
 } from '../components/workspace/WorkspaceInlineEdit'
 import { GitHubCloudWorkspace } from '../components/workspace/GitHubCloudWorkspace'
 import { WorkspaceQuickOpen } from '../components/workspace/WorkspaceQuickOpen'
+import { WorkspaceSyncPill } from '../components/workspace/WorkspaceSyncPill'
 import { WorkspaceAgentRail } from '../components/workspace/WorkspaceAgentRail'
 import { WorkspaceBottomDock } from '../components/workspace/WorkspaceBottomDock'
 import { WorkspaceLayoutControls } from '../components/workspace/WorkspaceLayoutControls'
@@ -116,6 +117,17 @@ export function Workspace() {
   const [recentProjects, setRecentProjects] = useState<DesktopRecentProject[]>(
     []
   )
+  const [recentProjectFilter, setRecentProjectFilter] = useState('')
+  const visibleRecentProjects = useMemo(() => {
+    const sorted = sortRecentProjects(recentProjects)
+    const filter = recentProjectFilter.trim().toLowerCase()
+    // The filter input only renders for lists longer than six entries, so a
+    // stale filter must not hide rows once the list shrinks below that.
+    if (!filter || recentProjects.length <= 6) return sorted
+    return sorted.filter((project) =>
+      project.name.toLowerCase().includes(filter)
+    )
+  }, [recentProjects, recentProjectFilter])
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
   const [secondaryPath, setSecondaryPath] = useState<string | null>(null)
   const [focusedPath, setFocusedPath] = useState<string | null>(null)
@@ -2467,25 +2479,38 @@ export function Workspace() {
                 •••
               </summary>
               <div
-                onClickCapture={(event) =>
+                onClickCapture={(event) => {
+                  if (!(event.target as HTMLElement).closest('button')) return
                   event.currentTarget
                     .closest('details')
                     ?.removeAttribute('open')
-                }
+                }}
               >
-                <button onClick={chooseFolder}>Add folder…</button>
+                <span className="workspace-project-menu__section">Project</span>
                 <button onClick={() => void saveCurrentWorkspace()}>
                   Save workspace…
                 </button>
                 <button onClick={openProject}>Switch project…</button>
+                <button onClick={createProject}>Create new project…</button>
+                <button onClick={cloneProject}>Clone from GitHub…</button>
+                <span className="workspace-project-menu__section">Files</span>
+                <button onClick={chooseFolder}>Add folder…</button>
+                <button onClick={addFiles}>Add individual files…</button>
+                <button onClick={importWorkspaceFile}>Import workspace file…</button>
+                <span className="workspace-project-menu__section">
+                  Safety & sync
+                </span>
+                <button onClick={showCheckpoints}>Safety checkpoints</button>
+                <button onClick={() => navigate('/settings/sync')}>
+                  Sync & backup…
+                </button>
                 <button onClick={() => void editStatsKey()}>
                   Edit StatsKey Desktop…
                 </button>
-                <button onClick={createProject}>Create new project…</button>
-                <button onClick={cloneProject}>Clone from GitHub…</button>
-                <button onClick={addFiles}>Add individual files…</button>
-                <button onClick={importWorkspaceFile}>Import workspace file…</button>
-                <button onClick={showCheckpoints}>Safety checkpoints</button>
+                <span
+                  className="workspace-project-menu__separator"
+                  role="separator"
+                />
                 <button className="danger" onClick={closeWorkspace}>
                   Close this project
                 </button>
@@ -2511,7 +2536,21 @@ export function Workspace() {
           <details className="workspace-recent-projects">
             <summary>Recent projects</summary>
             <div>
-              {recentProjects.map((project) => (
+              {recentProjects.length > 6 && (
+                <input
+                  className="workspace-recent-projects__filter"
+                  value={recentProjectFilter}
+                  onChange={(event) =>
+                    setRecentProjectFilter(event.target.value)
+                  }
+                  placeholder="Filter projects"
+                  aria-label="Filter recent projects"
+                />
+              )}
+              {visibleRecentProjects.length === 0 && (
+                <span className="workspace-muted">No matching projects</span>
+              )}
+              {visibleRecentProjects.map((project) => (
                 <div className="workspace-recent-project" key={project.id}>
                   <button
                     onClick={() => void openRecentProject(project)}
@@ -2521,9 +2560,15 @@ export function Workspace() {
                     <small>
                       {project.availableRootCount === 0
                         ? 'Folder unavailable'
-                        : `${project.rootCount} ${
-                            project.rootCount === 1 ? 'folder' : 'folders'
-                          }${project.saved ? ' · Saved' : ''}`}
+                        : [
+                            `${project.rootCount} ${
+                              project.rootCount === 1 ? 'folder' : 'folders'
+                            }`,
+                            formatRelativeTime(project.lastOpenedAt),
+                            project.saved ? 'Saved' : '',
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
                     </small>
                   </button>
                   <details>
@@ -2673,6 +2718,9 @@ export function Workspace() {
                   ? 'Search unavailable'
                   : 'Prepare search'}
           </button>
+          <WorkspaceSyncPill
+            rootPaths={workspace?.roots.map((root) => root.path) ?? []}
+          />
         </div>
 
         <div className="workspace-explorer__body">
@@ -3739,6 +3787,35 @@ function WorkspaceCheckpoints({
       </div>
     </aside>
   )
+}
+
+export function sortRecentProjects(
+  projects: DesktopRecentProject[]
+): DesktopRecentProject[] {
+  const openedAt = (project: DesktopRecentProject): number => {
+    const timestamp = Date.parse(project.lastOpenedAt)
+    return Number.isFinite(timestamp) ? timestamp : 0
+  }
+  return [...projects].sort((a, b) => {
+    if (a.saved !== b.saved) return a.saved ? -1 : 1
+    return openedAt(b) - openedAt(a)
+  })
+}
+
+export function formatRelativeTime(iso: string, now = Date.now()): string {
+  const timestamp = Date.parse(iso)
+  if (!Number.isFinite(timestamp)) return ''
+  const seconds = Math.max(0, Math.floor((now - timestamp) / 1000))
+  if (seconds < 60) return 'just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days}d ago`
+  if (days < 30) return `${Math.floor(days / 7)}w ago`
+  if (days < 365) return `${Math.max(1, Math.floor(days / 30))}mo ago`
+  return `${Math.floor(days / 365)}y ago`
 }
 
 function workspaceStorageKey(

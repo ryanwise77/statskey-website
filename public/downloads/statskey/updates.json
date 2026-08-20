@@ -1,26 +1,105 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.5",
+  "latest": "0.21.10",
   "releases": [
+    {
+      "version": "0.21.10",
+      "date": "2026-08-20",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Fleet remote sessions",
+      "summary": "StatsKey can now open a remote desktop session to your enrolled Windows workers from the Fleet tab, end-to-end encrypted through your own relay.",
+      "highlights": [
+        "Remote desktop sessions to enrolled Windows workers from the Fleet tab.",
+        "Sessions are approved per device and encrypted end to end through your own relay — no third-party service.",
+        "Ubuntu worker service attestation now refreshes continuously instead of expiring in place."
+      ]
+    },
+    {
+      "version": "0.21.9",
+      "date": "2026-08-17",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Helpers that stay in step",
+      "summary": "Investigators follow the active model and provider route by default, with one quiet advanced control for choosing any available StatsKey or My key route.",
+      "highlights": [
+        "Investigators inherit the chat's model, provider, billing route, and service tier by default.",
+        "The advanced Helper model control can choose any runnable StatsKey or configured My key route.",
+        "Ask and Plan can use read-only helpers while action review stays limited to action modes.",
+        "Platform-aware preparation keeps Mac and Windows versions, links, and signing disclosures aligned.",
+        "Private source provenance and launch health checks make each published build reproducible and verifiable."
+      ]
+    },
+    {
+      "version": "0.21.8",
+      "date": "2026-08-19",
+      "platforms": [
+        "Linux"
+      ],
+      "title": "Ubuntu 26.04 desktop preview",
+      "summary": "StatsKey Desktop now has an explicit Ubuntu 26.04 LTS x64 package with secure local storage checks and Fleet control that remains fail-closed for unattended jobs.",
+      "highlights": [
+        "Ubuntu 26.04 LTS x64 now has an explicit DEB package and native release-proof contract.",
+        "Terminal fallback uses Bash on stock Ubuntu, including fail-closed command batches.",
+        "Credentials are refused when Electron falls back to unprotected basic-text storage.",
+        "Ubuntu can control Fleet while unattended worker execution remains disabled pending a protected service."
+      ],
+      "linuxSigning": "unsigned-preview"
+    },
+    {
+      "version": "0.21.7",
+      "date": "2026-08-17",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Helpers that follow your lead",
+      "summary": "Investigators now follow your chosen model unless you quietly customize them, final answers stay active while providers are healthy, and releases use one guarded path from build to launch.",
+      "highlights": [
+        "Investigators now inherit the main model and provider route by default.",
+        "An advanced Helper model control can assign a different configured model without cluttering the everyday interface.",
+        "Final responses no longer stop at the former one-minute cutoff while the provider remains healthy.",
+        "A deterministic Mac release command now builds, publishes, installs, launches, and verifies the same artifact."
+      ]
+    },
+    {
+      "version": "0.21.6",
+      "date": "2026-08-16",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Public boundary correction",
+      "summary": "A focused Mac correction removes a residual private-machine command path from the public package and strengthens the checks that guard future releases.",
+      "highlights": [
+        "The public Mac package no longer contains the dormant Remote Access execution path that remained in 0.21.5.",
+        "Compiled assets are now checked for Remote Access, MacRemote, Oil Data, remote-command, and private-machine markers before publishing.",
+        "The clearer mode chooser and reviewable customization workflow from 0.21.5 are unchanged."
+      ]
+    },
     {
       "version": "0.21.5",
       "date": "2026-08-16",
-      "platforms": ["macOS"],
-      "title": "A clearer workspace with a hard public boundary",
-      "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages exclude internal infrastructure controls.",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "A clearer, more approachable workspace",
+      "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages remove Founder-only interfaces.",
       "highlights": [
         "The mode chooser stays inside the window, scrolls on compact screens, and has a clear Close control.",
         "Automatic is clearly recommended, while Ask, Plan, Fix, and Execute explain their outcomes in plain language.",
         "Model, context, and action controls remain under Advanced settings, while change permission appears only for an explicit Fix or Execute choice.",
         "Settings can open a reviewable StatsKey source workspace so you can describe the changes you want to Intelligence.",
-        "Public packages exclude the internal console, privileged bridge, infrastructure runtime, and private-machine setup, and legacy switches cannot restore them.",
-        "Release verification now fails closed if an internal route, command, or artifact is bundled."
+        "Public packages remove the internal Founder console, privileged Founder bridge, Founder runtime, and legacy Founder switches.",
+        "Release verification rejects known Founder routes, commands, and artifacts before publishing."
       ]
     },
     {
       "version": "0.21.4",
       "date": "2026-08-16",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Consent controls that stay reachable",
       "summary": "The Intelligence disclosure now fits every supported desktop window without trapping the workspace or hiding its controls.",
       "highlights": [
@@ -33,7 +112,9 @@
     {
       "version": "0.21.3",
       "date": "2026-08-16",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Clean recovery when a provider pauses",
       "summary": "StatsKey now preserves completed workspace work and ends the active pass cleanly when a model provider reaches its response deadline.",
       "highlights": [
@@ -46,7 +127,9 @@
     {
       "version": "0.21.2",
       "date": "2026-08-15",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Work that stays with its workspace",
       "summary": "StatsKey now keeps active tasks bound to the workspace where they started, while bringing billing, provider access, and third-party tools into one clearer setup.",
       "highlights": [
@@ -59,7 +142,9 @@
     {
       "version": "0.19.1",
       "date": "2026-08-13",
-      "platforms": ["Windows"],
+      "platforms": [
+        "Windows"
+      ],
       "windowsSigning": "unsigned-preview",
       "title": "Windows, tested where it runs",
       "summary": "The Windows preview now passes a native install, launch, restart, workspace, terminal, browser, and update-readiness gate before it can be published.",
@@ -73,7 +158,9 @@
     {
       "version": "0.19.0",
       "date": "2026-08-13",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Proof you can inspect",
       "summary": "StatsKey can now exercise mobile work directly and only calls implementation complete when the saved result and its verification agree.",
       "highlights": [
@@ -86,7 +173,10 @@
     {
       "version": "0.18.34",
       "date": "2026-08-07",
-      "platforms": ["macOS", "Windows"],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ],
       "title": "Desktop preview",
       "summary": "The first public StatsKey workspace preview.",
       "highlights": [

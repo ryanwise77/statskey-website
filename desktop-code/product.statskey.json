@@ -1,0 +1,23 @@
+{
+  "nameShort": "StatsKey Workbench",
+  "nameLong": "StatsKey Workbench",
+  "applicationName": "statskey-workbench",
+  "dataFolderName": ".statskey-workbench",
+  "darwinBundleIdentifier": "ai.statskey.workbench",
+  "win32AppUserModelId": "ai.statskey.workbench",
+  "urlProtocol": "statskey-workbench",
+  "downloadSlug": "statskey-workbench",
+  "downloadPath": "/downloads/statskey-workbench",
+  "downloadPage": "/workbench",
+  "artifactName": "StatsKey-Workbench-${version}-${os}-${arch}.${ext}",
+  "codeOssRef": "1.131.0",
+  "builtInExtension": "extensions/statskey-workbench",
+  "defaultSurface": "/app/enterprise",
+  "authSurface": "/app/workbench-auth",
+  "agentSdks": {
+    "codex": {
+      "version": "0.142.0",
+      "urlTemplate": "https://main.vscode-cdn.net/agent-sdk/codex/0.142.0/{sdkTarget}.tgz"
+    }
+  }
+}

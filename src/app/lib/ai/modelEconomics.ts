@@ -14,7 +14,7 @@ export interface ManagedTokenPack {
 }
 
 export const MANAGED_CREDIT_COST_USD_PER_1M = 3
-export const MODEL_PRICING_VERIFIED_AT = '2026-08-15'
+export const MODEL_PRICING_VERIFIED_AT = '2026-08-18'
 
 export const MANAGED_TOKEN_PACKS: readonly ManagedTokenPack[] = [
   { id: '1m', credits: 1_000_000, priceUsd: 12.99 },
@@ -26,8 +26,11 @@ export const MANAGED_TOKEN_PACKS: readonly ManagedTokenPack[] = [
 const ANTHROPIC_PRICING_URL =
   'https://platform.claude.com/docs/en/about-claude/pricing'
 const OPENAI_PRICING_URL = 'https://openai.com/api/pricing/'
+const OPENAI_FAST_PRICING_URL = 'https://openai.com/api-fast-mode/'
 const GOOGLE_PRICING_URL = 'https://ai.google.dev/gemini-api/docs/pricing'
-const XAI_PRICING_URL = 'https://docs.x.ai/developers/pricing'
+const GEMINI_37_FLASH_URL =
+  'https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-3-7-flash/'
+const GROK_46_URL = 'https://docs.x.ai/developers/models/grok-4.6'
 const KIMI_PRICING_URL =
   'https://platform.moonshot.ai/docs/pricing/chat'
 
@@ -71,9 +74,18 @@ export const MODEL_PRICING = {
     inputUsdPer1M: 10,
     cachedInputUsdPer1M: 1,
     outputUsdPer1M: 60,
-    sourceUrl: OPENAI_PRICING_URL,
+    sourceUrl: OPENAI_FAST_PRICING_URL,
     verifiedAt: MODEL_PRICING_VERIFIED_AT,
     note: 'Fast processing is 2× the standard GPT-5.6 Sol rate.',
+  },
+  'gemini-3.7-flash': {
+    inputUsdPer1M: 0.75,
+    cachedInputUsdPer1M: 0.075,
+    outputUsdPer1M: 3.75,
+    sourceUrl: GEMINI_37_FLASH_URL,
+    verifiedAt: MODEL_PRICING_VERIFIED_AT,
+    note:
+      'Introductory rate through December 31, 2026; Google lists $1.50 input, $0.15 cached input, and $7.50 output from January 1, 2027.',
   },
   'gemini-3.1-pro-preview': {
     inputUsdPer1M: 2,
@@ -94,15 +106,16 @@ export const MODEL_PRICING = {
     inputUsdPer1M: 2,
     cachedInputUsdPer1M: 0.5,
     outputUsdPer1M: 6,
-    sourceUrl: XAI_PRICING_URL,
+    sourceUrl: GROK_46_URL,
     verifiedAt: MODEL_PRICING_VERIFIED_AT,
-    note: 'Rates shown are for prompts under 200K tokens.',
+    note:
+      'Below 200K prompt tokens. At 200K or more, xAI lists $4 input, $1 cached input, and $12 output.',
   },
   'grok-4.3': {
     inputUsdPer1M: 1.25,
     cachedInputUsdPer1M: 0.2,
     outputUsdPer1M: 2.5,
-    sourceUrl: XAI_PRICING_URL,
+    sourceUrl: 'https://docs.x.ai/developers/pricing',
     verifiedAt: MODEL_PRICING_VERIFIED_AT,
     note: 'Rates shown are for prompts under 200K tokens.',
   },
@@ -118,7 +131,8 @@ export const MODEL_PRICING = {
 export type ModelPricingKey = keyof typeof MODEL_PRICING
 
 export function formatUsdPerMillion(value: number): string {
-  return `$${Number.isInteger(value) ? value.toFixed(0) : value.toFixed(2)}`
+  const digits = Number.isInteger(value) ? 0 : Math.abs(value) < 0.1 ? 3 : 2
+  return `$${value.toFixed(digits)}`
 }
 
 export function managedCreditsForProviderCost(costUsd: number): number {

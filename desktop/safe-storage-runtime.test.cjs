@@ -117,6 +117,46 @@ test('async safeStorage preserves Electron ciphertext and decrypt response contr
   })
 })
 
+test('Ubuntu refuses Electron basic-text storage and accepts Secret Service', async () => {
+  const insecure = new SafeStorageCrypto({
+    platform: 'linux',
+    safeStorage: fakeStorage({
+      getSelectedStorageBackend: () => 'basic_text',
+    }),
+  })
+  await assert.rejects(
+    insecure.encryptString('secret'),
+    (error) =>
+      error instanceof SafeStorageUnavailableError &&
+      error.message.includes('basic-text')
+  )
+
+  const secure = new SafeStorageCrypto({
+    platform: 'linux',
+    safeStorage: fakeStorage({
+      getSelectedStorageBackend: () => 'gnome_libsecret',
+      encryptStringAsync: async () => Buffer.from('protected'),
+    }),
+  })
+  assert.equal(
+    (await secure.encryptString('secret')).toString('utf8'),
+    'protected'
+  )
+})
+
+test('Ubuntu fails closed when the secure-storage backend cannot be identified', async () => {
+  const crypto = new SafeStorageCrypto({
+    platform: 'linux',
+    safeStorage: fakeStorage(),
+  })
+  await assert.rejects(
+    crypto.decryptString(Buffer.from('ciphertext')),
+    (error) =>
+      error instanceof SafeStorageUnavailableError &&
+      error.message.includes('could not verify')
+  )
+})
+
 test('desktop main has no direct synchronous safeStorage operation and awaits calendar crypto', () => {
   const main = readFileSync(path.join(__dirname, 'main.cjs'), 'utf8')
   assert.doesNotMatch(
