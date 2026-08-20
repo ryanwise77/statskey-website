@@ -8942,3 +8942,1225 @@ body.marketing-light :is(.ci-progress i, .rp-dist i, .rp-ready i) {
     height: 160px;
   }
 }
+
+/* Complete founder history archive */
+.experiment-copy__live-note {
+  margin-top: 14px;
+  border-left: 2px solid rgba(48, 213, 200, 0.7);
+  padding-left: 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.founder-history-archive {
+  margin-top: clamp(46px, 7vw, 84px);
+  border: 1px solid rgba(23, 91, 103, 0.13);
+  border-radius: 32px;
+  padding: clamp(20px, 4vw, 40px);
+  background:
+    radial-gradient(circle at 92% 0, rgba(48, 213, 200, 0.1), transparent 27%),
+    linear-gradient(180deg, rgba(250, 253, 253, 0.98), rgba(242, 249, 248, 0.96));
+  box-shadow: 0 30px 80px rgba(14, 61, 72, 0.09);
+}
+
+.founder-history-archive__toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.founder-history-archive__toggle span,
+.founder-history-archive__toggle h4,
+.founder-history-archive__toggle p {
+  display: block;
+}
+
+.founder-history-archive__toggle > div > span {
+  color: #168b7c;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.founder-history-archive__toggle h4 {
+  margin-top: 8px;
+  color: #102f3c;
+  font-size: clamp(27px, 4vw, 48px);
+  letter-spacing: -0.04em;
+}
+
+.founder-history-archive__toggle p {
+  max-width: 760px;
+  margin-top: 10px;
+  color: #6a8089;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.founder-history-archive__toggle > strong {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+  color: #177a6e;
+}
+
+.founder-history-archive__toggle > strong > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(20, 142, 124, 0.16);
+  border-radius: 999px;
+  padding: 9px 12px;
+  background: rgba(31, 159, 138, 0.08);
+  color: #177a6e;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.founder-history-archive__toggle > strong i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #24c58a;
+  box-shadow: 0 0 0 5px rgba(36, 197, 138, 0.1);
+}
+
+.founder-history-archive__toggle > strong b {
+  font-size: 11px;
+}
+
+.founder-history-archive__toggle > strong em {
+  font-size: 17px;
+  font-style: normal;
+  transition: transform 180ms ease;
+}
+
+.founder-history-archive.is-open .founder-history-archive__toggle > strong em {
+  transform: rotate(180deg);
+}
+
+.founder-history-archive__screen {
+  min-width: 0;
+}
+
+.founder-history-archive__screen:not([hidden]) {
+  margin-top: 22px;
+}
+
+.founder-history-archive__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 170px;
+  color: #758991;
+  font-size: 12px;
+}
+
+.founder-history-archive__loading > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #28aa94;
+  animation: founder-archive-pulse 1.1s ease-in-out infinite;
+}
+
+.founder-history-archive__loading > span:nth-child(2) { animation-delay: 0.13s; }
+.founder-history-archive__loading > span:nth-child(3) { animation-delay: 0.26s; }
+
+.founder-history-archive__loading p {
+  margin-left: 8px;
+}
+
+@keyframes founder-archive-pulse {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-4px); }
+}
+
+.founder-archive-summary {
+  overflow: hidden;
+  border-radius: 23px;
+  background:
+    radial-gradient(circle at 92% 15%, rgba(71, 214, 178, 0.2), transparent 28%),
+    linear-gradient(135deg, #0a2734, #164f54);
+  color: #fff;
+}
+
+.founder-archive-summary > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 23px 25px 18px;
+  border-bottom: 1px solid rgba(230, 255, 249, 0.12);
+}
+
+.founder-archive-summary > header small,
+.founder-archive-summary > header strong {
+  display: block;
+}
+
+.founder-archive-summary > header small {
+  color: #72dcc1;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.founder-archive-summary > header strong {
+  margin-top: 6px;
+  font-size: 18px;
+}
+
+.founder-archive-summary > header > span {
+  color: rgba(233, 251, 247, 0.58);
+  font-size: 9px;
+}
+
+.founder-archive-summary > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 20px 25px 24px;
+}
+
+.founder-archive-summary article {
+  min-width: 0;
+  border-right: 1px solid rgba(230, 255, 249, 0.13);
+  padding: 0 20px;
+}
+
+.founder-archive-summary article:first-child { padding-left: 0; }
+.founder-archive-summary article:last-child { border-right: 0; }
+
+.founder-archive-summary article small,
+.founder-archive-summary article strong,
+.founder-archive-summary article span {
+  display: block;
+}
+
+.founder-archive-summary article small {
+  color: rgba(233, 251, 247, 0.52);
+  font-family: var(--font-mono);
+  font-size: 7px;
+  text-transform: uppercase;
+}
+
+.founder-archive-summary article strong {
+  margin-top: 7px;
+  font-size: clamp(24px, 3vw, 38px);
+  letter-spacing: -0.04em;
+}
+
+.founder-archive-summary article span {
+  margin-top: 4px;
+  color: rgba(233, 251, 247, 0.58);
+  font-size: 8px;
+}
+
+.founder-archive-nav,
+.founder-micro-atlas,
+.founder-archive-scope,
+.founder-archive-nutrient-trend,
+.founder-archive-food-sources {
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(18, 96, 105, 0.11);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.founder-archive-nav > header,
+.founder-archive-scope > header,
+.founder-micro-atlas > header,
+.founder-archive-nutrient-trend > header,
+.founder-archive-food-sources > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 19px 21px 15px;
+  border-bottom: 1px solid rgba(18, 96, 105, 0.08);
+}
+
+.founder-archive-nav > header small,
+.founder-archive-nav > header strong,
+.founder-archive-scope > header small,
+.founder-archive-scope > header strong,
+.founder-micro-atlas > header small,
+.founder-micro-atlas > header strong,
+.founder-micro-atlas > header p,
+.founder-archive-nutrient-trend > header small,
+.founder-archive-nutrient-trend > header strong,
+.founder-archive-food-sources > header small,
+.founder-archive-food-sources > header strong {
+  display: block;
+}
+
+.founder-archive-nav > header small,
+.founder-archive-scope > header small,
+.founder-micro-atlas > header small,
+.founder-archive-nutrient-trend > header small,
+.founder-archive-food-sources > header small {
+  color: #178c7b;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.founder-archive-nav > header strong,
+.founder-archive-scope > header strong,
+.founder-micro-atlas > header strong,
+.founder-archive-nutrient-trend > header strong,
+.founder-archive-food-sources > header strong {
+  margin-top: 5px;
+  color: #173a46;
+  font-size: 17px;
+}
+
+.founder-archive-nav > header > span,
+.founder-archive-scope > header > span,
+.founder-micro-atlas > header > span,
+.founder-archive-nutrient-trend > header > span,
+.founder-archive-food-sources > header > span {
+  color: #71858c;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  text-align: right;
+}
+
+.founder-micro-atlas > header p {
+  max-width: 690px;
+  margin-top: 6px;
+  color: #778a91;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.founder-archive-months {
+  display: grid;
+  grid-auto-columns: minmax(65px, 1fr);
+  grid-auto-flow: column;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 15px 17px 10px;
+}
+
+.founder-archive-months button {
+  min-width: 65px;
+  min-height: 63px;
+  border: 1px solid rgba(21, 99, 108, 0.11);
+  border-radius: 12px;
+  padding: 9px 8px;
+  background: #f5faf9;
+  color: #5c737b;
+  cursor: pointer;
+}
+
+.founder-archive-months button small,
+.founder-archive-months button strong,
+.founder-archive-months button span {
+  display: block;
+}
+
+.founder-archive-months button small {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.founder-archive-months button strong {
+  margin-top: 5px;
+  color: #1b3f49;
+  font-size: 15px;
+}
+
+.founder-archive-months button span {
+  margin-top: 3px;
+  color: #839399;
+  font-size: 7px;
+}
+
+.founder-archive-months button.is-active {
+  border-color: #188f7a;
+  background: linear-gradient(145deg, #188f7a, #197384);
+  box-shadow: 0 8px 20px rgba(21, 123, 113, 0.18);
+  color: #c8f6e9;
+}
+
+.founder-archive-months button.is-active strong,
+.founder-archive-months button.is-active span { color: #fff; }
+
+.founder-archive-weeks {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 17px 16px;
+}
+
+.founder-archive-weeks button {
+  flex: 0 0 auto;
+  min-width: 136px;
+  border: 1px solid rgba(21, 99, 108, 0.11);
+  border-radius: 10px;
+  padding: 9px 11px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.founder-archive-weeks button strong,
+.founder-archive-weeks button small {
+  display: block;
+}
+
+.founder-archive-weeks button strong {
+  color: #284a52;
+  font-size: 8px;
+}
+
+.founder-archive-weeks button small {
+  margin-top: 4px;
+  color: #87989d;
+  font-size: 7px;
+}
+
+.founder-archive-weeks button.is-active {
+  border-color: rgba(24, 143, 122, 0.44);
+  background: rgba(24, 143, 122, 0.09);
+}
+
+.founder-archive-weeks button.is-active strong { color: #137b6a; }
+
+.founder-archive-dropdowns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+  padding: 15px 17px 17px;
+}
+
+.founder-archive-dropdowns label,
+.founder-micro-atlas__controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.founder-archive-dropdowns label > span,
+.founder-micro-atlas__controls label > span {
+  color: #71868d;
+  font-family: var(--font-mono);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.founder-archive-dropdowns select,
+.founder-micro-atlas__controls select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid rgba(20, 110, 105, 0.16);
+  border-radius: 11px;
+  padding: 0 38px 0 12px;
+  background: #f7fbfa;
+  color: #173d47;
+  font: 700 10px/1.2 var(--font-sans);
+  cursor: pointer;
+}
+
+.founder-archive-dropdown {
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(18, 96, 105, 0.11);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.founder-archive-dropdown > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  border: 0;
+  padding: 19px 21px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.founder-archive-dropdown > button small,
+.founder-archive-dropdown > button strong,
+.founder-archive-dropdown > button em {
+  display: block;
+  font-style: normal;
+}
+
+.founder-archive-dropdown > button small {
+  color: #178c7b;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.founder-archive-dropdown > button strong {
+  margin-top: 5px;
+  color: #173a46;
+  font-size: 17px;
+}
+
+.founder-archive-dropdown > button em {
+  margin-top: 5px;
+  color: #778a91;
+  font-size: 9px;
+}
+
+.founder-archive-dropdown > button > i {
+  color: #178c7b;
+  font-size: 19px;
+  font-style: normal;
+  transition: transform 180ms ease;
+}
+
+.founder-archive-dropdown.is-open > button > i {
+  transform: rotate(180deg);
+}
+
+.founder-archive-dropdown > div {
+  border-top: 1px solid rgba(18, 96, 105, 0.08);
+  padding: 0 12px 12px;
+}
+
+.founder-archive-dropdown .founder-micro-atlas {
+  margin-top: 12px;
+}
+
+.founder-micro-atlas__controls {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.55fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 16px;
+  padding: 14px 18px 4px;
+}
+
+.founder-micro-atlas__controls p {
+  margin-bottom: 12px;
+  color: #7c8f95;
+  font-size: 8px;
+  text-align: right;
+}
+
+.founder-archive-load-more {
+  display: block;
+  width: calc(100% - 26px);
+  min-height: 43px;
+  margin: 0 13px 13px;
+  border: 1px solid rgba(21, 125, 111, 0.18);
+  border-radius: 11px;
+  background: rgba(31, 159, 138, 0.08);
+  color: #147b6d;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.founder-archive-load-more:hover {
+  background: rgba(31, 159, 138, 0.14);
+}
+
+.founder-micro-atlas__scroll {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.founder-micro-atlas__grid {
+  display: grid;
+  grid-template-columns: minmax(225px, 1fr) repeat(var(--archive-months), minmax(49px, 0.35fr));
+  min-width: calc(260px + var(--archive-months) * 53px);
+  padding: 12px 14px 18px;
+}
+
+.founder-micro-atlas__corner,
+.founder-micro-atlas__month {
+  min-height: 40px;
+  border-bottom: 1px solid rgba(17, 76, 101, 0.09);
+  color: #7b8f9a;
+  font-family: var(--font-mono);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.founder-micro-atlas__corner {
+  display: flex;
+  align-items: center;
+  padding: 0 11px;
+}
+
+.founder-micro-atlas__month {
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+
+.founder-micro-atlas__month strong,
+.founder-micro-atlas__month small { display: block; }
+.founder-micro-atlas__month small { margin-top: 4px; opacity: 0.62; }
+
+.founder-micro-atlas__label,
+.founder-micro-atlas__cell {
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid rgba(17, 76, 101, 0.06);
+  background: transparent;
+  cursor: pointer;
+}
+
+.founder-micro-atlas__label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  display: grid;
+  align-content: center;
+  padding: 6px 11px;
+  background: rgba(249, 252, 252, 0.98);
+  text-align: left;
+}
+
+.founder-micro-atlas__label strong,
+.founder-micro-atlas__label small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.founder-micro-atlas__label strong {
+  color: #19384a;
+  font-size: 9px;
+}
+
+.founder-micro-atlas__label small {
+  margin-top: 3px;
+  color: #82929d;
+  font-size: 7px;
+}
+
+.founder-micro-atlas__cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 36px;
+  margin: 4px;
+  overflow: hidden;
+  border-radius: 8px;
+  color: #294653;
+}
+
+.founder-micro-atlas__cell::before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--archive-cell, #7c8b93);
+  content: "";
+  opacity: var(--archive-opacity, 0.18);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.founder-micro-atlas__cell:hover::before,
+.founder-micro-atlas__cell:focus-visible::before {
+  opacity: 0.9;
+  transform: scale(1.04);
+}
+
+.founder-micro-atlas__cell span {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.founder-micro-atlas__cell.is-strong,
+.founder-micro-atlas__cell.is-within { --archive-cell: #2bc683; }
+.founder-micro-atlas__cell.is-near { --archive-cell: #3f9fe7; }
+.founder-micro-atlas__cell.is-watch { --archive-cell: #f3a43c; }
+.founder-micro-atlas__cell.is-recorded { --archive-cell: #8b6ae1; }
+.founder-micro-atlas__cell.is-limited { --archive-cell: #98a4aa; }
+
+.founder-archive-scope {
+  overflow: visible;
+}
+
+.founder-archive-inline-loading,
+.founder-archive-empty {
+  padding: 18px 21px;
+  color: #758991;
+  font-size: 11px;
+}
+
+.founder-archive-day {
+  margin: 13px;
+  overflow: hidden;
+  border: 1px solid rgba(18, 96, 105, 0.09);
+  border-radius: 17px;
+  background: #fff;
+}
+
+.founder-archive-day > header {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.65fr) minmax(0, 1.5fr);
+  align-items: center;
+  gap: 20px;
+  padding: 15px 17px;
+  background: #f6faf9;
+}
+
+.founder-archive-day > header > div:first-child small,
+.founder-archive-day > header > div:first-child strong {
+  display: block;
+}
+
+.founder-archive-day > header > div:first-child small {
+  color: #71868c;
+  font-size: 8px;
+}
+
+.founder-archive-day > header > div:first-child strong {
+  margin-top: 4px;
+  color: #173b46;
+  font-size: 15px;
+}
+
+.founder-archive-day > header > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.founder-archive-day > header > div:last-child span {
+  border-left: 1px solid rgba(18, 96, 105, 0.08);
+  padding-left: 11px;
+}
+
+.founder-archive-day > header > div:last-child small,
+.founder-archive-day > header > div:last-child strong {
+  display: block;
+}
+
+.founder-archive-day > header > div:last-child small {
+  color: #829399;
+  font-family: var(--font-mono);
+  font-size: 6px;
+  text-transform: uppercase;
+}
+
+.founder-archive-day > header > div:last-child strong {
+  margin-top: 4px;
+  color: #294954;
+  font-size: 9px;
+}
+
+.founder-archive-meal {
+  border-top: 1px solid rgba(18, 96, 105, 0.07);
+}
+
+.founder-archive-meal__summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  border: 0;
+  padding: 14px 17px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.founder-archive-meal__summary:hover {
+  background: #fbfdfd;
+}
+
+.founder-archive-meal__summary > span:last-child {
+  text-align: right;
+}
+
+.founder-archive-meal__summary small,
+.founder-archive-meal__summary strong,
+.founder-archive-meal__summary em {
+  display: block;
+  font-style: normal;
+}
+
+.founder-archive-meal__summary small {
+  color: #829399;
+  font-size: 8px;
+}
+
+.founder-archive-meal__summary strong {
+  margin-top: 3px;
+  color: #183b47;
+  font-size: 12px;
+}
+
+.founder-archive-meal__summary em {
+  margin-top: 4px;
+  color: #8a999e;
+  font-size: 7px;
+}
+
+.founder-archive-meal__summary > span:last-child em {
+  color: #148875;
+  font-weight: 700;
+}
+
+.founder-archive-meal__detail {
+  display: grid;
+  gap: 13px;
+  padding: 0 17px 17px;
+  background: #fbfdfd;
+}
+
+.founder-archive-meal__detail > section {
+  border: 1px solid rgba(18, 96, 105, 0.08);
+  border-radius: 13px;
+  padding: 13px;
+  background: #fff;
+}
+
+.founder-archive-meal__detail h6 {
+  margin: 0 0 10px;
+  color: #187c6e;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.founder-archive-food + .founder-archive-food {
+  margin-top: 9px;
+  border-top: 1px solid rgba(18, 96, 105, 0.07);
+  padding-top: 9px;
+}
+
+.founder-archive-food > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.founder-archive-food > header strong,
+.founder-archive-food > header small {
+  display: block;
+}
+
+.founder-archive-food > header strong {
+  color: #234550;
+  font-size: 10px;
+}
+
+.founder-archive-food > header small {
+  margin-top: 3px;
+  color: #87979c;
+  font-size: 7px;
+}
+
+.founder-archive-food > header b {
+  color: #34545d;
+  font-size: 9px;
+}
+
+.founder-archive-food > div,
+.founder-archive-nutrient-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.founder-archive-food > div > span,
+.founder-archive-nutrient-list > span {
+  min-width: 0;
+  border-radius: 7px;
+  padding: 7px;
+  background: #f4f8f8;
+}
+
+.founder-archive-food > div small,
+.founder-archive-food > div strong,
+.founder-archive-nutrient-list small,
+.founder-archive-nutrient-list strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.founder-archive-food > div small,
+.founder-archive-nutrient-list small {
+  color: #84959a;
+  font-size: 6px;
+}
+
+.founder-archive-food > div strong,
+.founder-archive-nutrient-list strong {
+  margin-top: 3px;
+  color: #294954;
+  font-size: 8px;
+}
+
+.founder-archive-back {
+  border: 1px solid rgba(21, 125, 111, 0.18);
+  border-radius: 999px;
+  padding: 9px 13px;
+  background: rgba(31, 159, 138, 0.08);
+  color: #147b6d;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.founder-archive-nutrient-hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 12px;
+  border-radius: 22px;
+  padding: 27px;
+  background:
+    radial-gradient(circle at 90% 20%, rgba(84, 218, 181, 0.22), transparent 28%),
+    linear-gradient(135deg, #0b2636, #134e55);
+  color: #fff;
+}
+
+.founder-archive-nutrient-hero small {
+  color: #7ce0c2;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.founder-archive-nutrient-hero h5 {
+  margin: 7px 0;
+  font-size: clamp(25px, 4vw, 42px);
+}
+
+.founder-archive-nutrient-hero p {
+  max-width: 610px;
+  color: rgba(235, 249, 247, 0.7);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.founder-archive-nutrient-hero > span {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.founder-archive-nutrient-hero > span strong,
+.founder-archive-nutrient-hero > span small { display: block; }
+
+.founder-archive-nutrient-hero > span strong {
+  color: #fff;
+  font-size: clamp(24px, 3.5vw, 40px);
+}
+
+.founder-archive-nutrient-hero > span small {
+  margin-top: 5px;
+  color: rgba(235, 249, 247, 0.58);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.founder-archive-nutrient-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 76, 101, 0.1);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.founder-archive-nutrient-stats article {
+  min-width: 0;
+  border-right: 1px solid rgba(17, 76, 101, 0.08);
+  padding: 16px;
+}
+
+.founder-archive-nutrient-stats article:last-child { border-right: 0; }
+.founder-archive-nutrient-stats small,
+.founder-archive-nutrient-stats strong,
+.founder-archive-nutrient-stats span { display: block; }
+
+.founder-archive-nutrient-stats small {
+  color: #7d8e98;
+  font-family: var(--font-mono);
+  font-size: 7px;
+  text-transform: uppercase;
+}
+
+.founder-archive-nutrient-stats strong {
+  margin-top: 7px;
+  overflow: hidden;
+  color: #183849;
+  font-size: 15px;
+  text-overflow: ellipsis;
+}
+
+.founder-archive-nutrient-stats span {
+  margin-top: 4px;
+  color: #84939b;
+  font-size: 8px;
+}
+
+.founder-archive-nutrient-trend > div {
+  display: grid;
+  grid-template-columns: repeat(var(--archive-columns), minmax(53px, 1fr));
+  gap: 8px;
+  overflow-x: auto;
+  padding: 19px;
+}
+
+.founder-archive-nutrient-trend > div article {
+  display: grid;
+  min-width: 53px;
+  text-align: center;
+}
+
+.founder-archive-nutrient-trend > div article > div {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  height: 128px;
+  border-radius: 8px;
+  background: #f0f5f6;
+}
+
+.founder-archive-nutrient-trend > div article > div i {
+  width: min(62%, 29px);
+  border-radius: 7px 7px 3px 3px;
+  background: #8d9ba2;
+}
+
+.founder-archive-nutrient-trend article.is-strong > div i,
+.founder-archive-nutrient-trend article.is-within > div i { background: #26bd7c; }
+.founder-archive-nutrient-trend article.is-near > div i { background: #3c9be0; }
+.founder-archive-nutrient-trend article.is-watch > div i { background: #efa03b; }
+.founder-archive-nutrient-trend article.is-recorded > div i { background: #8263d8; }
+
+.founder-archive-nutrient-trend article > strong {
+  margin-top: 8px;
+  color: #254454;
+  font-size: 8px;
+}
+
+.founder-archive-nutrient-trend article > small,
+.founder-archive-nutrient-trend article > span {
+  color: #87969e;
+  font-size: 6px;
+}
+
+.founder-archive-nutrient-trend article > span { margin-top: 3px; }
+
+.founder-archive-food-sources > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 16px;
+}
+
+.founder-archive-food-sources > div article {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(17, 76, 101, 0.08);
+  border-radius: 11px;
+  padding: 10px;
+  background: #f9fbfc;
+}
+
+.founder-archive-food-sources article > b {
+  color: #38a691;
+  font-family: var(--font-mono);
+  font-size: 8px;
+}
+
+.founder-archive-food-sources article span,
+.founder-archive-food-sources article strong,
+.founder-archive-food-sources article small {
+  display: block;
+  min-width: 0;
+}
+
+.founder-archive-food-sources article span:last-child { text-align: right; }
+
+.founder-archive-food-sources article strong {
+  overflow: hidden;
+  color: #244454;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.founder-archive-food-sources article small {
+  margin-top: 3px;
+  color: #87969e;
+  font-size: 7px;
+}
+
+.founder-archive-disclaimer {
+  margin: 13px 4px 0;
+  color: #778a91;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .founder-history-archive {
+    border-radius: 23px;
+    padding: 17px 12px;
+  }
+
+  .founder-history-archive__toggle,
+  .founder-archive-nav > header,
+  .founder-archive-scope > header,
+  .founder-micro-atlas > header,
+  .founder-archive-nutrient-trend > header,
+  .founder-archive-food-sources > header {
+    grid-template-columns: 1fr;
+    display: grid;
+    align-items: start;
+  }
+
+  .founder-history-archive__toggle > strong {
+    width: fit-content;
+    justify-items: start;
+  }
+
+  .founder-archive-nav > header > span,
+  .founder-archive-scope > header > span,
+  .founder-micro-atlas > header > span,
+  .founder-archive-nutrient-trend > header > span,
+  .founder-archive-food-sources > header > span {
+    text-align: left;
+  }
+
+  .founder-archive-summary > header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .founder-archive-summary > div,
+  .founder-archive-nutrient-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .founder-archive-summary article:nth-child(2),
+  .founder-archive-nutrient-stats article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .founder-archive-summary article:nth-child(-n + 2),
+  .founder-archive-nutrient-stats article:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(230, 255, 249, 0.13);
+    padding-bottom: 14px;
+  }
+
+  .founder-archive-summary article:nth-child(n + 3),
+  .founder-archive-nutrient-stats article:nth-child(n + 3) {
+    padding-top: 14px;
+  }
+
+  .founder-archive-day > header {
+    grid-template-columns: 1fr;
+  }
+
+  .founder-archive-day > header > div:last-child span:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .founder-archive-food > div,
+  .founder-archive-nutrient-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .founder-archive-nutrient-hero {
+    display: grid;
+    align-items: start;
+  }
+
+  .founder-archive-nutrient-hero > span { text-align: left; }
+
+  .founder-archive-food-sources > div {
+    grid-template-columns: 1fr;
+  }
+
+  .founder-archive-dropdowns,
+  .founder-micro-atlas__controls {
+    grid-template-columns: 1fr;
+  }
+
+  .founder-micro-atlas__controls p {
+    margin: 0;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .founder-archive-summary > header,
+  .founder-archive-summary > div {
+    padding-inline: 16px;
+  }
+
+  .founder-micro-atlas__grid {
+    grid-template-columns: minmax(180px, 1fr) repeat(var(--archive-months), minmax(45px, 0.35fr));
+    min-width: calc(210px + var(--archive-months) * 48px);
+    padding-inline: 7px;
+  }
+
+  .founder-archive-day {
+    margin: 9px;
+  }
+
+  .founder-archive-day > header > div:last-child {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 0;
+  }
+
+  .founder-archive-day > header > div:last-child span:nth-child(4) {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .founder-archive-meal__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .founder-archive-meal__summary > span:last-child {
+    text-align: left;
+  }
+}

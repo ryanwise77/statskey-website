@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:founder-history": "node scripts/build-founder-history.mjs",
+    "refresh:founder-history": "node scripts/refresh-founder-history.mjs",
+    "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",
     "preview": "vite preview",
     "check:deploy": "node scripts/check-deploy-ready.mjs"
   },

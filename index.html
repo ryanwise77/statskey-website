@@ -131,6 +131,7 @@
               <div class="kicker">How I'm using it</div>
               <h2>Can I run an Olympic marathon?</h2>
               <p>I build StatsKey to answer a real question: how far can training principle take me?</p>
+              <p class="experiment-copy__live-note">The record below follows the experiment from late August 2025 forward: complete running history, every reliable public food recording, a full historical micronutrient profile, and the current training plan. Location coordinates never load in this public view.</p>
               <div class="hero-actions">
                 <a class="button button--primary" href="/statskey-app/olympic-marathon-experiment-001.mp4" target="_blank" rel="noopener">Open full video</a>
                 <a class="button button--secondary" href="https://www.instagram.com/p/DbXTEyjNeFc/" target="_blank" rel="noopener">Watch on Instagram</a>
@@ -160,8 +161,8 @@
             <header class="founder-live-suite__head">
               <div>
                 <span class="founder-live-badge"><i></i> Live from StatsKey</span>
-                <h3>My activity and nutrition record</h3>
-                <p>Read-only replicas of the app, updated from the same record I use every day.</p>
+                <h3>My complete activity and nutrition record</h3>
+                <p>Live recent data plus a date-indexed public archive, built once and served without recomputing the full history for every visit.</p>
               </div>
               <span id="founder-live-updated">Connecting…</span>
             </header>
@@ -169,7 +170,7 @@
             <div class="founder-app-screens">
               <article class="founder-app-screen" id="founder-running-app">
                 <div class="founder-panel-head">
-                  <span>Activity · Running year + recent workouts</span>
+                  <span>Activity · Complete history from late August 2025</span>
                 </div>
                 <div class="ios-device" data-live-device="running" aria-label="Live replica of recent activity in the StatsKey iOS app">
                   <div class="ios-device__island" aria-hidden="true"></div>
@@ -205,7 +206,7 @@
 
               <article class="founder-app-screen" id="founder-nutrition-app">
                 <div class="founder-panel-head">
-                  <span>Nutrition · 30-day insights</span>
+                  <span>Nutrition · Live insights + complete historical profile</span>
                 </div>
                 <div class="ios-device" data-live-device="nutrition" aria-label="Live replica of 30-day Nutrition Insights in the StatsKey iOS app">
                   <div class="ios-device__island" aria-hidden="true"></div>
@@ -246,6 +247,20 @@
                 <span></span>
               </div>
               <h4 class="sr-only" id="founder-longitudinal-title">Longitudinal running record and recent activity</h4>
+            </section>
+
+            <section class="founder-history-archive" id="founder-history-archive" aria-labelledby="founder-history-archive-title">
+              <button class="founder-history-archive__toggle" id="founder-history-archive-toggle" type="button" data-archive-toggle aria-expanded="false" aria-controls="founder-history-archive-screen">
+                <div>
+                  <span>Complete public food dataset</span>
+                  <h4 id="founder-history-archive-title">Every reliable meal. Every recorded nutrient.</h4>
+                  <p>Open the archive only when you want it, then load one month, week, nutrient category, or three-day meal chunk at a time.</p>
+                </div>
+                <strong><span><i aria-hidden="true"></i> Static historical archive</span><b>Open archive</b><em aria-hidden="true">⌄</em></strong>
+              </button>
+              <div class="founder-history-archive__screen" id="founder-history-archive-screen" aria-live="polite" hidden>
+                <div class="founder-history-archive__loading" aria-hidden="true"><span></span><span></span><span></span></div>
+              </div>
             </section>
 
             <div class="founder-route-privacy">

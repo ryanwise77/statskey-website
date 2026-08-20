@@ -7,7 +7,6 @@ import {
   collection,
   doc,
   getFirestore,
-  getDocs,
   limit,
   onSnapshot,
   orderBy,
@@ -40,9 +39,10 @@ const RANGE_LABELS = {
 }
 
 const NUTRITION_RANGE_DAYS = [7, 14, 30, 90]
-const PUBLIC_HISTORY_START_DAY = '2025-09-01'
-const PUBLIC_HISTORY_START_MONTH = '2025-09'
-const PUBLIC_HISTORY_START_LABEL = 'September 2025'
+const PUBLIC_HISTORY_START_DAY = '2025-08-25'
+const PUBLIC_HISTORY_START_MONTH = '2025-08'
+const PUBLIC_HISTORY_START_LABEL = 'late August 2025'
+const FOUNDER_HISTORY_INDEX_PATH = '/statskey-app/founder-history/index.json'
 
 const NUTRIENT_COLORS = {
   strong: '#34c759',
@@ -70,6 +70,19 @@ const state = {
   historyWorkouts: null,
   historyLoading: false,
   historyError: null,
+  archiveManifest: null,
+  archiveOpen: false,
+  archiveMonth: null,
+  archiveWeekStart: null,
+  archiveMealsByMonth: new Map(),
+  archiveLoading: true,
+  archiveError: null,
+  archiveNutrientsOpen: false,
+  archiveNutrientCategory: 'Vitamins',
+  archiveNutrientLimit: 20,
+  archiveVisibleDayCount: 3,
+  archiveNutrientKey: null,
+  archiveExpandedMealId: null,
   source: 'connecting',
   selectedTab: 'activity',
   activityView: 'fitness',
@@ -111,6 +124,7 @@ const timestampDate = (value) => {
   if (!value) return null
   if (typeof value.toDate === 'function') return value.toDate()
   if (typeof value.seconds === 'number') return new Date(value.seconds * 1000)
+  if (typeof value._seconds === 'number') return new Date(value._seconds * 1000)
   const parsed = new Date(value)
   return Number.isFinite(parsed.getTime()) ? parsed : null
 }
@@ -221,38 +235,34 @@ function workoutsReference() {
 
 async function loadCompleteWorkoutHistory() {
   if (state.historyWorkouts || state.historyLoading) return
-  if (state.source === 'snapshot' && state.workouts.length) {
-    state.historyWorkouts = [...state.workouts]
-    state.historyError = null
-    renderScreen()
-    return
-  }
-  if (!database) return
   state.historyLoading = true
   state.historyError = null
   renderScreen()
   try {
-    const reference = collection(
-      database,
-      'publicFounderReplicas',
-      'founder',
-      'workouts'
+    const response = await fetch(elements.stage.dataset.source)
+    if (!response.ok) {
+      throw new Error(`Workout archive returned ${response.status}`)
+    }
+    const payload = await response.json()
+    const archived = Array.isArray(payload.workouts) ? payload.workouts : []
+    const merged = new Map(
+      [...archived, ...state.workouts]
+        .filter((workout) => workout?.workoutId)
+        .map((workout) => [workout.workoutId, workout])
     )
-    const snapshot = await getDocs(query(
-      reference,
-      orderBy('day', 'desc'),
-      limit(120)
-    ))
-    state.historyWorkouts = snapshot.docs.map((entry) => ({
-        ...entry.data(),
-        workoutId: entry.id,
-      }))
+    state.historyWorkouts = Array.from(merged.values())
+      .filter((workout) => String(workout.day || '') >= PUBLIC_HISTORY_START_DAY)
+      .sort((left, right) => (
+        String(right.day || '').localeCompare(String(left.day || '')) ||
+        number(right.startMinute) - number(left.startMinute)
+      ))
   } catch (error) {
-    console.warn('Founder workout history unavailable', error.code)
-    state.historyError = 'Recent workout history is unavailable; the complete monthly record is still shown.'
+    console.warn('Founder workout archive unavailable', error)
+    state.historyWorkouts = [...state.workouts]
+    state.historyError = 'The static workout archive is temporarily unavailable; live recent activity is still shown.'
   } finally {
     state.historyLoading = false
-    renderScreen()
+    render()
   }
 }
 
@@ -292,6 +302,7 @@ async function loadFallback(reason = 'Published snapshot') {
 }
 
 function connectLiveRecord() {
+  void loadCompleteWorkoutHistory()
   try {
     database = initializeFirebase()
   } catch (error) {
@@ -349,6 +360,499 @@ function connectLiveRecord() {
       console.warn('Founder live workouts unavailable', error.code)
     }
   )
+}
+
+function archiveMonthDefinition(month = state.archiveMonth) {
+  return state.archiveManifest?.months?.find((entry) => entry.month === month) || null
+}
+
+function archiveWeekDefinition(weekStart = state.archiveWeekStart) {
+  return state.archiveManifest?.weeks?.find((entry) => entry.weekStart === weekStart) || null
+}
+
+function archiveMealPool() {
+  const records = new Map()
+  for (const meal of Array.from(state.archiveMealsByMonth.values()).flat()) {
+    if (meal?.mealId) records.set(meal.mealId, meal)
+  }
+  return Array.from(records.values()).sort((left, right) => (
+    String(right.day || '').localeCompare(String(left.day || '')) ||
+    String(right.timeLabel || '').localeCompare(String(left.timeLabel || ''))
+  ))
+}
+
+function archiveScopeMeals() {
+  const meals = archiveMealPool()
+  const week = archiveWeekDefinition()
+  if (week) {
+    return meals.filter((meal) => (
+      meal.day >= week.weekStart && meal.day <= week.weekEnd
+    ))
+  }
+  const month = archiveMonthDefinition()
+  return month
+    ? meals.filter((meal) => meal.day?.slice(0, 7) === month.month)
+    : meals
+}
+
+function archiveAggregate(meals) {
+  const values = {
+    mealCount: 0,
+    itemCount: 0,
+    calories: 0,
+    protein: 0,
+    carbohydrates: 0,
+    totalFat: 0,
+    nutrients: new Map(),
+  }
+  for (const meal of meals) {
+    values.mealCount += 1
+    values.itemCount += number(meal.itemCount || meal.items?.length)
+    values.calories += number(meal.calories)
+    values.protein += number(meal.protein)
+    values.carbohydrates += number(meal.carbohydrates)
+    values.totalFat += number(meal.totalFat)
+    for (const nutrient of meal.nutrients || []) {
+      const amount = Number(nutrient?.value)
+      if (!nutrient?.key || !Number.isFinite(amount)) continue
+      const previous = values.nutrients.get(nutrient.key)
+      values.nutrients.set(nutrient.key, {
+        ...nutrient,
+        value: number(previous?.value) + amount,
+      })
+    }
+  }
+  return values
+}
+
+function archiveFormatValue(value, unit = '') {
+  const amount = number(value)
+  const digits = Math.abs(amount) < 10 && amount % 1 ? 2 : amount % 1 ? 1 : 0
+  return `${amount.toLocaleString(undefined, { maximumFractionDigits: digits })}${unit ? ` ${unit}` : ''}`
+}
+
+function archiveDateLabel(day) {
+  if (!day) return ''
+  const date = new Date(`${day}T12:00:00.000Z`)
+  if (!Number.isFinite(date.getTime())) return day
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+function archiveStatusLabel(status) {
+  return {
+    strong: 'Reference met',
+    within: 'Within reference limit',
+    near: 'Near reference',
+    watch: 'Review intake',
+    limited: 'Limited coverage',
+    recorded: 'Recorded',
+  }[status] || 'Recorded'
+}
+
+async function loadArchiveMonths(months) {
+  const missing = (months || [])
+    .map((month) => archiveMonthDefinition(month))
+    .filter(Boolean)
+    .filter((month) => !state.archiveMealsByMonth.has(month.month))
+  if (!missing.length) return
+  state.archiveLoading = true
+  state.archiveError = null
+  renderArchive()
+  try {
+    const payloads = await Promise.all(missing.map(async (month) => {
+      const response = await fetch(month.path)
+      if (!response.ok) throw new Error(`${month.month} returned ${response.status}`)
+      return [month.month, await response.json()]
+    }))
+    for (const [month, payload] of payloads) {
+      state.archiveMealsByMonth.set(
+        month,
+        Array.isArray(payload?.meals) ? payload.meals : []
+      )
+    }
+  } catch (error) {
+    console.warn('Founder history segment unavailable', error)
+    state.archiveError = 'That published archive segment is temporarily unavailable.'
+  } finally {
+    state.archiveLoading = false
+    renderArchive()
+  }
+}
+
+async function loadFounderArchive() {
+  if (state.archiveManifest) return
+  state.archiveLoading = true
+  state.archiveError = null
+  renderArchive()
+  try {
+    const response = await fetch(FOUNDER_HISTORY_INDEX_PATH)
+    if (!response.ok) throw new Error(`History index returned ${response.status}`)
+    state.archiveManifest = await response.json()
+    state.archiveMonth = state.archiveManifest?.months?.[0]?.month || null
+    if (state.archiveMonth) await loadArchiveMonths([state.archiveMonth])
+  } catch (error) {
+    console.warn('Founder history index unavailable', error)
+    state.archiveError = 'The complete published archive is temporarily unavailable.'
+  } finally {
+    state.archiveLoading = false
+    renderArchive()
+  }
+}
+
+async function selectArchiveMonth(month) {
+  if (!archiveMonthDefinition(month)) return
+  state.archiveMonth = month
+  state.archiveWeekStart = null
+  state.archiveNutrientKey = null
+  state.archiveExpandedMealId = null
+  state.archiveVisibleDayCount = 3
+  await loadArchiveMonths([month])
+  renderArchive()
+}
+
+async function selectArchiveWeek(weekStart) {
+  if (!weekStart) {
+    state.archiveWeekStart = null
+    state.archiveExpandedMealId = null
+    state.archiveVisibleDayCount = 3
+    renderArchive()
+    return
+  }
+  const week = archiveWeekDefinition(weekStart)
+  if (!week) return
+  state.archiveWeekStart = weekStart
+  state.archiveExpandedMealId = null
+  state.archiveVisibleDayCount = 3
+  await loadArchiveMonths(week.months)
+  renderArchive()
+}
+
+function archiveNavigator() {
+  const manifest = state.archiveManifest
+  const month = archiveMonthDefinition()
+  if (!manifest || !month) return ''
+  const weeks = (month.weekStarts || [])
+    .map((weekStart) => archiveWeekDefinition(weekStart))
+    .filter(Boolean)
+    .sort((left, right) => right.weekStart.localeCompare(left.weekStart))
+  return `
+    <section class="founder-archive-nav">
+      <header>
+        <div><small>Date-indexed archive</small><strong>Load one bounded segment at a time</strong></div>
+        <span>${integer(month.mealCount)} records in ${escapeHTML(month.label)}</span>
+      </header>
+      <div class="founder-archive-dropdowns">
+        <label>
+          <span>Month</span>
+          <select data-archive-month-select aria-label="Food record month">
+            ${manifest.months.map((entry) => `<option value="${entry.month}" ${entry.month === month.month ? 'selected' : ''}>${escapeHTML(entry.label)} · ${integer(entry.mealCount)} records</option>`).join('')}
+          </select>
+        </label>
+        <label>
+          <span>Week</span>
+          <select data-archive-week-select aria-label="Week within selected month">
+            <option value="" ${state.archiveWeekStart ? '' : 'selected'}>All month · ${integer(month.recordedDays)} recorded ${number(month.recordedDays) === 1 ? 'day' : 'days'}</option>
+            ${weeks.map((week) => `<option value="${week.weekStart}" ${state.archiveWeekStart === week.weekStart ? 'selected' : ''}>${escapeHTML(dateLabel(week.weekStart, { short: true, year: false }))}–${escapeHTML(dateLabel(week.weekEnd, { short: true, year: false }))} · ${integer(week.mealCount)} records</option>`).join('')}
+          </select>
+        </label>
+      </div>
+    </section>
+  `
+}
+
+function archiveNutrientAtlas() {
+  const manifest = state.archiveManifest
+  const allNutrients = manifest?.nutritionProfile?.nutrients || []
+  const months = [...(manifest?.months || [])].reverse()
+  const categories = Array.from(new Set(allNutrients.map((nutrient) => (
+    nutrient.category || 'Other'
+  ))))
+  if (!categories.includes(state.archiveNutrientCategory)) {
+    state.archiveNutrientCategory = categories[0] || 'Other'
+  }
+  const filtered = allNutrients.filter((nutrient) => (
+    state.archiveNutrientCategory === 'All' ||
+    (nutrient.category || 'Other') === state.archiveNutrientCategory
+  ))
+  const nutrients = filtered.slice(0, state.archiveNutrientLimit)
+  if (!nutrients.length || !months.length) return ''
+  return `
+    <section class="founder-micro-atlas">
+      <header>
+        <div><small>Longitudinal micronutrient atlas</small><strong>Every recorded nutrient, month by month</strong><p>Color reflects daily-reference context where one exists. Gray marks limited coverage; blanks remain unknown.</p></div>
+        <span>${integer(filtered.length)} nutrients in category · ${integer(months.length)} months</span>
+      </header>
+      <div class="founder-micro-atlas__controls">
+        <label><span>Nutrient category</span><select data-archive-nutrient-category aria-label="Historical nutrient category"><option value="All" ${state.archiveNutrientCategory === 'All' ? 'selected' : ''}>All categories · ${integer(allNutrients.length)}</option>${categories.map((category) => `<option value="${escapeHTML(category)}" ${state.archiveNutrientCategory === category ? 'selected' : ''}>${escapeHTML(category)} · ${integer(allNutrients.filter((nutrient) => (nutrient.category || 'Other') === category).length)}</option>`).join('')}</select></label>
+        <p>Showing ${integer(nutrients.length)} of ${integer(filtered.length)} in this category.</p>
+      </div>
+      <div class="founder-micro-atlas__scroll">
+        <div class="founder-micro-atlas__grid" style="--archive-months:${months.length}">
+          <div class="founder-micro-atlas__corner">Nutrient</div>
+          ${months.map((month) => `<div class="founder-micro-atlas__month"><strong>${escapeHTML(month.label.split(' ')[0].slice(0, 3))}</strong><small>${escapeHTML(month.month.slice(2, 4))}</small></div>`).join('')}
+          ${nutrients.map((nutrient) => {
+            const monthly = new Map((nutrient.monthly || []).map((entry) => [entry.month, entry]))
+            return `
+              <button class="founder-micro-atlas__label" type="button" data-archive-nutrient="${escapeHTML(nutrient.key)}">
+                <strong>${escapeHTML(nutrient.label)}</strong>
+                <small>${archiveFormatValue(nutrient.average, nutrient.unit)} · ${integer(nutrient.coveragePercent)}% coverage</small>
+              </button>
+              ${months.map((month) => {
+                const entry = monthly.get(month.month)
+                const coverage = entry?.recordedDays
+                  ? entry.coverageDays / entry.recordedDays
+                  : 0
+                const intensity = entry?.percent == null
+                  ? coverage
+                  : Math.min(1, Math.max(0.08, entry.percent / 100))
+                const opacity = 0.1 + intensity * 0.72
+                const title = entry?.average == null
+                  ? `${month.label}: not recorded`
+                  : `${month.label}: ${archiveFormatValue(entry.average, nutrient.unit)} average on ${entry.coverageDays} days`
+                return `<button class="founder-micro-atlas__cell is-${escapeHTML(entry?.status || 'limited')}" type="button" data-archive-nutrient="${escapeHTML(nutrient.key)}" style="--archive-opacity:${opacity.toFixed(3)}" title="${escapeHTML(title)}"><span>${entry?.average == null ? '—' : entry.coverageDays}</span></button>`
+              }).join('')}
+            `
+          }).join('')}
+        </div>
+      </div>
+      ${nutrients.length < filtered.length ? `<button class="founder-archive-load-more" type="button" data-archive-more-nutrients>Load ${integer(Math.min(20, filtered.length - nutrients.length))} more nutrients</button>` : ''}
+    </section>
+  `
+}
+
+function archiveMealRow(meal) {
+  const expanded = state.archiveExpandedMealId === meal.mealId
+  const items = meal.items || []
+  return `
+    <article class="founder-archive-meal ${expanded ? 'is-expanded' : ''}">
+      <button class="founder-archive-meal__summary" type="button" data-archive-meal="${escapeHTML(meal.mealId)}" aria-expanded="${expanded}">
+        <span><small>${escapeHTML(meal.timeLabel || 'Time unavailable')}</small><strong>${escapeHTML(meal.title || 'Meal')}</strong><em>${integer(items.length || meal.itemCount)} ${(items.length || meal.itemCount) === 1 ? 'item' : 'items'} · ${integer((meal.nutrients || []).length)} nutrients</em></span>
+        <span><strong>${integer(meal.calories)} cal</strong><small>${number(meal.protein).toFixed(1)} P · ${number(meal.carbohydrates).toFixed(1)} C · ${number(meal.totalFat).toFixed(1)} F</small><em>${expanded ? 'Hide complete record' : 'Open complete record'}</em></span>
+      </button>
+      ${expanded ? `
+        <div class="founder-archive-meal__detail">
+          <section>
+            <h6>Individual foods</h6>
+            ${(items || []).map((item) => `
+              <article class="founder-archive-food">
+                <header><span><strong>${escapeHTML(item.name || 'Food')}</strong><small>${escapeHTML(item.brand || `${number(item.servingSize).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${item.servingUnit || 'serving'}`)}</small></span><b>${integer(item.calories)} cal</b></header>
+                <div>${(item.nutrients || []).map((nutrient) => `<span><small>${escapeHTML(nutrient.label || nutrient.key)}</small><strong>${archiveFormatValue(nutrient.value, nutrient.unit)}</strong></span>`).join('') || '<p>No item-level nutrient fields were published.</p>'}</div>
+              </article>
+            `).join('')}
+          </section>
+          <section>
+            <h6>Complete meal nutrient totals</h6>
+            <div class="founder-archive-nutrient-list">
+              ${(meal.nutrients || []).map((nutrient) => `<span><small>${escapeHTML(nutrient.label || nutrient.key)}</small><strong>${archiveFormatValue(nutrient.value, nutrient.unit)}</strong></span>`).join('')}
+            </div>
+          </section>
+        </div>
+      ` : ''}
+    </article>
+  `
+}
+
+function archiveDayGroups(meals, maximum = state.archiveVisibleDayCount) {
+  const groups = new Map()
+  for (const meal of meals) {
+    const current = groups.get(meal.day) || []
+    current.push(meal)
+    groups.set(meal.day, current)
+  }
+  return Array.from(groups.entries())
+    .sort(([left], [right]) => right.localeCompare(left))
+    .slice(0, maximum)
+    .map(([day, dayMeals]) => {
+      const totals = archiveAggregate(dayMeals)
+      return `
+        <section class="founder-archive-day">
+          <header>
+            <div><small>${escapeHTML(archiveDateLabel(day))}</small><strong>${integer(dayMeals.length)} ${dayMeals.length === 1 ? 'meal' : 'meals'}</strong></div>
+            <div><span><small>Energy</small><strong>${integer(totals.calories)} cal</strong></span><span><small>Protein</small><strong>${integer(totals.protein)} g</strong></span><span><small>Carbs</small><strong>${integer(totals.carbohydrates)} g</strong></span><span><small>Fat</small><strong>${integer(totals.totalFat)} g</strong></span><span><small>Nutrients</small><strong>${integer(totals.nutrients.size)}</strong></span></div>
+          </header>
+          <div>${dayMeals.map(archiveMealRow).join('')}</div>
+        </section>
+      `
+    }).join('')
+}
+
+function archiveNutrientDetail() {
+  const profile = state.archiveManifest?.nutritionProfile
+  const nutrient = profile?.nutrients?.find((entry) => entry.key === state.archiveNutrientKey)
+  if (!nutrient) {
+    state.archiveNutrientKey = null
+    return archiveHome()
+  }
+  const available = (nutrient.monthly || []).filter((month) => month.average != null)
+  const maximum = Math.max(1, ...available.map((month) => number(month.average)))
+  return `
+    <button class="founder-archive-back" type="button" data-archive-back>‹ Full micronutrient profile</button>
+    <section class="founder-archive-nutrient-hero">
+      <div><small>${escapeHTML(nutrient.category || 'Recorded nutrient')}</small><h5>${escapeHTML(nutrient.label)}</h5><p>Average on days where this nutrient was recorded. Unreported foods and days remain unknown, not zero.</p></div>
+      <span><strong>${archiveFormatValue(nutrient.average, nutrient.unit)}</strong><small>per covered day</small></span>
+    </section>
+    <section class="founder-archive-nutrient-stats">
+      <article><small>Coverage</small><strong>${integer(nutrient.coverageDays)} days</strong><span>${number(nutrient.coveragePercent).toFixed(1)}% of recorded days</span></article>
+      <article><small>Historical total</small><strong>${archiveFormatValue(nutrient.total, nutrient.unit)}</strong><span>${integer(profile.mealCount)} public food records</span></article>
+      <article><small>Reference context</small><strong>${nutrient.reference > 0 ? `${integer(nutrient.percent)}%` : 'No reference'}</strong><span>${escapeHTML(archiveStatusLabel(nutrient.status))}</span></article>
+      <article><small>Measurement window</small><strong>${escapeHTML(dateLabel(profile.startDay, { short: true }))}</strong><span>through ${escapeHTML(dateLabel(profile.endDay, { short: true }))}</span></article>
+    </section>
+    <section class="founder-archive-nutrient-trend">
+      <header><div><small>Monthly profile</small><strong>Recorded-day average and coverage</strong></div><span>${integer(available.length)} months with data</span></header>
+      <div style="--archive-columns:${Math.max(1, nutrient.monthly?.length || 0)}">
+        ${(nutrient.monthly || []).map((month) => {
+          const height = month.average == null ? 0 : number(month.average) / maximum * 100
+          const coverage = month.recordedDays ? month.coverageDays / month.recordedDays * 100 : 0
+          return `<article class="is-${escapeHTML(month.status || 'limited')}"><div><i style="height:${Math.max(month.average == null ? 0 : 3, height).toFixed(2)}%"></i></div><strong>${month.average == null ? '—' : archiveFormatValue(month.average, nutrient.unit)}</strong><small>${escapeHTML(month.month)}</small><span>${integer(coverage)}% covered</span></article>`
+        }).join('')}
+      </div>
+    </section>
+    <section class="founder-archive-food-sources">
+      <header><div><small>Contribution ledger</small><strong>Leading recorded food sources</strong></div><span>Across the full archive</span></header>
+      <div>${(nutrient.topFoods || []).map((food, index) => `<article><b>${String(index + 1).padStart(2, '0')}</b><span><strong>${escapeHTML(food.name)}</strong><small>${escapeHTML(food.brand || `${integer(food.occurrences)} recordings`)}</small></span><span><strong>${archiveFormatValue(food.amount, nutrient.unit)}</strong><small>${integer(food.occurrences)} occurrences</small></span></article>`).join('')}</div>
+    </section>
+    <p class="founder-archive-disclaimer">${escapeHTML(profile.disclaimer || '')}</p>
+  `
+}
+
+function archiveNutrientDropdown() {
+  const profile = state.archiveManifest?.nutritionProfile
+  return `
+    <section class="founder-archive-dropdown ${state.archiveNutrientsOpen ? 'is-open' : ''}">
+      <button type="button" data-archive-nutrients-toggle aria-expanded="${state.archiveNutrientsOpen}">
+        <span><small>Historical micronutrient profile</small><strong>${integer(profile?.nutrients?.length)} recorded nutrients across ${integer(state.archiveManifest?.months?.length)} months</strong><em>Open by category; twenty nutrient rows render at a time.</em></span>
+        <i aria-hidden="true">⌄</i>
+      </button>
+      ${state.archiveNutrientsOpen ? `<div>${archiveNutrientAtlas()}</div>` : ''}
+    </section>
+  `
+}
+
+function archiveHome() {
+  const manifest = state.archiveManifest
+  if (!manifest) {
+    return `<div class="founder-history-archive__loading"><span></span><span></span><span></span><p>${escapeHTML(state.archiveError || 'Loading the full historical archive…')}</p></div>`
+  }
+  const meals = archiveScopeMeals()
+  const totals = archiveAggregate(meals)
+  const scopeDayCount = new Set(meals.map((meal) => meal.day)).size
+  const visibleDayCount = Math.min(state.archiveVisibleDayCount, scopeDayCount)
+  const week = archiveWeekDefinition()
+  const scope = week
+    ? `${dateLabel(week.weekStart, { short: true })}–${dateLabel(week.weekEnd, { short: true })}`
+    : archiveMonthDefinition()?.label || 'Selected archive'
+  return `
+    <section class="founder-archive-summary">
+      <header><div><small>Verified public archive</small><strong>${escapeHTML(dateLabel(manifest.earliestDay, { short: true }))}–${escapeHTML(dateLabel(manifest.reliableThroughDay, { short: true }))}</strong></div><span>Updated once · served statically</span></header>
+      <div>
+        <article><small>Food records</small><strong>${integer(manifest.mealCount)}</strong><span>every reliable public meal</span></article>
+        <article><small>Food items</small><strong>${integer(manifest.itemCount)}</strong><span>preserved inside each meal</span></article>
+        <article><small>Recorded days</small><strong>${integer(manifest.recordedDays)}</strong><span>${integer(manifest.possibleDays)} calendar days covered</span></article>
+        <article><small>Nutrients</small><strong>${integer(manifest.nutrientCount)}</strong><span>missing fields remain unknown</span></article>
+      </div>
+    </section>
+    ${archiveNavigator()}
+    ${archiveNutrientDropdown()}
+    <section class="founder-archive-scope">
+      <header><div><small>Every meal in scope</small><strong>${escapeHTML(scope)}</strong></div><span>Showing ${integer(visibleDayCount)} of ${integer(scopeDayCount)} days · ${integer(totals.mealCount)} total records</span></header>
+      ${state.archiveLoading ? '<div class="founder-archive-inline-loading">Loading selected archive segment…</div>' : ''}
+      ${archiveDayGroups(meals) || `<div class="founder-archive-empty">${escapeHTML(state.archiveError || 'No public meals were recorded in this scope.')}</div>`}
+      ${visibleDayCount < scopeDayCount ? `<button class="founder-archive-load-more" type="button" data-archive-more-days>Load ${integer(Math.min(3, scopeDayCount - visibleDayCount))} more days</button>` : ''}
+    </section>
+    <p class="founder-archive-disclaimer">Public food data only. Private notes, photos, medications, supplements, hidden items, and private Intelligence output are excluded.</p>
+  `
+}
+
+function renderArchive() {
+  if (!elements.archive || !elements.archiveScreen || !elements.archiveToggle) return
+  elements.archive.classList.toggle('is-open', state.archiveOpen)
+  elements.archiveToggle.setAttribute('aria-expanded', String(state.archiveOpen))
+  const label = elements.archiveToggle.querySelector('b')
+  if (label) label.textContent = state.archiveOpen ? 'Close archive' : 'Open archive'
+  elements.archiveScreen.hidden = !state.archiveOpen
+  if (!state.archiveOpen) {
+    elements.archiveScreen.replaceChildren()
+    return
+  }
+  elements.archiveScreen.innerHTML = state.archiveNutrientKey
+    ? archiveNutrientDetail()
+    : archiveHome()
+}
+
+function handleArchiveClick(event) {
+  if (event.target.closest('[data-archive-toggle]')) {
+    state.archiveOpen = !state.archiveOpen
+    renderArchive()
+    if (state.archiveOpen && !state.archiveManifest) void loadFounderArchive()
+    return
+  }
+  const month = event.target.closest('[data-archive-month]')
+  if (month) {
+    void selectArchiveMonth(month.dataset.archiveMonth)
+    return
+  }
+  const week = event.target.closest('[data-archive-week]')
+  if (week) {
+    void selectArchiveWeek(week.dataset.archiveWeek || null)
+    return
+  }
+  const nutrient = event.target.closest('[data-archive-nutrient]')
+  if (nutrient) {
+    state.archiveNutrientKey = nutrient.dataset.archiveNutrient
+    renderArchive()
+    elements.archiveScreen.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    return
+  }
+  if (event.target.closest('[data-archive-back]')) {
+    state.archiveNutrientKey = null
+    renderArchive()
+    return
+  }
+  if (event.target.closest('[data-archive-nutrients-toggle]')) {
+    state.archiveNutrientsOpen = !state.archiveNutrientsOpen
+    state.archiveNutrientLimit = 20
+    renderArchive()
+    return
+  }
+  if (event.target.closest('[data-archive-more-nutrients]')) {
+    state.archiveNutrientLimit += 20
+    renderArchive()
+    return
+  }
+  if (event.target.closest('[data-archive-more-days]')) {
+    state.archiveVisibleDayCount += 3
+    renderArchive()
+    return
+  }
+  const meal = event.target.closest('[data-archive-meal]')
+  if (meal) {
+    state.archiveExpandedMealId = state.archiveExpandedMealId === meal.dataset.archiveMeal
+      ? null
+      : meal.dataset.archiveMeal
+    renderArchive()
+  }
+}
+
+function handleArchiveChange(event) {
+  if (event.target.matches('[data-archive-month-select]')) {
+    void selectArchiveMonth(event.target.value)
+    return
+  }
+  if (event.target.matches('[data-archive-week-select]')) {
+    void selectArchiveWeek(event.target.value || null)
+    return
+  }
+  if (event.target.matches('[data-archive-nutrient-category]')) {
+    state.archiveNutrientCategory = event.target.value
+    state.archiveNutrientLimit = 20
+    renderArchive()
+  }
 }
 
 function rangeStats(range = state.range) {
@@ -1008,21 +1512,20 @@ function renderLongitudinalRecord() {
   const history = publicHistorySummary(months)
   const year = calendarYearSummary()
   const trailingYearMiles = weeks.reduce((sum, week) => sum + number(week.runningMiles), 0)
-  const recentWorkouts = state.workouts
+  const completeWorkouts = (state.historyWorkouts ?? state.workouts)
     .filter((workout) => String(workout.day || '') >= PUBLIC_HISTORY_START_DAY)
-    .slice(0, 48)
 
   elements.longitudinal.innerHTML = `
     <header class="founder-longitudinal__head">
       <div>
         <span>Longitudinal founder record</span>
         <h4 id="founder-longitudinal-title">The trajectory, not a single day.</h4>
-        <p>A live year-scale view of volume, continuity, and every recent projected activity. Select an activity to inspect its metrics in the phone above.</p>
+        <p>A live year-scale view of volume and continuity plus every reliable public workout from the start of the experiment. Select an activity to inspect its metrics in the phone above.</p>
       </div>
       <strong><i aria-hidden="true"></i> Live record</strong>
     </header>
     <div class="founder-longitudinal__metrics">
-      <span><small>Since Sep 2025</small><strong>${number(trailingYearMiles).toFixed(1)}</strong><em>running miles</em></span>
+      <span><small>Since late Aug 2025</small><strong>${number(trailingYearMiles).toFixed(1)}</strong><em>running miles</em></span>
       <span><small>${escapeHTML(year.year)} average</small><strong>${number(year.averageMilesPerWeek).toFixed(1)}</strong><em>miles / week</em></span>
       <span><small>Last 30 days</small><strong>${number(month.runningMiles).toFixed(1)}</strong><em>${integer(month.runningActivities)} runs</em></span>
       <span><small>Calendar year</small><strong>${number(year.runningMiles).toFixed(1)}</strong><em>running miles</em></span>
@@ -1031,14 +1534,14 @@ function renderLongitudinalRecord() {
     <div class="founder-longitudinal__charts">
       <article class="founder-longitudinal__chart-card founder-longitudinal__chart-card--primary">
         <div class="founder-longitudinal__chart-head">
-          <div><small>Weekly running volume</small><strong>Since September 2025</strong></div>
+          <div><small>Weekly running volume</small><strong>Since late August 2025</strong></div>
           <span>${number(trailingYearMiles / Math.max(weeks.length, 1)).toFixed(1)} mi / week</span>
         </div>
         ${longitudinalWeeklyChart(weeks)}
       </article>
       <article class="founder-longitudinal__chart-card">
         <div class="founder-longitudinal__chart-head">
-          <div><small>Monthly running volume</small><strong>Since September 2025</strong></div>
+          <div><small>Monthly running volume</small><strong>Since late August 2025</strong></div>
           <span>${integer(months.length)} months</span>
         </div>
         ${longitudinalMonthBars(months)}
@@ -1046,11 +1549,11 @@ function renderLongitudinalRecord() {
     </div>
     <div class="founder-longitudinal__activity">
       <div class="founder-longitudinal__activity-head">
-        <div><small>Recent activity</small><strong>Every current public workout summary</strong></div>
-        <span>${integer(recentWorkouts.length)} activities · newest first</span>
+        <div><small>Complete activity archive</small><strong>Every reliable public workout summary</strong></div>
+        <span>${integer(completeWorkouts.length)} activities · newest first</span>
       </div>
       <div class="founder-longitudinal__activity-list">
-        ${longitudinalActivityRows(recentWorkouts)}
+        ${longitudinalActivityRows(completeWorkouts)}
       </div>
     </div>
   `
@@ -1317,7 +1820,7 @@ function historyHome() {
   return `
     <div class="ios-screen-heading">
       <div><small>Longitudinal record</small><h3>Fitness Record</h3></div>
-      <time>Sep 2025—now</time>
+      <time>Aug 2025—now</time>
     </div>
     <div class="ios-card ios-card--tinted">
       <div class="ios-pulse-value"><strong>${number(summary.runningMiles).toFixed(1)}</strong><span>running miles</span></div>
@@ -1332,9 +1835,9 @@ function historyHome() {
         <span><span class="ios-card-icon ios-card-icon--run">↗</span><span class="ios-card-title">Monthly Running Mileage</span></span>
       </div>
       ${historyBars(months, months.length)}
-      <p class="ios-card-copy" style="margin-top:9px">The public record begins in September 2025. Detailed activity stays limited to recent projected workouts until it is requested.</p>
+      <p class="ios-card-copy" style="margin-top:9px">The archive window begins in late August 2025; the first available run is September 7. Detailed activity loads from the static published archive without scanning Firestore.</p>
     </div>
-    <div class="ios-section-label"><span>Recent Activity</span></div>
+    <div class="ios-section-label"><span>Complete Activity</span></div>
     ${listStatus}
     <div class="ios-activity-stack">${activityWorkoutCards(history, history.length)}</div>
   `
@@ -1548,6 +2051,7 @@ function render() {
   renderScreen()
   renderNutritionScreen()
   renderLongitudinalRecord()
+  renderArchive()
 }
 
 function positionActivityAtYearSummary() {
@@ -1695,6 +2199,9 @@ export function initFounderLive() {
     nutritionTitle: document.getElementById('founder-nutrition-title'),
     nutritionBack: document.getElementById('founder-nutrition-back'),
     longitudinal: document.getElementById('founder-longitudinal-record'),
+    archive: document.getElementById('founder-history-archive'),
+    archiveToggle: document.getElementById('founder-history-archive-toggle'),
+    archiveScreen: document.getElementById('founder-history-archive-screen'),
     status: document.getElementById('founder-live-status'),
     updated: document.getElementById('founder-live-updated'),
   }
@@ -1721,6 +2228,8 @@ export function initFounderLive() {
     }, { passive: true })
   })
   elements.nutritionScreen.addEventListener('click', handleNutritionClick)
+  elements.archive.addEventListener('click', handleArchiveClick)
+  elements.archive.addEventListener('change', handleArchiveChange)
   stage.addEventListener('click', (event) => {
     const longitudinalWorkout = event.target.closest(
       '#founder-longitudinal-record [data-live-workout]'
