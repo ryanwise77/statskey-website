@@ -825,48 +825,73 @@ function workoutBuckets(workouts, keyForWorkout, labelForKey) {
     }))
 }
 
+function daySeries(endDay, count, step = 1) {
+  const days = []
+  for (let offset = count - 1; offset >= 0; offset -= 1) {
+    days.push(shiftDay(endDay, -offset * step))
+  }
+  return days
+}
+
+function dayValueTotals(workouts, start, end) {
+  const totals = new Map()
+  for (const workout of workouts) {
+    if (workout.day < start || workout.day > end) continue
+    totals.set(workout.day, (totals.get(workout.day) || 0) + workoutFitnessValue(workout))
+  }
+  return totals
+}
+
 function timelineBuckets() {
   const today = todayDay()
   const workouts = (state.allWorkouts ?? state.workouts).filter(isRun)
   if (state.range === 'week') {
-    const start = shiftDay(today, -6)
-    const runs = workouts
-      .filter((workout) => workout.day >= start && workout.day <= today)
-      .sort((left, right) => compareRecorded(right, left))
-    return runs.map((workout, index) => ({
-      key: workout.workoutId || `${workout.day}-${workout.startMinute}-${index}`,
+    const days = daySeries(today, 7)
+    const totals = dayValueTotals(workouts, days[0], today)
+    return days.map((day) => ({
+      key: day,
       label: new Intl.DateTimeFormat('en-US', {
         weekday: 'narrow',
         day: 'numeric',
         timeZone: 'UTC',
-      }).format(dayDate(workout.day)),
-      value: workoutFitnessValue(workout),
-      title: `${dateLabel(workout.day, { short: true })}${workout.timeLabel ? ` · ${workout.timeLabel}` : ''}`,
-      workout,
+      }).format(dayDate(day)),
+      value: number(totals.get(day)),
+      title: dateLabel(day, { short: true }),
     }))
   }
   if (state.range === 'month') {
-    const start = shiftDay(today, -29)
-    return workoutBuckets(
-      workouts.filter((workout) => workout.day >= start && workout.day <= today),
-      (workout) => workout.day,
-      (day, index) => index % 5 === 0 || day === today ? String(Number(day.slice(-2))) : ''
-    )
+    const days = daySeries(today, 30)
+    const totals = dayValueTotals(workouts, days[0], today)
+    return days.map((day, index) => ({
+      key: day,
+      label: index % 5 === 0 || day === today ? String(Number(day.slice(-2))) : '',
+      value: number(totals.get(day)),
+      title: dateLabel(day, { short: true }),
+    }))
   }
   if (state.range === 'quarter') {
+    const weekStarts = daySeries(mondayForDay(today), 13, 7)
     if (state.fitnessMetric === 'distance') {
-      return (state.root?.training?.weeklyMileage ?? []).slice(-13).map((week, index) => ({
-        key: week.weekStart,
-        label: index % 3 === 0 ? dateLabel(week.weekStart, { short: true, year: false }) : '',
-        value: number(week.runningMiles),
+      const byWeek = new Map(
+        (state.root?.training?.weeklyMileage ?? []).map((week) => [week.weekStart, number(week.runningMiles)])
+      )
+      return weekStarts.map((weekStart, index) => ({
+        key: weekStart,
+        label: index % 3 === 0 ? dateLabel(weekStart, { short: true, year: false }) : '',
+        value: number(byWeek.get(weekStart)),
       }))
     }
-    const start = shiftDay(today, -90)
-    return workoutBuckets(
-      workouts.filter((workout) => workout.day >= start && workout.day <= today),
-      (workout) => mondayForDay(workout.day),
-      (day, index) => index % 3 === 0 ? dateLabel(day, { short: true, year: false }) : ''
-    )
+    const totals = dayValueTotals(workouts, weekStarts[0], today)
+    const byWeek = new Map()
+    for (const [day, value] of totals) {
+      const weekStart = mondayForDay(day)
+      byWeek.set(weekStart, (byWeek.get(weekStart) || 0) + value)
+    }
+    return weekStarts.map((weekStart, index) => ({
+      key: weekStart,
+      label: index % 3 === 0 ? dateLabel(weekStart, { short: true, year: false }) : '',
+      value: number(byWeek.get(weekStart)),
+    }))
   }
 
   const endMonth = today.slice(0, 7)
@@ -948,7 +973,7 @@ function fitnessTimeline() {
         <i class="ios-fitness-chart__grid ios-fitness-chart__grid--one"></i>
         <i class="ios-fitness-chart__grid ios-fitness-chart__grid--two"></i>
         ${buckets.map((bucket) => `
-          <span class="ios-fitness-bar ${bucket.workout ? 'ios-fitness-bar--workout' : ''}" title="${escapeHTML(bucket.title || bucket.key)} · ${escapeHTML(formatFitnessMetric(bucket.value))}">
+          <span class="ios-fitness-bar" title="${escapeHTML(bucket.title || bucket.key)} · ${escapeHTML(formatFitnessMetric(bucket.value))}">
             <i style="height:${bucket.value > 0 ? Math.max(3, bucket.value / maximum * 100) : 1}%"></i>
             <small>${escapeHTML(bucket.label)}</small>
           </span>
@@ -960,7 +985,7 @@ function fitnessTimeline() {
     <div class="ios-fitness-timeline" aria-label="Running ${escapeHTML(metric.label.toLowerCase())} chart">
       <div class="ios-fitness-timeline__headline">
         <span>
-          <small>${state.range === 'week' ? 'INDIVIDUAL RUNS' : escapeHTML(metric.label.toUpperCase())}</small>
+          <small>${escapeHTML(metric.label.toUpperCase())}</small>
           <strong>${escapeHTML(formatFitnessMetric(total))}</strong>
         </span>
         <span>${peak ? `Peak ${escapeHTML(formatFitnessMetric(peak.value, state.fitnessMetric, true))}` : escapeHTML(RANGE_LABELS[state.range])}</span>
