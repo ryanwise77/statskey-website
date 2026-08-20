@@ -63,6 +63,7 @@ import { forkChatPlanCanvases } from '../lib/planCanvasChat'
 import { DesktopBridge } from './DesktopBridge'
 import { DesktopOperationGate } from './DesktopOperationGate'
 import { WorkspaceSyncCoordinator } from './WorkspaceSyncCoordinator'
+import { CockpitOnboardingPrompt } from './CockpitOnboardingPrompt'
 import { checkForDesktopUpdates } from './DesktopUpdater'
 import {
   DESKTOP_CHAT_TABS_KEY,
@@ -168,6 +169,7 @@ const DESKTOP_SURFACES: Array<{
   { id: 'github', to: '/github', label: 'GitHub', icon: 'github' },
   { id: 'plan', to: '/plan', label: 'Plan', icon: 'plan' },
   { id: 'calendar', to: '/calendar', label: 'Calendar', icon: 'calendar' },
+  { id: 'cockpit', to: '/cockpit', label: 'Cockpit', icon: 'tasks' },
   { id: 'fleet', to: '/fleet', label: 'Fleet', icon: 'tasks' },
   { id: 'jobs', to: '/jobs', label: 'Jobs', icon: 'tasks' },
 ]
@@ -440,6 +442,7 @@ export function Shell() {
         <DesktopBridge pendingCount={actions.pendingCount} />
         <DesktopOperationGate />
         <WorkspaceSyncCoordinator />
+        <CockpitOnboardingPrompt />
         <aside
           ref={sidebarRef}
           className={`desktop-sidebar${
@@ -2428,6 +2431,9 @@ function desktopSurfaceForPath(pathname: string) {
   if (pathname.startsWith('/calendar')) {
     return DESKTOP_SURFACES.find((surface) => surface.id === 'calendar')
   }
+  if (pathname.startsWith('/cockpit')) {
+    return DESKTOP_SURFACES.find((surface) => surface.id === 'cockpit')
+  }
   if (pathname.startsWith('/fleet')) {
     return DESKTOP_SURFACES.find((surface) => surface.id === 'fleet')
   }
@@ -2533,6 +2539,7 @@ function desktopRouteTitle(pathname: string): string {
   if (pathname.startsWith('/github')) return 'GitHub workspace'
   if (pathname.startsWith('/plan')) return 'Plan'
   if (pathname.startsWith('/calendar')) return 'Calendar'
+  if (pathname.startsWith('/cockpit')) return 'Cockpit'
   if (pathname.startsWith('/fleet')) return 'Fleet'
   if (pathname.startsWith('/jobs')) return 'Jobs'
   if (pathname.startsWith('/tasks')) return 'Parallel tasks'

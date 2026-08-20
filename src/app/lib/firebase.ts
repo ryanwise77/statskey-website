@@ -43,6 +43,16 @@ export const functions: Functions = getFunctions(firebaseApp)
 
 function getConfiguredAppCheck(app: FirebaseApp): AppCheck | null {
   if (typeof window === 'undefined') return null
+  const hostname = window.location.hostname.toLowerCase()
+  if (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '[::1]'
+  ) {
+    // Local preview origins cannot satisfy the production reCAPTCHA
+    // Enterprise key. Keep App Check enabled on every deployed web origin.
+    return null
+  }
   const desktopBridge = (window as { statsKeyDesktop?: unknown })
     .statsKeyDesktop
   if (desktopBridge != null && typeof desktopBridge === 'object') {

@@ -196,7 +196,7 @@ function nextDownloadPage(
             `/releases/${currentVersion}/StatsKey-${currentVersion}-mac-arm64.dmg`,
             `/releases/${nextVersion}/StatsKey-${nextVersion}-mac-arm64.dmg`,
             'Apple Silicon download',
-            1,
+            2,
           ],
           [
             `/releases/${currentVersion}/StatsKey-${currentVersion}-mac-x64.dmg`,
@@ -221,7 +221,7 @@ function nextDownloadPage(
             `/releases/${currentVersion}/StatsKey-${currentVersion}-win-x64.exe`,
             `/releases/${nextVersion}/StatsKey-${nextVersion}-win-x64.exe`,
             'Windows download',
-            1,
+            2,
           ],
           [
             `const windowsVersion = "${currentVersion}";`,

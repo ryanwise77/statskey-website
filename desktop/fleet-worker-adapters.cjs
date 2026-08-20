@@ -21,6 +21,10 @@ const DEFAULT_ALLOWED_REPOSITORY_HOSTS = Object.freeze([
 const DEFAULT_PROCESS_TIMEOUT_MS = 60 * 60 * 1000
 const GIT_TIMEOUT_MS = 10 * 60 * 1000
 const MAX_PROCESS_OUTPUT_CHARACTERS = 200_000
+// Command stdout rides a single bounded log event so controllers can read
+// results (e.g. Cockpit file browsing). The 24k tail stays inside the
+// coordinator's per-string and per-event payload limits.
+const MAX_COMMAND_OUTPUT_EVENT_CHARACTERS = 24_000
 const MAX_STALE_WORKSPACE_AGE_MS = 24 * 60 * 60 * 1000
 const MAX_WORKSPACE_ENTRIES = 1_000
 const MAX_ARTIFACT_SPOOL_ENTRIES = 32
@@ -376,6 +380,12 @@ function safeWorkspacePath(root, ...parts) {
     })
   }
   return candidate
+}
+
+function boundedCommandOutputTail(value) {
+  if (typeof value !== 'string') return ''
+  const tail = value.slice(-MAX_COMMAND_OUTPUT_EVENT_CHARACTERS)
+  return tail.trim() ? tail : ''
 }
 
 async function verifiedWorkspacePath(fsImpl, root, candidate) {
@@ -2238,6 +2248,13 @@ class CommandFleetAdapter {
         environmentOverrides: prepared.runtimeEnvironment,
       })
       const durationMs = Math.max(0, Number(context.now()) - startedAt)
+      const outputTail = boundedCommandOutputTail(result.stdout)
+      if (outputTail) {
+        // Observation must never fail an otherwise successful job.
+        await context
+          .emit('log', { stream: 'stdout', chunk: outputTail })
+          .catch(() => {})
+      }
       await context.emit('process-exit', {
         exitCode: result.exitCode,
         timedOut: false,

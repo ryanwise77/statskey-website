@@ -99,6 +99,9 @@ const {
 const {
   WorkspaceBindingRuntime,
 } = require('./workspace-binding-runtime.cjs')
+const {
+  createProjectInDefaultRoot,
+} = require('./workspace-create-runtime.cjs')
 const { searchWorkspaceDirect } = require('./workspace-search-runtime.cjs')
 const {
   createWorkspaceSyncRuntime,
@@ -1995,6 +1998,32 @@ ipcMain.handle('statskey-desktop:workspace-create-project', async (event) => {
     return { ok: false, error: safeProviderError(error) }
   }
 })
+
+ipcMain.handle(
+  'statskey-desktop:workspace-create-project-in-root',
+  async (event, rawName) => {
+    if (!isMainRenderer(event) || !mainWindow) {
+      return { ok: false, error: 'Unavailable.' }
+    }
+    try {
+      const created = createProjectInDefaultRoot({
+        homeDirectory: app.getPath('home'),
+        name: rawName,
+      })
+      if (!created.ok) return { ok: false, error: created.error }
+      const selected = canonicalExistingPath(created.path)
+      if (!selected) throw new Error('The project folder could not be opened.')
+      workspaceRoots.splice(0, workspaceRoots.length, selected)
+      workspaceLooseFiles.clear()
+      importedWorkspace = null
+      saveWorkspaceState()
+      scheduleWorkspaceIndex(0)
+      return { ok: true, workspace: workspaceSnapshot() }
+    } catch (error) {
+      return { ok: false, error: safeProviderError(error) }
+    }
+  }
+)
 
 ipcMain.handle(
   'statskey-desktop:workspace-clone-project',

@@ -9,6 +9,7 @@ export type DesktopSurfaceId =
   | 'github'
   | 'plan'
   | 'calendar'
+  | 'cockpit'
   | 'fleet'
   | 'jobs'
 
@@ -41,7 +42,7 @@ export type DesktopOpenTabMenuEntry =
       running: boolean
     }
 
-const DEFAULT_DESKTOP_SURFACES: DesktopSurfaceId[] = ['workspace']
+const DEFAULT_DESKTOP_SURFACES: DesktopSurfaceId[] = ['workspace', 'cockpit']
 const ALLOWED_DESKTOP_SURFACES = new Set<DesktopSurfaceId>([
   'workspace',
   'browser',
@@ -50,12 +51,36 @@ const ALLOWED_DESKTOP_SURFACES = new Set<DesktopSurfaceId>([
   'github',
   'plan',
   'calendar',
+  'cockpit',
   'fleet',
   'jobs',
 ])
 
+// One-time rollout marker: existing users' persisted tab lists predate the
+// Cockpit, so the new surface is appended once rather than hidden behind the
+// closed-tabs menu. Users who close it afterwards stay closed.
+const COCKPIT_ROLLOUT_KEY = 'statskey.desktop.surfaceTabs.cockpitRollout.v1'
+
 export function loadDesktopSurfaceTabs(
-  storage: Pick<Storage, 'getItem'> = localStorage
+  storage: Pick<Storage, 'getItem' | 'setItem'> = localStorage
+): DesktopSurfaceId[] {
+  const tabs = loadPersistedTabs(storage)
+  if (
+    !tabs.includes('cockpit') &&
+    storage.getItem(COCKPIT_ROLLOUT_KEY) == null
+  ) {
+    try {
+      storage.setItem(COCKPIT_ROLLOUT_KEY, '1')
+    } catch {
+      // Persistence is best-effort; the tab still appears this session.
+    }
+    return [...tabs, 'cockpit']
+  }
+  return tabs
+}
+
+function loadPersistedTabs(
+  storage: Pick<Storage, 'getItem'>
 ): DesktopSurfaceId[] {
   const raw = storage.getItem(DESKTOP_SURFACE_STORAGE_KEY)
   if (raw == null) return [...DEFAULT_DESKTOP_SURFACES]

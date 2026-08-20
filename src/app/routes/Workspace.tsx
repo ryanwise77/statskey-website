@@ -1313,6 +1313,34 @@ export function Workspace() {
     setCreatingFile(true)
   }
 
+  async function createProjectInRoot() {
+    if (!bridge) return
+    const name = await promptDialog({
+      title: 'New project folder',
+      body: 'Created inside the StatsKey Projects folder in your home directory.',
+      label: 'Project name',
+      placeholder: 'My project',
+      confirmLabel: 'Create folder',
+      maxLength: 80,
+    })
+    if (!name) return
+    revealExplorer()
+    setWorkspaceError(null)
+    const result = await runLocalWorkspaceChange(() =>
+      bridge.workspace.createProjectInRoot(name)
+    )
+    if (!result.ok || !result.workspace) {
+      if (!result.cancelled) {
+        setWorkspaceError(
+          result.error || 'The project folder could not be created.'
+        )
+      }
+      return
+    }
+    await activateWorkspace(result.workspace, { restore: false })
+    setCreatingFile(true)
+  }
+
   function cloneProject() {
     setCloneDialogOpen(true)
     setCloneUrl('')
@@ -2938,6 +2966,12 @@ export function Workspace() {
                 <>
                   <button className="btn btn-primary" onClick={openProject}>
                     Open a project
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => void createProjectInRoot()}
+                  >
+                    New project folder
                   </button>
                   <button className="btn btn-secondary" onClick={createProject}>
                     Create a project

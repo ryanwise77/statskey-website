@@ -66,6 +66,11 @@ const Fleet = lazy(() =>
     default: module.Fleet,
   }))
 )
+const Cockpit = lazy(() =>
+  import('./routes/Cockpit').then((module) => ({
+    default: module.Cockpit,
+  }))
+)
 const FleetRemote = lazy(() =>
   import('./routes/FleetRemote').then((module) => ({
     default: module.FleetRemote,
@@ -238,6 +243,7 @@ export function App() {
         <Route path="plan" element={<Planning />} />
         <Route path="calendar" element={<Calendar />} />
         <Route path="fleet" element={<Fleet />} />
+        <Route path="cockpit" element={<Cockpit />} />
         <Route path="fleet/remote" element={<FleetRemote />} />
         <Route path="jobs" element={<Jobs />} />
         <Route path="settings/*" element={<Settings />} />

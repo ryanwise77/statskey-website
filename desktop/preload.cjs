@@ -498,6 +498,15 @@ contextBridge.exposeInMainWorld(
       createProject() {
         return ipcRenderer.invoke('statskey-desktop:workspace-create-project')
       },
+      createProjectInRoot(name) {
+        if (typeof name !== 'string') {
+          return Promise.resolve({ ok: false, error: 'Invalid project name.' })
+        }
+        return ipcRenderer.invoke(
+          'statskey-desktop:workspace-create-project-in-root',
+          name
+        )
+      },
       cloneProject(repositoryUrl) {
         if (typeof repositoryUrl !== 'string') {
           return Promise.resolve({ ok: false, error: 'Invalid repository URL.' })

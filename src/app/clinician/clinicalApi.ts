@@ -8,18 +8,21 @@ export const CLINICIAN_ACKNOWLEDGEMENT_VERSION = 1
 export const clinicalCategories = [
   {
     id: 'activity',
-    label: 'Daily activity',
-    description: 'Steps, exercise, energy, distance, and synced sleep totals.',
+    label: 'Physical activity & energy expenditure',
+    description:
+      'Steps, exercise minutes, movement distance, and device-estimated energy expenditure.',
   },
   {
     id: 'nutrition',
-    label: 'Nutrition totals',
-    description: 'Daily calories, macros, fiber, and sodium—without meal names.',
+    label: 'Dietary intake & nutrient exposure',
+    description:
+      'Recorded energy, macronutrients, micronutrients, coverage, and estimate confidence.',
   },
   {
     id: 'workouts',
-    label: 'Workouts',
-    description: 'Sport, duration, distance, heart rate, and effort.',
+    label: 'Exercise sessions',
+    description:
+      'Modality, duration, distance, heart rate, energy expenditure, and perceived effort.',
   },
   {
     id: 'vitals',
@@ -38,13 +41,19 @@ export const clinicalCategories = [
   },
   {
     id: 'body',
-    label: 'Body measurements',
+    label: 'Anthropometrics',
     description: 'Weight and selected body-composition measurements.',
   },
   {
     id: 'bloodPanels',
     label: 'Blood panels',
     description: 'Patient-entered or scanned results, including review flags.',
+  },
+  {
+    id: 'wellness',
+    label: 'Wellness & GI record',
+    description:
+      'Symptoms, mood, energy, hydration, and structured bowel-pattern observations without notes or photos.',
   },
 ] as const
 
@@ -56,10 +65,25 @@ export interface ClinicianProfile {
   fullName: string
   practiceName: string
   professionalType: string
+  professionalTypeOther?: string
+  specialty?: string
+  specialtyOther?: string
   npi?: string
   licenseJurisdiction?: string
+  licenseNumber?: string
+  cdrNumber?: string
   status: string
   credentialStatus: string
+  credentialType?: string
+  credentialVerificationSource?: string
+  credentialVerificationURL?: string
+  credentialVerifiedAt?: string
+  credentialVerified: boolean
+  pairingCode?: string
+  canPair: boolean
+  canReceiveShares: boolean
+  dashboardModules: ClinicalCategoryID[]
+  dashboardSetupComplete: boolean
   termsVersion: number
 }
 
@@ -73,6 +97,7 @@ export interface ClinicianContext {
 export interface ClinicalShareSummary {
   id: string
   recipientLabel: string
+  pairingId?: string
   patientDisplayName?: string
   categoryIDs: ClinicalCategoryID[]
   rangeStart: string
@@ -89,6 +114,18 @@ export interface ClinicalShareSummary {
   accessCount: number
 }
 
+export interface ClinicianPairingRequest {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  emailVerified: boolean
+  status: 'pending' | 'confirmed' | 'declined' | 'revoked'
+  dataAccessStatus: 'none' | 'awaitingPatientAuthorization'
+  createdAt: string
+  respondedAt?: string
+}
+
 export interface ClinicalManifestEntry {
   categoryID: ClinicalCategoryID
   status: 'included' | 'empty' | 'unavailable'
@@ -97,6 +134,101 @@ export interface ClinicalManifestEntry {
 }
 
 export type ClinicalSnapshotRecord = Record<string, unknown>
+
+export interface DietitianMetricEstimate {
+  mean: number
+  lower95: number
+  upper95: number
+}
+
+export interface DietitianNutrientEstimate {
+  key: string
+  label: string
+  category: string
+  unit: string
+  meanPerRecordedDay: number
+  lower95: number
+  upper95: number
+  coverageDays: number
+  confidence: 'high' | 'moderate' | 'limited'
+  estimatedPercent: number
+}
+
+export interface DietitianInterval {
+  id: '7d' | '30d' | '90d' | 'all'
+  label: string
+  startDay: string
+  endDay: string
+  calendarDays: number
+  nutrition: {
+    recordedDays: number
+    recordingCoveragePercent: number
+    mealCount: number
+    nutrients: DietitianNutrientEstimate[]
+  }
+  activity: {
+    recordedDays: number
+    recordingCoveragePercent: number
+    steps: DietitianMetricEstimate
+    activeCaloriesKcal: DietitianMetricEstimate
+    basalCaloriesKcal: DietitianMetricEstimate
+    totalExpenditureKcal: DietitianMetricEstimate
+    exerciseMinutes: DietitianMetricEstimate
+    walkingRunningMiles: DietitianMetricEstimate
+  }
+  paired: {
+    matchedDays: number
+    intakeKcal: DietitianMetricEstimate
+    deviceExpenditureKcal: DietitianMetricEstimate
+    intakeMinusExpenditureKcal: DietitianMetricEstimate
+    proteinGrams: DietitianMetricEstimate
+    carbohydrateGrams: DietitianMetricEstimate
+    fiberGrams: DietitianMetricEstimate
+    steps: DietitianMetricEstimate
+    exerciseMinutes: DietitianMetricEstimate
+  }
+}
+
+export interface DietitianPairedDay {
+  day: string
+  intakeKcal: number
+  deviceExpenditureKcal: number
+  intakeMinusExpenditureKcal: number
+  proteinGrams: number
+  carbohydrateGrams: number
+  fatGrams: number
+  fiberGrams: number
+  steps: number
+  exerciseMinutes: number
+}
+
+export interface DietitianSummary {
+  schemaVersion: number
+  audience: 'registeredDietitian'
+  vocabulary: 'dieteticPractice'
+  scope: string
+  generatedAt: string
+  coverage: {
+    startDay: string
+    endDay: string
+    mealDocuments: number
+    nutritionRecordedDays: number
+    activityRecordedDays: number
+    truncated: {
+      meals: boolean
+      activity: boolean
+    }
+  }
+  intervals: DietitianInterval[]
+  pairedDaily: DietitianPairedDay[]
+  methodology: {
+    confidenceInterval: string
+    nutrition: string
+    activity: string
+    pairing: string
+  }
+  disclaimer: string
+}
 
 export interface ClinicalSnapshot {
   schemaVersion: number
@@ -112,6 +244,7 @@ export interface ClinicalSnapshot {
   sections: Partial<
     Record<ClinicalCategoryID, ClinicalSnapshotRecord[]>
   >
+  dietitianSummary?: DietitianSummary
   disclosure: {
     source: string
     use: string
@@ -121,6 +254,7 @@ export interface ClinicalSnapshot {
 
 export interface ClinicalShareDraft {
   recipientLabel: string
+  pairingId?: string
   categoryIDs: ClinicalCategoryID[]
   rangeStart: string
   rangeEnd: string
@@ -133,8 +267,13 @@ export interface ClinicianRegistration {
   fullName: string
   practiceName: string
   professionalType: string
+  professionalTypeOther?: string
+  specialty: string
+  specialtyOther?: string
   npi?: string
   licenseJurisdiction?: string
+  licenseNumber?: string
+  cdrNumber?: string
   termsVersion: number
   termsAccepted: boolean
 }
@@ -153,6 +292,25 @@ export async function registerClinician(
     'registerClinician',
     registration
   )
+}
+
+export async function updateClinicianDashboard(
+  dashboardModules: ClinicalCategoryID[]
+): Promise<ClinicianContext> {
+  return call('updateClinicianDashboard', { dashboardModules })
+}
+
+export async function listClinicianPairingRequests(): Promise<{
+  requests: ClinicianPairingRequest[]
+}> {
+  return call('listClinicianPairingRequests', {})
+}
+
+export async function respondClinicalPairingRequest(
+  pairingId: string,
+  action: 'confirm' | 'decline'
+): Promise<{ request: ClinicianPairingRequest }> {
+  return call('respondClinicalPairingRequest', { pairingId, action })
 }
 
 export async function createClinicalShare(

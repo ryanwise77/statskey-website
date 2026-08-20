@@ -21,18 +21,141 @@ import {
   acknowledgeClinicalShare,
   clinicalCategories,
   getClinicianContext,
+  listClinicianPairingRequests,
   listClinicianShares,
   readClinicalShare,
   redeemClinicalShare,
   registerClinician,
+  respondClinicalPairingRequest,
+  updateClinicianDashboard,
   type ClinicalCategoryID,
   type ClinicalShareSummary,
   type ClinicalSnapshot,
   type ClinicalSnapshotRecord,
   type ClinicianContext,
+  type ClinicianPairingRequest,
   type ClinicianProfile,
+  type DietitianMetricEstimate,
+  type DietitianNutrientEstimate,
+  type DietitianSummary,
 } from './clinicalApi'
 import { useClinicianAuth } from './ClinicianAuth'
+
+const professionalRoles = [
+  { id: 'physician', label: 'Physician' },
+  { id: 'nursePractitioner', label: 'Nurse practitioner' },
+  { id: 'physicianAssistant', label: 'Physician assistant' },
+  { id: 'registeredNurse', label: 'Registered nurse' },
+  { id: 'registeredDietitian', label: 'Registered dietitian' },
+  { id: 'careCoordinator', label: 'Care coordinator' },
+  { id: 'other', label: 'Other professional' },
+]
+
+const specialtyOptions: Array<{
+  id: string
+  label: string
+  roles?: string[]
+}> = [
+  { id: 'primaryCare', label: 'Primary care' },
+  { id: 'familyMedicine', label: 'Family medicine' },
+  { id: 'internalMedicine', label: 'Internal medicine' },
+  { id: 'endocrinology', label: 'Endocrinology' },
+  { id: 'cardiology', label: 'Cardiology' },
+  { id: 'gastroenterology', label: 'Gastroenterology' },
+  { id: 'sportsMedicine', label: 'Sports medicine' },
+  { id: 'obesityMedicine', label: 'Obesity medicine' },
+  { id: 'nephrology', label: 'Nephrology' },
+  { id: 'pediatrics', label: 'Pediatrics' },
+  { id: 'psychiatry', label: 'Psychiatry' },
+  { id: 'womensHealth', label: "Women's health" },
+  { id: 'oncology', label: 'Oncology' },
+  {
+    id: 'generalDietetics',
+    label: 'General dietetics',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'sportsNutrition',
+    label: 'Sports nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'diabetesNutrition',
+    label: 'Diabetes nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'renalNutrition',
+    label: 'Renal nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'gastrointestinalNutrition',
+    label: 'GI nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'eatingDisorders',
+    label: 'Eating disorders',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'weightManagement',
+    label: 'Weight management',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'pediatricNutrition',
+    label: 'Pediatric nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'maternalNutrition',
+    label: 'Maternal nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'oncologyNutrition',
+    label: 'Oncology nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'cardiovascularNutrition',
+    label: 'Cardiovascular nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'foodAllergyIntolerance',
+    label: 'Food allergy & intolerance',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'gerontologicalNutrition',
+    label: 'Gerontological nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'communityNutrition',
+    label: 'Community nutrition',
+    roles: ['registeredDietitian'],
+  },
+  {
+    id: 'chronicCareCoordination',
+    label: 'Chronic care coordination',
+    roles: ['careCoordinator', 'registeredNurse'],
+  },
+  {
+    id: 'careTransitions',
+    label: 'Care transitions',
+    roles: ['careCoordinator', 'registeredNurse'],
+  },
+  {
+    id: 'populationHealth',
+    label: 'Population health',
+    roles: ['careCoordinator', 'registeredNurse'],
+  },
+  { id: 'other', label: 'Other specialty' },
+]
 
 export function ClinicianApp() {
   const { user, loading } = useClinicianAuth()
@@ -87,8 +210,21 @@ function ClinicianBootstrap() {
     )
   }
   if (!context) return <FullPageStatus label="Opening clinician portal…" />
-  if (!context.registered || !context.profile) {
-    return <ProfileSetup onComplete={setContext} />
+  if (!context.registered || !context.profile || !context.profile.specialty) {
+    return (
+      <ProfileSetup
+        existingProfile={context.profile}
+        onComplete={setContext}
+      />
+    )
+  }
+  if (!context.profile.dashboardSetupComplete) {
+    return (
+      <DashboardSetup
+        profile={context.profile}
+        onComplete={setContext}
+      />
+    )
   }
   return <PortalShell profile={context.profile} />
 }
@@ -390,16 +526,41 @@ function VerifyEmailPage() {
 }
 
 function ProfileSetup({
+  existingProfile,
   onComplete,
 }: {
+  existingProfile?: ClinicianProfile
   onComplete: (context: ClinicianContext) => void
 }) {
   const { user, signOut } = useClinicianAuth()
-  const [fullName, setFullName] = useState(user?.displayName || '')
-  const [practiceName, setPracticeName] = useState('')
-  const [professionalType, setProfessionalType] = useState('physician')
-  const [npi, setNpi] = useState('')
-  const [jurisdiction, setJurisdiction] = useState('')
+  const [fullName, setFullName] = useState(
+    existingProfile?.fullName || user?.displayName || ''
+  )
+  const [practiceName, setPracticeName] = useState(
+    existingProfile?.practiceName || ''
+  )
+  const [professionalType, setProfessionalType] = useState(
+    existingProfile?.professionalType || 'physician'
+  )
+  const [professionalTypeOther, setProfessionalTypeOther] = useState(
+    existingProfile?.professionalTypeOther || ''
+  )
+  const [specialty, setSpecialty] = useState(
+    existingProfile?.specialty || ''
+  )
+  const [specialtyOther, setSpecialtyOther] = useState(
+    existingProfile?.specialtyOther || ''
+  )
+  const [npi, setNpi] = useState(existingProfile?.npi || '')
+  const [jurisdiction, setJurisdiction] = useState(
+    existingProfile?.licenseJurisdiction || ''
+  )
+  const [licenseNumber, setLicenseNumber] = useState(
+    existingProfile?.licenseNumber || ''
+  )
+  const [cdrNumber, setCdrNumber] = useState(
+    existingProfile?.cdrNumber || ''
+  )
   const [accepted, setAccepted] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -413,8 +574,17 @@ function ProfileSetup({
         fullName,
         practiceName,
         professionalType,
+        professionalTypeOther:
+          professionalType === 'other'
+            ? professionalTypeOther.trim()
+            : undefined,
+        specialty,
+        specialtyOther:
+          specialty === 'other' ? specialtyOther.trim() : undefined,
         npi: npi.trim() || undefined,
         licenseJurisdiction: jurisdiction.trim() || undefined,
+        licenseNumber: licenseNumber.trim() || undefined,
+        cdrNumber: cdrNumber.trim() || undefined,
         termsVersion: CLINICIAN_TERMS_VERSION,
         termsAccepted: accepted,
       })
@@ -435,13 +605,13 @@ function ProfileSetup({
         </button>
       </header>
       <main className="cp-onboarding__card">
-        <div className="cp-step-mark">2 of 2</div>
+        <div className="cp-step-mark">2 of 3</div>
         <span className="cp-eyebrow">Professional profile</span>
-        <h1>Tell patients who will receive their record.</h1>
+        <h1>Shape the portal around your practice.</h1>
         <p className="cp-lede">
-          These details appear in the portal and access history. Email
-          verification is complete; professional credentials are self-attested
-          in this preview.
+          Your role and specialty determine the first dashboard StatsKey
+          prepares. You will review that layout before any patient record can
+          appear.
         </p>
 
         <form className="cp-form cp-form--two-column" onSubmit={submit}>
@@ -465,19 +635,64 @@ function ProfileSetup({
           <FormField label="Professional role">
             <select
               value={professionalType}
-              onChange={(event) => setProfessionalType(event.target.value)}
+              onChange={(event) => {
+                const nextRole = event.target.value
+                setProfessionalType(nextRole)
+                if (
+                  !availableSpecialties(nextRole).some(
+                    (option) => option.id === specialty
+                  )
+                ) {
+                  setSpecialty('')
+                }
+              }}
             >
-              <option value="physician">Physician</option>
-              <option value="nursePractitioner">Nurse practitioner</option>
-              <option value="physicianAssistant">Physician assistant</option>
-              <option value="registeredNurse">Registered nurse</option>
-              <option value="registeredDietitian">
-                Registered dietitian
-              </option>
-              <option value="careCoordinator">Care coordinator</option>
-              <option value="other">Other professional</option>
+              {professionalRoles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.label}
+                </option>
+              ))}
             </select>
           </FormField>
+          {professionalType === 'other' && (
+            <FormField label="Professional role (other)">
+              <input
+                value={professionalTypeOther}
+                onChange={(event) =>
+                  setProfessionalTypeOther(event.target.value)
+                }
+                maxLength={80}
+                required
+              />
+            </FormField>
+          )}
+          <FormField label="Primary specialty">
+            <select
+              value={specialty}
+              onChange={(event) => setSpecialty(event.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Choose a specialty
+              </option>
+              {availableSpecialties(professionalType).map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          {specialty === 'other' && (
+            <FormField label="Specialty (other)">
+              <input
+                value={specialtyOther}
+                onChange={(event) => setSpecialtyOther(event.target.value)}
+                placeholder="Your area of practice"
+                maxLength={80}
+                required
+              />
+            </FormField>
+          )}
           <FormField label="NPI (optional)">
             <input
               inputMode="numeric"
@@ -497,6 +712,46 @@ function ProfileSetup({
               maxLength={40}
             />
           </FormField>
+          <FormField label="License number (optional)">
+            <input
+              value={licenseNumber}
+              onChange={(event) => setLicenseNumber(event.target.value)}
+              maxLength={40}
+            />
+          </FormField>
+          {professionalType === 'registeredDietitian' && (
+            <FormField label="CDR registration number (optional)">
+              <input
+                inputMode="numeric"
+                value={cdrNumber}
+                onChange={(event) =>
+                  setCdrNumber(
+                    event.target.value.replace(/\D/g, '').slice(0, 8)
+                  )
+                }
+                placeholder="4–8 digits"
+                pattern="[0-9]{4,8}"
+              />
+            </FormField>
+          )}
+
+          <div className="cp-credential-note">
+            <strong>Primary-source verification</strong>
+            <p>
+              A submitted credential remains pending until it is matched to
+              the issuing registry. Dietitian registrations use the{' '}
+              <a
+                href="https://secure.eatright.org/v14pgmlib/prd/cdrvfy001.html"
+                rel="noreferrer"
+                target="_blank"
+              >
+                CDR verification system
+              </a>
+              . Submitting a number does not mark it verified; the profile
+              remains pending until a primary-source match is recorded. You
+              can continue using the professional portal in the meantime.
+            </p>
+          </div>
 
           <label className="cp-consent">
             <input
@@ -520,7 +775,7 @@ function ProfileSetup({
             disabled={busy || !accepted}
             type="submit"
           >
-            {busy ? 'Creating portal…' : 'Open clinician portal'}
+            {busy ? 'Preparing dashboard…' : 'Build my dashboard'}
           </button>
         </form>
       </main>
@@ -528,8 +783,164 @@ function ProfileSetup({
   )
 }
 
-function PortalShell({ profile }: { profile: ClinicianProfile }) {
+function DashboardSetup({
+  profile,
+  onComplete,
+  embedded = false,
+}: {
+  profile: ClinicianProfile
+  onComplete: (context: ClinicianContext) => void
+  embedded?: boolean
+}) {
   const { signOut } = useClinicianAuth()
+  const [selected, setSelected] = useState<Set<ClinicalCategoryID>>(
+    () => new Set(profile.dashboardModules || [])
+  )
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  function toggle(moduleID: ClinicalCategoryID) {
+    setSelected((current) => {
+      const next = new Set(current)
+      if (next.has(moduleID)) next.delete(moduleID)
+      else next.add(moduleID)
+      return next
+    })
+  }
+
+  async function save() {
+    if (selected.size === 0) {
+      setError('Choose at least one dashboard module.')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      const ordered = clinicalCategories
+        .map((category) => category.id)
+        .filter((id) => selected.has(id))
+      onComplete(await updateClinicianDashboard(ordered))
+    } catch (saveError) {
+      setError(message(saveError))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const content = (
+    <>
+      {!embedded && <div className="cp-step-mark">3 of 3</div>}
+      <span className="cp-eyebrow">
+        {embedded ? 'Dashboard preferences' : 'Your starting workspace'}
+      </span>
+      <h1>
+        {embedded
+          ? 'Choose what your dashboard emphasizes.'
+          : `Built for ${specialtyName(profile)}.`}
+      </h1>
+      <p className="cp-lede">
+        StatsKey selected these modules from your role and specialty. Adjust
+        them now or return here later. This setup contains no patient data.
+      </p>
+
+      <div className="cp-dashboard-module-grid">
+        {clinicalCategories.map((module) => {
+          const isSelected = selected.has(module.id)
+          return (
+            <button
+              aria-pressed={isSelected}
+              className={`cp-dashboard-module ${
+                isSelected ? 'is-selected' : ''
+              }`}
+              key={module.id}
+              onClick={() => toggle(module.id)}
+              type="button"
+            >
+              <span className="cp-dashboard-module__check">
+                {isSelected ? '✓' : '+'}
+              </span>
+              <strong>{module.label}</strong>
+              <small>{module.description}</small>
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="cp-credential-status">
+        <span
+          aria-label={
+            profile.credentialVerified
+              ? 'Primary-source credential verified'
+              : 'Credential not verified'
+          }
+          className={`cp-credential-mark ${
+            profile.credentialVerified ? 'is-verified' : ''
+          }`}
+        >
+          {profile.credentialVerified ? '✓' : ''}
+        </span>
+        <div>
+          <strong>
+            Credential status:{' '}
+            {profile.credentialVerified
+              ? 'Verified'
+              : humanize(profile.credentialStatus)}
+          </strong>
+          <small>
+            {profile.credentialVerified
+              ? 'Primary-source verification is complete.'
+              : 'You can use the professional portal while verification remains pending.'}
+          </small>
+        </div>
+      </div>
+
+      {error && <div className="cp-message cp-message--error">{error}</div>}
+      <button
+        className="cp-button cp-button--primary cp-button--wide"
+        disabled={busy || selected.size === 0}
+        onClick={() => void save()}
+        type="button"
+      >
+        {busy
+          ? 'Saving workspace…'
+          : embedded
+            ? 'Save dashboard'
+            : 'Open clinician portal'}
+      </button>
+    </>
+  )
+
+  if (embedded) {
+    return <main className="cp-page cp-page--narrow">{content}</main>
+  }
+
+  return (
+    <div className="cp-onboarding">
+      <header className="cp-onboarding__header">
+        <BrandLockup />
+        <button className="cp-text-button" onClick={() => void signOut()}>
+          Sign out
+        </button>
+      </header>
+      <main className="cp-onboarding__card cp-onboarding__card--wide">
+        {content}
+      </main>
+    </div>
+  )
+}
+
+function PortalShell({
+  profile: initialProfile,
+}: {
+  profile: ClinicianProfile
+}) {
+  const { signOut } = useClinicianAuth()
+  const [profile, setProfile] = useState(initialProfile)
+
+  function updateProfile(context: ClinicianContext) {
+    if (context.profile) setProfile(context.profile)
+  }
+
   return (
     <div className="cp-shell">
       <aside className="cp-sidebar">
@@ -537,8 +948,23 @@ function PortalShell({ profile }: { profile: ClinicianProfile }) {
         <div className="cp-sidebar__identity">
           <span>{initials(profile.fullName)}</span>
           <div>
-            <strong>{profile.fullName}</strong>
+            <strong className="cp-professional-name">
+              <span>{profile.fullName}</span>
+              {profile.credentialVerified && (
+                <span
+                  aria-label="Primary-source credential verified"
+                  className="cp-verification-check"
+                  title="Primary-source credential verified"
+                >
+                  ✓
+                </span>
+              )}
+            </strong>
             <small>{profile.practiceName}</small>
+            <small>{specialtyName(profile)}</small>
+            {profile.cdrNumber ? (
+              <small>CDR# {profile.cdrNumber}</small>
+            ) : null}
           </div>
         </div>
         <nav className="cp-sidebar__nav" aria-label="Clinician portal">
@@ -546,9 +972,15 @@ function PortalShell({ profile }: { profile: ClinicianProfile }) {
             <PortalIcon symbol="⌂" />
             Patient records
           </NavLink>
-          <NavLink to="/redeem">
-            <PortalIcon symbol="＋" />
-            Redeem care share
+          {profile.canReceiveShares && (
+            <NavLink to="/redeem">
+              <PortalIcon symbol="＋" />
+              Redeem care share
+            </NavLink>
+          )}
+          <NavLink to="/setup">
+            <PortalIcon symbol="◇" />
+            Customize dashboard
           </NavLink>
         </nav>
         <div className="cp-sidebar__boundary">
@@ -575,11 +1007,24 @@ function PortalShell({ profile }: { profile: ClinicianProfile }) {
           <NavLink to="/" end>
             Records
           </NavLink>
-          <NavLink to="/redeem">Redeem</NavLink>
+          {profile.canReceiveShares && (
+            <NavLink to="/redeem">Redeem</NavLink>
+          )}
+          <NavLink to="/setup">Customize</NavLink>
         </nav>
         <Routes>
           <Route path="/" element={<Dashboard profile={profile} />} />
           <Route path="/redeem" element={<RedeemShare />} />
+          <Route
+            path="/setup"
+            element={
+              <DashboardSetup
+                embedded
+                profile={profile}
+                onComplete={updateProfile}
+              />
+            }
+          />
           <Route path="/shares/:shareId" element={<ShareDetail />} />
           <Route path="/access" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -591,21 +1036,46 @@ function PortalShell({ profile }: { profile: ClinicianProfile }) {
 
 function Dashboard({ profile }: { profile: ClinicianProfile }) {
   const [shares, setShares] = useState<ClinicalShareSummary[]>([])
+  const [pairingRequests, setPairingRequests] = useState<
+    ClinicianPairingRequest[]
+  >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [pairingError, setPairingError] = useState<string | null>(null)
+  const [respondingID, setRespondingID] = useState<string | null>(null)
+  const [codeCopied, setCodeCopied] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
+    setPairingError(null)
+    if (!profile.canReceiveShares) {
+      setShares([])
+      setPairingRequests([])
+      setLoading(false)
+      return
+    }
     try {
-      const result = await listClinicianShares()
-      setShares(result.shares)
+      const [shareResult, pairingResult] = await Promise.allSettled([
+        listClinicianShares(),
+        listClinicianPairingRequests(),
+      ])
+      if (shareResult.status === 'rejected') throw shareResult.reason
+      setShares(shareResult.value.shares)
+      if (pairingResult.status === 'fulfilled') {
+        setPairingRequests(pairingResult.value.requests)
+      } else {
+        const pairingMessage = message(pairingResult.reason)
+        if (!/not enabled/i.test(pairingMessage)) {
+          setPairingError(pairingMessage)
+        }
+      }
     } catch (loadError) {
       setError(message(loadError))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [profile.canReceiveShares])
 
   useEffect(() => {
     void load()
@@ -613,17 +1083,59 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
 
   const active = shares.filter((share) => share.status === 'active')
   const recentlyOpened = shares.filter((share) => share.lastAccessedAt).length
+  const pendingPairings = pairingRequests.filter(
+    (request) => request.status === 'pending'
+  )
+
+  async function respond(
+    pairingID: string,
+    action: 'confirm' | 'decline'
+  ) {
+    setRespondingID(pairingID)
+    setPairingError(null)
+    try {
+      const result = await respondClinicalPairingRequest(pairingID, action)
+      setPairingRequests((current) =>
+        current.map((request) =>
+          request.id === pairingID ? result.request : request
+        )
+      )
+    } catch (responseError) {
+      setPairingError(message(responseError))
+    } finally {
+      setRespondingID(null)
+    }
+  }
+
+  async function copyPairingCode() {
+    if (!profile.pairingCode) return
+    try {
+      await navigator.clipboard.writeText(profile.pairingCode)
+      setCodeCopied(true)
+      window.setTimeout(() => setCodeCopied(false), 1800)
+    } catch {
+      setPairingError('Copy failed. Select the code and copy it manually.')
+    }
+  }
 
   return (
     <main className="cp-page">
       <PageHeader
         eyebrow={profile.practiceName}
         title={`Good ${daypart()}, ${firstName(profile.fullName)}.`}
-        description="Review only the records patients deliberately shared with your professional account."
+        description={
+          !profile.canReceiveShares
+            ? 'Finish primary-source credential verification before inviting clients or receiving records.'
+            : profile.cdrNumber
+            ? `CDR# ${profile.cdrNumber}. Review only the records patients deliberately shared with your professional account.`
+            : 'Review only the records patients deliberately shared with your professional account.'
+        }
         action={
-          <Link className="cp-button cp-button--primary" to="/redeem">
-            Redeem care share
-          </Link>
+          profile.canReceiveShares ? (
+            <Link className="cp-button cp-button--primary" to="/redeem">
+              Redeem care share
+            </Link>
+          ) : undefined
         }
       />
 
@@ -634,10 +1146,158 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
           label="Records reviewed"
         />
         <StatCard
-          value="Scoped"
-          label="Patient-authorized access"
+          value={String(pendingPairings.length)}
+          label="Identity checks waiting"
           accent
         />
+      </section>
+
+      <section className="cp-panel cp-workspace-config">
+        <div className="cp-panel__header">
+          <div>
+            <span className="cp-eyebrow">{specialtyName(profile)} workspace</span>
+            <h2>Your dashboard emphasis</h2>
+            <p>
+              Prepared before patient data arrives. These modules change
+              presentation, never a patient’s sharing permissions.
+            </p>
+          </div>
+          <Link className="cp-button cp-button--secondary" to="/setup">
+            Customize
+          </Link>
+        </div>
+        <div className="cp-dashboard-chip-list">
+          {(profile.dashboardModules || []).map((moduleID) => (
+            <span key={moduleID}>
+              <b>{categorySymbol(moduleID)}</b>
+              {categoryName(moduleID)}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <section className="cp-panel cp-pairing-center">
+        <div className="cp-pairing-code-card">
+          <div>
+            <span className="cp-eyebrow">Your office pairing code</span>
+            <h2>
+              {profile.canPair
+                ? 'Invite clients to connect.'
+                : 'Available after credential verification.'}
+            </h2>
+            <p>
+              {profile.canPair
+                ? 'Clients enter this code in StatsKey. You confirm their first name, last name, and account email before the pairing is active.'
+                : 'Your dashboard can be customized now, but client identities and records stay closed until primary-source verification is complete.'}
+            </p>
+          </div>
+          <div className="cp-provider-code">
+            <code>
+              {profile.pairingCode || 'Verification required'}
+            </code>
+            <button
+              className="cp-button cp-button--secondary"
+              disabled={!profile.pairingCode}
+              onClick={() => void copyPairingCode()}
+              type="button"
+            >
+              {codeCopied ? 'Copied' : 'Copy code'}
+            </button>
+          </div>
+          <small>
+            Pairing confirms identity only. It does not expose a meal,
+            workout, measurement, or other record.
+          </small>
+        </div>
+
+        <div className="cp-pairing-inbox">
+          <div className="cp-panel__header">
+            <div>
+              <span className="cp-eyebrow">Identity confirmation</span>
+              <h2>Client pairing requests</h2>
+            </div>
+            <button
+              aria-label="Refresh pairing requests"
+              className="cp-icon-button"
+              disabled={loading || !profile.canPair}
+              onClick={() => void load()}
+            >
+              ↻
+            </button>
+          </div>
+          {pairingError && (
+            <div className="cp-message cp-message--error">{pairingError}</div>
+          )}
+          {!profile.canPair ? (
+            <div className="cp-pairing-empty">
+              <strong>Client pairing is locked.</strong>
+              <p>
+                Primary-source credential verification must be recorded before
+                StatsKey accepts an office code or reveals client identity.
+              </p>
+            </div>
+          ) : pairingRequests.length === 0 ? (
+            <div className="cp-pairing-empty">
+              <strong>No identity checks waiting.</strong>
+              <p>
+                Share your office code before the visit. Requests appear here
+                without opening any StatsKey health data.
+              </p>
+            </div>
+          ) : (
+            <div className="cp-pairing-list">
+              {pairingRequests.map((request) => (
+                <article className="cp-pairing-request" key={request.id}>
+                  <div className="cp-pairing-request__identity">
+                    <span>{initials(`${request.firstName} ${request.lastName}`)}</span>
+                    <div>
+                      <strong>
+                        {request.firstName} {request.lastName}
+                      </strong>
+                      <a href={`mailto:${request.email}`}>{request.email}</a>
+                      <small>
+                        Requested {formatDate(request.createdAt)}
+                        {request.emailVerified
+                          ? ' · Account email verified'
+                          : ' · Email not independently verified'}
+                      </small>
+                    </div>
+                  </div>
+                  {request.status === 'pending' ? (
+                    <div className="cp-pairing-request__actions">
+                      <button
+                        className="cp-button cp-button--primary"
+                        disabled={respondingID === request.id}
+                        onClick={() => void respond(request.id, 'confirm')}
+                        type="button"
+                      >
+                        Confirm match
+                      </button>
+                      <button
+                        className="cp-button cp-button--quiet"
+                        disabled={respondingID === request.id}
+                        onClick={() => void respond(request.id, 'decline')}
+                        type="button"
+                      >
+                        Not this client
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className={`cp-pairing-state cp-pairing-state--${request.status}`}
+                    >
+                      {request.status === 'confirmed'
+                        ? 'Confirmed · waiting for patient authorization'
+                        : request.status === 'revoked'
+                          ? 'Disconnected by patient'
+                          : 'Not confirmed'}
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
       <section className="cp-panel cp-records-panel">
@@ -666,12 +1326,15 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
             <div className="cp-empty__icon">＋</div>
             <h3>No patient records yet.</h3>
             <p>
-              Ask a patient to open Care Sharing in StatsKey and send you their
-              one-time code.
+              {profile.canReceiveShares
+                ? 'A confirmed pairing still contains no health data. Ask the patient to create a scoped Care Share when they are ready.'
+                : 'Patient records remain unavailable until primary-source credential verification is complete.'}
             </p>
-            <Link className="cp-button cp-button--secondary" to="/redeem">
-              Enter a code
-            </Link>
+            {profile.canReceiveShares && (
+              <Link className="cp-button cp-button--secondary" to="/redeem">
+                Enter a code
+              </Link>
+            )}
           </div>
         ) : (
           <div className="cp-record-list">
@@ -1010,6 +1673,10 @@ function ClinicalRecord({
         </p>
       </div>
 
+      {snapshot.dietitianSummary ? (
+        <DietitianReview summary={snapshot.dietitianSummary} />
+      ) : null}
+
       <section className="cp-manifest" aria-label="Record completeness">
         {snapshot.manifest.map((entry) => (
           <div key={entry.categoryID}>
@@ -1045,6 +1712,323 @@ function ClinicalRecord({
       </div>
     </>
   )
+}
+
+function DietitianReview({ summary }: { summary: DietitianSummary }) {
+  const initialInterval =
+    summary.intervals.find((interval) => interval.id === '30d') ||
+    summary.intervals[0]
+  const [selectedID, setSelectedID] = useState(initialInterval?.id || 'all')
+  const interval =
+    summary.intervals.find((value) => value.id === selectedID) ||
+    initialInterval
+
+  if (!interval) return null
+
+  const nutrientsByKey = new Map(
+    interval.nutrition.nutrients.map((nutrient) => [
+      nutrient.key,
+      nutrient,
+    ])
+  )
+  const pairedRows = summary.pairedDaily
+    .filter(
+      (row) =>
+        row.day >= interval.startDay && row.day <= interval.endDay
+    )
+    .slice(0, 14)
+  const groupedNutrients = groupNutrients(interval.nutrition.nutrients)
+
+  return (
+    <section className="cp-dietitian-review">
+      <div className="cp-dietitian-review__header">
+        <div>
+          <span className="cp-eyebrow">Dietitian review</span>
+          <h2>Dietary intake, micronutrients, and activity</h2>
+          <p>
+            Recorded intake estimates are paired with device-synced activity.
+            Every estimate includes its observed coverage and approximate 95%
+            interval.
+          </p>
+        </div>
+        <div
+          className="cp-interval-tabs"
+          aria-label="Dietitian review interval"
+        >
+          {summary.intervals.map((value) => (
+            <button
+              className={value.id === interval.id ? 'is-selected' : ''}
+              key={value.id}
+              onClick={() => setSelectedID(value.id)}
+              type="button"
+            >
+              {value.id === 'all' ? 'All' : value.id.replace('d', ' days')}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="cp-coverage-strip">
+        <span>
+          <strong>{interval.nutrition.recordedDays}</strong> intake days
+          recorded
+        </span>
+        <span>
+          <strong>{interval.activity.recordedDays}</strong> activity days
+          synced
+        </span>
+        <span>
+          <strong>{interval.paired.matchedDays}</strong> paired days
+        </span>
+        <span>
+          {formatDate(interval.startDay)} – {formatDate(interval.endDay)}
+        </span>
+      </div>
+
+      <div className="cp-dietitian-metric-grid">
+        <NutrientEstimateCard
+          label="Energy intake"
+          nutrient={nutrientsByKey.get('calories')}
+        />
+        <NutrientEstimateCard
+          label="Protein"
+          nutrient={nutrientsByKey.get('protein')}
+        />
+        <NutrientEstimateCard
+          label="Dietary fiber"
+          nutrient={nutrientsByKey.get('dietary_fiber')}
+        />
+        <MetricEstimateCard
+          estimate={interval.activity.totalExpenditureKcal}
+          label="Device-estimated expenditure"
+          unit="kcal/day"
+        />
+        <MetricEstimateCard
+          estimate={interval.activity.steps}
+          label="Steps"
+          unit="/day"
+        />
+        <MetricEstimateCard
+          estimate={interval.activity.exerciseMinutes}
+          label="Exercise"
+          unit="min/day"
+        />
+      </div>
+
+      <section className="cp-panel cp-paired-panel">
+        <div className="cp-panel__header">
+          <div>
+            <span className="cp-eyebrow">Nutrition + activity pairing</span>
+            <h2>Recorded intake alongside movement</h2>
+            <p>
+              Energy difference is intake minus device-estimated basal and
+              active expenditure. It is not a measure of energy availability.
+            </p>
+          </div>
+        </div>
+        <div className="cp-paired-summary">
+          <MetricEstimateCard
+            estimate={interval.paired.intakeKcal}
+            label="Paired-day intake"
+            unit="kcal/day"
+          />
+          <MetricEstimateCard
+            estimate={interval.paired.deviceExpenditureKcal}
+            label="Paired-day expenditure"
+            unit="kcal/day"
+          />
+          <MetricEstimateCard
+            estimate={interval.paired.intakeMinusExpenditureKcal}
+            label="Intake − expenditure"
+            signed
+            unit="kcal/day"
+          />
+        </div>
+        {pairedRows.length > 0 ? (
+          <div className="cp-paired-table-wrap">
+            <table className="cp-paired-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Intake</th>
+                  <th>Expenditure</th>
+                  <th>Difference</th>
+                  <th>Protein</th>
+                  <th>Fiber</th>
+                  <th>Steps</th>
+                  <th>Exercise</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pairedRows.map((row) => (
+                  <tr key={row.day}>
+                    <td>{formatDate(row.day)}</td>
+                    <td>{formatCompact(row.intakeKcal)} kcal</td>
+                    <td>{formatCompact(row.deviceExpenditureKcal)} kcal</td>
+                    <td className={row.intakeMinusExpenditureKcal < 0 ? 'is-negative' : ''}>
+                      {formatSigned(row.intakeMinusExpenditureKcal)} kcal
+                    </td>
+                    <td>{formatCompact(row.proteinGrams)} g</td>
+                    <td>{formatCompact(row.fiberGrams)} g</td>
+                    <td>{formatCompact(row.steps)}</td>
+                    <td>{formatCompact(row.exerciseMinutes)} min</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="cp-muted">
+            No days in this interval contain both intake and activity data.
+          </p>
+        )}
+      </section>
+
+      <section className="cp-panel cp-nutrient-estimates">
+        <div className="cp-panel__header">
+          <div>
+            <span className="cp-eyebrow">Nutrient exposure estimates</span>
+            <h2>Macronutrients and micronutrients</h2>
+            <p>
+              Means use days where that nutrient was reported. Intervals
+              combine day-to-day variation with source and portion uncertainty.
+            </p>
+          </div>
+        </div>
+        <div className="cp-nutrient-groups">
+          {groupedNutrients.map(([category, nutrients]) => (
+            <details
+              key={category}
+              open={[
+                'Macronutrients & intake',
+                'Vitamins',
+                'Minerals & electrolytes',
+              ].includes(category)}
+            >
+              <summary>
+                <strong>{category}</strong>
+                <span>{nutrients.length} nutrients</span>
+              </summary>
+              <div className="cp-nutrient-table">
+                <div className="cp-nutrient-row cp-nutrient-row--header">
+                  <span>Nutrient</span>
+                  <span>Mean / recorded day</span>
+                  <span>Approx. 95% interval</span>
+                  <span>Coverage</span>
+                  <span>Confidence</span>
+                </div>
+                {nutrients.map((nutrient) => (
+                  <div className="cp-nutrient-row" key={nutrient.key}>
+                    <strong>{nutrient.label}</strong>
+                    <span>
+                      {formatCompact(nutrient.meanPerRecordedDay)}{' '}
+                      {nutrient.unit}
+                    </span>
+                    <span>
+                      {formatCompact(nutrient.lower95)}–
+                      {formatCompact(nutrient.upper95)} {nutrient.unit}
+                    </span>
+                    <span>{nutrient.coverageDays} days</span>
+                    <span
+                      className={`cp-confidence cp-confidence--${nutrient.confidence}`}
+                    >
+                      {humanize(nutrient.confidence)}
+                      {nutrient.estimatedPercent > 0
+                        ? ` · ${nutrient.estimatedPercent}% estimated`
+                        : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <div className="cp-methodology">
+        <strong>Interpretation notes</strong>
+        <p>{summary.methodology.confidenceInterval}</p>
+        <p>{summary.methodology.nutrition}</p>
+        <p>{summary.methodology.activity}</p>
+        <p>{summary.disclaimer}</p>
+      </div>
+    </section>
+  )
+}
+
+function NutrientEstimateCard({
+  label,
+  nutrient,
+}: {
+  label: string
+  nutrient?: DietitianNutrientEstimate
+}) {
+  if (!nutrient) {
+    return (
+      <article className="cp-estimate-card">
+        <span>{label}</span>
+        <strong>Not recorded</strong>
+      </article>
+    )
+  }
+  return (
+    <article className="cp-estimate-card">
+      <span>{label}</span>
+      <strong>
+        {formatCompact(nutrient.meanPerRecordedDay)} {nutrient.unit}
+        <small>/ recorded day</small>
+      </strong>
+      <p>
+        95% interval {formatCompact(nutrient.lower95)}–
+        {formatCompact(nutrient.upper95)} {nutrient.unit}
+      </p>
+      <small>
+        {nutrient.coverageDays} days · {humanize(nutrient.confidence)} confidence
+      </small>
+    </article>
+  )
+}
+
+function MetricEstimateCard({
+  label,
+  estimate,
+  unit,
+  signed = false,
+}: {
+  label: string
+  estimate: DietitianMetricEstimate
+  unit: string
+  signed?: boolean
+}) {
+  const value = signed
+    ? formatSigned(estimate.mean)
+    : formatCompact(estimate.mean)
+  return (
+    <article className="cp-estimate-card">
+      <span>{label}</span>
+      <strong>
+        {value} {unit}
+      </strong>
+      <p>
+        95% interval {signed ? formatSigned(estimate.lower95) : formatCompact(estimate.lower95)}
+        –
+        {signed ? formatSigned(estimate.upper95) : formatCompact(estimate.upper95)}{' '}
+        {unit}
+      </p>
+    </article>
+  )
+}
+
+function groupNutrients(
+  nutrients: DietitianNutrientEstimate[]
+): Array<[string, DietitianNutrientEstimate[]]> {
+  const groups = new Map<string, DietitianNutrientEstimate[]>()
+  for (const nutrient of nutrients) {
+    const values = groups.get(nutrient.category) || []
+    values.push(nutrient)
+    groups.set(nutrient.category, values)
+  }
+  return [...groups.entries()]
 }
 
 function SnapshotSection({
@@ -1313,6 +2297,9 @@ function recordTitle(
   if (categoryID === 'vitals' || categoryID === 'body') {
     return humanize(String(record.kind || categoryName(categoryID)))
   }
+  if (categoryID === 'wellness') {
+    return humanize(String(record.type || 'Wellness entry'))
+  }
   return categoryName(categoryID)
 }
 
@@ -1321,13 +2308,33 @@ function formatValue(value: unknown): string {
     return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
   }
   if (typeof value === 'boolean') return value ? 'Yes' : 'No'
-  if (Array.isArray(value)) return `${value.length} items`
+  if (Array.isArray(value)) {
+    return value.every(
+      (item) =>
+        typeof item === 'string' ||
+        typeof item === 'number' ||
+        typeof item === 'boolean'
+    )
+      ? value.map((item) => humanize(String(item))).join(', ')
+      : `${value.length} items`
+  }
   if (isRecord(value)) {
     return Object.entries(value)
       .map(([key, nested]) => `${humanize(key)} ${formatValue(nested)}`)
       .join(' · ')
   }
   return String(value ?? '—')
+}
+
+function formatCompact(value: number): string {
+  const magnitude = Math.abs(value)
+  return value.toLocaleString(undefined, {
+    maximumFractionDigits: magnitude < 10 ? 2 : magnitude < 100 ? 1 : 0,
+  })
+}
+
+function formatSigned(value: number): string {
+  return `${value > 0 ? '+' : ''}${formatCompact(value)}`
 }
 
 function formatRecordDate(value: unknown): string {
@@ -1367,6 +2374,29 @@ function categoryName(id: ClinicalCategoryID): string {
   return clinicalCategories.find((category) => category.id === id)?.label || id
 }
 
+function availableSpecialties(role: string) {
+  if (role === 'registeredDietitian' || role === 'careCoordinator') {
+    return specialtyOptions.filter(
+      (option) => option.id === 'other' || option.roles?.includes(role)
+    )
+  }
+  return specialtyOptions.filter(
+    (option) => !option.roles || option.roles.includes(role)
+  )
+}
+
+function specialtyName(profile: ClinicianProfile): string {
+  if (profile.specialty === 'other' && profile.specialtyOther) {
+    return profile.specialtyOther
+  }
+  return (
+    specialtyOptions.find((option) => option.id === profile.specialty)?.label ||
+    professionalRoles.find((role) => role.id === profile.professionalType)
+      ?.label ||
+    'Clinical'
+  )
+}
+
 function categoryLabel(count: number): string {
   return `${count} categor${count === 1 ? 'y' : 'ies'}`
 }
@@ -1381,6 +2411,7 @@ function categorySymbol(id: ClinicalCategoryID): string {
     glucose: '∿',
     body: '◎',
     bloodPanels: '✣',
+    wellness: '◌',
   }
   return symbols[id]
 }

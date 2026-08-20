@@ -246,6 +246,12 @@ export interface DesktopWorkspaceBridge {
     workspace?: DesktopWorkspaceState
     error?: string
   }>
+  createProjectInRoot(name: string): Promise<{
+    ok: boolean
+    cancelled?: boolean
+    workspace?: DesktopWorkspaceState
+    error?: string
+  }>
   cloneProject(repositoryUrl: string): Promise<{
     ok: boolean
     cancelled?: boolean

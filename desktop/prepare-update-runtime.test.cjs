@@ -101,6 +101,7 @@ test('updates only the active Mac markers on the download page', () => {
     'Mac 1.2.3 · signed and Apple notarized',
     'Mac 1.2.3 · Windows',
     '/releases/1.2.3/StatsKey-1.2.3-mac-arm64.dmg',
+    '/releases/1.2.3/StatsKey-1.2.3-mac-arm64.dmg',
     '/releases/1.2.3/StatsKey-1.2.3-mac-x64.dmg',
     'const macVersion = "1.2.3";',
     'Windows 1.2.2 preview</p>',
@@ -112,7 +113,7 @@ test('updates only the active Mac markers on the download page', () => {
   assert.match(next, /Mac 1\.2\.4 · signed/)
   assert.equal(
     next.match(/releases\/1\.2\.4\/StatsKey-1\.2\.4-mac-arm64\.dmg/g)?.length,
-    1
+    2
   )
   assert.doesNotMatch(next, /releases\/1\.2\.3\/StatsKey-1\.2\.3-mac-arm64\.dmg/)
   assert.match(next, /Historical release 1\.2\.3 remains text\./)
@@ -127,6 +128,7 @@ test('updates only active Windows preview markers while preserving Mac', () => {
     '/releases/1.2.3/StatsKey-1.2.3-mac-arm64.dmg',
     '/releases/1.2.3/StatsKey-1.2.3-mac-x64.dmg',
     '/releases/1.2.2/StatsKey-1.2.2-win-x64.exe',
+    '/releases/1.2.2/StatsKey-1.2.2-win-x64.exe',
     'const macVersion = "1.2.3";',
     'const windowsVersion = "1.2.2";',
     'On Windows, SmartScreen may require\n            <strong>More info → Run anyway</strong> while the Windows preview is unsigned.',
@@ -140,7 +142,7 @@ test('updates only active Windows preview markers while preserving Mac', () => {
   assert.match(next, /Mac 1\.2\.3 · Windows 1\.2\.4<\/span>/)
   assert.equal(
     next.match(/releases\/1\.2\.4\/StatsKey-1\.2\.4-win-x64\.exe/g)?.length,
-    1
+    2
   )
   assert.doesNotMatch(next, /releases\/1\.2\.2\/StatsKey-1\.2\.2-win-x64\.exe/)
   assert.match(next, /const windowsVersion = "1\.2\.4";/)
@@ -154,6 +156,7 @@ test('marks a signed Windows release without unsigned-preview metadata', () => {
   const page = [
     'Mac 1.2.3 · signed and Apple notarized · Windows 1.2.2 preview</p>',
     'Mac 1.2.3 · Windows 1.2.2</span>',
+    '/releases/1.2.2/StatsKey-1.2.2-win-x64.exe',
     '/releases/1.2.2/StatsKey-1.2.2-win-x64.exe',
     'const windowsVersion = "1.2.2";',
     'On Windows, SmartScreen may require\n            <strong>More info → Run anyway</strong> while the Windows preview is unsigned.',
@@ -265,17 +268,19 @@ test('fails closed when a download-page marker is missing or duplicated', () => 
   const incompleteMacDownloads = [
     'Mac 1.2.3 · signed and Apple notarized',
     'Mac 1.2.3 · Windows',
+    '/releases/1.2.3/StatsKey-1.2.3-mac-arm64.dmg',
     '/releases/1.2.3/StatsKey-1.2.3-mac-x64.dmg',
     'const macVersion = "1.2.3";',
   ].join('\n')
   assert.throws(
     () => nextDownloadPage(incompleteMacDownloads, '1.2.3', '1.2.4'),
-    /exactly one Apple Silicon download marker/
+    /exactly 2 Apple Silicon download markers/
   )
 
   const extraWindowsDownloads = [
     'Mac 1.2.3 · signed and Apple notarized · Windows 1.2.2 preview</p>',
     'Mac 1.2.3 · Windows 1.2.2</span>',
+    '/releases/1.2.2/StatsKey-1.2.2-win-x64.exe',
     '/releases/1.2.2/StatsKey-1.2.2-win-x64.exe',
     '/releases/1.2.2/StatsKey-1.2.2-win-x64.exe',
     'const windowsVersion = "1.2.2";',
@@ -287,6 +292,6 @@ test('fails closed when a download-page marker is missing or duplicated', () => 
         platform: 'windows',
         preview: true,
       }),
-    /exactly one Windows download marker/
+    /exactly 2 Windows download markers/
   )
 })

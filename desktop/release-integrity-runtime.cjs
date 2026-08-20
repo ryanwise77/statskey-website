@@ -48,6 +48,7 @@ const REQUIRED_RELEASE_SOURCE_FILES = Object.freeze([
   'desktop/preferences-runtime.cjs',
   'desktop/self-edit-runtime.cjs',
   'desktop/calendar-feed-runtime.cjs',
+  'desktop/workspace-create-runtime.cjs',
   'desktop/workspace-runtime.cjs',
   'desktop/workspace-sync-runtime.cjs',
   'desktop/fleet-runtime.cjs',

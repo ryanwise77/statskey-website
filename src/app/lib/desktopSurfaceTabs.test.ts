@@ -6,22 +6,52 @@ import {
 } from './desktopSurfaceTabs'
 
 describe('desktop surface tabs', () => {
-  it('keeps an explicitly empty tab strip empty', () => {
+  it('keeps an explicitly empty tab strip empty once the rollout has run', () => {
     const storage = {
       getItem(key: string) {
-        return key === DESKTOP_SURFACE_STORAGE_KEY ? '[]' : null
+        if (key === DESKTOP_SURFACE_STORAGE_KEY) return '[]'
+        return '1' // rollout marker already written
       },
+      setItem() {},
     }
     expect(loadDesktopSurfaceTabs(storage)).toEqual([])
   })
 
-  it('uses Workspace only when no valid preference has ever been saved', () => {
-    expect(loadDesktopSurfaceTabs({ getItem: () => null })).toEqual([
+  it('lands on Workspace and Cockpit when no preference has ever been saved', () => {
+    const fresh = {
+      getItem: () => null,
+      setItem() {},
+    }
+    expect(loadDesktopSurfaceTabs(fresh)).toEqual(['workspace', 'cockpit'])
+    expect(loadDesktopSurfaceTabs({ getItem: () => 'not-json', setItem() {} }))
+      .toEqual(['workspace', 'cockpit'])
+  })
+
+  it('appends Cockpit once for pre-Cockpit tab lists, then respects closure', () => {
+    const written: Record<string, string> = {}
+    const storage = {
+      getItem(key: string) {
+        if (key === DESKTOP_SURFACE_STORAGE_KEY) return '["workspace","plan"]'
+        return written[key] ?? null
+      },
+      setItem(key: string, value: string) {
+        written[key] = value
+      },
+    }
+    expect(loadDesktopSurfaceTabs(storage)).toEqual([
       'workspace',
+      'plan',
+      'cockpit',
     ])
-    expect(loadDesktopSurfaceTabs({ getItem: () => 'not-json' })).toEqual([
-      'workspace',
-    ])
+    // A later load (rollout marker written) does not re-add after closure.
+    const closed = {
+      getItem(key: string) {
+        if (key === DESKTOP_SURFACE_STORAGE_KEY) return '["workspace","plan"]'
+        return written[key] ?? null
+      },
+      setItem() {},
+    }
+    expect(loadDesktopSurfaceTabs(closed)).toEqual(['workspace', 'plan'])
   })
 
   it('deduplicates and rejects unknown surfaces', () => {
@@ -31,6 +61,7 @@ describe('desktop surface tabs', () => {
           'browser',
           'simulator',
           'github',
+          'cockpit',
           'fleet',
           'jobs',
           'unknown',
@@ -42,6 +73,7 @@ describe('desktop surface tabs', () => {
       'browser',
       'simulator',
       'github',
+      'cockpit',
       'fleet',
       'jobs',
       'plan',

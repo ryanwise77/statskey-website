@@ -819,6 +819,113 @@ test('command adapter requires an explicit executable allowlist', async () => {
   }
 })
 
+test('command adapter forwards a bounded stdout tail as a log event', async () => {
+  const root = await temporaryDirectory()
+  try {
+    const materializer = {
+      async materialize() {
+        return { workspace: root, commit: COMMIT }
+      },
+    }
+    const commandJob = {
+      ...context().context.job,
+      type: 'command',
+      cage: { enabled: true, maxWallTimeMs: 30_000 },
+      execution: {
+        kind: 'command',
+        executable: 'node',
+        arguments: ['-e', 'console.log("hello")'],
+        workingDirectory: '.',
+        timeoutMs: 60_000,
+      },
+    }
+    const harness = context({ job: commandJob })
+    const adapter = new CommandFleetAdapter({
+      materializer,
+      allowedExecutables: ['node'],
+      processRunner: async () => ({
+        ok: true,
+        exitCode: 0,
+        stdout: `${'x'.repeat(30_000)}tail-marker`,
+        stderr: '',
+      }),
+    })
+    await adapter.prepare(harness.context)
+    await adapter.run(harness.context)
+    const log = harness.events.find((event) => event.type === 'log')
+    assert.ok(log)
+    assert.equal(log.payload.stream, 'stdout')
+    assert.equal(log.payload.chunk.length, 24_000)
+    assert.ok(log.payload.chunk.endsWith('tail-marker'))
+    assert.ok(
+      harness.events.some(
+        (event) => event.type === 'process-exit' && event.payload.exitCode === 0
+      )
+    )
+
+    const quietHarness = context({ job: commandJob })
+    const quiet = new CommandFleetAdapter({
+      materializer,
+      allowedExecutables: ['node'],
+      processRunner: async () => ({
+        ok: true,
+        exitCode: 0,
+        stdout: '',
+        stderr: '',
+      }),
+    })
+    await quiet.prepare(quietHarness.context)
+    await quiet.run(quietHarness.context)
+    assert.ok(!quietHarness.events.some((event) => event.type === 'log'))
+  } finally {
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
+test('a rejected stdout log event never fails the command job', async () => {
+  const root = await temporaryDirectory()
+  try {
+    const harness = context({
+      job: {
+        ...context().context.job,
+        type: 'command',
+        cage: { enabled: true, maxWallTimeMs: 30_000 },
+        execution: {
+          kind: 'command',
+          executable: 'node',
+          arguments: ['-e', 'console.log("hello")'],
+          workingDirectory: '.',
+          timeoutMs: 60_000,
+        },
+      },
+    })
+    const baseEmit = harness.context.emit
+    harness.context.emit = async (type, payload) => {
+      if (type === 'log') throw new Error('coordinator rejected the log')
+      return baseEmit(type, payload)
+    }
+    const adapter = new CommandFleetAdapter({
+      materializer: {
+        async materialize() {
+          return { workspace: root, commit: COMMIT }
+        },
+      },
+      allowedExecutables: ['node'],
+      processRunner: async () => ({
+        ok: true,
+        exitCode: 0,
+        stdout: 'hello\n',
+        stderr: '',
+      }),
+    })
+    await adapter.prepare(harness.context)
+    const result = await adapter.run(harness.context)
+    assert.equal(result.exitCode, 0)
+  } finally {
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
 test('Windows workers route typed builds through the command adapter', async () => {
   const root = await temporaryDirectory()
   try {
