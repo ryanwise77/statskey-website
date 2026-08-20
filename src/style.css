@@ -13750,3 +13750,146 @@ body.marketing-light .site-brand__mark {
     font-size: 13px;
   }
 }
+
+/* Lazy, bounded historical nutrition controls */
+.food-history-dropdown-toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  min-height: 126px;
+  border: 1px solid rgba(22, 119, 109, 0.16);
+  border-radius: 22px;
+  padding: 23px 25px;
+  background:
+    radial-gradient(circle at 94% 0, rgba(65, 202, 168, 0.15), transparent 32%),
+    linear-gradient(135deg, #f8fcfb, #edf7f5);
+  text-align: left;
+  cursor: pointer;
+}
+
+.food-history-dropdown-toggle small,
+.food-history-dropdown-toggle strong,
+.food-history-dropdown-toggle p {
+  display: block;
+}
+
+.food-history-dropdown-toggle small {
+  color: #168d7d;
+  font: 700 8px/1.2 var(--mono);
+  letter-spacing: 0.12em;
+}
+
+.food-history-dropdown-toggle strong {
+  margin-top: 7px;
+  color: #143846;
+  font-size: clamp(18px, 2.4vw, 27px);
+}
+
+.food-history-dropdown-toggle p {
+  max-width: 720px;
+  margin: 7px 0 0;
+  color: #70858d;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.food-history-dropdown-toggle > i {
+  color: #168d7d;
+  font-size: 24px;
+  font-style: normal;
+  transition: transform 180ms ease;
+}
+
+.food-history-dropdown-toggle.is-open > i {
+  transform: rotate(180deg);
+}
+
+.food-history-dropdowns,
+.nutrition-history-atlas__controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+  padding: 15px 17px 17px;
+}
+
+.food-history-dropdowns label,
+.nutrition-history-atlas__controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.food-history-dropdowns label > span,
+.nutrition-history-atlas__controls label > span {
+  color: #71868d;
+  font: 700 7px/1.2 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.food-history-dropdowns select,
+.nutrition-history-atlas__controls select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid rgba(20, 110, 105, 0.16);
+  border-radius: 11px;
+  padding: 0 38px 0 12px;
+  background: #f7fbfa;
+  color: #173d47;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nutrition-history-atlas__controls {
+  grid-template-columns: minmax(230px, 0.55fr) minmax(0, 1fr);
+  align-items: end;
+  padding-bottom: 5px;
+}
+
+.nutrition-history-atlas__controls p {
+  margin: 0 0 12px;
+  color: #7c8f95;
+  font-size: 8px;
+  text-align: right;
+}
+
+.food-history-load-more,
+.nutrition-history-load-more {
+  display: block;
+  width: calc(100% - 26px);
+  min-height: 44px;
+  margin: 0 13px 13px;
+  border: 1px solid rgba(21, 125, 111, 0.18);
+  border-radius: 11px;
+  background: rgba(31, 159, 138, 0.08);
+  color: #147b6d;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.food-history-load-more:hover,
+.nutrition-history-load-more:hover {
+  background: rgba(31, 159, 138, 0.14);
+}
+
+@media (max-width: 760px) {
+  .food-history-dropdowns,
+  .nutrition-history-atlas__controls {
+    grid-template-columns: 1fr;
+  }
+
+  .nutrition-history-atlas__controls p {
+    margin: 0;
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .food-history-dropdown-toggle {
+    border-radius: 18px;
+    padding: 19px 16px;
+  }
+}
