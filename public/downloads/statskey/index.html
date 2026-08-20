@@ -15,8 +15,9 @@
       property="og:description"
       content="See the work. Steer it live. Review a clean, verified handoff."
     />
-    <meta property="og:url" content="https://statskey.ai/downloads/statskey/" />
+    <meta property="og:url" content="https://statskey.ai/desktop" />
     <meta property="og:image" content="https://statskey.ai/downloads/statskey/og.png" />
+    <link rel="canonical" href="https://statskey.ai/desktop" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="StatsKey Desktop — Intelligence that finishes the work" />
     <meta
@@ -25,7 +26,7 @@
     />
     <meta name="twitter:image" content="https://statskey.ai/downloads/statskey/og.png" />
     <title>StatsKey Desktop — Intelligence that finishes the work</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="/statskey-desktop-logo.svg" />
     <style>
       :root {
         --ink: #101828;
@@ -109,6 +110,22 @@
       }
 
       .brand span { color: #8190a5; font-weight: 500; }
+
+      .nav__actions {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .nav__link {
+        color: #60738b;
+        font-size: 13px;
+        font-weight: 650;
+        text-decoration: none;
+      }
+
+      .nav__link:hover { color: var(--blue-dark); }
+      .nav__link:focus-visible { outline: 3px solid rgba(8, 120, 228, 0.24); outline-offset: 5px; }
 
       .button {
         min-height: 46px;
@@ -386,6 +403,58 @@
       .principle p { margin: 0; color: #b8c5d6; line-height: 1.58; }
       .principle:last-child p { color: #5f738b; }
 
+      .capability-catalog { padding: 96px 0; border-top: 1px solid var(--line); }
+      .capability-grid {
+        margin-top: 40px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .capability-card {
+        padding: 26px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+      }
+
+      .capability-card__title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+
+      .capability-card__title span {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        border-radius: 9px;
+        background: var(--blue-soft);
+        color: var(--blue-dark);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .capability-card h3 { margin: 0; font-size: 20px; letter-spacing: -0.03em; }
+      .capability-card p { margin: 11px 0 0; color: #61748b; line-height: 1.5; }
+      .capability-card ul { margin: 17px 0 0; padding-left: 19px; color: #53657c; line-height: 1.55; }
+      .capability-card li + li { margin-top: 7px; }
+      .capability-card li::marker { color: var(--blue); }
+
+      .capability-meta {
+        margin: 24px 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 14px;
+        color: #7b8ca0;
+        font-size: 12px;
+      }
+
+      .capability-meta a { color: #315e85; text-underline-offset: 3px; }
+
       .release-history { padding: 96px 0; border-top: 1px solid var(--line); }
       .release-list { display: grid; gap: 12px; margin-top: 40px; }
       .release-card {
@@ -438,6 +507,7 @@
       @media (max-width: 620px) {
         .shell { width: min(100% - 24px, 1160px); }
         .nav .button { min-height: 40px; padding: 0 14px; font-size: 13px; }
+        .nav__link { display: none; }
         .brand span { display: none; }
         .hero { padding: 64px 0 42px; }
         h1 { font-size: clamp(44px, 14vw, 62px); }
@@ -451,7 +521,9 @@
         .update { grid-template-columns: 1fr; }
         .update__mark { display: none; }
         .section { padding: 72px 0; }
-        .proof-grid, .principles { grid-template-columns: 1fr; }
+        .proof-grid, .principles, .capability-grid { grid-template-columns: 1fr; }
+        .capability-catalog { padding: 72px 0; }
+        .capability-card { padding: 21px; }
         .release-card { grid-template-columns: 1fr; gap: 12px; padding: 21px; }
         .proof { min-height: 0; }
         .proof span { margin-bottom: 20px; }
@@ -470,10 +542,14 @@
     <nav class="nav" aria-label="Primary navigation">
       <div class="shell nav__inner">
         <a class="brand" href="/">
-          <img src="/favicon.png" alt="" />
+          <img src="/statskey-desktop-logo.svg" alt="" />
           StatsKey <span>/ Desktop</span>
         </a>
-        <a class="button button--primary" id="nav-download" href="#download">Download</a>
+        <div class="nav__actions">
+          <a class="nav__link" href="#capabilities">Capabilities</a>
+          <a class="nav__link" href="#updates">What’s new</a>
+          <a class="button button--primary" id="nav-download" href="#download">Download</a>
+        </div>
       </div>
     </nav>
 
@@ -486,12 +562,21 @@
           without starting over, then review the files, checks, and final handoff.
         </p>
         <div class="hero__actions">
-          <a class="button button--primary" id="primary-download" href="#download">
+          <a
+            class="button button--primary"
+            data-target="mac-arm64"
+            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.9/StatsKey-0.21.9-mac-arm64.dmg"
+          >
             Download for Apple Silicon <span aria-hidden="true">↓</span>
           </a>
+          <a
+            class="button"
+            data-target="win-x64"
+            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.8/StatsKey-0.21.8-win-x64.exe"
+          >Download for Windows <span aria-hidden="true">↓</span></a>
           <a class="button" href="#why">Why StatsKey</a>
         </div>
-        <p class="hero__note">Mac 0.21.10 · signed and Apple notarized · Windows 0.19.1 preview · Ubuntu 0.21.8 preview</p>
+        <p class="hero__note">Mac 0.21.9 · signed and Apple notarized · Windows 0.21.8 preview</p>
       </header>
 
       <section class="shell product-wrap" aria-label="StatsKey in action">
@@ -598,6 +683,136 @@
         </div>
       </section>
 
+      <section class="capability-catalog" id="capabilities">
+        <div class="shell">
+          <div class="section-heading">
+            <span class="kicker" id="capability-version">Capability catalog · Mac 0.21.6</span>
+            <h2>What StatsKey can do today.</h2>
+            <p>
+              A maintained, plain-language list of the current Mac app’s capabilities.
+              The Windows preview remains on 0.19.1. Each release updates this
+              catalog and the version history below.
+            </p>
+          </div>
+          <div class="capability-grid" id="capability-grid" aria-live="polite">
+            <article class="capability-card">
+              <div class="capability-card__title"><span>01</span><h3>Choose how StatsKey helps</h3></div>
+              <p>Start simply, then expose technical controls only when you need them.</p>
+              <ul>
+                <li>Automatic chooses the safest capable approach from your request.</li>
+                <li>Ask researches and explains without changing anything.</li>
+                <li>Plan creates an editable step-by-step plan without changing anything.</li>
+                <li>Fix diagnoses a problem, makes the repair, and verifies the result.</li>
+                <li>Execute completes the task, makes the needed changes, and verifies them.</li>
+                <li>Advanced settings keep model, context, reasoning, and action controls available.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>02</span><h3>Work in real projects</h3></div>
+              <p>Use the same local files and project structure you already trust.</p>
+              <ul>
+                <li>Open local and multi-root workspaces with files, tabs, split editors, and persistent layouts.</li>
+                <li>Read, search, create, edit, rename, and delete files inside the approved workspace.</li>
+                <li>Use encrypted local indexing with ignored-file and secret-file exclusions.</li>
+                <li>Review workspace changes, linked files, checkpoints, and saved results in one place.</li>
+                <li>Open GitHub-backed browser workspaces with explicit remote diff review.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>03</span><h3>Run and verify the work</h3></div>
+              <p>Implementation and proof stay connected.</p>
+              <ul>
+                <li>Run terminal commands, builds, tests, and focused verification in the bound workspace.</li>
+                <li>Inspect Git status and diffs, stage or unstage changes, and approve commits.</li>
+                <li>Generate and preview selection-aware inline edits before applying them.</li>
+                <li>Keep long-running tool output visible and synthesize a final verified handoff.</li>
+                <li>Restore checkpoints when a reviewed change needs to be reversed.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>04</span><h3>Stay in control while it works</h3></div>
+              <p>You can follow, redirect, pause, and resume without starting over.</p>
+              <ul>
+                <li>See the current action, elapsed work, completed steps, and next concrete step.</li>
+                <li>Send corrections, queue follow-ups, reorder queued work, or interrupt with a priority message.</li>
+                <li>Keep conversations and active work recoverable when tabs are closed or switched.</li>
+                <li>Run up to two independent top-level tasks at once while conflicting edits remain coordinated.</li>
+                <li>Create isolated task workspaces from a clean committed baseline.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>05</span><h3>Test what people actually use</h3></div>
+              <p>Verification can extend beyond source files.</p>
+              <ul>
+                <li>Open isolated browser tabs, inspect bounded page content, click, type non-secret text, and capture screenshots.</li>
+                <li>Discover and launch approved local applications.</li>
+                <li>Discover, boot, inspect, and interact with iOS Simulators and Android emulators.</li>
+                <li>Install and launch mobile builds, capture device screenshots, and inspect process logs.</li>
+                <li>Keep browser and device evidence tied to the conversation that requested it.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>06</span><h3>Use the right Intelligence</h3></div>
+              <p>Choose a managed route or connect your own provider.</p>
+              <ul>
+                <li>Select a model, reasoning effort, context size, and managed or direct-provider route.</li>
+                <li>Store supported provider keys in encrypted local storage.</li>
+                <li>Stream responses, cancel work, and use bounded subagents for independent investigation.</li>
+                <li>Connect approved MCP tools over local or remote transports with exact-argument review.</li>
+                <li>Attach files and inspect how much context a task is using.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>07</span><h3>Connect personal tools only when invited</h3></div>
+              <p>Work and personal context remain separate by default.</p>
+              <ul>
+                <li>Work conversations cannot read health, calendar, inbox, or personal memory unless you explicitly include allowed context.</li>
+                <li>Personal conversations do not receive project files, terminal, Git, MCP, or browser automation.</li>
+                <li>Connect Google Calendar or Gmail with separately chosen read, create, and send capabilities.</li>
+                <li>Review the exact email or calendar event before an external action is completed.</li>
+                <li>Bring optional health context into an approved workspace without silently enabling other personal sources.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>08</span><h3>Turn plans into durable artifacts</h3></div>
+              <p>Plans remain editable, reviewable, and connected to implementation.</p>
+              <ul>
+                <li>Create local planning canvases with checklists, revisions, and bounded flow diagrams.</li>
+                <li>Refine a plan conversationally without losing its prior revisions.</li>
+                <li>Save a plan into the workspace with conflict checks.</li>
+                <li>Fork a plan without changing the original.</li>
+                <li>Start implementation from an immutable plan handoff.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>09</span><h3>Customize the workspace</h3></div>
+              <p>Shape StatsKey through the same review boundary as project work.</p>
+              <ul>
+                <li>Discover workspace rules, skills, hooks, MCP configuration, and connected tools in one Customize surface.</li>
+                <li>Open StatsKey’s own source from Settings and describe the interface or workflow change you want.</li>
+                <li>Review and verify customization changes before they become part of a release.</li>
+                <li>Use workspace hooks for prompts, responses, file reads, mutations, terminal commands, and MCP actions.</li>
+              </ul>
+            </article>
+            <article class="capability-card">
+              <div class="capability-card__title"><span>10</span><h3>Review and protect changes</h3></div>
+              <p>Capability does not remove the approval boundary.</p>
+              <ul>
+                <li>Choose Review each, Auto-review, or Run everything for local actions.</li>
+                <li>Keep file writes and commands contained to the approved workspace with symlink and external-file protection.</li>
+                <li>Require explicit approval for deletion, external actions, commits, MCP calls, and configured hooks.</li>
+                <li>Block password fields, unsafe destinations, popups, downloads, and hidden permissions in controlled browsing.</li>
+                <li>Receive signed, notarized macOS updates through immutable architecture-specific feeds.</li>
+              </ul>
+            </article>
+          </div>
+          <p class="capability-meta">
+            <span>Updated <time id="capability-updated" datetime="2026-08-16">August 16, 2026</time></span>
+            <a href="/downloads/statskey/capabilities.json">Machine-readable catalog</a>
+          </p>
+        </div>
+      </section>
+
       <section class="release-history" id="updates">
         <div class="shell">
           <div class="section-heading">
@@ -609,14 +824,16 @@
           </div>
           <div class="release-list" id="release-list" aria-live="polite">
             <article class="release-card">
-              <div class="release-card__meta">Version 0.19.1 · Windows<time datetime="2026-08-13">August 13, 2026</time></div>
+              <div class="release-card__meta">Version 0.21.9 · macOS<time datetime="2026-08-17">August 17, 2026</time></div>
               <div>
-                <h3>Windows, tested where it runs</h3>
-                <p>The Windows preview now has to pass native install, restart, workspace, terminal, browser, and update-readiness checks before release.</p>
+                <h3>Helpers that stay in step</h3>
+                <p>Investigators follow the active model and provider route by default, with one quiet advanced control for choosing any available StatsKey or My key route.</p>
                 <ul>
-                  <li>Workspace changes remain available after restarting the app.</li>
-                  <li>Commands and installed tools follow the Windows environment.</li>
-                  <li>The public installer is tied to native Windows proof.</li>
+                  <li>Investigators inherit the chat's model, provider, billing route, and service tier by default.</li>
+                  <li>The advanced Helper model control can choose any runnable StatsKey or configured My key route.</li>
+                  <li>Ask and Plan can use read-only helpers while action review stays limited to action modes.</li>
+                  <li>Platform-aware preparation keeps Mac and Windows versions, links, and signing disclosures aligned.</li>
+                  <li>Private source provenance and launch health checks make each published build reproducible and verifiable.</li>
                 </ul>
               </div>
             </article>
@@ -627,7 +844,7 @@
       <section class="download" id="download">
         <div class="shell">
           <div class="section-heading">
-            <span class="kicker" id="release-status">Mac 0.21.10 · Windows 0.19.1 · Ubuntu 0.21.8</span>
+            <span class="kicker" id="release-status">Mac 0.21.9 · Windows 0.21.8</span>
             <h2>Start with the outcome.</h2>
             <p>Bring a project. Tell StatsKey what finished looks like. Stay in the conversation.</p>
           </div>
@@ -635,22 +852,20 @@
             <a
               class="button button--primary"
               data-target="mac-arm64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.10/StatsKey-0.21.10-mac-arm64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.9/StatsKey-0.21.9-mac-arm64.dmg"
             >Download for Apple Silicon ↓</a>
+            <a
+              class="button"
+              data-target="win-x64"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.8/StatsKey-0.21.8-win-x64.exe"
+            >Download for Windows ↓</a>
           </div>
           <div class="download__links">
             <a
               data-target="mac-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.10/StatsKey-0.21.10-mac-x64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.9/StatsKey-0.21.9-mac-x64.dmg"
             >Intel Mac</a>
-            <a
-              data-target="win-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.19.1/StatsKey-0.19.1-win-x64.exe"
-            >Windows</a>
-            <a
-              data-target="linux-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.8/StatsKey-0.21.8-linux-x64.deb"
-            >Ubuntu 26.04</a>
+            <a href="#capabilities">Capabilities</a>
             <a href="#updates">What’s new</a>
             <a href="/privacy">Privacy</a>
           </div>
@@ -658,10 +873,6 @@
             On Mac, open the DMG and drag StatsKey to Applications. The app and disk image
             are signed and notarized by Apple. On Windows, SmartScreen may require
             <strong>More info → Run anyway</strong> while the Windows preview is unsigned.
-            On Ubuntu 26.04, install the x64 DEB with App Center or
-            <code>sudo apt install ./StatsKey-0.21.8-linux-x64.deb</code>. The Ubuntu
-            preview is unsigned, automatic updates and unattended Fleet jobs are disabled,
-            and protected credentials require GNOME Keyring or KWallet.
           </div>
         </div>
       </section>
@@ -671,40 +882,32 @@
       <div class="shell footer__inner">
         <span>© 2026 StatsKey</span>
         <div class="footer__links">
-          <a href="/">Home</a><a href="/privacy">Privacy</a><a href="/support">Support</a>
+          <a href="/">Home</a><a href="#capabilities">Capabilities</a><a href="/privacy">Privacy</a><a href="/support">Support</a>
         </div>
       </div>
     </footer>
 
     <script>
-      const macVersion = "0.21.10";
-      const windowsVersion = "0.19.1";
-      const linuxVersion = "0.21.8";
+      const macVersion = "0.21.9";
+      const windowsVersion = "0.21.8";
       const releaseRoot = (version) =>
         `https://storage.googleapis.com/statskey-workbench-downloads/releases/${version}`;
       const targets = {
         "mac-arm64": { version: macVersion, file: `StatsKey-${macVersion}-mac-arm64.dmg`, label: "Download for Apple Silicon" },
         "mac-x64": { version: macVersion, file: `StatsKey-${macVersion}-mac-x64.dmg`, label: "Download for Intel Mac" },
         "win-x64": { version: windowsVersion, file: `StatsKey-${windowsVersion}-win-x64.exe`, label: "Download for Windows" },
-        "linux-x64": { version: linuxVersion, file: `StatsKey-${linuxVersion}-linux-x64.deb`, label: "Download for Ubuntu 26.04" },
       };
 
       const userAgent = navigator.userAgent.toLowerCase();
-      const preferredTarget = userAgent.includes("windows")
-        ? "win-x64"
-        : userAgent.includes("linux") && !userAgent.includes("android")
-          ? "linux-x64"
-          : "mac-arm64";
+      const preferredTarget = userAgent.includes("windows") ? "win-x64" : "mac-arm64";
       const preferred = targets[preferredTarget];
 
-      for (const id of ["primary-download", "nav-download"]) {
-        const link = document.getElementById(id);
-        if (!link) continue;
-        link.href = `${releaseRoot(preferred.version)}/${preferred.file}`;
-        link.textContent = id === "nav-download" ? "Download" : `${preferred.label} ↓`;
+      const navDownload = document.getElementById("nav-download");
+      if (navDownload) {
+        navDownload.href = `${releaseRoot(preferred.version)}/${preferred.file}`;
       }
 
-      for (const version of new Set([macVersion, windowsVersion, linuxVersion])) {
+      for (const version of new Set([macVersion, windowsVersion])) {
         fetch(`${releaseRoot(version)}/release-manifest.json`, { cache: "no-store" })
           .then((response) => {
             if (!response.ok) throw new Error("Release manifest unavailable");
@@ -733,7 +936,7 @@
           const list = document.getElementById('release-list');
           if (!list) return;
           list.replaceChildren();
-          for (const release of history.releases.slice(0, 8)) {
+          for (const release of history.releases) {
             if (!release || typeof release.version !== 'string') continue;
             const article = document.createElement('article');
             article.className = 'release-card';
@@ -764,7 +967,7 @@
             body.append(title, summary);
             if (Array.isArray(release.highlights)) {
               const highlights = document.createElement('ul');
-              for (const value of release.highlights.slice(0, 6)) {
+              for (const value of release.highlights) {
                 if (typeof value !== 'string') continue;
                 const item = document.createElement('li');
                 item.textContent = value;
@@ -774,6 +977,67 @@
             }
             article.append(meta, body);
             list.append(article);
+          }
+        })
+        .catch(() => {});
+
+      fetch('/downloads/statskey/capabilities.json', { cache: 'no-store' })
+        .then((response) => {
+          if (!response.ok) throw new Error('Capability catalog unavailable');
+          return response.json();
+        })
+        .then((catalog) => {
+          if (!Array.isArray(catalog.groups)) return;
+          const grid = document.getElementById('capability-grid');
+          if (!grid) return;
+          grid.replaceChildren();
+          catalog.groups.forEach((group, index) => {
+            if (
+              !group ||
+              typeof group.title !== 'string' ||
+              typeof group.summary !== 'string' ||
+              !Array.isArray(group.items)
+            ) return;
+            const article = document.createElement('article');
+            article.className = 'capability-card';
+            const titleRow = document.createElement('div');
+            titleRow.className = 'capability-card__title';
+            const number = document.createElement('span');
+            number.textContent = String(index + 1).padStart(2, '0');
+            const title = document.createElement('h3');
+            title.textContent = group.title;
+            titleRow.append(number, title);
+            const summary = document.createElement('p');
+            summary.textContent = group.summary;
+            const items = document.createElement('ul');
+            for (const value of group.items) {
+              if (typeof value !== 'string') continue;
+              const item = document.createElement('li');
+              item.textContent = value;
+              items.append(item);
+            }
+            article.append(titleRow, summary, items);
+            grid.append(article);
+          });
+
+          if (typeof catalog.asOfVersion === 'string') {
+            const version = document.getElementById('capability-version');
+            if (version) {
+              version.textContent = `Capability catalog · Mac ${catalog.asOfVersion}`;
+            }
+          }
+          if (typeof catalog.updated === 'string') {
+            const updated = document.getElementById('capability-updated');
+            if (updated) {
+              updated.dateTime = catalog.updated;
+              updated.textContent = new Date(
+                `${catalog.updated}T12:00:00Z`
+              ).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              });
+            }
           }
         })
         .catch(() => {});

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "asOfVersion": "0.21.8",
-  "updated": "2026-08-19",
+  "asOfVersion": "0.21.6",
+  "updated": "2026-08-16",
   "groups": [
     {
       "id": "modes",
@@ -14,17 +14,6 @@
         "Fix diagnoses a problem, makes the repair, and verifies the result.",
         "Execute completes the task, makes the needed changes, and verifies them.",
         "Advanced settings keep model, context, reasoning, and action controls available."
-      ]
-    },
-    {
-      "id": "platforms",
-      "title": "Use the desktop that fits the machine",
-      "summary": "Platform support is disclosed at the level that has actually been verified.",
-      "items": [
-        "macOS releases are signed and Apple notarized.",
-        "The Windows installer remains an explicitly unsigned preview.",
-        "The Ubuntu 26.04 LTS x64 DEB remains an explicitly unsigned preview.",
-        "Ubuntu supports the desktop workspace, local tools, and Fleet control; automatic updates and unattended Fleet jobs remain disabled until their Linux trust services are verified."
       ]
     },
     {
@@ -131,8 +120,7 @@
         "Keep file writes and commands contained to the approved workspace with symlink and external-file protection.",
         "Require explicit approval for deletion, external actions, commits, MCP calls, and configured hooks.",
         "Block password fields, unsafe destinations, popups, downloads, and hidden permissions in controlled browsing.",
-        "Receive signed, notarized macOS updates through immutable architecture-specific feeds.",
-        "Keep unsigned Windows and Ubuntu previews explicit; neither is described as a signed release."
+        "Receive signed, notarized macOS updates through immutable architecture-specific feeds."
       ]
     }
   ]
