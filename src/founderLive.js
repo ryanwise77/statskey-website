@@ -25,14 +25,16 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID ?? '1:1081412767986:web:15dbdf5870c78be674c06b',
 }
 
-const PUBLIC_HISTORY_START_DAY = '2025-09-01'
-const PUBLIC_HISTORY_START_MONTH = '2025-09'
-const PUBLIC_HISTORY_START_LABEL = 'September 2025'
+const PUBLIC_HISTORY_START_DAY = '2025-08-25'
+const PUBLIC_HISTORY_START_MONTH = '2025-08'
+const PUBLIC_HISTORY_START_LABEL = 'late August 2025'
+const FOUNDER_JOURNEY_START_DAY = '2025-09-01'
 const FOUNDER_JOURNEY_TIME_ZONE = 'America/Chicago'
-const NUTRITION_RANGE_DAYS = [7, 14, 30, 90]
-const WORKOUT_PAGE_SIZE = 60
+const NUTRITION_RANGE_DAYS = [7, 14, 30, 90, 'all']
+const FOUNDER_HISTORY_INDEX_PATH = '/statskey-app/founder-history/index.json'
+const WORKOUT_PAGE_SIZE = 20
 const WORKOUT_VISIBLE_STEP = 12
-const MEAL_PAGE_SIZE = 50
+const MEAL_PAGE_SIZE = 20
 const RANGE_KEYS = {
   week: 'last7Days',
   month: 'last30Days',
@@ -171,6 +173,7 @@ const state = {
   allWorkouts: null,
   workoutCursor: null,
   workoutsLoading: false,
+  staticWorkoutAttempted: false,
   workoutHistoryExhausted: false,
   visibleWorkoutCount: WORKOUT_VISIBLE_STEP,
   workoutsError: null,
@@ -186,7 +189,7 @@ const state = {
   fitnessMetric: 'distance',
   fitnessChartStyle: 'bars',
   fitnessMenu: null,
-  nutritionRangeDays: 30,
+  nutritionRangeDays: 'all',
   includeToday: false,
   runningView: 'home',
   selectedWorkout: null,
@@ -202,6 +205,12 @@ const state = {
   mealsReturnView: 'home',
   sourceReturnView: 'detail',
   mealsReturnScrollTop: 0,
+  historyManifest: null,
+  historyLoading: true,
+  historyError: null,
+  historyMonth: null,
+  historyWeekStart: null,
+  historyMealsByMonth: new Map(),
   route: null,
   routeLoading: false,
   connected: false,
@@ -244,6 +253,7 @@ const timestampDate = (value) => {
   if (!value) return null
   if (typeof value.toDate === 'function') return value.toDate()
   if (typeof value.seconds === 'number') return new Date(value.seconds * 1000)
+  if (typeof value._seconds === 'number') return new Date(value._seconds * 1000)
   const parsed = new Date(value)
   return Number.isFinite(parsed.getTime()) ? parsed : null
 }
@@ -281,19 +291,19 @@ const zonedDay = (date = new Date(), timeZone = FOUNDER_JOURNEY_TIME_ZONE) => {
 
 const founderJourneyWeek = (now = new Date()) => {
   const timeZone = state.root?.timeZone || FOUNDER_JOURNEY_TIME_ZONE
-  const start = dayDate(PUBLIC_HISTORY_START_DAY)
+  const start = dayDate(FOUNDER_JOURNEY_START_DAY)
   const today = dayDate(zonedDay(now, timeZone))
   const elapsedWeeks = Math.max(
     0,
     Math.floor((today.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000))
   )
   const weekNumber = elapsedWeeks + 1
-  const weekStartDay = shiftDay(PUBLIC_HISTORY_START_DAY, elapsedWeeks * 7)
+  const weekStartDay = shiftDay(FOUNDER_JOURNEY_START_DAY, elapsedWeeks * 7)
   const weekId = `week-${String(weekNumber).padStart(4, '0')}`
   const published = state.journey
   const currentPublished = published?.weekId === weekId ? published : null
   return {
-    startDay: PUBLIC_HISTORY_START_DAY,
+    startDay: FOUNDER_JOURNEY_START_DAY,
     weekId,
     weekNumber,
     weekStartDay,
@@ -485,6 +495,117 @@ function journeyReference() {
   return doc(database, 'publicFounderReplicas', 'founder', 'journey', 'current')
 }
 
+function historyMonthDefinition(month = state.historyMonth) {
+  return state.historyManifest?.months?.find((entry) => entry.month === month) || null
+}
+
+function historyWeekDefinition(weekStart = state.historyWeekStart) {
+  return state.historyManifest?.weeks?.find((entry) => entry.weekStart === weekStart) || null
+}
+
+function mealPool() {
+  return mergeRecords([
+    ...state.meals,
+    ...Array.from(state.historyMealsByMonth.values()).flat(),
+  ], [], 'mealId')
+}
+
+function archiveMealsForView() {
+  if (!state.historyManifest) return state.meals
+  const week = historyWeekDefinition()
+  const month = historyMonthDefinition()
+  const meals = mealPool()
+  if (week) {
+    return meals.filter((meal) => (
+      meal.day >= week.weekStart && meal.day <= week.weekEnd
+    ))
+  }
+  if (month) {
+    return meals.filter((meal) => meal.day?.slice(0, 7) === month.month)
+  }
+  return meals
+}
+
+async function loadHistoryMonths(months) {
+  const definitions = (months || [])
+    .map((month) => historyMonthDefinition(month))
+    .filter(Boolean)
+    .filter((month) => !state.historyMealsByMonth.has(month.month))
+  if (!definitions.length) return
+  state.historyLoading = true
+  state.historyError = null
+  renderMeals()
+  try {
+    const payloads = await Promise.all(definitions.map(async (month) => {
+      const response = await fetch(month.path)
+      if (!response.ok) {
+        throw new Error(`History month ${month.month} returned ${response.status}`)
+      }
+      return [month.month, await response.json()]
+    }))
+    for (const [month, payload] of payloads) {
+      const meals = Array.isArray(payload?.meals) ? payload.meals : []
+      state.historyMealsByMonth.set(month, meals)
+      state.meals = mergeRecords(state.meals, meals, 'mealId')
+    }
+    state.mealHistoryExhausted = true
+  } catch (error) {
+    console.warn('Founder static meal archive unavailable', error)
+    state.historyError = 'That published archive segment is temporarily unavailable.'
+  } finally {
+    state.historyLoading = false
+    renderMeals()
+    renderPerformanceSummary()
+  }
+}
+
+async function selectHistoryMonth(month) {
+  if (!historyMonthDefinition(month)) return
+  state.historyMonth = month
+  state.historyWeekStart = null
+  elements.mealsScreen.scrollTop = 0
+  await loadHistoryMonths([month])
+  renderMeals()
+}
+
+async function selectHistoryWeek(weekStart) {
+  if (!weekStart) {
+    state.historyWeekStart = null
+    renderMeals()
+    return
+  }
+  const week = historyWeekDefinition(weekStart)
+  if (!week) return
+  state.historyWeekStart = weekStart
+  elements.mealsScreen.scrollTop = 0
+  await loadHistoryMonths(week.months)
+  renderMeals()
+}
+
+async function loadFounderHistory() {
+  if (state.historyManifest) return
+  state.historyLoading = true
+  state.historyError = null
+  try {
+    const response = await fetch(FOUNDER_HISTORY_INDEX_PATH)
+    if (!response.ok) {
+      throw new Error(`Founder history index returned ${response.status}`)
+    }
+    state.historyManifest = await response.json()
+    state.historyMonth = state.historyManifest?.months?.[0]?.month || null
+    state.mealHistoryExhausted = true
+    if (state.historyMonth) await loadHistoryMonths([state.historyMonth])
+  } catch (error) {
+    console.warn('Founder history index unavailable', error)
+    state.historyError = 'The complete published archive is temporarily unavailable.'
+  } finally {
+    state.historyLoading = false
+    renderNutrition()
+    renderMeals()
+    renderPerformanceSummary()
+  }
+}
+
 function setConnectionState(source, message) {
   state.source = source
   elements.stage.classList.toggle('is-fallback', source === 'snapshot')
@@ -506,9 +627,13 @@ async function loadFallback(reason = 'Published snapshot') {
     const payload = await response.json()
     state.root = payload.root ?? payload
     state.workouts = Array.isArray(payload.workouts) ? payload.workouts : []
-    state.meals = Array.isArray(payload.meals) ? payload.meals : []
+    state.meals = mergeRecords(
+      state.meals,
+      Array.isArray(payload.meals) ? payload.meals : [],
+      'mealId'
+    )
     state.workoutHistoryExhausted = true
-    state.mealHistoryExhausted = true
+    state.mealHistoryExhausted = Boolean(state.historyManifest)
     state.plan = payload.plan ?? null
     state.journey = null
     setConnectionState('snapshot', `${reason} · live connection pending`)
@@ -530,9 +655,44 @@ async function loadFallback(reason = 'Published snapshot') {
   render()
 }
 
+async function loadStaticWorkoutArchive() {
+  if (state.staticWorkoutAttempted || state.workoutsLoading) return
+  state.staticWorkoutAttempted = true
+  state.workoutsLoading = true
+  state.workoutsError = null
+  let fallbackToLive = false
+  renderRunning()
+  try {
+    const response = await fetch(elements.stage.dataset.source)
+    if (!response.ok) throw new Error(`Workout archive returned ${response.status}`)
+    const payload = await response.json()
+    const archived = Array.isArray(payload.workouts) ? payload.workouts : []
+    state.allWorkouts = mergeRecords(
+      archived,
+      state.allWorkouts ?? state.workouts,
+      'workoutId'
+    )
+    state.workoutHistoryExhausted = true
+    state.visibleWorkoutCount = Math.min(
+      state.allWorkouts.length,
+      state.visibleWorkoutCount + WORKOUT_VISIBLE_STEP
+    )
+  } catch (error) {
+    console.warn('Founder static workout archive unavailable', error)
+    state.workoutsError = 'The published activity archive is unavailable; loading the live record instead.'
+    state.staticWorkoutAttempted = false
+    fallbackToLive = true
+  } finally {
+    state.workoutsLoading = false
+    renderRunning()
+    if (fallbackToLive) void loadMoreWorkouts()
+  }
+}
+
 function connectLiveRecord() {
   if (state.connected) return
   state.connected = true
+  void loadFounderHistory()
   try {
     database = initializeFirebase()
   } catch (error) {
@@ -1136,7 +1296,7 @@ function longitudinalTrainingVisualizations() {
           <span><small>LONGITUDINAL LOAD</small><strong>${cumulativeMiles.toFixed(1)} miles</strong></span>
           <em>${months.length} months · ${integer(history.runningActivities)} runs</em>
         </header>
-        <svg class="founder-history-chart" viewBox="0 0 960 250" preserveAspectRatio="none" role="img" aria-label="${cumulativeMiles.toFixed(1)} cumulative running miles since September 2025">
+        <svg class="founder-history-chart" viewBox="0 0 960 250" preserveAspectRatio="none" role="img" aria-label="${cumulativeMiles.toFixed(1)} cumulative running miles in the complete archive from late August 2025">
           <defs>
             <linearGradient id="founder-cumulative-fill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#39a7ff" stop-opacity=".42"></stop>
@@ -1565,9 +1725,18 @@ function workoutDetail() {
 }
 
 function nutritionSnapshot() {
+  if (state.nutritionRangeDays === 'all') {
+    return state.historyManifest?.nutritionProfile || null
+  }
   const mode = state.includeToday ? 'includingToday' : 'complete'
   return state.root?.nutrition?.ranges?.[mode]?.[String(state.nutritionRangeDays)] ??
     (state.nutritionRangeDays === 7 ? state.root?.nutrition : null)
+}
+
+function nutritionRangeLabel() {
+  return state.nutritionRangeDays === 'all'
+    ? 'FULL-HISTORY'
+    : `${state.nutritionRangeDays}-DAY`
 }
 
 function nutritionCategory(item) {
@@ -1642,10 +1811,112 @@ function nutritionRows(items) {
   }).join('')
 }
 
+function historicalNutrientAtlas(nutrients) {
+  const months = [...(state.historyManifest?.months || [])].reverse()
+  if (!months.length || !nutrients?.length) return ''
+  return `
+    <section class="nutrition-history-atlas">
+      <header>
+        <div><small>LONGITUDINAL MICRONUTRIENT ATLAS</small><h4>Every nutrient, month by month</h4><p>Color shows reference context when one exists. Gray marks sparse coverage; missing fields remain unknown rather than becoming zero.</p></div>
+        <span>${integer(nutrients.length)} nutrients · ${integer(months.length)} months</span>
+      </header>
+      <div class="nutrition-history-atlas__scroll">
+        <div class="nutrition-history-atlas__grid" style="--history-months:${months.length}">
+          <div class="nutrition-history-atlas__corner">Nutrient</div>
+          ${months.map((month) => `<div class="nutrition-history-atlas__month"><strong>${escapeHTML(month.label.split(' ')[0].slice(0, 3))}</strong><small>${escapeHTML(month.month.slice(2, 4))}</small></div>`).join('')}
+          ${nutrients.map((nutrient) => {
+            const monthly = new Map((nutrient.monthly || []).map((month) => [month.month, month]))
+            return `
+              <button class="nutrition-history-atlas__label" type="button" data-nutrient-key="${escapeHTML(nutrient.key)}">
+                <strong>${escapeHTML(nutrient.label)}</strong>
+                <small>${formatNutrientValue(nutrient.average, nutrient.unit)} · ${number(nutrient.coveragePercent).toFixed(0)}% coverage</small>
+              </button>
+              ${months.map((month) => {
+                const value = monthly.get(month.month)
+                const coverage = value?.recordedDays
+                  ? value.coverageDays / value.recordedDays
+                  : 0
+                const intensity = value?.percent == null
+                  ? coverage
+                  : Math.min(1, Math.max(0.08, value.percent / 100))
+                const opacity = 0.1 + intensity * 0.72
+                const title = value?.average == null
+                  ? `${month.label}: not recorded`
+                  : `${month.label}: ${formatNutrientValue(value.average, nutrient.unit)} average on ${value.coverageDays} covered days`
+                return `<button class="nutrition-history-atlas__cell is-${escapeHTML(value?.status || 'limited')}" type="button" data-nutrient-key="${escapeHTML(nutrient.key)}" style="--history-opacity:${opacity.toFixed(3)}" title="${escapeHTML(title)}"><span>${value?.average == null ? '—' : value.coverageDays}</span></button>`
+              }).join('')}
+            `
+          }).join('')}
+        </div>
+      </div>
+      <footer><span><i class="is-strong"></i>At reference</span><span><i class="is-near"></i>Near reference</span><span><i class="is-watch"></i>Review</span><span><i class="is-recorded"></i>Recorded</span><span><i class="is-limited"></i>Limited coverage</span></footer>
+    </section>
+  `
+}
+
+function historicalNutrientDetail(item) {
+  const months = item?.monthly || []
+  const available = months.filter((month) => month.average != null)
+  const maximum = Math.max(1, ...available.map((month) => number(month.average)))
+  const profile = state.historyManifest?.nutritionProfile || {}
+  return `
+    <button class="ios-inline-back" type="button" data-nutrition-back>${uiIcon('chevron', 'ios-symbol--back')} Historical profile</button>
+    <section class="historical-nutrient-hero">
+      <div>
+        <small>${escapeHTML(item.category || nutritionCategory(item))}</small>
+        <h3>${escapeHTML(item.label)}</h3>
+        <p>Average on days where this nutrient was recorded. Unreported foods and days remain unknown, not zero.</p>
+      </div>
+      <span><strong>${formatNutrientValue(item.average, item.unit)}</strong><small>per covered day</small></span>
+    </section>
+    <section class="historical-nutrient-stats">
+      <article><small>Coverage</small><strong>${integer(item.coverageDays)} days</strong><span>${number(item.coveragePercent).toFixed(1)}% of recorded days</span></article>
+      <article><small>Historical total</small><strong>${formatNutrientValue(item.total, item.unit)}</strong><span>${integer(profile.mealCount)} public food records</span></article>
+      <article><small>Reference context</small><strong>${item.reference > 0 ? `${integer(item.percent)}%` : 'No reference'}</strong><span>${escapeHTML(nutrientStatusLabel(item.status))}</span></article>
+      <article><small>Measurement window</small><strong>${escapeHTML(dateLabel(profile.startDay, { short: true }))}</strong><span>through ${escapeHTML(dateLabel(profile.endDay, { short: true }))}</span></article>
+    </section>
+    <section class="historical-nutrient-trend">
+      <header><div><small>MONTHLY PROFILE</small><h4>Recorded-day average and coverage</h4></div><span>${integer(available.length)} months with data</span></header>
+      <div class="historical-nutrient-trend__plot" style="--history-columns:${Math.max(1, months.length)}">
+        ${months.map((month) => {
+          const height = month.average == null ? 0 : number(month.average) / maximum * 100
+          const coverage = month.recordedDays
+            ? month.coverageDays / month.recordedDays * 100
+            : 0
+          return `
+            <article class="is-${escapeHTML(month.status || 'limited')}">
+              <div><i style="height:${Math.max(month.average == null ? 0 : 3, height).toFixed(2)}%"></i></div>
+              <strong>${month.average == null ? '—' : formatNutrientValue(month.average, item.unit)}</strong>
+              <small>${escapeHTML(month.month)}</small>
+              <span>${integer(coverage)}% covered</span>
+            </article>
+          `
+        }).join('')}
+      </div>
+    </section>
+    <section class="historical-nutrient-foods">
+      <header><div><small>CONTRIBUTION LEDGER</small><h4>Leading recorded food sources</h4></div><span>Across the full archive</span></header>
+      <div>
+        ${(item.topFoods || []).map((food, index) => `
+          <article>
+            <b>${String(index + 1).padStart(2, '0')}</b>
+            <span><strong>${escapeHTML(food.name)}</strong><small>${escapeHTML(food.brand || `${integer(food.occurrences)} recordings`)}</small></span>
+            <span><strong>${formatNutrientValue(food.amount, item.unit)}</strong><small>${integer(food.occurrences)} occurrences</small></span>
+          </article>
+        `).join('') || '<p>No item-level contribution detail is available for this field.</p>'}
+      </div>
+    </section>
+    <p class="ios-disclaimer">${escapeHTML(profile.disclaimer || '')}</p>
+  `
+}
+
 function nutrientDetail(item) {
   if (!item) {
     state.selectedNutrient = null
     return nutritionHome()
+  }
+  if (state.nutritionRangeDays === 'all') {
+    return historicalNutrientDetail(item)
   }
   const snapshot = nutritionSnapshot()
   const meals = state.meals.filter((meal) => (
@@ -1755,7 +2026,7 @@ function nutrientStatusVisualization(nutrients) {
         <span><strong>${nutrients.length}</strong><small>nutrients</small></span>
       </div>
       <div class="founder-nutrient-spectrum__copy">
-        <small>${state.nutritionRangeDays}-DAY NUTRIENT SPECTRUM</small>
+        <small>${nutritionRangeLabel()} NUTRIENT SPECTRUM</small>
         <strong>${favorablePercent.toFixed(0)}% at or near reference</strong>
         <p>Every recorded nutrient remains visible below. Status reflects the selected food-record window, not a diagnosis.</p>
         <div class="founder-nutrient-legend">
@@ -1772,33 +2043,50 @@ function nutrientStatusVisualization(nutrients) {
 
 function nutritionHome() {
   const nutrition = nutritionSnapshot()
+  if (!nutrition && state.nutritionRangeDays === 'all') {
+    return `
+      <section class="founder-history-loading">
+        <i></i>
+        <div><small>FULL-HISTORY NUTRITION</small><strong>${state.historyLoading ? 'Loading the micronutrient archive…' : 'Historical archive unavailable'}</strong><p>${escapeHTML(state.historyError || 'Preparing every reliable recorded day without querying the database for each visit.')}</p></div>
+      </section>
+    `
+  }
   const average = nutrition?.dailyAverage ?? {}
   const micronutrients = nutrition?.nutrients ?? nutrition?.micronutrients ?? []
   const strong = micronutrients.filter((item) => ['strong', 'within'].includes(item.status)).length
   const watch = micronutrients.filter((item) => item.status === 'watch').length
+  const historical = state.nutritionRangeDays === 'all'
+  const manifest = state.historyManifest
   return `
     <div class="founder-record-heading">
       <span>
-        <small>FOOD-ONLY INTAKE</small>
-        <h3>${state.nutritionRangeDays}-day nutrition intelligence</h3>
-        <p>${integer(nutrition?.recordedDays)} of ${integer(nutrition?.possibleDays)} days contain food recordings.</p>
+        <small>${historical ? 'COMPLETE FOOD-ONLY HISTORY' : 'FOOD-ONLY INTAKE'}</small>
+        <h3>${historical ? 'Historical micronutrient profile' : `${state.nutritionRangeDays}-day nutrition intelligence`}</h3>
+        <p>${integer(nutrition?.recordedDays)} of ${integer(nutrition?.possibleDays)} days contain public food recordings${historical ? ` · ${integer(nutrition?.mealCount)} individual records` : ''}.</p>
       </span>
       <time>${escapeHTML(nutrition?.startDay || '')} — ${escapeHTML(nutrition?.endDay || '')}</time>
     </div>
     <div class="founder-nutrition-controls">
       <div class="ios-range-pills ios-range-pills--nutrition" role="group" aria-label="Nutrition range">
         ${NUTRITION_RANGE_DAYS.map((days) => `
-          <button class="${state.nutritionRangeDays === days ? 'is-active' : ''}" type="button" data-nutrition-range="${days}" aria-pressed="${state.nutritionRangeDays === days}">${days}D</button>
+          <button class="${String(state.nutritionRangeDays) === String(days) ? 'is-active' : ''}" type="button" data-nutrition-range="${days}" aria-pressed="${String(state.nutritionRangeDays) === String(days)}">${days === 'all' ? 'ALL HISTORY' : `${days}D`}</button>
         `).join('')}
       </div>
-      <button class="ios-include-today" type="button" data-include-today aria-pressed="${state.includeToday}">
-        <span><strong>Include today</strong><small>${state.includeToday ? 'Partial day included' : 'Complete days only'}</small></span>
-        <i class="${state.includeToday ? 'is-on' : ''}" aria-hidden="true"></i>
-      </button>
+      ${historical ? `
+        <div class="nutrition-history-freshness">
+          <span><strong>Published archive</strong><small>Verified through ${escapeHTML(dateLabel(manifest?.reliableThroughDay, { short: true }))}</small></span>
+          ${uiIcon('seal')}
+        </div>
+      ` : `
+        <button class="ios-include-today" type="button" data-include-today aria-pressed="${state.includeToday}">
+          <span><strong>Include today</strong><small>${state.includeToday ? 'Partial day included' : 'Complete days only'}</small></span>
+          <i class="${state.includeToday ? 'is-on' : ''}" aria-hidden="true"></i>
+        </button>
+      `}
     </div>
     ${nutrientStatusVisualization(micronutrients)}
     <section class="founder-nutrition-averages">
-      <header><span><small>DAILY AVERAGE</small><strong>Recorded food</strong></span><em>${strong} at reference · ${watch} review</em></header>
+      <header><span><small>DAILY AVERAGE</small><strong>${historical ? 'Days with recorded food' : 'Recorded food'}</strong></span><em>${strong} at reference · ${watch} review</em></header>
       <div>
         <span><small>Energy</small><strong>${integer(average.calories)}</strong><em>cal</em></span>
         <span><small>Carbohydrate</small><strong>${integer(average.carbohydrateGrams)}</strong><em>g</em></span>
@@ -1806,6 +2094,7 @@ function nutritionHome() {
         <span><small>Fiber</small><strong>${number(average.fiberGrams).toFixed(1)}</strong><em>g</em></span>
       </div>
     </section>
+    ${historical ? historicalNutrientAtlas(micronutrients) : ''}
     <div class="founder-history-heading">
       <span><small>COMPLETE EXPLORER</small><strong>Every recorded nutrient</strong><p>Open any row to inspect its values and contributing food sources.</p></span>
       <em>${micronutrients.length} nutrients</em>
@@ -2044,7 +2333,8 @@ function nutrientProvenance(meals, key, options = {}) {
 }
 
 function nutrientScopeMeals(day = null) {
-  return day ? state.meals.filter((meal) => meal.day === day) : state.meals
+  const meals = mealPool()
+  return day ? meals.filter((meal) => meal.day === day) : meals
 }
 
 function nutritionPercent(value, key) {
@@ -2512,7 +2802,7 @@ function provenanceDetailView(definition, summary, options = {}) {
 }
 
 function makeDayTotalMeal(day) {
-  const meals = state.meals.filter((meal) => meal.day === day)
+  const meals = mealPool().filter((meal) => meal.day === day)
   const values = aggregateDayRecord(meals, day)
   return {
     mealId: `day-${day}`,
@@ -2919,7 +3209,7 @@ function foodRecordMealRow(meal, featured = false) {
 }
 
 function foodArchiveDay(group, options = {}) {
-  const latestMealId = state.meals[0]?.mealId
+  const latestMealId = archiveMealsForView()[0]?.mealId
   return `
     <section class="food-archive-day">
       <header>
@@ -2942,48 +3232,93 @@ function foodArchiveDay(group, options = {}) {
   `
 }
 
+function foodHistoryNavigator() {
+  const manifest = state.historyManifest
+  const month = historyMonthDefinition()
+  if (!manifest || !month) return ''
+  const weeks = (month.weekStarts || [])
+    .map((weekStart) => historyWeekDefinition(weekStart))
+    .filter(Boolean)
+    .sort((left, right) => right.weekStart.localeCompare(left.weekStart))
+  return `
+    <section class="food-history-navigator">
+      <header>
+        <div><small>DATE-INDEXED ARCHIVE</small><h5>Jump to any month, week, or day</h5><p>The browser fetches only the selected static archive segment—never thousands of database records.</p></div>
+        <span><strong>${escapeHTML(month.label)}</strong><small>${integer(month.mealCount)} records · ${integer(month.recordedDays)} ${number(month.recordedDays) === 1 ? 'day' : 'days'}</small></span>
+      </header>
+      <div class="food-history-months" role="group" aria-label="Historical food record month">
+        ${manifest.months.map((entry) => `
+          <button class="${entry.month === month.month ? 'is-active' : ''}" type="button" data-history-month="${entry.month}" aria-pressed="${entry.month === month.month}">
+            <small>${escapeHTML(entry.label.split(' ')[0].slice(0, 3))}</small>
+            <strong>${escapeHTML(entry.month.slice(2, 4))}</strong>
+            <span>${integer(entry.mealCount)}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="food-history-weeks" role="group" aria-label="Week within selected month">
+        <button class="${state.historyWeekStart ? '' : 'is-active'}" type="button" data-history-week="" aria-pressed="${!state.historyWeekStart}">
+          <strong>All month</strong><small>${integer(month.recordedDays)} recorded ${number(month.recordedDays) === 1 ? 'day' : 'days'}</small>
+        </button>
+        ${weeks.map((week) => `
+          <button class="${state.historyWeekStart === week.weekStart ? 'is-active' : ''}" type="button" data-history-week="${week.weekStart}" aria-pressed="${state.historyWeekStart === week.weekStart}">
+            <strong>${escapeHTML(dateLabel(week.weekStart, { short: true, year: false }))}–${escapeHTML(dateLabel(week.weekEnd, { short: true, year: false }))}</strong>
+            <small>${integer(week.mealCount)} records · ${integer(week.recordedDays)} ${number(week.recordedDays) === 1 ? 'day' : 'days'}</small>
+          </button>
+        `).join('')}
+      </div>
+    </section>
+  `
+}
+
 function foodRecordHome() {
-  const groups = foodArchiveGroups()
-  const metadata = state.root?.mealRecord || {}
+  const viewMeals = archiveMealsForView()
+  const groups = foodArchiveGroups(viewMeals)
+  const metadata = state.historyManifest || state.root?.mealRecord || {}
   const latest = groups[0]
-  const loadedItems = state.meals.reduce((sum, meal) => sum + number(meal.itemCount || meal.items?.length), 0)
-  const uniqueNutrients = new Set(state.meals.flatMap((meal) => (
+  const loadedItems = viewMeals.reduce((sum, meal) => sum + number(meal.itemCount || meal.items?.length), 0)
+  const uniqueNutrients = state.historyManifest?.nutrientCount || new Set(viewMeals.flatMap((meal) => (
     (meal.nutrients || []).map((nutrient) => nutrient.key)
   ))).size
   if (!latest) {
-    return '<section class="food-record-empty"><strong>No public food records are available.</strong><p>New published records will appear here automatically.</p></section>'
+    return `
+      ${foodHistoryNavigator()}
+      <section class="food-record-empty">
+        <strong>${state.historyLoading ? 'Loading this archive segment…' : 'No public food records are available in this scope.'}</strong>
+        <p>${escapeHTML(state.historyError || 'Choose another month or week to continue through the historical record.')}</p>
+      </section>
+    `
   }
+  const scope = historyWeekDefinition()
+  const scopeLabel = scope
+    ? `${dateLabel(scope.weekStart, { short: true })}–${dateLabel(scope.weekEnd, { short: true })}`
+    : historyMonthDefinition()?.label || 'Loaded archive'
   return `
     <section class="food-record-overview">
       <header>
-        <div><small>PUBLIC FOOD DATASET</small><h5>A complete nutritional record, presented for the web</h5><p>Every published meal remains individually inspectable without reproducing the StatsKey app interface.</p></div>
-        <span>Live through ${escapeHTML(dateLabel(
-          !metadata.latestDay || latest.day > metadata.latestDay ? latest.day : metadata.latestDay,
-          { short: true }
-        ))}</span>
+        <div><small>PUBLIC FOOD DATASET</small><h5>The complete reliable food record</h5><p>Every published meal remains individually inspectable, grouped into exact calendar days and Monday-through-Sunday weeks.</p></div>
+        <span>Verified through ${escapeHTML(dateLabel(metadata.reliableThroughDay || metadata.latestDay || latest.day, { short: true }))}</span>
       </header>
       <div>
-        <article><small>Historical records</small><strong>${integer(metadata.mealCount || state.meals.length)}</strong><span>since ${escapeHTML(dateLabel(metadata.startDay || PUBLIC_HISTORY_START_DAY, { short: true }))}</span></article>
-        <article><small>Recorded days</small><strong>${integer(metadata.recordedDays || groups.length)}</strong><span>full archive loads on scroll</span></article>
-        <article><small>Records loaded now</small><strong>${integer(state.meals.length)}</strong><span>${integer(loadedItems)} individual food items</span></article>
-        <article><small>Nutrient fields</small><strong>${integer(uniqueNutrients)}</strong><span>preserved in the loaded window</span></article>
+        <article><small>Historical records</small><strong>${integer(metadata.mealCount || viewMeals.length)}</strong><span>since ${escapeHTML(dateLabel(metadata.earliestDay || metadata.startDay || PUBLIC_HISTORY_START_DAY, { short: true }))}</span></article>
+        <article><small>Recorded days</small><strong>${integer(metadata.recordedDays || groups.length)}</strong><span>${integer(metadata.possibleDays || metadata.recordedDays || groups.length)} calendar days covered</span></article>
+        <article><small>Selected scope</small><strong>${integer(viewMeals.length)}</strong><span>${escapeHTML(scopeLabel)} · ${integer(loadedItems)} food items</span></article>
+        <article><small>Nutrient fields</small><strong>${integer(uniqueNutrients)}</strong><span>unknown values stay explicitly unknown</span></article>
       </div>
     </section>
+    ${foodHistoryNavigator()}
     ${foodIntakeTrend(groups)}
     ${foodMetricBars(latest.totals, {
-      eyebrow: latest.day === todayDay() ? 'TODAY SO FAR' : 'LATEST COMPLETE DAY',
+      eyebrow: latest.day === todayDay() ? 'TODAY SO FAR' : 'LATEST DAY IN SCOPE',
       title: dateLabel(latest.day, { weekday: true, short: true }),
     })}
     <section class="food-archive">
-      <header><div><small>RECORD-LEVEL ARCHIVE</small><h5>Every meal and every food</h5></div><span>${integer(state.meals.length)} records loaded</span></header>
+      <header><div><small>RECORD-LEVEL ARCHIVE</small><h5>Every meal and every food</h5></div><span>${integer(viewMeals.length)} records in ${escapeHTML(scopeLabel)}</span></header>
       ${groups.map((group) => foodArchiveDay(group)).join('')}
     </section>
-    <div class="food-history-loader ${state.mealHistoryExhausted ? 'is-complete' : ''}" data-meal-history aria-live="polite">
-      ${state.mealHistoryLoading ? '<i></i><span>Loading older records…</span>' : state.mealHistoryExhausted
-        ? `<span>Full public food record loaded · ${integer(state.meals.length)} records</span>`
-        : '<i></i><span>Continue scrolling to load the full historical record</span>'}
+    <div class="food-history-loader is-complete" aria-live="polite">
+      <span>${state.historyLoading ? 'Loading archive segment…' : `Complete selected scope · ${integer(viewMeals.length)} records`}</span>
     </div>
-    ${state.mealHistoryError ? `<p class="food-record-error">${escapeHTML(state.mealHistoryError)}</p>` : ''}
+    ${state.historyError || state.mealHistoryError ? `<p class="food-record-error">${escapeHTML(state.historyError || state.mealHistoryError)}</p>` : ''}
     <p class="food-record-disclaimer">Public food data only. Private notes, photos, medications, supplements, hidden items, and private Intelligence output are never requested by this page.</p>
   `
 }
@@ -3111,7 +3446,7 @@ function foodRecordDetail() {
 }
 
 function foodDayReport(day) {
-  const dayMeals = state.meals.filter((meal) => meal.day === day)
+  const dayMeals = mealPool().filter((meal) => meal.day === day)
   const totals = aggregateDayRecord(dayMeals, day)
   const categories = ['All', ...foodCategoryOrder(totals.nutrientList)]
   if (!categories.includes(state.dayNutrientCategory)) state.dayNutrientCategory = 'All'
@@ -3338,12 +3673,12 @@ function renderPerformanceSummary() {
   const latestMeal = state.meals[0]
   elements.summary.innerHTML = `
     <article>
-      <small>RUNNING SINCE SEP ’25</small>
+      <small>RUNNING ARCHIVE · AUG ’25+</small>
       <strong>${number(history.runningMiles).toFixed(1)} <i>mi</i></strong>
       <span>${integer(history.runningActivities)} runs in the public record</span>
     </article>
     <article>
-      <small>AVG. SINCE SEP 1</small>
+      <small>AVG. SINCE AUG 25</small>
       <strong>${historyRate.average.toFixed(1)} <i>mi/wk</i></strong>
       <span>${historyRate.miles.toFixed(1)} mi ÷ ${historyRate.elapsedWeeks.toFixed(1)} weeks · through ${escapeHTML(dateLabel(historyRate.endDay, { short: true, year: false }))}</span>
     </article>
@@ -3512,12 +3847,13 @@ function revealMoreWorkouts() {
     state.visibleWorkoutCount >= workouts.length - 3 &&
     !state.workoutHistoryExhausted
   ) {
-    void loadMoreWorkouts()
+    void loadStaticWorkoutArchive()
   }
 }
 
 async function loadMoreMeals() {
   if (
+    state.historyManifest ||
     state.mealHistoryLoading ||
     state.mealHistoryExhausted ||
     !state.mealCursor ||
@@ -3553,7 +3889,7 @@ async function loadMoreMeals() {
 }
 
 function openMeal(mealId, itemIndex = null, returnView = 'home') {
-  const meal = state.meals.find((item) => item.mealId === mealId)
+  const meal = mealPool().find((item) => item.mealId === mealId)
   if (!meal) return
   state.selectedMeal = meal
   state.selectedMealItemIndex = Number.isInteger(itemIndex) ? itemIndex : null
@@ -3615,7 +3951,9 @@ function handleRunningScroll() {
 function handleNutritionClick(event) {
   const rangeButton = event.target.closest('[data-nutrition-range]')
   if (rangeButton) {
-    state.nutritionRangeDays = Number(rangeButton.dataset.nutritionRange)
+    state.nutritionRangeDays = rangeButton.dataset.nutritionRange === 'all'
+      ? 'all'
+      : Number(rangeButton.dataset.nutritionRange)
     state.selectedNutrient = null
     renderNutrition()
     return
@@ -3641,6 +3979,16 @@ function handleNutritionClick(event) {
 }
 
 function handleMealsClick(event) {
+  const historyMonth = event.target.closest('[data-history-month]')
+  if (historyMonth) {
+    void selectHistoryMonth(historyMonth.dataset.historyMonth)
+    return
+  }
+  const historyWeek = event.target.closest('[data-history-week]')
+  if (historyWeek) {
+    void selectHistoryWeek(historyWeek.dataset.historyWeek || null)
+    return
+  }
   const expand = event.target.closest('[data-meal-expand]')
   if (expand) {
     state.expandedMealId = state.expandedMealId === expand.dataset.mealExpand
@@ -3750,7 +4098,7 @@ function handleMealsClick(event) {
 }
 
 function handleMealsScroll() {
-  if (state.mealsView !== 'home') return
+  if (state.mealsView !== 'home' || state.historyManifest) return
   const remaining = elements.mealsScreen.scrollHeight -
     elements.mealsScreen.scrollTop -
     elements.mealsScreen.clientHeight
@@ -3779,6 +4127,7 @@ function handleFounderPageScroll() {
     const mealBounds = mealLoader?.getBoundingClientRect()
     if (
       state.mealsView === 'home' &&
+      !state.historyManifest &&
       mealLoader &&
       mealBounds.top < threshold &&
       mealBounds.bottom > 160

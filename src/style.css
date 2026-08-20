@@ -12991,3 +12991,762 @@ body.marketing-light .site-brand__mark {
     margin-top: 2px;
   }
 }
+
+/* Full founder nutrition and date-indexed food archive */
+.founder-history-loading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 150px;
+  border: 1px solid rgba(24, 111, 143, 0.13);
+  border-radius: 22px;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 0 0, rgba(47, 174, 154, 0.12), transparent 38%),
+    #f8fbfc;
+}
+
+.founder-history-loading > i {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(26, 139, 126, 0.16);
+  border-top-color: #168d7d;
+  border-radius: 50%;
+  animation: founder-history-spin 0.8s linear infinite;
+}
+
+.founder-history-loading small,
+.founder-history-loading strong,
+.founder-history-loading p {
+  display: block;
+}
+
+.founder-history-loading small {
+  color: #168d7d;
+  font: 700 9px/1.2 var(--mono);
+  letter-spacing: 0.12em;
+}
+
+.founder-history-loading strong {
+  margin-top: 5px;
+  color: #102c3d;
+  font-size: 19px;
+}
+
+.founder-history-loading p {
+  max-width: 620px;
+  margin: 6px 0 0;
+  color: #718695;
+  font-size: 11px;
+}
+
+@keyframes founder-history-spin {
+  to { transform: rotate(360deg); }
+}
+
+.nutrition-history-freshness {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  border: 1px solid rgba(19, 138, 119, 0.18);
+  border-radius: 13px;
+  padding: 0 16px;
+  background: linear-gradient(135deg, rgba(27, 158, 135, 0.1), rgba(32, 116, 156, 0.05));
+}
+
+.nutrition-history-freshness span,
+.nutrition-history-freshness strong,
+.nutrition-history-freshness small {
+  display: block;
+}
+
+.nutrition-history-freshness strong {
+  color: #123b3d;
+  font-size: 11px;
+}
+
+.nutrition-history-freshness small {
+  margin-top: 3px;
+  color: #6e8a8c;
+  font-size: 8px;
+}
+
+.nutrition-history-freshness .ios-symbol {
+  width: 22px;
+  color: #168d7d;
+}
+
+.nutrition-history-atlas {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 76, 101, 0.12);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(70, 176, 180, 0.12), transparent 32%),
+    #f7fbfc;
+  box-shadow: 0 18px 44px rgba(23, 72, 91, 0.07);
+}
+
+.nutrition-history-atlas > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 25px 19px;
+  border-bottom: 1px solid rgba(17, 76, 101, 0.09);
+}
+
+.nutrition-history-atlas > header small,
+.nutrition-history-atlas > header h4,
+.nutrition-history-atlas > header p {
+  display: block;
+}
+
+.nutrition-history-atlas > header small {
+  color: #178c7b;
+  font: 700 8px/1.2 var(--mono);
+  letter-spacing: 0.12em;
+}
+
+.nutrition-history-atlas > header h4 {
+  margin: 6px 0 0;
+  color: #102c3d;
+  font-size: clamp(17px, 2vw, 23px);
+}
+
+.nutrition-history-atlas > header p {
+  max-width: 680px;
+  margin: 7px 0 0;
+  color: #6c8190;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.nutrition-history-atlas > header > span {
+  flex: 0 0 auto;
+  color: #5d7583;
+  font: 700 9px/1.3 var(--mono);
+}
+
+.nutrition-history-atlas__scroll {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.nutrition-history-atlas__grid {
+  display: grid;
+  grid-template-columns: minmax(225px, 1fr) repeat(var(--history-months), minmax(50px, 0.36fr));
+  min-width: calc(260px + var(--history-months) * 54px);
+  padding: 12px 16px 18px;
+}
+
+.nutrition-history-atlas__corner,
+.nutrition-history-atlas__month {
+  min-height: 42px;
+  border-bottom: 1px solid rgba(17, 76, 101, 0.09);
+  color: #7b8f9a;
+  font: 700 7px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nutrition-history-atlas__corner {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.nutrition-history-atlas__month {
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+
+.nutrition-history-atlas__month strong,
+.nutrition-history-atlas__month small {
+  display: block;
+}
+
+.nutrition-history-atlas__month small {
+  margin-top: 4px;
+  opacity: 0.62;
+}
+
+.nutrition-history-atlas__label,
+.nutrition-history-atlas__cell {
+  min-height: 46px;
+  border: 0;
+  border-bottom: 1px solid rgba(17, 76, 101, 0.065);
+  background: transparent;
+  cursor: pointer;
+}
+
+.nutrition-history-atlas__label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  display: grid;
+  align-content: center;
+  padding: 6px 12px;
+  background: rgba(247, 251, 252, 0.96);
+  text-align: left;
+}
+
+.nutrition-history-atlas__label strong,
+.nutrition-history-atlas__label small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nutrition-history-atlas__label strong {
+  color: #19384a;
+  font-size: 9px;
+}
+
+.nutrition-history-atlas__label small {
+  margin-top: 3px;
+  color: #82929d;
+  font-size: 7px;
+}
+
+.nutrition-history-atlas__cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 4px;
+  min-height: 38px;
+  overflow: hidden;
+  border-radius: 8px;
+  color: #294653;
+}
+
+.nutrition-history-atlas__cell::before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--history-cell, #7c8b93);
+  content: "";
+  opacity: var(--history-opacity, 0.18);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.nutrition-history-atlas__cell:hover::before,
+.nutrition-history-atlas__cell:focus-visible::before {
+  opacity: 0.9;
+  transform: scale(1.04);
+}
+
+.nutrition-history-atlas__cell span {
+  position: relative;
+  z-index: 1;
+  font: 700 7px/1 var(--mono);
+}
+
+.nutrition-history-atlas__cell.is-strong,
+.nutrition-history-atlas__cell.is-within { --history-cell: #2bc683; }
+.nutrition-history-atlas__cell.is-near { --history-cell: #3f9fe7; }
+.nutrition-history-atlas__cell.is-watch { --history-cell: #f3a43c; }
+.nutrition-history-atlas__cell.is-recorded { --history-cell: #8b6ae1; }
+.nutrition-history-atlas__cell.is-limited { --history-cell: #98a4aa; }
+
+.nutrition-history-atlas > footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 13px 25px 17px;
+  border-top: 1px solid rgba(17, 76, 101, 0.08);
+}
+
+.nutrition-history-atlas > footer span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #718590;
+  font-size: 8px;
+}
+
+.nutrition-history-atlas > footer i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #98a4aa;
+}
+
+.nutrition-history-atlas > footer i.is-strong { background: #2bc683; }
+.nutrition-history-atlas > footer i.is-near { background: #3f9fe7; }
+.nutrition-history-atlas > footer i.is-watch { background: #f3a43c; }
+.nutrition-history-atlas > footer i.is-recorded { background: #8b6ae1; }
+
+.historical-nutrient-hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 90% 20%, rgba(84, 218, 181, 0.22), transparent 28%),
+    linear-gradient(135deg, #0b2636, #134e55);
+  color: #fff;
+}
+
+.historical-nutrient-hero small {
+  color: #7ce0c2;
+  font: 700 8px/1.2 var(--mono);
+  letter-spacing: 0.12em;
+}
+
+.historical-nutrient-hero h3 {
+  margin: 7px 0;
+  font-size: clamp(24px, 4vw, 42px);
+}
+
+.historical-nutrient-hero p {
+  max-width: 610px;
+  margin: 0;
+  color: rgba(235, 249, 247, 0.7);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.historical-nutrient-hero > span {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.historical-nutrient-hero > span strong,
+.historical-nutrient-hero > span small {
+  display: block;
+}
+
+.historical-nutrient-hero > span strong {
+  color: #fff;
+  font-size: clamp(25px, 3.5vw, 42px);
+  letter-spacing: -0.04em;
+}
+
+.historical-nutrient-hero > span small {
+  margin-top: 5px;
+  color: rgba(235, 249, 247, 0.58);
+  letter-spacing: 0;
+}
+
+.historical-nutrient-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 76, 101, 0.1);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.historical-nutrient-stats article {
+  min-width: 0;
+  border-right: 1px solid rgba(17, 76, 101, 0.08);
+  padding: 17px;
+}
+
+.historical-nutrient-stats article:last-child {
+  border-right: 0;
+}
+
+.historical-nutrient-stats small,
+.historical-nutrient-stats strong,
+.historical-nutrient-stats span {
+  display: block;
+}
+
+.historical-nutrient-stats small {
+  color: #7d8e98;
+  font: 700 7px/1.2 var(--mono);
+  text-transform: uppercase;
+}
+
+.historical-nutrient-stats strong {
+  margin-top: 7px;
+  overflow: hidden;
+  color: #183849;
+  font-size: 16px;
+  text-overflow: ellipsis;
+}
+
+.historical-nutrient-stats span {
+  margin-top: 4px;
+  color: #84939b;
+  font-size: 8px;
+}
+
+.historical-nutrient-trend,
+.historical-nutrient-foods {
+  margin-top: 14px;
+  border: 1px solid rgba(17, 76, 101, 0.1);
+  border-radius: 20px;
+  padding: 22px;
+  background: #fff;
+}
+
+.historical-nutrient-trend > header,
+.historical-nutrient-foods > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.historical-nutrient-trend > header small,
+.historical-nutrient-foods > header small {
+  color: #178c7b;
+  font: 700 8px/1.2 var(--mono);
+  letter-spacing: 0.1em;
+}
+
+.historical-nutrient-trend > header h4,
+.historical-nutrient-foods > header h4 {
+  margin: 5px 0 0;
+  color: #173647;
+  font-size: 17px;
+}
+
+.historical-nutrient-trend > header > span,
+.historical-nutrient-foods > header > span {
+  color: #7d8f99;
+  font-size: 9px;
+}
+
+.historical-nutrient-trend__plot {
+  display: grid;
+  grid-template-columns: repeat(var(--history-columns), minmax(54px, 1fr));
+  gap: 8px;
+  margin-top: 22px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.historical-nutrient-trend__plot article {
+  display: grid;
+  min-width: 54px;
+  text-align: center;
+}
+
+.historical-nutrient-trend__plot article > div {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  height: 135px;
+  border-radius: 9px;
+  background: #f0f5f6;
+}
+
+.historical-nutrient-trend__plot article > div i {
+  width: min(62%, 30px);
+  border-radius: 7px 7px 3px 3px;
+  background: #8d9ba2;
+}
+
+.historical-nutrient-trend__plot article.is-strong > div i,
+.historical-nutrient-trend__plot article.is-within > div i { background: #26bd7c; }
+.historical-nutrient-trend__plot article.is-near > div i { background: #3c9be0; }
+.historical-nutrient-trend__plot article.is-watch > div i { background: #efa03b; }
+.historical-nutrient-trend__plot article.is-recorded > div i { background: #8263d8; }
+
+.historical-nutrient-trend__plot strong {
+  margin-top: 8px;
+  color: #254454;
+  font-size: 8px;
+}
+
+.historical-nutrient-trend__plot small,
+.historical-nutrient-trend__plot span {
+  color: #87969e;
+  font-size: 6px;
+}
+
+.historical-nutrient-trend__plot span {
+  margin-top: 3px;
+}
+
+.historical-nutrient-foods > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 17px;
+}
+
+.historical-nutrient-foods article {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(17, 76, 101, 0.08);
+  border-radius: 11px;
+  padding: 10px;
+  background: #f9fbfc;
+}
+
+.historical-nutrient-foods article > b {
+  color: #38a691;
+  font: 700 8px/1 var(--mono);
+}
+
+.historical-nutrient-foods article span,
+.historical-nutrient-foods article strong,
+.historical-nutrient-foods article small {
+  display: block;
+  min-width: 0;
+}
+
+.historical-nutrient-foods article span:last-child {
+  text-align: right;
+}
+
+.historical-nutrient-foods article strong {
+  overflow: hidden;
+  color: #244454;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.historical-nutrient-foods article small {
+  margin-top: 3px;
+  color: #87969e;
+  font-size: 7px;
+}
+
+.food-history-navigator {
+  margin: 17px 0;
+  overflow: hidden;
+  border: 1px solid rgba(18, 96, 105, 0.13);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(31, 159, 132, 0.06), transparent 44%),
+    #fff;
+}
+
+.food-history-navigator > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgba(18, 96, 105, 0.08);
+}
+
+.food-history-navigator > header small,
+.food-history-navigator > header h5,
+.food-history-navigator > header p,
+.food-history-navigator > header strong {
+  display: block;
+}
+
+.food-history-navigator > header > div small {
+  color: #188a78;
+  font: 700 8px/1.2 var(--mono);
+  letter-spacing: 0.12em;
+}
+
+.food-history-navigator > header h5 {
+  margin: 6px 0 0;
+  color: #173b47;
+  font-size: 18px;
+}
+
+.food-history-navigator > header p {
+  margin: 6px 0 0;
+  color: #768b92;
+  font-size: 9px;
+}
+
+.food-history-navigator > header > span {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.food-history-navigator > header > span strong {
+  color: #183c48;
+  font-size: 13px;
+}
+
+.food-history-navigator > header > span small {
+  margin-top: 4px;
+  color: #7c9097;
+  font-size: 8px;
+}
+
+.food-history-months {
+  display: grid;
+  grid-auto-columns: minmax(66px, 1fr);
+  grid-auto-flow: column;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 15px 17px 11px;
+}
+
+.food-history-months button {
+  min-width: 66px;
+  min-height: 64px;
+  border: 1px solid rgba(21, 99, 108, 0.11);
+  border-radius: 12px;
+  padding: 9px 8px;
+  background: #f6faf9;
+  color: #5c737b;
+  cursor: pointer;
+}
+
+.food-history-months button small,
+.food-history-months button strong,
+.food-history-months button span {
+  display: block;
+}
+
+.food-history-months button small {
+  font: 700 7px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.food-history-months button strong {
+  margin-top: 5px;
+  color: #1b3f49;
+  font-size: 15px;
+}
+
+.food-history-months button span {
+  margin-top: 3px;
+  color: #839399;
+  font-size: 7px;
+}
+
+.food-history-months button.is-active {
+  border-color: #188f7a;
+  background: linear-gradient(145deg, #188f7a, #197384);
+  box-shadow: 0 8px 20px rgba(21, 123, 113, 0.18);
+  color: #c8f6e9;
+}
+
+.food-history-months button.is-active strong,
+.food-history-months button.is-active span {
+  color: #fff;
+}
+
+.food-history-weeks {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 3px 17px 16px;
+}
+
+.food-history-weeks button {
+  flex: 0 0 auto;
+  min-width: 132px;
+  border: 1px solid rgba(21, 99, 108, 0.11);
+  border-radius: 10px;
+  padding: 9px 11px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.food-history-weeks button strong,
+.food-history-weeks button small {
+  display: block;
+}
+
+.food-history-weeks button strong {
+  color: #284a52;
+  font-size: 8px;
+}
+
+.food-history-weeks button small {
+  margin-top: 4px;
+  color: #87989d;
+  font-size: 7px;
+}
+
+.food-history-weeks button.is-active {
+  border-color: rgba(24, 143, 122, 0.44);
+  background: rgba(24, 143, 122, 0.09);
+}
+
+.food-history-weeks button.is-active strong {
+  color: #137b6a;
+}
+
+@media (max-width: 760px) {
+  .nutrition-history-atlas > header,
+  .food-history-navigator > header,
+  .historical-nutrient-trend > header,
+  .historical-nutrient-foods > header {
+    display: grid;
+    align-items: start;
+  }
+
+  .nutrition-history-atlas > header > span,
+  .food-history-navigator > header > span {
+    text-align: left;
+  }
+
+  .historical-nutrient-hero {
+    display: grid;
+    align-items: start;
+  }
+
+  .historical-nutrient-hero > span {
+    text-align: left;
+  }
+
+  .historical-nutrient-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .historical-nutrient-stats article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .historical-nutrient-stats article:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(17, 76, 101, 0.08);
+  }
+
+  .historical-nutrient-foods > div {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .nutrition-history-atlas,
+  .food-history-navigator {
+    border-radius: 18px;
+  }
+
+  .nutrition-history-atlas > header,
+  .food-history-navigator > header {
+    padding: 19px 16px 15px;
+  }
+
+  .nutrition-history-atlas__grid {
+    grid-template-columns: minmax(180px, 1fr) repeat(var(--history-months), minmax(46px, 0.36fr));
+    min-width: calc(210px + var(--history-months) * 49px);
+    padding-inline: 8px;
+  }
+
+  .historical-nutrient-hero,
+  .historical-nutrient-trend,
+  .historical-nutrient-foods {
+    border-radius: 18px;
+    padding: 18px 15px;
+  }
+
+  .historical-nutrient-stats article {
+    padding: 13px 11px;
+  }
+
+  .historical-nutrient-stats strong {
+    font-size: 13px;
+  }
+}

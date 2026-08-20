@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const websiteRoot = resolve(here, '..')
-const publicHistoryStartDay = '2025-09-01'
+const publicHistoryStartDay = '2025-08-25'
 const outputPath = resolve(
   websiteRoot,
   'public/statskey-app/founder-live-fallback.json'

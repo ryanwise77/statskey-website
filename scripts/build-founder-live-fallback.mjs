@@ -83,7 +83,7 @@ const snapshotDay = latestSourceDate.toISOString().slice(0, 10)
 // Treat the newest exported day as in progress, matching the production
 // projection's complete-days-only nutrition window.
 const snapshotNow = new Date(`${snapshotDay}T18:00:00.000Z`)
-const publicHistoryStartDay = '2025-09-01'
+const publicHistoryStartDay = '2025-08-25'
 const generatedAt = new Date().toISOString()
 
 const projectedWorkouts = workouts
