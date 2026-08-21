@@ -385,19 +385,19 @@
           </p>
           <div class="metrics">
             <div class="metric metrics--teal">
-              <div class="metric__v">9.0 h</div>
-              <h3>GPU-hours per training run</h3>
-              <p>One full 1,000,000-step training run at the measured throughput of 31.0 steps per second.</p>
+              <div class="metric__v">96%</div>
+              <h3>Measured utilization</h3>
+              <p>The owned GPU has run at 96% utilization around the clock for weeks, with a queued backlog of surveys behind it. Base-load demand is measured, not forecast.</p>
             </div>
             <div class="metric metrics--blue">
-              <div class="metric__v">$0.79</div>
-              <h3>Electricity per run</h3>
-              <p>4.3 kWh, measured at 477 W at the wall, priced at the August 2026 U.S. average of 18.44¢/kWh — after this year's increases. At the 20.9¢ implied by pending filings: $0.89.</p>
+              <div class="metric__v">11–21 mo</div>
+              <h3>Payback versus renting</h3>
+              <p>At the August 2026 street price of ~$4,700 for the same card and market rentals of $0.40–$0.70 per GPU-hour, ownership at our sustained utilization breaks even in 11–21 months — on an asset with a working life of three years or more.</p>
             </div>
             <div class="metric metrics--teal">
-              <div class="metric__v">$1.81</div>
-              <h3>Fully loaded per run</h3>
-              <p>Electricity plus hardware amortized over three years. The same run on rented capacity quotes at roughly $3–$36 at current market rates.</p>
+              <div class="metric__v">+135%</div>
+              <h3>Hardware price since launch</h3>
+              <p>The card listed at $1,999 at launch and a $4,700 median today — up ~$400 in the last two months alone. Memory supply is not projected to normalize before 2027. Waiting has a measured cost.</p>
             </div>
           </div>
           <p class="section__intro">
@@ -408,13 +408,16 @@
             spending stops; the next dollar goes to new data, not more steps on the old data.
           </p>
           <p class="section__intro">
-            Against the decisions this work informs, break-even is arithmetic. Running the machine
-            around the clock, fully loaded, costs about $148 a month. For that spend to pay against a
-            single $250,000 workover decision, the screen must shift the odds by 0.06 percentage
-            points; against a $2,000,000 well, 0.007. Everything above that threshold is return.
+            Owning versus renting is the same arithmetic. About $4,700 buys the card outright; the
+            identical machine rented at market rates costs that much every 13–16 months, indefinitely.
+            Over a three-year life at our utilization, the rented path costs roughly $13,000 per card
+            against about $7,000 all-in owned. And against the decisions this work informs, the whole
+            program is small: running one machine around the clock, fully loaded, costs about $200 a
+            month — for that spend to pay against a single $250,000 workover decision, the screen must
+            shift the odds by less than 0.1 percentage points. Everything above that threshold is return.
           </p>
-          <div class="banner">Compute is an investment like any other on this page: own the first tier, rent bursts when a test justifies them, and let scale wait for evidence — the same gates capital gets.</div>
-          <p class="small-note">Throughput (31.0 steps/s) and power draw (477 W) measured on our training hardware, August 2026. Electricity priced at the U.S. average residential rate of 18.44¢/kWh (August 2026, up 6.2% year over year); pending utility rate filings average a further 13.2%. Hardware amortization assumes $3,000 over three years of continuous use. Rented-market range $0.35–$4.00 per GPU-hour.</p>
+          <div class="banner">Compute is an investment like any other on this page: own the base load you can prove you saturate, rent bursts when a test justifies them, and let scale wait for evidence — the same gates capital gets.</div>
+          <p class="small-note">Utilization (96%), throughput (31.0 steps/s), and power draw (477 W) measured on our training hardware, August 2026. Hardware at the August 2026 median U.S. street price (~$4,700; $1,999 launch MSRP, January 2025); consumer-GPU rentals assumed at $0.40–$0.70 per GPU-hour; electricity at the August 2026 U.S. average of 18.44¢/kWh. Payback = price ÷ (rental rate − operating cost) at sustained utilization. Memory-supply outlook per TrendForce/IDC, 2027–2028.</p>
         </div>
       </section>
 
