@@ -12,25 +12,25 @@
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StatsKey Energy — AI underwriting for the subsurface</title>
+    <title>StatsKey Energy — Measured drilling intelligence</title>
     <meta
       name="description"
-      content="StatsKey Energy trains a seismic-driven, multimodal model on the public subsurface record at scale — calibrated predictions that optimize capital allocation and drilling: which rock to drill, buy, or pass, and how to drill it."
+      content="StatsKey Energy treats subsurface models like instruments: blind cross-basin validation, stated error bounds, and predictions archived before outcomes. Seismic foundation model trained to 1,000,000 steps and verified on a held-out basin."
     />
     <meta name="theme-color" content="#080b14" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="StatsKey Energy — AI underwriting for the subsurface" />
+    <meta property="og:title" content="StatsKey Energy — Measured drilling intelligence" />
     <meta
       property="og:description"
-      content="Calibrated, forward-tested predictions of which energy assets will actually produce, built from the public subsurface record."
+      content="A drilling model is an instrument. We calibrate it like one: blind holdout validation, stated significance, predictions archived before capital moves."
     />
-    <meta property="og:url" content="https://statskeybiometrics.com/energy" />
+    <meta property="og:url" content="https://statskey.ai/energy" />
     <!-- Intentionally unlisted: not linked from the main site. Remove the line below to allow search indexing when ready to go public. -->
     <meta name="robots" content="noindex, nofollow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -39,7 +39,7 @@
         --bg: #080b14;
         --bg-soft: #0c1120;
         --panel: rgba(255, 255, 255, 0.035);
-        --panel-2: rgba(255, 255, 255, 0.05);
+        --panel-2: rgba(255, 255, 255, 0.055);
         --border: rgba(255, 255, 255, 0.09);
         --border-soft: rgba(255, 255, 255, 0.06);
         --text: #eaeef8;
@@ -47,620 +47,359 @@
         --faint: #6c768f;
         --teal: #30d5c8;
         --blue: #6e8eff;
-        --violet: #9b7cff;
+        --amber: #f0b45a;
+        --display: "Space Grotesk", "Inter", system-ui, sans-serif;
+        --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
       }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       html { scroll-behavior: smooth; }
       body {
-        background: var(--bg);
+        background:
+          radial-gradient(circle at 85% 4%, rgba(48, 213, 200, 0.09), transparent 32%),
+          radial-gradient(circle at 8% 55%, rgba(110, 142, 255, 0.08), transparent 30%),
+          var(--bg);
         color: var(--text);
         font-family: "Inter", system-ui, -apple-system, sans-serif;
         line-height: 1.62;
+        font-size: 16.5px;
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
-        overflow-x: hidden;
-        position: relative;
       }
-      /* faint ambient backdrop */
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background:
-          radial-gradient(620px circle at 78% -6%, rgba(48, 213, 200, 0.10), transparent 60%),
-          radial-gradient(720px circle at 8% 18%, rgba(110, 142, 255, 0.08), transparent 60%);
-        z-index: 0;
-        pointer-events: none;
-      }
-      h1, h2, h3, .brand, .eyebrow, .section__label, .btn, .pill, .stat__v {
-        font-family: "Space Grotesk", "Inter", sans-serif;
-      }
-      .shell { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
-      a { color: inherit; }
-      a:focus-visible, .btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 6px; }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 0 clamp(18px, 4.5vw, 44px); }
+      a { color: var(--teal); text-decoration: none; }
+      a:hover { text-decoration: underline; text-underline-offset: 3px; }
+      :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 3px; }
 
-      /* ---- header ---- */
-      header { border-bottom: 1px solid var(--border-soft); }
-      .header__inner { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; gap: 16px; }
-      .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
-      .brand svg { display: block; flex: none; }
-      .brand__tag { color: var(--faint); font-weight: 500; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; font-family: "Inter", sans-serif; }
-      @media (max-width: 620px) { .brand__tag { display: none; } }
+      nav {
+        display: flex; align-items: center; gap: 12px;
+        padding: 22px 0; border-bottom: 1px solid var(--border-soft);
+      }
+      .mark { width: 21px; height: 21px; border-radius: 6px; flex: none;
+        background: linear-gradient(135deg, var(--teal), var(--blue)); }
+      .word { font-family: var(--display); font-weight: 700; letter-spacing: 0.01em; font-size: 1.02rem; }
+      .word span { color: var(--faint); font-weight: 500; }
+      nav .home { margin-left: auto; font-size: 0.85rem; color: var(--muted); }
 
-      /* ---- hero ---- */
-      .hero { padding: 92px 0 76px; }
-      .hero__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
-      .eyebrow {
-        display: inline-flex; align-items: center; gap: 8px;
-        font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal);
-        margin-bottom: 22px; font-weight: 500;
+      .kicker {
+        color: var(--teal); text-transform: uppercase; letter-spacing: 0.17em;
+        font-weight: 650; font-size: 0.74rem; margin-bottom: 16px;
       }
-      .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--teal); opacity: 0.6; }
-      h1 { font-size: clamp(36px, 5.4vw, 58px); line-height: 1.05; letter-spacing: -0.028em; font-weight: 600; }
-      .lede { margin-top: 22px; font-size: clamp(16.5px, 1.9vw, 19px); color: var(--muted); max-width: 540px; }
-      .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
-      .pill {
-        font-size: 12.5px; letter-spacing: 0.02em; color: var(--text);
-        border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; background: var(--panel);
+      h1 {
+        font-family: var(--display); font-weight: 700; letter-spacing: -0.035em;
+        line-height: 1.03; font-size: clamp(2.2rem, 6vw, 3.7rem); text-wrap: balance;
+        max-width: 21ch;
       }
-      .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-      .btn {
-        display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font-weight: 600; font-size: 14.5px;
-        padding: 13px 22px; border-radius: 999px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      h2 {
+        font-family: var(--display); font-weight: 700; letter-spacing: -0.025em;
+        line-height: 1.08; font-size: clamp(1.45rem, 3.2vw, 2.05rem); text-wrap: balance;
+        margin-bottom: 12px;
       }
-      .btn--primary { color: #06121f; background: linear-gradient(135deg, var(--teal), var(--blue)); }
-      .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -12px rgba(48, 213, 200, 0.6); }
-      .btn--ghost { color: var(--text); border: 1px solid var(--border); }
-      .btn--ghost:hover { border-color: var(--teal); background: var(--panel); }
+      .sub { color: var(--muted); font-size: clamp(1rem, 1.8vw, 1.16rem); max-width: 58ch; margin-top: 18px; }
+      section { padding: 62px 0; border-top: 1px solid var(--border-soft); }
+      section.hero { border-top: 0; padding: 72px 0 56px; }
 
-      /* ---- hero visual ---- */
-      .visual {
-        position: relative; border: 1px solid var(--border); border-radius: 20px; padding: 22px;
-        background: linear-gradient(180deg, var(--panel-2), var(--panel)); overflow: hidden;
+      .stats {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 13px; margin-top: 42px;
       }
-      .visual__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-      .visual__title { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); font-family: "Space Grotesk", sans-serif; }
-      .live { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--muted); letter-spacing: 0.04em; }
-      .live span { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 0 rgba(48,213,200,0.5); animation: pulse 2.4s infinite; }
-      @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(48,213,200,0.5);} 70% { box-shadow: 0 0 0 8px rgba(48,213,200,0);} 100% { box-shadow: 0 0 0 0 rgba(48,213,200,0);} }
-      .visual svg { display: block; width: 100%; height: auto; }
-      .visual__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
-      .stat { border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px 13px; background: rgba(255,255,255,0.02); }
-      .stat__k { font-size: 11px; letter-spacing: 0.04em; color: var(--faint); }
-      .stat__v { font-size: 18px; font-weight: 600; margin-top: 4px; letter-spacing: -0.01em; }
+      .stat { border: 1px solid var(--border); background: var(--panel); border-radius: 13px; padding: 20px 19px; }
+      .stat .n {
+        font-family: var(--mono); font-weight: 600; font-size: clamp(1.45rem, 2.9vw, 1.95rem);
+        letter-spacing: -0.03em; color: var(--teal); line-height: 1.05; font-variant-numeric: tabular-nums;
+      }
+      .stat .n sup { font-size: 0.55em; }
+      .stat .n.blue { color: var(--blue); }
+      .stat .k { margin-top: 9px; font-size: 0.83rem; color: var(--muted); line-height: 1.45; }
+      .stat .k b { color: var(--text); font-weight: 600; }
 
-      /* ---- sections ---- */
-      .section { padding: 60px 0; }
-      .section__label { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint); margin-bottom: 14px; }
-      .section__title { font-size: clamp(24px, 3.6vw, 33px); line-height: 1.12; letter-spacing: -0.022em; font-weight: 600; max-width: 720px; }
-      .section__intro { color: var(--muted); font-size: 16px; max-width: 600px; margin-top: 14px; }
-      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+      /* protocol table */
+      .protocol {
+        border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+        margin-top: 34px; background: var(--panel);
+      }
+      .protocol .row {
+        display: grid; grid-template-columns: 200px 1fr; gap: 18px;
+        padding: 16px 22px; border-bottom: 1px solid var(--border-soft);
+      }
+      .protocol .row:last-child { border-bottom: 0; }
+      .protocol .key {
+        font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em;
+        text-transform: uppercase; color: var(--faint); font-weight: 500; padding-top: 3px;
+      }
+      .protocol .val { font-size: 0.94rem; color: var(--text); }
+      .protocol .val .dim { color: var(--muted); }
+      @media (max-width: 640px) { .protocol .row { grid-template-columns: 1fr; gap: 4px; } }
+
+      .math {
+        margin-top: 26px; border-left: 3px solid var(--teal);
+        background: rgba(48, 213, 200, 0.06); border-radius: 0 12px 12px 0;
+        padding: 22px 26px; overflow-x: auto;
+      }
+      .math .eq {
+        font-family: var(--mono); font-size: clamp(0.86rem, 1.9vw, 1.02rem);
+        color: var(--text); white-space: nowrap; line-height: 2;
+      }
+      .math .eq .op { color: var(--faint); }
+      .math .eq .hi { color: var(--teal); font-weight: 600; }
+      .math .note { margin-top: 10px; font-size: 0.86rem; color: var(--muted); max-width: 68ch; }
+
+      /* chance vs measured bars */
+      .bars { margin-top: 30px; display: grid; gap: 14px; max-width: 640px; }
+      .bar { display: grid; grid-template-columns: 150px 1fr 74px; gap: 14px; align-items: center; }
+      .bar .lbl { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); text-align: right; }
+      .bar .track { height: 14px; border-radius: 7px; background: var(--panel-2); border: 1px solid var(--border-soft); overflow: hidden; }
+      .bar .fill { height: 100%; border-radius: 7px; }
+      .bar .fill.chance { width: 4.2%; background: var(--faint); }
+      .bar .fill.meas { width: 100%; background: linear-gradient(90deg, var(--teal), var(--blue)); }
+      .bar .v { font-family: var(--mono); font-size: 0.82rem; color: var(--text); font-variant-numeric: tabular-nums; }
+      @media (max-width: 560px) { .bar { grid-template-columns: 96px 1fr 60px; } }
+
+      .grid { display: grid; gap: 14px; margin-top: 34px; }
+      @media (min-width: 800px) {
+        .grid.three { grid-template-columns: repeat(3, 1fr); }
+        .grid.two { grid-template-columns: repeat(2, 1fr); }
+      }
       .card {
-        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px;
-        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+        border: 1px solid var(--border); background: var(--panel);
+        border-radius: 14px; padding: 24px 22px;
       }
-      .card:hover { border-color: rgba(110, 142, 255, 0.45); transform: translateY(-3px); background: var(--panel-2); }
-      .card__n { font-family: "Space Grotesk", sans-serif; font-size: 12.5px; color: var(--teal); letter-spacing: 0.12em; }
-      .card h3 { font-size: 19px; margin: 16px 0 10px; font-weight: 600; letter-spacing: -0.01em; }
-      .card p { color: var(--muted); font-size: 14.5px; }
+      .card .no {
+        font-family: var(--mono); font-size: 0.72rem; color: var(--teal);
+        letter-spacing: 0.1em; font-weight: 600; margin-bottom: 10px;
+      }
+      .card h3 { font-family: var(--display); font-size: 1.06rem; letter-spacing: -0.015em; margin-bottom: 7px; }
+      .card p { font-size: 0.89rem; color: var(--muted); }
+      .card p b { color: var(--text); font-weight: 600; }
 
-      /* ---- metric cards (big numbers) ---- */
-      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
-      .metric {
-        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 26px 24px;
-        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      .ladder { margin-top: 34px; display: grid; gap: 10px; }
+      .step {
+        display: grid; grid-template-columns: 148px 1fr; gap: 18px;
+        border: 1px solid var(--border); border-radius: 12px;
+        background: var(--panel); padding: 18px 22px; align-items: start;
       }
-      .metric:hover { border-color: rgba(48, 213, 200, 0.42); transform: translateY(-3px); background: var(--panel-2); }
-      .metric__v {
-        font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 4.4vw, 41px); font-weight: 700;
-        line-height: 1; letter-spacing: -0.02em; width: fit-content;
-        background: var(--metric-grad, linear-gradient(135deg, var(--teal), var(--blue)));
-        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      .step .tag {
+        font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.09em;
+        text-transform: uppercase; font-weight: 600; padding-top: 3px;
       }
-      .metric h3 { font-size: 15.5px; margin: 15px 0 7px; font-weight: 600; letter-spacing: -0.01em; }
-      .metric p { color: var(--muted); font-size: 13.8px; }
-      .metrics--teal { --metric-grad: linear-gradient(135deg, #30d5c8, #57e1d4); }
-      .metrics--blue { --metric-grad: linear-gradient(135deg, #6e8eff, #9b7cff); }
+      .step.done .tag { color: var(--teal); }
+      .step.now .tag { color: var(--amber); }
+      .step.not .tag { color: var(--faint); }
+      .step p { font-size: 0.93rem; color: var(--muted); }
+      .step p b { color: var(--text); }
+      @media (max-width: 600px) { .step { grid-template-columns: 1fr; gap: 6px; } }
 
-      /* ---- principle list ---- */
-      .principles { display: grid; gap: 14px; margin-top: 30px; max-width: 880px; }
-      .principle {
-        display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start;
-        padding: 20px 22px; border: 1px solid var(--border-soft); border-radius: 14px; background: var(--panel);
-        transition: border-color 0.25s ease, background 0.25s ease;
+      .callout {
+        margin-top: 36px; border-left: 3px solid var(--amber);
+        background: rgba(240, 180, 90, 0.06); border-radius: 0 12px 12px 0;
+        padding: 20px 26px;
       }
-      .principle:hover { border-color: rgba(110, 142, 255, 0.35); background: var(--panel-2); }
-      .principle__dot { width: 9px; height: 9px; margin-top: 9px; border-radius: 50%; background: linear-gradient(135deg, var(--teal), var(--blue)); box-shadow: 0 0 0 4px rgba(48, 213, 200, 0.08); }
-      .principle p { color: var(--muted); font-size: 15px; }
-      .principle strong { color: var(--text); font-weight: 600; font-family: "Space Grotesk", sans-serif; letter-spacing: -0.01em; }
+      .callout p { color: #e8dcc2; font-size: 0.98rem; max-width: 70ch; }
+      .callout p b { color: #fff; }
 
-      /* ---- technical method table ---- */
-      .method-table {
-        margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
-        background: var(--panel);
+      ul.terms { margin-top: 30px; list-style: none; max-width: 720px; }
+      ul.terms li {
+        position: relative; padding-left: 32px; margin: 16px 0;
+        font-size: 1rem; color: var(--text);
       }
-      .method-row { display: grid; grid-template-columns: 0.85fr 1.15fr 1fr; border-top: 1px solid var(--border-soft); }
-      .method-row:first-child { border-top: 0; }
-      .method-row--head { background: rgba(255, 255, 255, 0.03); }
-      .method-cell { padding: 18px 20px; border-left: 1px solid var(--border-soft); color: var(--muted); font-size: 14px; line-height: 1.55; }
-      .method-cell:first-child { border-left: 0; }
-      .method-cell--head {
-        font-family: "Space Grotesk", sans-serif; color: var(--faint); font-size: 11px;
-        text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
-      }
-      .method-cell strong { display: block; color: var(--text); font-family: "Space Grotesk", sans-serif; font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
-
-      /* ---- banner / pull quote ---- */
-      .banner {
-        margin-top: 28px; border: 1px solid var(--border-soft); border-left: 3px solid var(--teal);
-        border-radius: 0 14px 14px 0; background: linear-gradient(90deg, rgba(48, 213, 200, 0.08), rgba(48, 213, 200, 0));
-        padding: 17px 24px; color: var(--text); font-family: "Space Grotesk", sans-serif;
-        font-size: clamp(15px, 1.85vw, 17px); font-weight: 500; letter-spacing: -0.01em;
-      }
-      .banner--blue { border-left-color: var(--blue); background: linear-gradient(90deg, rgba(110, 142, 255, 0.08), rgba(110, 142, 255, 0)); }
-
-      /* ---- industry-gap cards ---- */
-      .gapcards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 30px; }
-      .gapcard {
-        border: 1px solid var(--border-soft); border-radius: 14px; padding: 20px 22px; background: var(--panel);
-        transition: border-color 0.25s ease, background 0.25s ease;
-      }
-      .gapcard:hover { border-color: rgba(110, 142, 255, 0.32); background: var(--panel-2); }
-      .gapcard h4 { font-family: "Space Grotesk", sans-serif; font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
-      .gapcard__row { margin-top: 12px; }
-      .gapcard__k { display: block; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 3px; }
-      .gapcard__v { color: var(--muted); font-size: 13.8px; }
-      .gapcard__v--open { color: var(--text); }
-      .gapcard--open {
-        background: linear-gradient(150deg, rgba(48, 213, 200, 0.10), rgba(110, 142, 255, 0.06));
-        border-color: rgba(48, 213, 200, 0.32);
-      }
-      .gapcard--open h4 { color: var(--teal); }
-
-      /* ---- scale stat band ---- */
-      .statband { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
-      .statband__s { border: 1px solid var(--border-soft); border-radius: 14px; padding: 18px 18px; background: rgba(255, 255, 255, 0.02); }
-      .statband__v { font-family: "Space Grotesk", sans-serif; font-size: clamp(22px, 2.8vw, 29px); font-weight: 700; letter-spacing: -0.02em; line-height: 1; color: var(--text); }
-      .statband__k { margin-top: 9px; font-size: 12.7px; color: var(--muted); line-height: 1.5; }
-      .src { color: var(--faint); white-space: nowrap; }
-      .scale__note { margin-top: 22px; max-width: 780px; color: var(--muted); font-size: 15.5px; }
-      .scale__note strong { color: var(--text); font-weight: 600; }
-
-      /* ---- spend ladder ---- */
-      .ladder { display: grid; gap: 12px; margin-top: 30px; }
-      .rung {
-        display: grid; grid-template-columns: 150px 1fr; gap: 22px; align-items: center;
-        padding: 18px 22px; border: 1px solid var(--border-soft); border-radius: 14px; background: var(--panel);
-        transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
-      }
-      .rung:hover { border-color: rgba(110, 142, 255, 0.32); background: var(--panel-2); transform: translateX(3px); }
-      .rung__spend {
-        font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: clamp(19px, 2.3vw, 23px);
-        letter-spacing: -0.02em; line-height: 1.1; width: fit-content;
+      ul.terms li b { font-weight: 650; }
+      ul.terms li span { color: var(--muted); }
+      ul.terms li::before {
+        content: ""; position: absolute; left: 0; top: 0.42em;
+        width: 14px; height: 14px; border-radius: 4px;
         background: linear-gradient(135deg, var(--teal), var(--blue));
-        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
       }
-      .rung__per { font-size: 0.6em; -webkit-text-fill-color: var(--faint); color: var(--faint); }
-      .rung__buys { color: var(--text); font-size: 14.5px; font-weight: 500; letter-spacing: -0.005em; }
-      .rung__buys strong { font-family: "Space Grotesk", sans-serif; font-weight: 600; color: var(--text); }
-      .rung__use { color: var(--muted); font-size: 13.5px; margin-top: 5px; }
-      .rung--peak { background: linear-gradient(150deg, rgba(48, 213, 200, 0.10), rgba(110, 142, 255, 0.06)); border-color: rgba(48, 213, 200, 0.32); }
-      .rung--peak .rung__spend { background: linear-gradient(135deg, #57e1d4, #9b7cff); -webkit-background-clip: text; background-clip: text; }
 
-      .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
-      .vision__inner { max-width: 760px; }
-      .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
-      .vision p { margin-top: 18px; color: var(--muted); font-size: 16.5px; }
-      .vision .accent { color: var(--text); font-weight: 500; }
-
-      footer { border-top: 1px solid var(--border-soft); padding: 30px 0 44px; }
-      .footer__inner { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; color: var(--faint); font-size: 13px; }
-      .footer__inner .dotsep { opacity: 0.4; }
-
-      @media (max-width: 860px) {
-        .hero__grid { grid-template-columns: 1fr; gap: 40px; }
-        .visual { order: 2; }
+      .fineprint { margin-top: 30px; color: var(--faint); font-size: 0.79rem; max-width: 76ch; }
+      footer {
+        padding: 36px 0 58px; border-top: 1px solid var(--border-soft);
+        display: flex; align-items: center; gap: 12px; color: var(--faint); font-size: 0.8rem;
       }
-      @media (max-width: 720px) {
-        .cards, .metrics, .gapcards { grid-template-columns: 1fr; }
-        .statband { grid-template-columns: repeat(2, 1fr); }
-        .method-row, .method-row--head { grid-template-columns: 1fr; }
-        .method-row--head { display: none; }
-        .method-cell { border-left: 0; border-top: 1px solid var(--border-soft); padding: 15px 18px; }
-        .method-cell:first-child { border-top: 0; }
-        .rung { grid-template-columns: 1fr; gap: 8px; }
-        .rung:hover { transform: none; }
-        .hero { padding: 62px 0 52px; }
-        .section { padding: 48px 0; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-      }
+      footer .mark { width: 15px; height: 15px; border-radius: 4px; }
     </style>
   </head>
   <body>
-    <header>
-      <div class="shell header__inner">
-        <div class="brand">
-          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
-            <rect x="0.5" y="0.5" width="25" height="25" rx="7" stroke="url(#g)" stroke-opacity="0.5" />
-            <path d="M5 16.5 L10 13 L15 15 L21 9.5" stroke="url(#g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M5 11 L10 8.5 L15 10.5 L21 6" stroke="#6e8eff" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-            <defs>
-              <linearGradient id="g" x1="3" y1="6" x2="22" y2="20" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#30d5c8" /><stop offset="1" stop-color="#6e8eff" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <span>StatsKey&nbsp;Energy</span>
-        </div>
-        <span class="brand__tag">Subsurface intelligence</span>
-      </div>
-    </header>
+    <div class="wrap">
+      <nav>
+        <div class="mark" aria-hidden="true"></div>
+        <div class="word">StatsKey <span>Energy</span></div>
+        <a class="home" href="https://statskey.ai">statskey.ai →</a>
+      </nav>
 
-    <main>
+      <!-- HERO -->
       <section class="hero">
-        <div class="shell hero__grid">
-          <div class="hero__copy">
-            <span class="eyebrow">Subsurface intelligence</span>
-            <h1>AI underwriting for the subsurface.</h1>
-            <p class="lede">
-              StatsKey Energy trains on the public subsurface record at scale — 3D seismic the
-              leading driver, fused with well logs, geology, and production. It optimizes capital
-              allocation and drilling decisions: which rock to drill, buy, or pass, and how to drill
-              it, even in basins the model has never seen.
-            </p>
-            <div class="pill-row">
-              <span class="pill">3D seismic at scale</span>
-              <span class="pill">Calibrated &amp; forward-tested</span>
-              <span class="pill">Generalizes to unseen basins</span>
-            </div>
-            <div class="actions">
-              <a class="btn btn--ghost" href="#approach">The method</a>
-            </div>
-          </div>
+        <div class="kicker">Subsurface intelligence · North America</div>
+        <h1>A drilling model is an instrument. We calibrate it like one.</h1>
+        <p class="sub">
+          Every gauge on a rig floor earns trust the same way: a stated range, a blind test,
+          and error bounds. StatsKey Energy holds its subsurface models to the same standard —
+          blind cross-basin validation, published significance, and predictions archived
+          <em>before</em> outcomes arrive.
+        </p>
 
-          <div class="visual" aria-label="Illustrative subsurface model view">
-            <div class="visual__head">
-              <span class="visual__title">Subsurface model</span>
-              <span class="live"><span></span> training at scale</span>
-            </div>
-            <svg viewBox="0 0 380 180" role="img" aria-label="Stylized rock layers with well-log curves">
-              <defs>
-                <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#6e8eff" stop-opacity="0.16" />
-                  <stop offset="1" stop-color="#6e8eff" stop-opacity="0.04" />
-                </linearGradient>
-                <linearGradient id="pay" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#30d5c8" stop-opacity="0.34" />
-                  <stop offset="1" stop-color="#30d5c8" stop-opacity="0.10" />
-                </linearGradient>
-              </defs>
-              <!-- strata -->
-              <path d="M0 26 Q95 16 190 24 T380 22 V44 Q285 36 190 44 T0 46 Z" fill="url(#band)" />
-              <path d="M0 54 Q95 46 190 52 T380 50 V78 Q285 70 190 78 T0 80 Z" fill="url(#pay)" />
-              <path d="M0 88 Q95 80 190 86 T380 84 V108 Q285 100 190 108 T0 110 Z" fill="url(#band)" />
-              <path d="M0 118 Q95 110 190 116 T380 114 V150 Q285 142 190 150 T0 152 Z" fill="url(#band)" />
-              <!-- log curve A (gamma) -->
-              <path d="M58 8 C70 40, 44 58, 64 84 C80 104, 52 128, 70 168" fill="none" stroke="#30d5c8" stroke-width="2.2" stroke-linecap="round" />
-              <!-- log curve B (resistivity) -->
-              <path d="M300 8 C288 44, 318 64, 300 92 C286 116, 314 134, 300 168" fill="none" stroke="#6e8eff" stroke-width="2" stroke-opacity="0.8" stroke-linecap="round" />
-              <!-- pay pick -->
-              <circle cx="190" cy="65" r="4.5" fill="#30d5c8" />
-              <circle cx="190" cy="65" r="9" fill="none" stroke="#30d5c8" stroke-opacity="0.4" />
-            </svg>
-            <div class="visual__row">
-              <div class="stat"><div class="stat__k">Lead driver</div><div class="stat__v">3D seismic</div></div>
-              <div class="stat"><div class="stat__k">Corpus</div><div class="stat__v">Multi-basin</div></div>
-              <div class="stat"><div class="stat__k">Output</div><div class="stat__v">Allocation</div></div>
-            </div>
-          </div>
+        <div class="stats">
+          <div class="stat"><div class="n">1,000,000</div><div class="k"><b>training steps, complete.</b> Self-supervised seismic context model, trained on owned hardware running 24/7.</div></div>
+          <div class="stat"><div class="n">384 / 384</div><div class="k"><b>blind holdout trials correct</b> on a basin excluded from training. Chance rate: 4.2% per trial.</div></div>
+          <div class="stat"><div class="n blue">p &lt; 10<sup>−40</sup></div><div class="k"><b>significance under conservative assumptions.</b> Naive binomial: ≈ 10<sup>−530</sup>. We report the discounted figure.</div></div>
+          <div class="stat"><div class="n">0.965</div><div class="k"><b>embedding cosine alignment,</b> stable across ten consecutive evaluations — convergence, not a lucky checkpoint.</div></div>
         </div>
       </section>
 
-      <section class="section" id="principle">
-        <div class="shell">
-          <div class="section__label">The principle</div>
-          <h2 class="section__title">Generalization beats interpretation.</h2>
-          <div class="principles">
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>Superior data, not cleverer features.</strong> A model trained on a representative sample of the earth's subsurface learns structure that transfers — the same way large models generalize in every other domain.</p>
-            </div>
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>One field teaches one field; a thousand surveys teach the rock.</strong> The scale and breadth of representative data is the moat — not any single clever model.</p>
-            </div>
-            <div class="principle">
-              <span class="principle__dot" aria-hidden="true"></span>
-              <p><strong>Compute is the enabler, not the edge.</strong> Modern accelerators are simply what finally make training on a corpus this large possible.</p>
-            </div>
-          </div>
-          <div class="banner banner--blue">Majors aim this at their own acreage. No one aims it at the whole public record.</div>
+      <!-- THE EXPERIMENT -->
+      <section>
+        <div class="kicker">The experiment</div>
+        <h2>Trained on the Gulf Coast. Verified on a basin it never saw.</h2>
+        <p class="sub">
+          Stated like a lab protocol, because it was run like one. The holdout is a public
+          benchmark, so any geoscientist can reproduce the test.
+        </p>
+
+        <div class="protocol">
+          <div class="row"><div class="key">Instrument</div><div class="val">2.5-D seismic context encoder, self-supervised <span class="dim">(no human labels)</span>, 1,000,000 training steps</div></div>
+          <div class="row"><div class="key">Training corpus</div><div class="val">9 prepared 3-D volumes, 54 GB — Gulf Coast marine surveys (NAMSS/BOEM public archive) + Stratton, South Texas onshore</div></div>
+          <div class="row"><div class="key">Holdout</div><div class="val">Teapot Dome (NPR-3), Wyoming — <b>different basin, different depositional setting, zero survey overlap with training</b>. Held-out public benchmark.</div></div>
+          <div class="row"><div class="key">Task</div><div class="val">24-way forced-choice context retrieval; N = 384 trials <span class="dim">(16 evaluation batches × 24)</span></div></div>
+          <div class="row"><div class="key">Null hypothesis</div><div class="val">No transferable structure learned → success probability 1/24 per trial <span class="dim">(≈ 4.2%)</span></div></div>
+          <div class="row"><div class="key">Result</div><div class="val"><b>384 of 384 correct.</b> Embedding cosine alignment 0.965, flat across the final ten evaluations (steps 440k–640k).</div></div>
         </div>
-      </section>
 
-      <section class="section" id="gap">
-        <div class="shell">
-          <div class="section__label">The industry gap</div>
-          <h2 class="section__title">Everyone models their own acreage. No model predicts the whole record.</h2>
-          <p class="section__intro">The unclaimed layer is one model that does two things at once — statistically, and in basins it has never seen: predict where economic oil is most likely to be, and inform how to drill it. Today that capability is split across camps that each solve a slice for their own incentive, and no one connects it end to end on the public record.</p>
-          <div class="gapcards">
-            <div class="gapcard">
-              <h4>Majors</h4>
-              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Proprietary AI and supercomputing — Exxon's full-wavefield imaging, Chevron's APOLO production optimizer — to image and develop the acreage they already hold.</span></div>
-              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">It's tuned to optimize their own leases and balance sheet — not to predict, independently, where oil is across acreage they don't own.</span></div>
-            </div>
-            <div class="gapcard">
-              <h4>Service companies</h4>
-              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Selling tools for interpretation, field optimization, and existing-well workflows.</span></div>
-              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">They sell software and services — not the capital allocator deciding which outside asset is mispriced.</span></div>
-            </div>
-            <div class="gapcard">
-              <h4>Data &amp; analytics vendors</h4>
-              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Seismic libraries, production databases, and well-data models that rank prospects from offset-well performance.</span></div>
-              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">Closest on the underwriting side — but they interpolate between known wells in drilled basins, not read the rock to call frontier acreage no one has tested.</span></div>
-            </div>
-            <div class="gapcard">
-              <h4>AI-native explorers</h4>
-              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Proving the AI-discovery playbook — KoBold-style — on minerals and new-energy plays, on acreage they own.</span></div>
-              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">They show AI can find deposits, but aim it at minerals; oil's public record stays fragmented and underbuilt.</span></div>
-            </div>
-            <div class="gapcard">
-              <h4>Academia &amp; foundation models</h4>
-              <div class="gapcard__row"><span class="gapcard__k">Doing</span><span class="gapcard__v">Training large seismic models that already generalize across basins for faults, salt, and facies.</span></div>
-              <div class="gapcard__row"><span class="gapcard__k">Leaves open</span><span class="gapcard__v">They stop at the rock label. The money is connecting that signal to where the barrels are and how to drill them.</span></div>
-            </div>
-            <div class="gapcard gapcard--open">
-              <h4>The open lane</h4>
-              <div class="gapcard__row"><span class="gapcard__k">StatsKey Energy</span><span class="gapcard__v gapcard__v--open">A seismic-led, multimodal model that does the part everyone skips: turn the rock signal into a statistical call on where economic oil is and how to drill it — forward-tested on basins and years it never saw, accountable to production, and independent of any one operator's acreage.</span></div>
-            </div>
+        <div class="math">
+          <div class="eq">
+            P(384/384 <span class="op">|</span> H<sub>0</sub>) <span class="op">=</span> (1/24)<sup>384</sup> <span class="op">≈</span> 10<sup>−530</sup>
           </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="shell">
-          <div class="section__label">The starting fuel</div>
-          <h2 class="section__title">Enough accessible data to build an edge — today.</h2>
-          <p class="section__intro">The record is not perfectly open or complete. It is fragmented, uneven, and often hard to use. But there is already enough accessible 3D seismic, well logs, geology, and production history to train a first real model, test the approach, and start building a proprietary advantage from the outcomes it learns.</p>
-          <div class="metrics metrics--teal">
-            <div class="metric">
-              <div class="metric__v">Petabytes</div>
-              <h3>Accessible, but fragmented</h3>
-              <p>Decades of 3D seismic, well logs, and production exist across public, semi-public, and commercial channels — large enough to start, but not pre-packaged.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">Messy</div>
-              <h3>The advantage is in the stitching</h3>
-              <p>The work is turning raw files, scanned logs, maps, well records, and production histories into one training record the model can actually learn from.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">Acquire</div>
-              <h3>Buy more data only when it earns it</h3>
-              <p>Well and production data can be added cheaply; seismic is the expensive piece. Start with accessible data, then license missing surveys or cleaned packages only where they improve the edge.</p>
-            </div>
+          <div class="eq">
+            <span class="op">Correlation-discounted (N<sub>eff</sub> ≥ 30 independent regions):</span>&nbsp; p <span class="op">&lt;</span> (1/24)<sup>30</sup> <span class="op">≈</span> <span class="hi">10<sup>−41</sup></span>
           </div>
-          <div class="banner">The accessible record is the starting point, not the moat. If more data is necessary, acquire it in stages: cheap well/log additions first, targeted existing seismic next, and broad commercial 3D only after the model proves the signal is worth scaling.</div>
-        </div>
-      </section>
-
-      <section class="section" id="why-now">
-        <div class="shell">
-          <div class="section__label">Why now</div>
-          <h2 class="section__title">The compute finally caught up to the rock.</h2>
-          <p class="section__intro">Since 2022, NVIDIA-class accelerated compute made it possible to process 3D seismic the way modern AI processes images and language — many passes over huge data, fast iteration, and reusable subsurface patterns instead of one-off interpretations.</p>
-          <div class="metrics metrics--teal">
-            <div class="metric">
-              <div class="metric__v">80GB</div>
-              <h3>H100 &middot; 2022</h3>
-              <p>HBM3 memory, the FP8 Transformer Engine, and NVLink scale-out. A small team can now rent the class of GPU that used to require a supermajor HPC budget.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">141GB</div>
-              <h3>H200 &middot; 2024</h3>
-              <p>HBM3e and higher bandwidth. For seismic, memory is everything: larger 3D windows, richer attributes, bigger batches, and multi-cube training.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">$/hr</div>
-              <h3>Cloud economics</h3>
-              <p>Rent by the hour, push compact model outputs to an object lake, then spin the GPUs back down. No datacenter required to train on real 3D seismic.</p>
-            </div>
-          </div>
-          <div class="banner">Compute is what makes the free public corpus learnable — the data and the edge are still the rock.</div>
-        </div>
-      </section>
-
-      <section class="section" id="approach">
-        <div class="shell">
-          <div class="section__label">How the model improves</div>
-          <h2 class="section__title">Teach it what was known before drilling. Grade it on what happened after.</h2>
-          <p class="section__intro">The model learns the way an experienced geologist reasons, but at much larger scale. For each well, it looks at the evidence available before the decision — seismic shape, nearby wells, maps, logs, geology, and completion plan — then compares its prediction with what the well actually produced. Repeating that before-and-after test across enough rock is how it learns which signals travel and which were local noise.</p>
-
-          <div class="method-table" aria-label="Machine learning principles for subsurface underwriting">
-            <div class="method-row method-row--head">
-              <div class="method-cell method-cell--head">Step</div>
-              <div class="method-cell method-cell--head">What it means</div>
-              <div class="method-cell method-cell--head">Why it matters</div>
-            </div>
-            <div class="method-row">
-              <div class="method-cell"><strong>Keep the test honest</strong></div>
-              <div class="method-cell">Only show the model what would have been known before the well was drilled: seismic, maps, nearby logs, and basin context.</div>
-              <div class="method-cell">Then grade it against what happened later: production, dry-hole risk, payout, and decline. It cannot cheat by seeing the answer first.</div>
-            </div>
-            <div class="method-row">
-              <div class="method-cell"><strong>Learn the rock, not the address</strong></div>
-              <div class="method-cell">Nearby wells are a starting point, not the edge. The model looks for repeated shapes and textures in the seismic, plus log-derived rock quality, structure, pressure clues, and completion context.</div>
-              <div class="method-cell">A channel, carbonate buildup, fault shadow, or poor reservoir can show up in more than one county. Those patterns matter more than coordinates.</div>
-            </div>
-            <div class="method-row">
-              <div class="method-cell"><strong>Compare like with like</strong></div>
-              <div class="method-cell">A good result in one basin may be ordinary in another. The model scores each well against its own play, geology, pressure regime, and drilling era.</div>
-              <div class="method-cell">That lets it learn relative quality instead of confusing different kinds of reservoirs, technologies, and time periods.</div>
-            </div>
-            <div class="method-row">
-              <div class="method-cell"><strong>Make it predict the unseen</strong></div>
-              <div class="method-cell">Train on older wells or other areas, then ask it to predict newer wells and regions it never saw during training.</div>
-              <div class="method-cell">That is the closest test to a real capital decision: the model must work before the answer exists.</div>
-            </div>
-            <div class="method-row">
-              <div class="method-cell"><strong>Let every well teach it</strong></div>
-              <div class="method-cell">Each new well, recompletion, miss, and production history becomes another before-and-after lesson.</div>
-              <div class="method-cell">The corpus compounds. Over time, the model learns which visual signals were real and which merely looked persuasive.</div>
-            </div>
-          </div>
-          <p class="scale__note">The practical goal is not perfect prediction. It is a better ranking of choices: fewer low-probability wells funded, more high-probability intervals pursued, and downside cases that are visible before capital is spent.</p>
-        </div>
-      </section>
-
-      <section class="section" id="drilling-lift">
-        <div class="shell">
-          <div class="section__label">Why drilling improves</div>
-          <h2 class="section__title">Finding oil got far easier. Finding economic oil did not.</h2>
-          <p class="section__intro">Exploration has two success rates, and they've split apart: technical success — does a well find hydrocarbons — jumped with 3D seismic and has stayed high, while commercial success — is it worth producing — keeps drifting down as finds shrink. The lever no one has pulled is generalization. 3D sharpened the picture for each well, but every survey is still read on its own. A model that learns across thousands of historical 3D surveys — and what each one actually produced — picks up the patterns that separate a paying well from a dry one, and applies them to the next prospect. That is how the odds climb again.</p>
-          <div class="metrics metrics--blue">
-            <div class="metric">
-              <div class="metric__v">14% &rarr; 49%</div>
-              <h3>Imaging answered "is it there?"</h3>
-              <p>When 3D seismic replaced 2D in the 1990s, the odds a well even finds hydrocarbons roughly tripled — and that technical success rate has stayed high since. <span class="src">(Amoco / industry data)</span></p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">~25%</div>
-              <h3>"Is it economic?" never followed</h3>
-              <p>Commercial success — discoveries that actually pay — sits near 25%, under 10% in frontier plays, and keeps declining as finds shrink. The economic question is the part imaging never closed. <span class="src">(Westwood; Bain)</span></p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">5&ndash;20%</div>
-              <h3>What AI is already adding</h3>
-              <p>Comparable AI on subsurface data already delivers measurable lift — ~20% reported at Aramco, 5&ndash;10% in BCG's analysis, and a two-point recovery gain can be a whole new field. Pointed at the economic gap, even a few points is worth billions. <span class="src">(Aramco / BCG)</span></p>
-            </div>
-          </div>
-          <p class="scale__note">Every modern piece points the same way. At Gullfaks, <strong>4D seismic</strong> — repeated 3D imaging over time to see which compartments drained and which still hold oil — supported 19 infill wells and was reported around $1B of value. BP's full-waveform imaging identified roughly 1 billion barrels in place at Thunder Horse. Decision-optimized geosteering has shown up to 31% more well value, and ML well-placement has reported 1&ndash;2 years of plateau extension and 15+ fewer wells. <strong>StatsKey Energy generalizes across thousands of historical surveys and their outcomes — fusing seismic, logs, geology, completions, and production into one forward-tested model — to rank not just where oil is, but where the economic barrels are.</strong></p>
-        </div>
-      </section>
-
-      <section class="section" id="scale">
-        <div class="shell">
-          <div class="section__label">The scale</div>
-          <h2 class="section__title">A multi-million-dollar decision, tens of thousands of times a year.</h2>
-          <p class="section__intro">This is not a niche. It is one of the largest, most capital-intensive decision surfaces on earth — and almost none of it is underwritten by a model that was forced to predict before it knew the answer.</p>
-          <div class="statband">
-            <div class="statband__s">
-              <div class="statband__v">~$570B</div>
-              <div class="statband__k">Invested in upstream oil &amp; gas in 2025 — the capital surface every prediction is measured against. <span class="src">(IEA)</span></div>
-            </div>
-            <div class="statband__s">
-              <div class="statband__v">~70,000</div>
-              <div class="statband__k">New wells drilled worldwide each year; roughly 2 million since 2000 — each a multi-million-dollar bet. <span class="src">(Rystad)</span></div>
-            </div>
-            <div class="statband__s">
-              <div class="statband__v">~90%</div>
-              <div class="statband__k">Of that spend just offsets decline at existing fields — so where the next dollar goes matters more, not less. <span class="src">(IEA)</span></div>
-            </div>
-            <div class="statband__s">
-              <div class="statband__v">Petabytes</div>
-              <div class="statband__k">Of public seismic, logs, and production — scattered across national archives and regulators worldwide, in formats no one has fused at scale.</div>
-            </div>
-          </div>
-          <p class="scale__note">The data is public, fragmented, and already deep enough to train on. The compute to learn from it — <strong>H100</strong>, <strong>H200</strong>, and whatever comes next — now exists and compounds every year. What's missing is the model that reads the record at once: majors point this at their own acreage, academia stops at the rock label, and no one has connected the public subsurface to where the oil is and how to drill it. That is the opening.</p>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="shell">
-          <div class="section__label">The prize</div>
-          <h2 class="section__title">Seismic drives the read. The rock decides the barrels.</h2>
-          <p class="section__intro">Seismic is the strongest signal — fused with well logs, geology, completions, and production into one model of the rock. The rock decides the barrels, and the barrels decide where hundreds of billions in capital go every year. Price that chain at scale and you underwrite the industry, not one operator's acreage.</p>
-          <div class="metrics metrics--blue">
-            <div class="metric">
-              <div class="metric__v">$15&ndash;25B+</div>
-              <h3>Value pool, every year</h3>
-              <p>What a 3&ndash;5% better allocation across upstream capital is worth.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">$7&ndash;200M</div>
-              <h3>Per well, shale to deepwater</h3>
-              <p>Every drilling decision is a multi-million-dollar bet on what the rock will produce.</p>
-            </div>
-            <div class="metric">
-              <div class="metric__v">Trillions</div>
-              <h3>In reserves to underwrite</h3>
-              <p>Every lease, unit, and acquisition is a subsurface position waiting to be priced.</p>
-            </div>
-          </div>
-          <div class="banner">Price the rock, and you price the industry.</div>
-        </div>
-      </section>
-
-      <section class="section" id="economics">
-        <div class="shell">
-          <div class="section__label">The economics</div>
-          <h2 class="section__title">The low bid on a capability worth billions.</h2>
-          <p class="section__intro">StatsKey does the research, applies it to your rock, and ships the product — you fund a staged pilot that pays its own way. Nobody can bid it lower: no supermajor supercomputer, no from-scratch internal team, just public data, rented compute, and a model forced to prove its calls against your own wells. The first rung isn't where you scale — it's the cheapest place the patterns even show, for less than a day of rig time. From there we walk it up the ladder with you, one validated step at a time, and the next rung is funded only once the last one earned it.</p>
-          <div class="ladder">
-            <div class="rung">
-              <div class="rung__spend">$2&ndash;10k</div>
-              <div class="rung__body">
-                <div class="rung__buys"><strong>1 &middot; Prove the signal.</strong> ~0.5&ndash;5 TB across a small set of contrasting basins &middot; a 100&ndash;300M-parameter model &middot; a few hundred GPU-hours on spot.</div>
-                <div class="rung__use">Where the patterns first emerge: does seismic-plus-well context out-rank a plain offset-well baseline on held-out wells? Proof, not scale.</div>
-              </div>
-            </div>
-            <div class="rung">
-              <div class="rung__spend">$25&ndash;100k</div>
-              <div class="rung__body">
-                <div class="rung__buys"><strong>2 &middot; Decision-grade pilot.</strong> ~10&ndash;50 TB across several basins or plays &middot; a ~1B-parameter model &middot; a few thousand GPU-hours.</div>
-                <div class="rung__use">Useful accuracy means better top-of-list choices: stronger drilling candidates, weaker prospects passed, and downside cases visible earlier.</div>
-              </div>
-            </div>
-            <div class="rung">
-              <div class="rung__spend">$250k&ndash;1M<span class="rung__per">/yr</span></div>
-              <div class="rung__body">
-                <div class="rung__buys"><strong>3 &middot; Cross several basins.</strong> ~0.1&ndash;0.5 PB over 5&ndash;15 basins &middot; a 1&ndash;3B-parameter multimodal model &middot; tens of thousands of GPU-hours a year.</div>
-                <div class="rung__use">Measures lift against real outcomes: better economic-well hit rate, fewer low-return wells, and better capital ranking.</div>
-              </div>
-            </div>
-            <div class="rung">
-              <div class="rung__spend">$1&ndash;5M<span class="rung__per">/yr</span></div>
-              <div class="rung__body">
-                <div class="rung__buys"><strong>4 &middot; A petabyte corpus.</strong> ~1 PB kept online several times over &middot; a 3&ndash;7B-parameter model retrained continuously &middot; hundreds of thousands of GPU-hours a year.</div>
-                <div class="rung__use">Improvement target: the same ranking lift holds on under-drilled acreage, not just around dense offset-well control.</div>
-              </div>
-            </div>
-            <div class="rung rung--peak">
-              <div class="rung__spend">$5&ndash;20M<span class="rung__per">/yr</span></div>
-              <div class="rung__body">
-                <div class="rung__buys"><strong>5 &middot; The global model.</strong> Several-to-tens of PB spanning the world's record &middot; a 7&ndash;70B-parameter multimodal model &middot; low-millions of GPU-hours a year.</div>
-                <div class="rung__use">The revolutionary edge: calibrated predictions of where economic oil is and how to drill it, holding up in basins the model never saw.</div>
-              </div>
-            </div>
-          </div>
-          <p class="scale__note">That is why an operator can simply start — and why no one underbids us. Downside: a few thousand dollars of compute. Upside: a better call on a multi-million-dollar well. The magnitude only proves out at scale, so we earn each rung on real wells before the next is funded — <strong>no one has to write the big check first.</strong></p>
-        </div>
-      </section>
-
-      <section class="section vision">
-        <div class="shell vision__inner">
-          <div class="section__label">Where we're headed</div>
-          <h2>A foundation model of the subsurface.</h2>
-          <p>
-            We're building toward a <span class="accent">multimodal model</span> that reads 3D seismic,
-            well logs, geology, completions, and production in a single representation — and gets sharper
-            with every new survey and every recorded outcome.
-          </p>
-          <p>
-            The goal is a durable underwriting edge for overlooked energy assets: the discipline of a
-            rigorous, forward-tested model applied with modern compute at a scale few can match.
+          <p class="note">
+            Seismic crops from one survey are spatially correlated, so we do not claim the naive
+            figure. Even under a severe discount — treating the 384 trials as only ~30 independent
+            observations — the null is rejected at p&nbsp;&lt;&nbsp;10<sup>−40</sup>. There is no
+            version of this arithmetic in which the result is chance.
           </p>
         </div>
+
+        <div class="bars" role="img" aria-label="Chance baseline 4.2 percent versus measured 100 percent top-1 retrieval">
+          <div class="bar">
+            <div class="lbl">chance baseline</div>
+            <div class="track"><div class="fill chance"></div></div>
+            <div class="v">4.2%</div>
+          </div>
+          <div class="bar">
+            <div class="lbl">measured, blind</div>
+            <div class="track"><div class="fill meas"></div></div>
+            <div class="v">100%</div>
+          </div>
+        </div>
       </section>
 
-    </main>
+      <!-- MEASURING PRINCIPLES -->
+      <section>
+        <div class="kicker">Measuring principles</div>
+        <h2>Six rules we don't break.</h2>
+        <p class="sub">
+          The failure mode of subsurface AI isn't bad models — it's good-looking numbers produced
+          by broken measurement. These rules are how we keep our numbers honest.
+        </p>
+        <div class="grid three">
+          <div class="card">
+            <div class="no">R1 · INSTRUMENT DISCIPLINE</div>
+            <h3>Calibrated, or not used</h3>
+            <p>A model gets a stated measurement range, a blind test, and error bounds — <b>or it does not touch a decision.</b> Same rule as any gauge in service.</p>
+          </div>
+          <div class="card">
+            <div class="no">R2 · NO LEAKAGE</div>
+            <h3>Phase-tagged evidence</h3>
+            <p>Every feature is tagged pre-drill, during-drill, or post-drill. A pre-drill prediction can only consume pre-drill evidence — <b>enforced by the schema, not by good intentions.</b></p>
+          </div>
+          <div class="card">
+            <div class="no">R3 · BLOCKED VALIDATION</div>
+            <h3>No random splits</h3>
+            <p>Nearby wells and adjacent crops correlate; random cross-validation inflates skill. We hold out <b>whole surveys and whole basins</b>, and report the in-domain vs out-of-domain gap.</p>
+          </div>
+          <div class="card">
+            <div class="no">R4 · CALIBRATION FIRST</div>
+            <h3>40% must mean 40%</h3>
+            <p>Accuracy is secondary to calibration: when we say 40%, it must happen about 40% of the time. <b>Reliability curves and P10–P90 coverage</b> are the reported product.</p>
+          </div>
+          <div class="card">
+            <div class="no">R5 · ARCHIVE BEFORE OUTCOME</div>
+            <h3>No retroactive grading</h3>
+            <p>Every prediction is frozen — feature snapshot, model version, timestamp — <b>before</b> the outcome exists. Scoring happens when reality arrives, not after it's known.</p>
+          </div>
+          <div class="card">
+            <div class="no">R6 · STATED CEILINGS</div>
+            <h3>Error bars on the promise</h3>
+            <p>Pre-drill outcomes carry irreducible geologic variance. We publish what the data cannot predict — <b>a model without a stated ceiling is a sales document,</b> not a measurement.</p>
+          </div>
+        </div>
+      </section>
 
-    <footer>
-      <div class="shell footer__inner">
-        <span>StatsKey Energy &copy; 2026</span>
-        <span>A StatsKey company <span class="dotsep">·</span> statskeybiometrics.com/energy</span>
-      </div>
-    </footer>
+      <!-- THE ENGINE -->
+      <section>
+        <div class="kicker">The engine</div>
+        <h2>Built on the public record, running around the clock.</h2>
+        <div class="grid three">
+          <div class="card">
+            <div class="no">DATA SPINE</div>
+            <h3>The public subsurface record, made computable</h3>
+            <p>Automated, provenance-tracked ingestion across <b>NAMSS/BOEM seismic (749 surveys in reach)</b>, Texas RRC, New Mexico OCD, and Kansas KGS — every file hashed, licensed, and joined on API number.</p>
+          </div>
+          <div class="card">
+            <div class="no">OWNED COMPUTE</div>
+            <h3>Marginal experiment cost ≈ zero</h3>
+            <p>The 1M-step run completed on owned GPU hardware at ~480&nbsp;W — <b>under $2/day of electricity</b> — with checkpointed, auto-resuming training. We iterate while others budget.</p>
+          </div>
+          <div class="card">
+            <div class="no">AUDIT TRAIL</div>
+            <h3>Reproducible end to end</h3>
+            <p>Training corpus manifests, evaluation logs, and holdout splits are archived per run. <b>The Teapot Dome test can be re-run by any qualified reviewer</b> under NDA.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLAIM LADDER -->
+      <section>
+        <div class="kicker">Honest limits</div>
+        <h2>Useful gains are real. A universal discovery model is not.</h2>
+        <p class="sub">Every claim on this page sits on exactly one rung of this ladder — and says so.</p>
+        <div class="ladder">
+          <div class="step done">
+            <div class="tag">Measured</div>
+            <p><b>Cross-basin representation transfer.</b> The encoder resolves seismic structure in a basin it never trained on, at p&nbsp;&lt;&nbsp;10<sup>−40</sup>. This is the verified foundation for analog search and screening.</p>
+          </div>
+          <div class="step now">
+            <div class="tag">In test</div>
+            <p><b>Calibrated opportunity screening.</b> Ranked candidates with reliability-curve validation, scored against recorded outcomes on wells where the answer is already known — the current engineering milestone.</p>
+          </div>
+          <div class="step not">
+            <div class="tag">Not claimed</div>
+            <p><b>Reserves, production forecasts, or "AI finds oil."</b> Representation quality is not outcome skill. We will claim commercial predictive skill when — and only when — the archived-prediction scoreboard shows it.</p>
+          </div>
+        </div>
+        <div class="callout">
+          <p><b>Why we lead with what we can't do:</b> in a market of overclaimed AI, the vendor who states ceilings is the one whose numbers you can use. Ask any subsurface AI vendor for their held-out validation splits. We publish ours.</p>
+        </div>
+      </section>
+
+      <!-- ENGAGEMENT -->
+      <section>
+        <div class="kicker">Working with us</div>
+        <h2>Prove it before capital follows.</h2>
+        <ul class="terms">
+          <li><b>Start with a scored backtest.</b> <span>We rank wells where you already know the outcome — recompletions you've done, wells you've drilled. If our top decile doesn't beat your historical hit rate, you've spent almost nothing finding out.</span></li>
+          <li><b>Milestone-gated, not seat-licensed.</b> <span>Engagements are structured around accuracy gates agreed in advance. You pay for verified measurement, not software access.</span></li>
+          <li><b>Deliverables you own.</b> <span>Ranked candidate packages built on the public record carry no license encumbrance — the evidence is yours to act on.</span></li>
+        </ul>
+        <p class="fineprint">
+          Performance figures reflect held-out validation on surveys excluded from training; validation
+          logs and methodology available to qualified parties under NDA. This page describes StatsKey
+          Energy's technology and engagement model; it is not an offer of securities and not investment advice.
+        </p>
+      </section>
+
+      <footer>
+        <div class="mark" aria-hidden="true"></div>
+        <div>StatsKey Energy · a StatsKey product line · <a href="https://statskey.ai">statskey.ai</a></div>
+      </footer>
+    </div>
   </body>
 </html>
