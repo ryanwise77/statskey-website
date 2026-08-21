@@ -75,6 +75,7 @@ const state = {
   archiveMonth: null,
   archiveWeekStart: null,
   archiveMealsByMonth: new Map(),
+  liveMeals: [],
   archiveLoading: true,
   archiveError: null,
   archiveNutrientsOpen: false,
@@ -99,6 +100,7 @@ const state = {
   routeLoading: false,
   unsubscribeRoot: null,
   unsubscribeWorkouts: null,
+  unsubscribeMeals: null,
   unsubscribeRoute: null,
 }
 
@@ -233,6 +235,16 @@ function workoutsReference() {
   )
 }
 
+// Recent meals stream in live so the archive's newest days never wait for the
+// next static rebuild. 80 records ≈ the last five or six days.
+function liveMealsReference() {
+  return query(
+    collection(database, 'publicFounderReplicas', 'founder', 'meals'),
+    orderBy('recordedAt', 'desc'),
+    limit(80)
+  )
+}
+
 async function loadCompleteWorkoutHistory() {
   if (state.historyWorkouts || state.historyLoading) return
   state.historyLoading = true
@@ -337,6 +349,22 @@ function connectLiveRecord() {
     }
   )
 
+  state.unsubscribeMeals = onSnapshot(
+    liveMealsReference(),
+    (snapshot) => {
+      state.liveMeals = snapshot.docs
+        .map((entry) => ({
+          ...entry.data(),
+          mealId: entry.data().mealId || entry.id,
+        }))
+        .filter((meal) => String(meal.day || '') >= PUBLIC_HISTORY_START_DAY)
+      if (state.archiveOpen) renderArchive()
+    },
+    (error) => {
+      console.warn('Founder live meals unavailable', error.code)
+    }
+  )
+
   state.unsubscribeWorkouts = onSnapshot(
     workoutsReference(),
     (snapshot) => {
@@ -374,6 +402,11 @@ function archiveMealPool() {
   const records = new Map()
   for (const meal of Array.from(state.archiveMealsByMonth.values()).flat()) {
     if (meal?.mealId) records.set(meal.mealId, meal)
+  }
+  // Live records win over the static archive so the newest days stay current
+  // between rebuilds.
+  for (const meal of state.liveMeals) {
+    if (meal?.mealId && meal.day) records.set(meal.mealId, meal)
   }
   return Array.from(records.values()).sort((left, right) => (
     String(right.day || '').localeCompare(String(left.day || '')) ||
@@ -747,9 +780,13 @@ function archiveHome() {
   const scope = week
     ? `${dateLabel(week.weekStart, { short: true })}–${dateLabel(week.weekEnd, { short: true })}`
     : archiveMonthDefinition()?.label || 'Selected archive'
+  const liveThroughDay = [
+    String(manifest.reliableThroughDay || ''),
+    ...state.liveMeals.map((meal) => String(meal.day || '')),
+  ].sort().at(-1)
   return `
     <section class="founder-archive-summary">
-      <header><div><small>Verified public archive</small><strong>${escapeHTML(dateLabel(manifest.earliestDay, { short: true }))}–${escapeHTML(dateLabel(manifest.reliableThroughDay, { short: true }))}</strong></div><span>Updated once · served statically</span></header>
+      <header><div><small>Verified public archive</small><strong>${escapeHTML(dateLabel(manifest.earliestDay, { short: true }))}–${escapeHTML(dateLabel(liveThroughDay, { short: true }))}</strong></div><span>Static history · live recent days</span></header>
       <div>
         <article><small>Food records</small><strong>${integer(manifest.mealCount)}</strong><span>every reliable public meal</span></article>
         <article><small>Food items</small><strong>${integer(manifest.itemCount)}</strong><span>preserved inside each meal</span></article>
