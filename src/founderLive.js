@@ -174,6 +174,7 @@ const state = {
   workoutCursor: null,
   workoutsLoading: false,
   staticWorkoutAttempted: false,
+  workoutArchiveOpen: false,
   workoutHistoryExhausted: false,
   visibleWorkoutCount: WORKOUT_VISIBLE_STEP,
   workoutsError: null,
@@ -191,6 +192,8 @@ const state = {
   fitnessMenu: null,
   nutritionRangeDays: 30,
   includeToday: false,
+  nutritionPanelOpen: false,
+  nutritionDetailsOpen: false,
   runningView: 'home',
   selectedWorkout: null,
   selectedNutrient: null,
@@ -687,10 +690,6 @@ async function loadStaticWorkoutArchive() {
       'workoutId'
     )
     state.workoutHistoryExhausted = true
-    state.visibleWorkoutCount = Math.min(
-      state.allWorkouts.length,
-      state.visibleWorkoutCount + WORKOUT_VISIBLE_STEP
-    )
   } catch (error) {
     console.warn('Founder static workout archive unavailable', error)
     state.workoutsError = 'The published activity archive is unavailable; loading the live record instead.'
@@ -1496,7 +1495,7 @@ function runningHome() {
   return `
     <div class="founder-record-heading">
       <span>
-        <small>SEPTEMBER 2025 — PRESENT</small>
+        <small>LATE AUGUST 2025 — PRESENT</small>
         <h3>The complete training record</h3>
         <p>${integer(totalActivities)} public workouts across ${integer(state.root?.training?.allTime?.activeDays)} active days.</p>
       </span>
@@ -1522,17 +1521,26 @@ function runningHome() {
         ${fitnessTimeline()}
       </div>
     </section>
-    <div class="founder-history-heading">
-      <span><small>RECORD LEVEL</small><strong>Every workout</strong><p>Tap any entry for splits, zones, crop edits, and all published telemetry.</p></span>
-      <em>${integer(visibleCount)} of ${integer(totalActivities || allWorkouts.length)}</em>
-    </div>
-    <div class="ios-activity-list">${workoutRows(allWorkouts, visibleCount)}</div>
-    <div class="ios-scroll-loader ${historyComplete ? 'is-complete' : ''}" data-running-history aria-live="polite">
-      ${state.workoutsLoading ? '<i></i><span>Loading older activity…</span>' : historyComplete
-        ? `<span>Full workout history · ${PUBLIC_HISTORY_START_LABEL} to present</span>`
-        : `<i></i><span>Keep scrolling · full history since ${PUBLIC_HISTORY_START_LABEL}</span>`}
-    </div>
-    ${state.workoutsError ? `<p class="ios-inline-error">${escapeHTML(state.workoutsError)}</p>` : ''}
+    ${state.workoutArchiveOpen ? `
+      <section class="workout-history-dropdown is-open">
+        <button class="workout-history-dropdown__toggle" type="button" data-workout-archive-toggle aria-expanded="true">
+          <span><small>RECORD LEVEL</small><strong>Every workout</strong><p>Showing ${integer(visibleCount)} of ${integer(totalActivities || allWorkouts.length)}. Records render twelve at a time.</p></span>
+          <i aria-hidden="true">⌄</i>
+        </button>
+        <div class="ios-activity-list">${workoutRows(allWorkouts, visibleCount)}</div>
+        <button class="workout-history-load-more ${historyComplete ? 'is-complete' : ''}" type="button" data-running-history ${historyComplete ? 'disabled' : ''} aria-live="polite">
+          ${state.workoutsLoading ? '<i></i><span>Loading the static workout archive…</span>' : historyComplete
+            ? `<span>All ${integer(allWorkouts.length)} workouts loaded</span>`
+            : `<span>Load ${integer(Math.min(WORKOUT_VISIBLE_STEP, Math.max(0, allWorkouts.length - visibleCount)) || WORKOUT_VISIBLE_STEP)} more workouts</span>`}
+        </button>
+        ${state.workoutsError ? `<p class="ios-inline-error">${escapeHTML(state.workoutsError)}</p>` : ''}
+      </section>
+    ` : `
+      <button class="workout-history-dropdown__toggle" type="button" data-workout-archive-toggle aria-expanded="false">
+        <span><small>COMPLETE WORKOUT ARCHIVE</small><strong>Open every workout</strong><p>The record stays collapsed and unloaded until requested, then renders twelve entries at a time.</p></span>
+        <i aria-hidden="true">⌄</i>
+      </button>
+    `}
   `
 }
 
@@ -2071,6 +2079,17 @@ function nutrientStatusVisualization(nutrients) {
 }
 
 function nutritionHome() {
+  if (!state.nutritionPanelOpen) {
+    const preview = state.root?.nutrition?.ranges?.complete?.['30'] ??
+      state.root?.nutrition
+    const previewNutrients = preview?.nutrients ?? preview?.micronutrients ?? []
+    return `
+      <button class="workout-history-dropdown__toggle nutrition-panel-dropdown-toggle" type="button" data-nutrition-panel-toggle aria-expanded="false">
+        <span><small>PERSONAL NUTRITION DATA</small><strong>Open nutrition history and nutrient detail</strong><p>${integer(preview?.recordedDays)} recorded days · ${integer(previewNutrients.length)} nutrients. Nothing historical renders until requested.</p></span>
+        <i aria-hidden="true">⌄</i>
+      </button>
+    `
+  }
   const nutrition = nutritionSnapshot()
   if (!nutrition && state.nutritionRangeDays === 'all') {
     return `
@@ -2086,15 +2105,22 @@ function nutritionHome() {
   const watch = micronutrients.filter((item) => item.status === 'watch').length
   const historical = state.nutritionRangeDays === 'all'
   const manifest = state.historyManifest
-  const explorerNutrients = historical
-    ? micronutrients
-        .filter((nutrient) => (
-          state.historyNutrientCategory === 'All' ||
-          (nutrient.category || nutritionCategory(nutrient)) === state.historyNutrientCategory
-        ))
-        .slice(0, state.historyNutrientLimit)
-    : micronutrients
+  const nutrientCategories = Array.from(new Set(micronutrients.map((nutrient) => (
+    nutrient.category || nutritionCategory(nutrient)
+  ))))
+  if (!nutrientCategories.includes(state.historyNutrientCategory)) {
+    state.historyNutrientCategory = nutrientCategories[0] || 'Other'
+  }
+  const categoryNutrients = micronutrients.filter((nutrient) => (
+    state.historyNutrientCategory === 'All' ||
+    (nutrient.category || nutritionCategory(nutrient)) === state.historyNutrientCategory
+  ))
+  const explorerNutrients = categoryNutrients.slice(0, state.historyNutrientLimit)
   return `
+    <button class="workout-history-dropdown__toggle nutrition-panel-dropdown-toggle is-open" type="button" data-nutrition-panel-toggle aria-expanded="true">
+      <span><small>PERSONAL NUTRITION DATA</small><strong>Close nutrition panel</strong><p>Detailed rows remain inside bounded dropdowns below.</p></span>
+      <i aria-hidden="true">⌄</i>
+    </button>
     <div class="founder-record-heading">
       <span>
         <small>${historical ? 'COMPLETE FOOD-ONLY HISTORY' : 'FOOD-ONLY INTAKE'}</small>
@@ -2131,12 +2157,28 @@ function nutritionHome() {
         <span><small>Fiber</small><strong>${number(average.fiberGrams).toFixed(1)}</strong><em>g</em></span>
       </div>
     </section>
-    ${historical ? historicalNutrientAtlas(micronutrients) : ''}
-    <div class="founder-history-heading">
-      <span><small>${historical ? 'BOUNDED EXPLORER' : 'COMPLETE EXPLORER'}</small><strong>${historical ? state.historyNutrientCategory : 'Every recorded nutrient'}</strong><p>Open any row to inspect its values and contributing food sources.</p></span>
-      <em>${historical ? `${explorerNutrients.length} shown` : `${micronutrients.length} nutrients`}</em>
-    </div>
-    <div class="founder-nutrient-explorer">${nutritionRows(explorerNutrients)}</div>
+    <section class="nutrition-details-dropdown ${state.nutritionDetailsOpen ? 'is-open' : ''}">
+      <button type="button" data-nutrition-details-toggle aria-expanded="${state.nutritionDetailsOpen}">
+        <span><small>COMPLETE NUTRIENT DATA</small><strong>${integer(micronutrients.length)} recorded nutrients</strong><p>The full explorer stays collapsed and renders one category, up to twenty nutrients, at a time.</p></span>
+        <i aria-hidden="true">⌄</i>
+      </button>
+      ${state.nutritionDetailsOpen ? `
+        <div>
+          ${historical ? historicalNutrientAtlas(micronutrients) : `
+            <div class="nutrition-history-atlas__controls">
+              <label><span>Nutrient category</span><select data-history-nutrient-category aria-label="Nutrient category"><option value="All" ${state.historyNutrientCategory === 'All' ? 'selected' : ''}>All categories · ${integer(micronutrients.length)}</option>${nutrientCategories.map((category) => `<option value="${escapeHTML(category)}" ${state.historyNutrientCategory === category ? 'selected' : ''}>${escapeHTML(category)} · ${integer(micronutrients.filter((nutrient) => (nutrient.category || nutritionCategory(nutrient)) === category).length)}</option>`).join('')}</select></label>
+              <p>Showing ${integer(explorerNutrients.length)} of ${integer(categoryNutrients.length)} in this category.</p>
+            </div>
+          `}
+          <div class="founder-history-heading">
+            <span><small>BOUNDED EXPLORER</small><strong>${escapeHTML(state.historyNutrientCategory)}</strong><p>Open any row to inspect its values and contributing food sources.</p></span>
+            <em>${explorerNutrients.length} shown</em>
+          </div>
+          <div class="founder-nutrient-explorer">${nutritionRows(explorerNutrients)}</div>
+          ${!historical && explorerNutrients.length < categoryNutrients.length ? `<button class="nutrition-history-load-more" type="button" data-history-more-nutrients>Load ${integer(Math.min(20, categoryNutrients.length - explorerNutrients.length))} more nutrients</button>` : ''}
+        </div>
+      ` : ''}
+    </section>
     <p class="ios-disclaimer">${escapeHTML(nutrition?.disclaimer || 'Recorded food estimate; supplements are excluded. Not a diagnosis.')}</p>
   `
 }
@@ -3878,7 +3920,11 @@ async function loadMoreWorkouts() {
 }
 
 function revealMoreWorkouts() {
-  if (state.runningView !== 'home') return
+  if (
+    state.runningView !== 'home' ||
+    !state.workoutArchiveOpen ||
+    state.workoutsLoading
+  ) return
   const workouts = state.allWorkouts ?? state.workouts
   if (state.visibleWorkoutCount < workouts.length) {
     state.visibleWorkoutCount = Math.min(
@@ -3946,6 +3992,13 @@ function openMeal(mealId, itemIndex = null, returnView = 'home') {
 }
 
 function handleRunningClick(event) {
+  if (event.target.closest('[data-workout-archive-toggle]')) {
+    state.workoutArchiveOpen = !state.workoutArchiveOpen
+    state.visibleWorkoutCount = WORKOUT_VISIBLE_STEP
+    renderRunning()
+    if (state.workoutArchiveOpen) void loadStaticWorkoutArchive()
+    return
+  }
   const workoutButton = event.target.closest('[data-live-workout]')
   if (workoutButton) {
     openWorkout(workoutButton.dataset.liveWorkout)
@@ -3985,23 +4038,40 @@ function handleRunningClick(event) {
 }
 
 function handleRunningScroll() {
-  if (state.runningView !== 'home') return
-  const remaining = elements.runningScreen.scrollHeight -
-    elements.runningScreen.scrollTop -
-    elements.runningScreen.clientHeight
-  if (remaining < 260) revealMoreWorkouts()
+  // Workout history is intentionally click-paged. Scrolling never expands it.
 }
 
 function handleNutritionClick(event) {
+  if (event.target.closest('[data-nutrition-panel-toggle]')) {
+    state.nutritionPanelOpen = !state.nutritionPanelOpen
+    state.selectedNutrient = null
+    if (!state.nutritionPanelOpen) state.nutritionDetailsOpen = false
+    renderNutrition()
+    return
+  }
   const rangeButton = event.target.closest('[data-nutrition-range]')
   if (rangeButton) {
     state.nutritionRangeDays = rangeButton.dataset.nutritionRange === 'all'
       ? 'all'
       : Number(rangeButton.dataset.nutritionRange)
     state.selectedNutrient = null
+    state.nutritionDetailsOpen = false
     state.historyNutrientLimit = 20
     renderNutrition()
     if (state.nutritionRangeDays === 'all' && !state.historyManifest) {
+      void loadFounderHistory(false)
+    }
+    return
+  }
+  if (event.target.closest('[data-nutrition-details-toggle]')) {
+    state.nutritionDetailsOpen = !state.nutritionDetailsOpen
+    state.historyNutrientLimit = 20
+    renderNutrition()
+    if (
+      state.nutritionDetailsOpen &&
+      state.nutritionRangeDays === 'all' &&
+      !state.historyManifest
+    ) {
       void loadFounderHistory(false)
     }
     return
@@ -4194,17 +4264,6 @@ function handleFounderPageScroll() {
     pageScrollFrame = null
     if (Date.now() < pausePageLoadingUntil) return
     const threshold = window.innerHeight + 900
-    const workoutLoader = elements.runningScreen
-      ?.querySelector('[data-running-history]')
-    const workoutBounds = workoutLoader?.getBoundingClientRect()
-    if (
-      state.runningView === 'home' &&
-      workoutLoader &&
-      workoutBounds.top < threshold &&
-      workoutBounds.bottom > 160
-    ) {
-      revealMoreWorkouts()
-    }
     const mealLoader = elements.mealsScreen
       ?.querySelector('[data-meal-history]')
     const mealBounds = mealLoader?.getBoundingClientRect()
