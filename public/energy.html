@@ -25,7 +25,6 @@
       content="Use the drilling record to rank prospects, estimate outcomes, and update the plan as new measurements arrive."
     />
     <meta property="og:url" content="https://statskey.ai/energy" />
-    <!-- Intentionally unlisted: not linked from the main site. Remove the line below to allow search indexing when ready to go public. -->
     <meta name="robots" content="noindex, nofollow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -171,6 +170,39 @@
       }
       .banner--blue { border-left-color: var(--blue); background: linear-gradient(90deg, rgba(110, 142, 255, 0.08), rgba(110, 142, 255, 0)); }
 
+      /* ---- pricing schedule ---- */
+      .sched { margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); overflow: hidden; }
+      .sched__head {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+        padding: 16px 26px; border-bottom: 1px solid var(--border-soft); background: rgba(255,255,255,0.015);
+      }
+      .sched__row {
+        display: grid; grid-template-columns: 200px 1fr; gap: 4px 32px; padding: 26px;
+        border-bottom: 1px solid var(--border-soft); transition: background 0.25s ease;
+      }
+      .sched__row:last-child { border-bottom: none; }
+      .sched__row:hover { background: var(--panel-2); }
+      .sched__price {
+        font-family: "Space Grotesk", sans-serif; font-size: clamp(26px, 3.4vw, 32px); font-weight: 700;
+        line-height: 1.05; letter-spacing: -0.02em; width: fit-content; align-self: start;
+        grid-column: 1; grid-row: 1;
+        background: var(--sched-grad, linear-gradient(135deg, var(--teal), var(--blue)));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .sched__body { grid-column: 2; grid-row: 1; }
+      .sched__row--teal { --sched-grad: linear-gradient(135deg, #30d5c8, #57e1d4); }
+      .sched__row--blue { --sched-grad: linear-gradient(135deg, #6e8eff, #9b7cff); }
+      .sched__unit { display: block; margin-top: 5px; font-family: "Inter", sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+      .sched__row h3 { font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .sched__desc { color: var(--muted); font-size: 14.2px; margin-top: 7px; max-width: 640px; }
+      .sched__anchor { color: var(--muted); font-size: 12.8px; margin-top: 11px; }
+      .sched__anchor::before { content: "— "; color: var(--teal); }
+      @media (max-width: 720px) {
+        .sched__row { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
+        .sched__price { grid-row: 1; }
+        .sched__body { grid-column: 1; grid-row: 2; }
+      }
+
       .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
       .vision__inner { max-width: 760px; }
       .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
@@ -248,11 +280,12 @@
             <div class="actions">
               <a class="btn btn--primary" href="#use">How it helps</a>
               <a class="btn btn--ghost" href="#evidence">Public evidence</a>
+              <a class="btn btn--ghost" href="#terms">The schedule</a>
             </div>
             <div class="asof">Evidence reviewed August 9, 2026</div>
           </div>
 
-          <div class="visual" aria-label="2025 global high-impact exploration results">
+          <div class="visual" role="region" aria-label="2025 global high-impact exploration results">
             <div class="visual__head">
               <span class="visual__title">The drilling bet</span>
               <span class="live"><span></span> 2025 public record</span>
@@ -373,120 +406,82 @@
         </div>
       </section>
 
-      <section class="section" id="compute">
+      <section class="section" id="terms">
         <div class="shell">
-          <div class="section__label">The investment</div>
-          <h2 class="section__title">What it takes, and how it comes back.</h2>
+          <div class="section__label">The price</div>
+          <h2 class="section__title">Priced the way this industry pays its partners.</h2>
           <p class="section__intro">
-            The first rung is already bought and proven: one owned GPU has run at 96% utilization
-            around the clock for weeks, training on public seismic. The numbers below are measured on
-            that machine and on current market prices — not projected.
+            Oil and gas has never paid the people who de-risk capital by the hour. The prospect
+            generator keeps an override. The underwriter takes points on the deal. The promoter is
+            paid in carry. StatsKey prices inside that tradition — cash that covers the work,
+            interest that carries the conviction — because a fee small enough to ignore is evidence
+            the model is too.
           </p>
-          <div class="metrics">
-            <div class="metric metrics--teal">
-              <div class="metric__v">$40k</div>
-              <h3>Infrastructure — already bought</h3>
-              <p>The owned compute-and-storage stack, purchased at 2026 post-shortage prices and running at 96% utilization for weeks. Founder capital, in the deal before anyone else's dollar — and as the survey lake grows toward 130&nbsp;TB hot, it avoids ~$1,950/month of cloud storage at list prices.</p>
+          <p class="section__intro">
+            The economics underneath are owned, not rented: corpus, model, and machines are built
+            once, run around the clock on dedicated hardware, and reused by every engagement that
+            follows — costs that do not move when cloud and GPU prices do.
+          </p>
+
+          <div class="sched" role="region" aria-label="Engagement pricing schedule">
+            <div class="sched__head">
+              <span class="visual__title">The schedule</span>
+              <span class="live"><span></span> cash covers the work · interest carries the conviction</span>
             </div>
-            <div class="metric metrics--blue">
-              <div class="metric__v">≈90%</div>
-              <h3>Gross margin per engagement</h3>
-              <p>Owned infrastructure holds delivery cost under ~$3,000 per engagement against five-figure engagement pricing — and idle months cost ~$250, not the ~$2,000 a cloud-hosted corpus bleeds between projects.</p>
+            <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>Screen the book</h3>
+                <p class="sched__desc">Every wellbore you operate, ranked drill, wait, or pass — with probability and production ranges, estimated cost, and the evidence behind each call. Priced per wellbore because that is how the value scales. $50,000 minimum.</p>
+                <p class="sched__anchor">A 1,500-wellbore book runs about $90,000 — one plugging liability, spread across every well you operate.</p>
+              </div>
+              <div class="sched__price">$60<span class="sched__unit">per wellbore</span></div>
             </div>
-            <div class="metric metrics--teal">
-              <div class="metric__v">12–24 mo</div>
-              <h3>Modeled capital return</h3>
-              <p>At modeled pricing and margin, a first tranche is returned by roughly four to six paid engagements — before any success-fee upside on the drilling and acquisition decisions the work informs.</p>
+            <div class="sched__row sched__row--blue">
+              <div class="sched__body">
+                <h3>Success fee, only on action</h3>
+                <p class="sched__desc">Due when you action a wellbore the screen scored — workover, recompletion, re-entry, or new well — within the term set in the master agreement. Pass on a recommendation and it costs nothing.</p>
+                <p class="sched__anchor">A $250,000 workover carries a $25,000 fee — a tenth of the decision it informs, and zero if you pass.</p>
+              </div>
+              <div class="sched__price">10%<span class="sched__unit">of AFE</span></div>
+            </div>
+            <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>Carried in the outcome</h3>
+                <p class="sched__desc">A small interest in each actioned decision — override, net-profits, or a fixed per-outcome payment, structured to the asset. We are paid when the well pays.</p>
+                <p class="sched__anchor">Alignment by construction: our conviction rides on our own calls.</p>
+              </div>
+              <div class="sched__price">2.5%<span class="sched__unit">interest</span></div>
+            </div>
+            <div class="sched__row sched__row--blue">
+              <div class="sched__body">
+                <h3>Acquisition underwriting</h3>
+                <p class="sched__desc">Data-complete diligence on producing-asset deals: every wellbore in the data room forecast against its own record, locked before close. $150,000 minimum — half at engagement, balance at close.</p>
+                <p class="sched__anchor">Diligence that moves price is worth 1–2% of deal size.</p>
+              </div>
+              <div class="sched__price">1%<span class="sched__unit">of deal size</span></div>
             </div>
           </div>
-          <p class="section__intro">
-            Realistically expecting a return starts near $75,000 — and none of it buys hardware.
-            The $40,000 infrastructure is already purchased, already trained the current model, and
-            is already running around the clock: founder capital, spent before asking for anyone
-            else's. The tranche funds roughly $10,000 of operations and rented burst compute for a
-            year, with the balance delivering the first scored pilots through to completion — which
-            is when the return clock starts.
-          </p>
-          <p class="section__intro">
-            The return arrives on two tracks. Retainers on screening and backtest engagements are
-            priced with margin by construction — five-figure engagements against low-four-figure
-            delivery cost — and return the tranche as cash. Success interests on decisions that
-            proceed carry the upside: the work informs $250,000 workovers and $2,000,000 wells, and a
-            small interest in a small number of good outcomes is where the multiple lives. The spend
-            side stays disciplined — training stops when the measured learning curve flattens, and at
-            current prices each GPU pays back against renting in 11–21 months.
-          </p>
-          <p class="section__intro">
-            Scale multiplies the same arithmetic; it does not change it. The corpus and the trained
-            model are built once and reused by every engagement that follows, so delivery cost per
-            engagement falls as the operation grows — margin widens with scale rather than
-            compressing. A scaled configuration — a multi-GPU tier and a few hundred terabytes of
-            storage, roughly $60,000–$120,000 of further infrastructure at 2026 prices — supports one
-            to two engagements a month across multiple districts: a mid-six-figure annual run-rate at the
-            margins above, on infrastructure that costs less per year than one month of the revenue
-            it carries. The growing book of success interests sits on top, each tied to decisions ten
-            to a hundred times the size of the fee that created it. And the margin is defended by
-            construction: pricing is set cost-plus at every tier, and because the cost base is owned,
-            this year's cloud and hardware price inflation raised competitors' delivery costs — not ours.
-          </p>
 
-          <div class="visual" style="margin-top: 30px; overflow-x: auto;" aria-label="Return on compute investment: where an engagement dollar goes, and the scale of the decision it informs">
-            <div class="visual__head">
-              <span class="visual__title">Return on compute investment</span>
-              <span class="live"><span></span> measured costs · modeled pricing</span>
+          <div class="cards">
+            <div class="card">
+              <div class="card__n">01</div>
+              <h3>The model is not a deliverable</h3>
+              <p>Engagements license outputs — rankings, forecasts, evidence files — never the model. Corpus, model weights, and methods remain StatsKey property in every agreement, including improvements to the model and methods made during an engagement. Outputs are licensed to you.</p>
             </div>
-            <svg viewBox="0 0 720 296" style="min-width: 640px;" role="img" aria-label="Diagram: $40,000 infrastructure, already paid, feeds each engagement. A representative $25,000 engagement splits into $300 compute and storage, $2,200 delivery and review, and $22,500 gross margin at 90 percent. On the compressed scale of a $250,000 workover decision, the entire fee is a thin sliver.">
-              <title>Return on compute investment</title>
-              <defs>
-                <linearGradient id="marginfill" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color="#30d5c8" stop-opacity="0.85" />
-                  <stop offset="1" stop-color="#6e8eff" stop-opacity="0.75" />
-                </linearGradient>
-                <linearGradient id="decisionfill" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color="#6e8eff" stop-opacity="0.30" />
-                  <stop offset="0.85" stop-color="#6e8eff" stop-opacity="0.16" />
-                  <stop offset="1" stop-color="#6e8eff" stop-opacity="0" />
-                </linearGradient>
-              </defs>
-
-              <rect x="10" y="52" width="128" height="72" rx="10" fill="rgba(48,213,200,0.07)" stroke="rgba(48,213,200,0.45)" />
-              <text x="74" y="82" text-anchor="middle" fill="#eaeef8" font-family="'Space Grotesk',Inter,sans-serif" font-size="20" font-weight="700">$40k</text>
-              <text x="74" y="100" text-anchor="middle" fill="#99a4bd" font-family="Inter,sans-serif" font-size="10.5">infrastructure · already paid</text>
-              <text x="74" y="114" text-anchor="middle" fill="#6c768f" font-family="Inter,sans-serif" font-size="10">~$250/mo to run</text>
-              <path d="M138 88 L166 88" stroke="#30d5c8" stroke-width="1.6" />
-              <path d="M161 83 L167 88 L161 93" fill="none" stroke="#30d5c8" stroke-width="1.6" />
-              <text x="74" y="146" text-anchor="middle" fill="#6c768f" font-family="Inter,sans-serif" font-size="9.5">reused by every engagement</text>
-
-              <text x="172" y="46" fill="#99a4bd" font-family="'Space Grotesk',Inter,sans-serif" font-size="11.5" letter-spacing="1">ONE ENGAGEMENT · $25,000 · nothing hidden</text>
-              <rect x="172" y="60" width="6.4" height="44" fill="#30d5c8" fill-opacity="0.55" />
-              <rect x="178.4" y="60" width="46.6" height="44" fill="#6e8eff" fill-opacity="0.5" />
-              <rect x="225" y="60" width="477" height="44" rx="3" fill="url(#marginfill)" />
-              <text x="440" y="87" text-anchor="middle" fill="#06121f" font-family="'Space Grotesk',Inter,sans-serif" font-size="15" font-weight="700">gross margin $22,500 · 90%</text>
-              <path d="M175 104 L175 122" stroke="#6c768f" stroke-width="1" />
-              <text x="170" y="136" fill="#99a4bd" font-family="Inter,sans-serif" font-size="10.5">$300 compute + storage (owned, amortized)</text>
-              <path d="M201 104 L201 148" stroke="#6c768f" stroke-width="1" />
-              <text x="196" y="162" fill="#99a4bd" font-family="Inter,sans-serif" font-size="10.5">$2,200 delivery &amp; review</text>
-
-              <text x="172" y="196" fill="#99a4bd" font-family="'Space Grotesk',Inter,sans-serif" font-size="11.5" letter-spacing="1">THE DECISION IT INFORMS · $250,000 · scale compressed 10×</text>
-              <rect x="172" y="206" width="530" height="30" rx="3" fill="url(#decisionfill)" stroke="rgba(110,142,255,0.35)" />
-              <rect x="172" y="206" width="53" height="30" fill="#30d5c8" fill-opacity="0.8" />
-              <path d="M225 200 L225 242" stroke="#30d5c8" stroke-width="1.4" />
-              <text x="232" y="226" fill="#eaeef8" font-family="Inter,sans-serif" font-size="10.5">← the entire fee, margin included</text>
-              <text x="560" y="226" fill="#6c768f" font-family="Inter,sans-serif" font-size="10.5">a $2M well runs 8 panels further →</text>
-
-              <text x="172" y="266" fill="#99a4bd" font-family="Inter,sans-serif" font-size="11">The margin is the return mechanism: corpus, model, and machines are bought once — each engagement pays for their output.</text>
-              <text x="172" y="284" fill="#99a4bd" font-family="Inter,sans-serif" font-size="11">Priced against the decision, not the electricity: the full fee is 10% of the smallest decision it informs.</text>
-            </svg>
-            <div class="visual__row">
-              <div class="stat"><div class="stat__k">Already invested</div><div class="stat__v">$40k</div></div>
-              <div class="stat"><div class="stat__k">Direct cost per engagement</div><div class="stat__v">$2.5k</div></div>
-              <div class="stat"><div class="stat__k">Gross margin</div><div class="stat__v">90%</div></div>
+            <div class="card">
+              <div class="card__n">02</div>
+              <h3>No unpaid pilots. No day rates.</h3>
+              <p>Screening is priced per wellbore, decisions per AFE, deals per deal size. The backtest is paid work, because it is the product. Hourly engagement converts an underwriter into a contractor; we decline it.</p>
             </div>
-            <p class="small-note">Representative engagement at $25,000 with $2,500 direct delivery cost ($300 compute and storage usage; $2,200 preparation and review). The fixed base — $40,000 of infrastructure amortized over three years plus operations, about $1,350/month all-in — is carried below the line and covered by the first engagement's margin each month. The margin funds corpus growth, model training, and the return of the capital already invested — stated openly, because it is the mechanism, not the markup.</p>
+            <div class="card">
+              <div class="card__n">03</div>
+              <h3>Your data stays yours</h3>
+              <p>Operator data is used only to deliver that operator's engagement. It trains nothing used for anyone else — any broader use requires a separate, priced, written data-rights agreement. Exclusivity is never implied; where it makes sense, basin- or area-level exclusivity is a separately priced term.</p>
+            </div>
           </div>
 
-          <div class="banner">Compute is an investment like any other on this page: own the base load you can prove you saturate, rent bursts when a test justifies them, and let scale wait for evidence — the same gates capital gets.</div>
-          <p class="small-note">Infrastructure at actual 2026 purchase cost ($40,000: GPU compute and redundant storage, bought at post-shortage prices); operations $150–$300/month cash; cloud-storage comparison at $15/TB-month list pricing. GPU utilization (96%), throughput, and power measured on our hardware, August 2026; GPU street price ~$4,700 (August 2026, versus $1,999 launch MSRP). Engagement pricing, engagement counts, the tranche split, and the scaled-configuration cost and cadence are model assumptions for planning, not commitments or forecasts. Nothing on this page is an offer of securities or investment advice.</p>
+          <div class="banner">Every engagement opens the same way: a scored blind backtest on wells whose outcomes are already known — paid, because it is the product; decisive, because it is scored. The pass bar — metric, wells, and window — is agreed in writing before anything is scored. Clear it and the engagement scales; miss it and you walk away having bought exactly that answer.</div>
+          <p class="small-note">The schedule is the standard rate card; scope and interests are papered per engagement under a master agreement, structured to the asset and jurisdiction. Nothing on this page is an offer of securities, legal advice, or investment advice.</p>
         </div>
       </section>
 
@@ -495,7 +490,7 @@
           <div class="section__label">The bigger number</div>
           <h2 class="section__title">The seven-figure value sits on the operator's side of the table.</h2>
           <p class="section__intro">
-            This model is deliberately small on our side — fees with margin, plus small success
+            The structure is deliberately asymmetric: our side is the schedule plus small
             interests. The larger arithmetic belongs to the asset owner, because the value shows up
             as redirected capital on wells and deals they already control.
           </p>
@@ -516,7 +511,7 @@
               <p>Every legacy wellbore justified rather than plugged avoids a $30,000–$100,000 plugging liability. Across the hundreds of wells facing that decision in a mature field, the triage alone is a seven-figure line.</p>
             </div>
           </div>
-          <div class="banner">The bridge to scale is pre-agreed and evidence-gated: fund the pilot at five figures now, with larger participation locked to a scored backtest on wells whose outcomes are already known. If the top decile doesn't beat the operator's own history, the option never triggers — our staging principle, applied to ourselves.</div>
+          <div class="banner">Scale is evidence-gated: the engagement opens with a paid screen at the schedule's minimum, and expands on the schedule only after the backtest clears the bar agreed before scoring — our staging principle, applied to ourselves.</div>
           <p class="small-note">Illustrative arithmetic at stated assumptions; well counts, workover economics, and deal sizes vary by field and operator.</p>
         </div>
       </section>
@@ -534,7 +529,7 @@
             <span class="accent">Intelligence can improve the odds. It cannot remove geological,
             execution, price, title, safety, or regulatory risk.</span>
           </p>
-          <div class="disclaimer">StatsKey Energy is an early research program. This page is not a drilling recommendation, reserves estimate, title opinion, or investment advice. Any decision requires independent engineering, geoscience, land, safety, legal, regulatory, environmental, and commercial review.</div>
+          <div class="disclaimer">The StatsKey Energy model is in active development — which is why every engagement opens with a scored blind backtest. This page is not a drilling recommendation, reserves estimate, title opinion, or investment advice. Any decision requires independent engineering, geoscience, land, safety, legal, regulatory, environmental, and commercial review.</div>
         </div>
       </section>
 
