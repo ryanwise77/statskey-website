@@ -203,6 +203,40 @@
         .sched__body { grid-column: 1; grid-row: 2; }
       }
 
+      /* ---- the order of operations ---- */
+      .order { margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); overflow: hidden; }
+      .order__head {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+        padding: 16px 26px; border-bottom: 1px solid var(--border-soft); background: rgba(255,255,255,0.015);
+      }
+      .order__row {
+        display: grid; grid-template-columns: 56px 1fr; gap: 2px 22px; padding: 22px 26px;
+        border-bottom: 1px solid var(--border-soft); transition: background 0.25s ease;
+      }
+      .order__row:last-child { border-bottom: none; }
+      .order__row:hover { background: var(--panel-2); }
+      .order__n {
+        font-family: "Space Grotesk", sans-serif; font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;
+        width: fit-content; align-self: start; grid-column: 1; grid-row: 1;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .order__body { grid-column: 2; grid-row: 1; min-width: 0; }
+      .order__row h3 { font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .order__math {
+        display: block; margin-top: 9px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12.2px; line-height: 1.55; color: var(--text); background: rgba(255,255,255,0.035);
+        border: 1px solid var(--border-soft); border-radius: 8px; padding: 7px 11px; white-space: pre-wrap; overflow-wrap: anywhere;
+      }
+      .order__desc { color: var(--muted); font-size: 14.2px; margin-top: 9px; max-width: 720px; }
+      .order__src { margin-top: 8px; font-size: 12.3px; color: var(--muted); }
+      .order__src a { color: #aebcff; text-underline-offset: 3px; }
+      .order__src a:hover { color: var(--teal); }
+      @media (max-width: 720px) {
+        .order__row { grid-template-columns: 1fr; gap: 6px; padding: 20px 22px; }
+        .order__body { grid-column: 1; grid-row: 2; }
+      }
+
       /* ---- price ladder ---- */
       .ladder {
         display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end;
@@ -215,10 +249,9 @@
         transition: border-color 0.25s ease, background 0.25s ease;
       }
       .ladder__step:hover { border-color: rgba(48, 213, 200, 0.42); background: var(--panel-2); }
-      .ladder__step:nth-of-type(1) { min-height: 150px; }
-      .ladder__step:nth-of-type(2) { min-height: 236px; }
-      .ladder__step:nth-of-type(3) { min-height: 324px; }
-      .ladder__step:nth-of-type(4) { min-height: 348px; }
+      .ladder__step:nth-of-type(2) { min-height: 432px; }
+      .ladder__step:nth-of-type(3) { min-height: 456px; }
+      .ladder__step:nth-of-type(4) { min-height: 480px; }
       .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
       .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
       .ladder__price {
@@ -229,12 +262,15 @@
       }
       .ladder__fig { margin-top: 8px; font-size: 12px; line-height: 1.45; font-weight: 500; color: var(--text); }
       .ladder__sub { margin-top: 7px; font-size: 12px; line-height: 1.5; color: var(--muted); }
-      .ladder__caption + .ladder__caption { margin-top: 0; }
-      .ladder__tag { margin-top: 7px; font-size: 10.5px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--teal); }
       .ladder__caption { grid-column: 1 / -1; color: var(--muted); font-size: 12.8px; margin-top: 6px; }
+      .ladder__caption + .ladder__caption { margin-top: 0; }
+      @media (max-width: 1000px) {
+        .ladder { grid-template-columns: repeat(2, 1fr); align-items: start; }
+        .ladder__step { justify-content: flex-start; }
+        .ladder__step:nth-of-type(n) { min-height: 0; }
+      }
       @media (max-width: 720px) {
-        .ladder { grid-template-columns: repeat(2, 1fr); align-items: stretch; padding: 18px 22px 22px; }
-        .ladder__step, .ladder__step:nth-of-type(n) { min-height: 92px; }
+        .ladder { grid-template-columns: 1fr; padding: 18px 22px 22px; }
       }
 
       .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
@@ -314,9 +350,9 @@
             <div class="actions">
               <a class="btn btn--primary" href="#use">How it helps</a>
               <a class="btn btn--ghost" href="#evidence">Public evidence</a>
-              <a class="btn btn--ghost" href="#terms">The schedule</a>
+              <a class="btn btn--ghost" href="#terms">How it is priced</a>
             </div>
-            <div class="asof">Evidence reviewed August 9, 2026</div>
+            <div class="asof">Evidence reviewed August 22, 2026</div>
           </div>
 
           <div class="visual" role="region" aria-label="2025 global high-impact exploration results">
@@ -423,7 +459,7 @@
             <div class="card">
               <div class="card__n">01</div>
               <h3>Screen wide, spend little</h3>
-              <p>Public records make the first pass nearly free. A ranked list narrows thousands of candidates to a testable few — before any capital is at risk.</p>
+              <p>Public records make the first screen cheap. A ranked list narrows thousands of candidates to a testable few — before any capital is at risk.</p>
             </div>
             <div class="card">
               <div class="card__n">02</div>
@@ -442,79 +478,152 @@
 
       <section class="section" id="terms">
         <div class="shell">
-          <div class="section__label">The price</div>
-          <h2 class="section__title">Priced the way this industry pays its partners.</h2>
+          <div class="section__label">The order</div>
+          <h2 class="section__title">Run the history first. Earn the upside on what it measures.</h2>
           <p class="section__intro">
-            Oil and gas has never paid the people who de-risk capital by the hour. The prospect
-            generator keeps an override. The underwriter takes points on the deal. The promoter is
-            paid in carry. StatsKey prices inside that tradition, but in order: cash that covers
-            the work now, participation in outcomes only after the backtest clears — because a fee
-            small enough to ignore is evidence the model is too, and upside promised before proof is
-            evidence of a pitch.
+            Every well you drill and every asset you price is already a bet on a probability; the
+            only open question is how well that probability is measured. Your own history — every
+            well, log, survey, workover, and recompletion, with its outcome — is the one instrument
+            that measures how reliable any ranking is on your rock, and that measurement, not the
+            model, sets what the upside is worth. That record already exists, alongside the offset
+            and regulator data you hold rights to. Running it through the model — field by field,
+            rung by rung — turns a claim into a confusion matrix.
           </p>
           <p class="section__intro">
-            The economics underneath are owned, not rented: corpus, model, and machines are built
-            once, run around the clock on dedicated hardware, and reused by every engagement that
-            follows — costs that do not move when cloud and GPU prices do.
+            Oil and gas pays the people who de-risk capital on the outcome, not by the hour — the
+            prospect generator keeps an override, the underwriter takes points — and StatsKey prices
+            the same way: cash for the work now, participation in outcomes after the backtest clears,
+            on a schedule agreed before it is scored. The economics underneath are owned, not rented:
+            corpus, model, and machines are built once and run around the clock on dedicated hardware.
           </p>
 
-          <div class="sched" role="region" aria-label="Engagement pricing schedule">
+          <div class="order" role="region" aria-labelledby="order-title">
+            <div class="order__head">
+              <span class="visual__title" id="order-title">The order of operations</span>
+              <span class="live"><span></span> adjacent-domain evidence · your backtest measures your own curve</span>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">01</div>
+              <div class="order__body">
+                <h3>A ranking is worth what it changes</h3>
+                <code class="order__math">EMV = p·S + (1−p)·F   ·   VOI = E[ max over actions, with the signal ] − max over actions, without   ·   0 ≤ VOI ≤ EVPI</code>
+                <p class="order__desc">A ranking earns its value on the decisions it changes; one with coin-flip reliability changes none and is worth nothing. Above that threshold the value rises steeply — in the SPE worked example a 90%-reliable test captures 57% of the value of perfect information. The ceiling per decision is the dry hole avoided or the good well captured, times the decisions you make under a budget.</p>
+                <p class="order__src">Sources: <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">Bratvold, Bickel &amp; Lohne, SPE 110378 ↗</a> · <a class="evidence-link" href="https://utw10181.utweb.utexas.edu/Papers/Value_of_Seismic_OGFJ.pdf" target="_blank" rel="noopener">Pickering &amp; Bickel, value of seismic (OGFJ 2006) ↗</a></p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">02</div>
+              <div class="order__body">
+                <h3>Reliability is measured on your own history, not claimed</h3>
+                <code class="order__math">P(x | y) ∝ P(y | x) · P(x)   —   the likelihood P(y | x) is the confusion matrix from scoring decisions whose outcomes are already known   ·   SE ∝ 1/√n</code>
+                <p class="order__desc">Every value-of-information calculation needs one number the industry rarely measures: how often the signal is right. In the SPE survey of imperfect-information studies, thirteen of twenty-five assessed reliability at all — eleven by expert judgment, two by tying it to a model — and published studies find fields delivering about 20% less than forecast in their first five years. Running the wells in scope through the model, outcomes held out by spatial block, turns a claimed reliability into a measured one; and in the published scaling fits an order of magnitude of unique data moves error further than an order of magnitude of compute — your record sets the floor.</p>
+                <p class="order__src">Sources: <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">SPE 110378 ↗</a> · <a class="evidence-link" href="https://www.sodir.no/492205/globalassets/2-force/2024/02.06.-07.-making-good-decisions/presentations/2-2-reidar-bratvold---debiasing-production-forecasts_published-version.pdf" target="_blank" rel="noopener">Nesvold &amp; Bratvold, debiasing production forecasts (Energy 2022, via FORCE 2024) ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan et al., scaling laws ↗</a></p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">03</div>
+              <div class="order__body">
+                <h3>What one field teaches is expected to carry — the broad record multiplies your labels, and the carry is scored, not assumed</h3>
+                <code class="order__math">D_eff = D_F · [ 1 + k·N^β · D_F^(α−1) ]   —   pretraining multiplies local labels most when they are few   ·   ε_target ≤ ε_source + d(source, target) + λ</code>
+                <p class="order__desc">Pretrained on the broad seismic, log, and production record, the model multiplies a field’s labeled wells rather than learning from zero: a seismic foundation model fine-tuned on about a hundred local labels scored 0.73 mIoU against 0.49 from scratch, and a production model trained on the rest of a basin’s counties cut forecast error 30–48% in five thin counties with 12–36 wells each and no local training. What carries is the physical relationship between measurement and outcome — reflectivity to rock and fluid, pressure and permeability to decline — not addresses. Domain-adaptation theory says the penalty for moving is bounded and measurable; the published number is about ten points on a structural task (foreground IoU 0.83 against 0.93 on a third basin, after fine-tuning on two).</p>
+                <p class="order__src">Sources: <a class="evidence-link" href="https://arxiv.org/abs/2102.01293" target="_blank" rel="noopener">Hernandez et al., transfer scaling ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2309.02791" target="_blank" rel="noopener">Sheng et al., Seismic Foundation Model ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2106.11051" target="_blank" rel="noopener">MIT, cross-county transfer ↗</a> · <a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20Articles/fb2025026.pdf" target="_blank" rel="noopener">TGS, First Break 2025 ↗</a></p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">04</div>
+              <div class="order__body">
+                <h3>Coverage: pooling the record has beaten one model per asset wherever it has been tested</h3>
+                <code class="order__math">error(one model, all sites) < error(per-site models), on average across sites   ·   D′ = U · [ 1 + R*(1 − e^(−R/R*)) ], R* ≈ 15 — repetition can make a fixed archive worth at most ≈16× its unique size, each pass worth less than the last</code>
+                <p class="order__desc">One model trained on 531 catchments beat models calibrated one catchment at a time; in oil and gas, a multi-basin model beat decline curves by about 23% on undrilled locations and 36% on producing wells, and pooling basins helped most where a basin’s data was thin. So the question is never which asset to model but how much of your own record to pool — the regulator record is public, and partner data follows your agreements. A fixed archive can be learned only so many times: a few passes are nearly free, by tens of passes nothing; each new, different record moves the floor in a way more passes cannot.</p>
+                <p class="order__src">Sources: <a class="evidence-link" href="https://hess.copernicus.org/articles/23/5089/2019/" target="_blank" rel="noopener">Kratzert et al., HESS 2019 ↗</a> · <a class="evidence-link" href="https://doi.org/10.2118/191538-MS" target="_blank" rel="noopener">Amr et al., SPE 191538 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2305.16264" target="_blank" rel="noopener">Muennighoff et al., data-constrained scaling ↗</a></p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">05</div>
+              <div class="order__body">
+                <h3>Applied to the drilling program and to acquisitions</h3>
+                <code class="order__math">∂EMV/∂p = S − F  →  N · (S − F) · Δp across a program   ·   logit p_post = logit p_prior + evidence from each result   ·   A&amp;D: overpayment grows with valuation-error variance</code>
+                <p class="order__desc">Each point of realized success probability is worth the full spread between a good well and a dry one, on every well drilled — on a program of dozens of wells a year, that spread times the wells is what the upside is priced against; the fee is set by scope. Re-deciding as results post is worth more than one-off scoring: in a 2026 case study, a two-stage plan that re-decided after first results raised expected NPV 34% and cut tail loss 59% over a one-shot plan, with Bayesian updating of the success probabilities adding a few percent more. In acquisitions the same calibrated model lowers the variance of your valuation error — which is what the winner’s curse taxes.</p>
+                <p class="order__src">Sources: <a class="evidence-link" href="https://jimsmith.host.dartmouth.edu/wp-content/uploads/2022/04/Optimal_Sequential_Exploration.pdf" target="_blank" rel="noopener">Bickel &amp; Smith, optimal sequential exploration (Decision Analysis 2006) ↗</a> · <a class="evidence-link" href="https://doi.org/10.2118/164816-PA" target="_blank" rel="noopener">Willigers, Begg &amp; Bratvold, SPE 164816-PA ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2605.26493" target="_blank" rel="noopener">Portfolio recourse case study, 2026 ↗</a></p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">06</div>
+              <div class="order__body">
+                <h3>Compute scales with the data, not ahead of it</h3>
+                <code class="order__math">L(N, D) = E + A/N^α + B/D^β   ·   reducible loss ∝ C^(−0.15 … −0.18)</code>
+                <p class="order__desc">Compute-optimal training grows the model and the data in step — which is why the compute share rises gently with scope: preparation and review do not scale with the record, but the model’s appetite does. Returns are a power law — tenfold compute buys roughly a third of the remaining error under the published fits, tenfold unique data buys more — and repeated passes over a fixed archive stop moving the curve, so training stops when the curve flattens and spend follows evidence, not a budget line. Published seismic pretraining runs, from one basin’s archive to a 63-survey global corpus, cost roughly 1,000 to 24,000 GPU-hours; the basin rung covers that several times over.</p>
+                <p class="order__src">Sources: <a class="evidence-link" href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., Chinchilla ↗</a> · <a class="evidence-link" href="https://epoch.ai/publications/chinchilla-scaling-a-replication-attempt" target="_blank" rel="noopener">Epoch AI, replication ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">NCS-Model, 2026 ↗</a> · <a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20Articles/fb2025026.pdf" target="_blank" rel="noopener">TGS, First Break 2025 ↗</a></p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">07</div>
+              <div class="order__body">
+                <h3>Upside is set against the measured reliability — agreed before scoring, paid after</h3>
+                <code class="order__math">buy information iff VOI(r) > price + delay   ·   r measured on held-out history → VOI(r) computed → the schedule agreed before scoring is filled in</code>
+                <p class="order__desc">The participation schedule — what share follows what measured reliability — is agreed in writing alongside the pass bar, before anything is scored; the backtest then fills in the number. A share set without that number is a share of a guess; a share negotiated after it is a negotiation about sunk work. Nothing is paid before the bar clears — commit as evidence compounds.</p>
+                <p class="order__src">Sources: <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">SPE 110378 ↗</a></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="sched" id="schedule" role="region" aria-labelledby="sched-title">
             <div class="sched__head">
-              <span class="visual__title">The schedule</span>
-              <span class="live"><span></span> cash covers the work · upside waits for proof</span>
+              <span class="visual__title" id="sched-title">The schedule</span>
+              <span class="live"><span></span> cash covers the work · upside on a schedule agreed before scoring</span>
             </div>
             <div class="sched__row sched__row--teal">
               <div class="sched__body">
                 <h3>Scope sets the spend</h3>
-                <p class="sched__desc">Size the engagement to the decisions you want ranked — one field, a district, a basin, a portfolio. Whatever the level, it buys the same thing: every decision in scope ranked drill, wait, or pass, with probability and production ranges, estimated cost, and the evidence behind each call. Every engagement opens with the backtest, credited against whatever follows.</p>
-                <p class="sched__anchor">Spend follows scope, and compute follows spend — never hours. The ladder below shows what each rung of compute does for the ranking.</p>
+                <p class="sched__desc">Size the engagement to the decisions you want ranked — one field, a district, a basin, a portfolio. Whatever the level, the output is the same kind of thing: every decision in scope ranked drill, wait, or pass, with probability and production ranges, estimated cost, and the evidence behind each call. What scales is how many decisions, how often they refresh, and how many blind wells back them. Every engagement opens with the backtest on your own history, credited against the next rung.</p>
+                <p class="sched__anchor">You set the scope; the scope sets the spend. The ladder below shows what each rung buys for the ranking, and how far each one carries.</p>
               </div>
               <div class="sched__price">Scope<span class="sched__unit">sets the spend</span></div>
             </div>
             <div class="sched__row sched__row--blue">
               <div class="sched__body">
                 <h3>Where the fee goes, and why the compute share rises</h3>
-                <p class="sched__desc">Compute is what turns the record into a calibrated ranking. What the model learns from the record is physics — how reflectivity answers to rock and fluid, how pressure and permeability set a well's decline, how a completion responds to the rock it meets — and more compute means more of that record learned, finer models, more blind wells scored, and retraining as each result posts. At the baseline engagement, sixty cents of every dollar runs as that compute, dedicated to your program — owned GPUs and storage first, rented bursts when a test justifies them — and the share rises modestly with the size of the engagement, because preparation and review do not scale with the spend while the model's appetite does. What remains pays the people: preparation, review, and a named engineer who reviews every call.</p>
+                <p class="sched__desc">Compute is what turns the record into a calibrated ranking. What the model learns is the physics in the record — how reflectivity answers to rock and fluid, how pressure and permeability set a well’s decline, how a completion responds to the rock it meets — and the published scaling laws say model and data should grow together: more record ingested justifies more of it learned, finer models, more blind wells scored, retraining as each result posts. At the baseline engagement, sixty cents of every dollar runs as that compute, dedicated to your program — owned GPUs and storage first, rented bursts when a test justifies them. The share rises modestly with scope, because preparation and review do not scale with the size of the record while the model’s appetite does; and it is bounded, because repeated passes over a fixed archive stop moving the curve, so training ends when the curve flattens. The rest pays for preparation, review, and named engineering sign-off on every refresh.</p>
                 <p class="sched__anchor">At a district, about two-thirds of every dollar is compute; at a basin, seven in ten; at a portfolio, three-quarters.</p>
               </div>
               <div class="sched__price">60%<span class="sched__unit">compute at baseline · more with scale</span></div>
             </div>
             <div class="sched__row sched__row--teal">
               <div class="sched__body">
-                <h3>Upside is earned, not promised</h3>
-                <p class="sched__desc">No success fee, no carried interest, no underwriting rate is set before the backtest clears the bar you agreed to before scoring. Participation in outcomes and acquisition work are negotiated then, on the evidence — our staging principle, applied to ourselves.</p>
+                <h3>Upside is earned, on a schedule agreed up front</h3>
+                <p class="sched__desc">No success fee, carried interest, or underwriting rate is paid before the backtest clears the bar agreed before scoring. The schedule that sets them is agreed at the same time as the bar; the measured reliability fills it in — our staging principle, applied to ourselves.</p>
                 <p class="sched__anchor">Commit as evidence compounds — the same rule we ask of your capital.</p>
               </div>
-              <div class="sched__price">Earned<span class="sched__unit">after proof</span></div>
+              <div class="sched__price">Earned<span class="sched__unit">on a schedule agreed up front</span></div>
             </div>
-            <div class="ladder" role="group" aria-label="Screen pricing by program size">
-              <span class="visual__title ladder__lede">The ladder · how compute scales with scope, and what it costs</span>
+            <div class="ladder" role="group" aria-labelledby="ladder-title">
+              <span class="visual__title ladder__lede" id="ladder-title">The ladder · what each rung buys, what it costs, and how far it carries</span>
               <div class="ladder__step ladder__step--min">
                 <span class="ladder__size">Rung one · the backtest</span>
                 <span class="ladder__price">One field</span>
-                <span class="ladder__fig">Opens every engagement · one dedicated GPU and its storage</span>
-                <span class="ladder__sub">Ingest the field's wells and seismic, train against wells with known outcomes, score the blind set.</span>
+                <span class="ladder__fig">Opens every engagement · a scored blind backtest on wells with known outcomes · pass bar agreed up front · credited against the next rung · baseline compute share</span>
+                <span class="ladder__sub">The field’s wells, logs, surveys, workovers, and recompletions plus the public regulator record — partner data where your agreements allow — trained against known outcomes and scored on a blind set held out by spatial block. Already general: pretrained on the broad record, the model multiplies the field’s labels rather than learning from zero, and the backtest measures your own learning curve.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung two · full-book ranking</span>
                 <span class="ladder__price">A district</span>
-                <span class="ladder__fig">≈ $250k · ≈ $160k compute (65%) · ≈ 65,000 GPU-hours</span>
-                <span class="ladder__sub">Multi-field, multi-formation model; K-fold backtests across fields; monthly refresh. The physics it learns does not stop at the district line — this is the general model, reused by every rung above it, so the next district costs less than the first.</span>
+                <span class="ladder__fig">$250k per year · ≈ $160k compute (65%) · ≈ 65,000 GPU-hours</span>
+                <span class="ladder__sub">Multi-field, multi-formation model; K-fold backtests with whole fields held out; monthly refresh. Carries by pooling — one model fed every field has beaten a model per field — and each field’s labels are multiplied by what the model already knows about your rock, so your second district costs less than your first.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung three · continuous retraining</span>
                 <span class="ladder__price">A basin</span>
-                <span class="ladder__fig">≈ $500k · ≈ $350k compute (70%) · ≈ 140,000 GPU-hours</span>
-                <span class="ladder__sub">Basin-scale pretraining takes 5–20k hours; this covers it several times over, with hundreds of blind tests and continuous retraining — the rung where the constraint flips from compute to data.</span>
+                <span class="ladder__fig">$500k per year · ≈ $350k compute (70%) · ≈ 140,000 GPU-hours</span>
+                <span class="ladder__sub">Retraining as results post; blind tests at every refresh; enough passes to reach the floor the basin’s data sets — the rung where the constraint flips from compute to data. Carries with a measured penalty: about ten points out-of-basin on a structural task after broad pretraining — scored, disclosed, adapted.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung four · cluster scale</span>
                 <span class="ladder__price">A portfolio</span>
-                <span class="ladder__fig">≈ $5M · ≈ $3.75M compute (75%) · ≈ 1.5M GPU-hours</span>
-                <span class="ladder__sub">Every operated area, weekly retraining, exhaustive testing — the same model everywhere, every week.</span>
+                <span class="ladder__fig">$5M per year · ≈ $3.75M compute (75%) · ≈ 1.5M GPU-hours</span>
+                <span class="ladder__sub">Every operated area, weekly retraining, blind tests in every area at every refresh — the same model everywhere, every week. Carries by coverage: pooling every basin lowers the divergence for each, and gives the acquisition screen one calibrated model for any offered asset.</span>
               </div>
-              <p class="ladder__caption">The physics is what generalizes. Seismic reflectivity answers to rock and fluid the same way in every district; decline is set by pressure and permeability everywhere; a completion responds to the rock it meets. The model learns those relationships from the record — not addresses — which is why a district-scale model carries to the next district with less compute, not more. Three curves then drive the math: coverage grows with the data, linearly; accuracy grows with the log of compute, and only while the data supports it — on our own corpus the learning curve flattened well before the training budget did, so training stops when the curve flattens and spend follows evidence of improvement, not a budget line; confidence grows with the square root of the blind tests — four times the tests halve the error bar.</p>
-              <p class="ladder__caption">Half a million dollars buys everything a basin's data can teach; five million buys the same lesson across everything you operate, faster and more often. Hours are H100-equivalent at 2026 market rates; owned hardware carries the base load at near parity, without the queue. Every engagement opens at the bottom rung, the backtest, credited against whatever follows. Upside terms are set after the bar clears, not before.</p>
+              <p class="ladder__caption">The physics is what carries. Seismic reflectivity answers to rock and fluid the same way in every district; decline is set by pressure and permeability everywhere; a completion responds to the rock it meets. The model learns those relationships from the record — not addresses — which is why one field’s calibration is expected to carry, why pooling beats one model per asset, and why the second district costs less than the first. More blind wells shrink the error bar on the reliability — roughly with the square root of their number, less where wells are clustered.</p>
+              <p class="ladder__caption">Half a million is a complete basin program: enough passes to reach the floor the basin’s data sets, with blind tests at every refresh; five million runs the same program across everything you operate, weekly. GPU-hours are H100-equivalent. Every engagement opens at the bottom rung, credited against the next; the participation schedule is agreed up front and paid after the bar clears.</p>
             </div>
           </div>
 
@@ -522,22 +631,22 @@
             <div class="card">
               <div class="card__n">01</div>
               <h3>The model is not a deliverable</h3>
-              <p>Engagements license outputs — rankings, forecasts, evidence files — never the model. Corpus, model weights, and methods remain StatsKey property in every agreement, including improvements to the model and methods made during an engagement. Outputs are licensed to you.</p>
+              <p>Outputs are yours — rankings, forecasts, evidence files — to keep and use. The base model, corpus, and methods are ours, including what we learn about how to train. What the model learns from your data is held for your engagement and is not carried into anyone else’s.</p>
             </div>
             <div class="card">
               <div class="card__n">02</div>
-              <h3>No unpaid pilots. No day rates.</h3>
-              <p>You set the spend; it buys compute and review, never hours. The backtest is paid work, because it is the product. Hourly engagement converts an underwriter into a contractor; we decline it.</p>
+              <h3>The backtest is the first deliverable</h3>
+              <p>It is priced, scored, and credited against the next rung. Fees buy compute and review, not hours — the way the industry pays the people who de-risk capital.</p>
             </div>
             <div class="card">
               <div class="card__n">03</div>
               <h3>Your data stays yours</h3>
-              <p>Operator data is used only to deliver that operator's engagement. It trains nothing used for anyone else — any broader use requires a separate, priced, written data-rights agreement. Exclusivity is never implied; where it makes sense, basin- or area-level exclusivity is a separately priced term.</p>
+              <p>Operator data is used only to deliver that operator’s engagement; it trains nothing used for anyone else. Any broader use would require a separate, written data-rights agreement. Exclusivity is not included; basin- or area-level exclusivity is available as a priced term.</p>
             </div>
           </div>
 
-          <div class="banner">Every engagement opens the same way: a scored blind backtest on wells whose outcomes are already known — paid, because it is the product; decisive, because it is scored. The pass bar — metric, wells, and window — is agreed in writing before anything is scored. Clear it and the engagement scales — and that is when upside terms are set; miss it and you walk away having bought exactly that answer.</div>
-          <p class="small-note">Scope and spend are papered per engagement under a master agreement. Participation, carried interests, and underwriting terms are set after the backtest, on its evidence, structured to the asset and jurisdiction. Nothing on this page is an offer of securities, legal advice, or investment advice.</p>
+          <div class="banner">Every engagement opens the same way: a scored blind backtest on wells whose outcomes are already known — paid, because it is the product; decisive, because it is scored. The pass bar — metric, wells, and window — and the participation schedule are agreed in writing before anything is scored. Clear it and the engagement scales, and the participation agreed before scoring takes effect at the measured reliability; miss it and you walk away having bought exactly that answer.</div>
+          <p class="small-note">Transfer and scaling figures above are published results from adjacent domains — seismic interpretation, production forecasting, hydrology, and language-model scaling — not a decision-ranking benchmark; the backtest fits your own curve, and carry is measured on held-out blocks, never assumed. Scope and spend are papered per engagement under a master agreement; participation, carried interests, and underwriting terms are set on the schedule agreed up front, structured to the asset and jurisdiction. Nothing on this page is an offer of securities, legal advice, or investment advice.</p>
         </div>
       </section>
 
@@ -546,15 +655,15 @@
           <div class="section__label">The bigger number</div>
           <h2 class="section__title">The seven-figure value sits on the operator's side of the table.</h2>
           <p class="section__intro">
-            The structure is deliberately asymmetric: our side is the spend now and a small
-            interest only after proof. The larger arithmetic belongs to the asset owner, because the value shows up
+            The structure is deliberately asymmetric: our side is the spend now and a share
+            sized to the measured lift, after proof. The larger arithmetic belongs to the asset owner, because the value shows up
             as redirected capital on wells and deals they already control.
           </p>
           <div class="cards">
             <div class="card">
               <div class="card__n">01</div>
               <h3>Workover triage at field scale</h3>
-              <p>Across a thousand legacy wellbores, surfacing ten economic workovers a year at a $250,000 average cost, each returning about twice its cost, creates roughly $2.5M of annual value on assets already owned. Our share is the fee and, after proof, a small interest; the rest stays in the field.</p>
+              <p>Across a thousand legacy wellbores, surfacing ten economic workovers a year at a $250,000 average cost, each returning about twice its cost, creates roughly $2.5M of annual value on assets already owned. Our share is the fee and, after proof, an interest sized to the measured lift; the rest stays in the field.</p>
             </div>
             <div class="card">
               <div class="card__n">02</div>
@@ -594,7 +703,7 @@
     <footer>
       <div class="shell footer__inner">
         <span>StatsKey Energy &copy; 2026</span>
-        <span>Evidence cutoff: August 9, 2026 <span class="dotsep">·</span> statskey.ai/energy</span>
+        <span>Evidence cutoff: August 22, 2026 <span class="dotsep">·</span> statskey.ai/energy</span>
       </div>
     </footer>
   </body>
