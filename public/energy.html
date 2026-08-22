@@ -249,9 +249,9 @@
         transition: border-color 0.25s ease, background 0.25s ease;
       }
       .ladder__step:hover { border-color: rgba(48, 213, 200, 0.42); background: var(--panel-2); }
-      .ladder__step:nth-of-type(2) { min-height: 432px; }
-      .ladder__step:nth-of-type(3) { min-height: 456px; }
-      .ladder__step:nth-of-type(4) { min-height: 480px; }
+      .ladder__step:nth-of-type(2) { min-height: 594px; }
+      .ladder__step:nth-of-type(3) { min-height: 618px; }
+      .ladder__step:nth-of-type(4) { min-height: 642px; }
       .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
       .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
       .ladder__price {
@@ -262,6 +262,8 @@
       }
       .ladder__fig { margin-top: 8px; font-size: 12px; line-height: 1.45; font-weight: 500; color: var(--text); }
       .ladder__sub { margin-top: 7px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+      .ladder__gain { margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 12px; line-height: 1.5; color: var(--text); }
+      .ladder__gain b { font-weight: 600; color: var(--teal); }
       .ladder__caption { grid-column: 1 / -1; color: var(--muted); font-size: 12.8px; margin-top: 6px; }
       .ladder__caption + .ladder__caption { margin-top: 0; }
       @media (max-width: 1000px) {
@@ -597,33 +599,38 @@
               <div class="sched__price">Earned<span class="sched__unit">on a schedule agreed up front</span></div>
             </div>
             <div class="ladder" role="group" aria-labelledby="ladder-title">
-              <span class="visual__title ladder__lede" id="ladder-title">The ladder · what each rung buys, what it costs, and how far it carries</span>
+              <span class="visual__title ladder__lede" id="ladder-title">The ladder · what each rung buys, what it costs, how far it carries, and what to expect</span>
               <div class="ladder__step ladder__step--min">
                 <span class="ladder__size">Rung one · the backtest</span>
                 <span class="ladder__price">One field</span>
                 <span class="ladder__fig">Opens every engagement · a scored blind backtest on wells with known outcomes · pass bar agreed up front · credited against the next rung · baseline compute share</span>
                 <span class="ladder__sub">The field’s wells, logs, surveys, workovers, and recompletions plus the public regulator record — partner data where your agreements allow — trained against known outcomes and scored on a blind set held out by spatial block. Already general: pretrained on the broad record, the model multiplies the field’s labels rather than learning from zero, and the backtest measures your own learning curve.</span>
+                <span class="ladder__gain"><b>Expect ·</b> Expect a measured number, not a lift: roughly 15–25% per-well forecast error and under 2% at field level, with a ranked candidate list; at fewer than a hundred wells any edge over your type curve sits inside sampling noise — which is what the backtest is for.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung two · full-book ranking</span>
                 <span class="ladder__price">A district</span>
                 <span class="ladder__fig">$250k per year · ≈ $160k compute (65%) · ≈ 65,000 GPU-hours</span>
                 <span class="ladder__sub">Multi-field, multi-formation model; K-fold backtests with whole fields held out; monthly refresh. Carries by pooling — one model fed every field has beaten a model per field — and each field’s labels are multiplied by what the model already knows about your rock, so your second district costs less than your first.</span>
+                <span class="ladder__gain"><b>Expect ·</b> Expect per-well error near 15–20% — about five points, a quarter, better than planning type curves — systematic bias driven from around −20% toward zero once pooled wells pass roughly nine hundred, and 11–47% lower error than decline curves field by field.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung three · continuous retraining</span>
                 <span class="ladder__price">A basin</span>
                 <span class="ladder__fig">$500k per year · ≈ $350k compute (70%) · ≈ 140,000 GPU-hours</span>
                 <span class="ladder__sub">Retraining as results post; blind tests at every refresh; enough passes to reach the floor the basin’s data sets — the rung where the constraint flips from compute to data. Carries with a measured penalty: about ten points out-of-basin on a structural task after broad pretraining — scored, disclosed, adapted.</span>
+                <span class="ladder__gain"><b>Expect ·</b> Expect per-well error at its floor near 15%; the extra data buys resolution of second-order levers — landing position worth about +5% to −10% of three-year oil in one zone, spacing degradation, rock tiers — and 30–60% lower error than auto-fit decline curves at twenty thousand wells.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung four · cluster scale</span>
                 <span class="ladder__price">A portfolio</span>
                 <span class="ladder__fig">$5M per year · ≈ $3.75M compute (75%) · ≈ 1.5M GPU-hours</span>
                 <span class="ladder__sub">Every operated area, weekly retraining, blind tests in every area at every refresh — the same model everywhere, every week. Carries by coverage: pooling every basin lowers the divergence for each, and gives the acquisition screen one calibrated model for any offered asset.</span>
+                <span class="ladder__gain"><b>Expect ·</b> Expect the basin numbers in every basin plus a pooling premium for thin ones — cross-basin training removes the −20% bias and cuts error 30–48% where wells are few. For exploration and acquisitions no published model has shown a probability-of-success lift; the evidence bounds it at one to six points, so your own prospect lookback is the number.</span>
               </div>
               <p class="ladder__caption">The physics is what carries. Seismic reflectivity answers to rock and fluid the same way in every district; decline is set by pressure and permeability everywhere; a completion responds to the rock it meets. The model learns those relationships from the record — not addresses — which is why one field’s calibration is expected to carry, why pooling beats one model per asset, and why the second district costs less than the first. More blind wells shrink the error bar on the reliability — roughly with the square root of their number, less where wells are clustered.</p>
               <p class="ladder__caption">Half a million is a complete basin program: enough passes to reach the floor the basin’s data sets, with blind tests at every refresh; five million runs the same program across everything you operate, weekly. GPU-hours are H100-equivalent. Every engagement opens at the bottom rung, credited against the next; the participation schedule is agreed up front and paid after the bar clears.</p>
+              <p class="ladder__caption">What the improvement is worth, at stated assumptions — a forty-well program, $2M wells, about $5M of three-year revenue per well: re-siting or deferring a bottom decile that underperforms by 15% is about $3M of revenue; removing a −20% systematic bias is about $40M of forecast error on that revenue base, a budget and reserves number rather than cash; moving landings from the bottom half of the zone to the top is roughly $8–18M a year; and on exploration, each point of realized success probability is worth the spread between the success case and the dry hole on every well — (S − F)·Δp. The figures are priors from published results — several vendor-authored, several model-inferred without confidence intervals — and your own blind backtest replaces them with the measured number. <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi, URTeC 2026 ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2024-enhancing-production-efficiency-the-impact-of-precision-targeting-in-the-midland-basin/" target="_blank" rel="noopener">Midland targeting, URTeC 2024 ↗</a> · <a class="evidence-link" href="https://geoconvention.com/wp-content/uploads/abstracts/2024/106408-enhancing-sweet-spot-analysis-with-machine-learnin.pdf" target="_blank" rel="noopener">Montney, GeoConvention 2024 ↗</a> · <a class="evidence-link" href="https://novilabs.com/blog/expanding-machine-learning-models-for-better-production-forecasting-in-emerging-shale-basins/" target="_blank" rel="noopener">NW Shelf pooling ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2106.11051" target="_blank" rel="noopener">MIT cross-county ↗</a> · <a class="evidence-link" href="https://doi.org/10.2118/205349-PA" target="_blank" rel="noopener">Li et al., SPE J. ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2212.07563" target="_blank" rel="noopener">prospect risking, IMAGE 2022 ↗</a> · <a class="evidence-link" href="https://www.westwoodenergy.com/news/westwood-insight/westwood-insight-the-state-of-exploration-2026" target="_blank" rel="noopener">Westwood 2026 ↗</a></p>
             </div>
           </div>
 
