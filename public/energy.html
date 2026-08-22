@@ -203,6 +203,37 @@
         .sched__body { grid-column: 1; grid-row: 2; }
       }
 
+      /* ---- price ladder ---- */
+      .ladder {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end;
+        padding: 20px 26px 24px; border-top: 1px solid var(--border-soft);
+      }
+      .ladder__lede { grid-column: 1 / -1; margin-bottom: 4px; }
+      .ladder__step {
+        border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02);
+        padding: 14px 16px; display: flex; flex-direction: column; justify-content: flex-end;
+        transition: border-color 0.25s ease, background 0.25s ease;
+      }
+      .ladder__step:hover { border-color: rgba(48, 213, 200, 0.42); background: var(--panel-2); }
+      .ladder__step:nth-of-type(1) { min-height: 102px; }
+      .ladder__step:nth-of-type(2) { min-height: 124px; }
+      .ladder__step:nth-of-type(3) { min-height: 146px; }
+      .ladder__step:nth-of-type(4) { min-height: 168px; }
+      .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
+      .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+      .ladder__price {
+        font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: clamp(17px, 2.2vw, 22px);
+        letter-spacing: -0.01em; margin-top: 6px; width: fit-content;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .ladder__tag { margin-top: 7px; font-size: 10.5px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--teal); }
+      .ladder__caption { grid-column: 1 / -1; color: var(--muted); font-size: 12.8px; margin-top: 6px; }
+      @media (max-width: 720px) {
+        .ladder { grid-template-columns: repeat(2, 1fr); align-items: stretch; padding: 18px 22px 22px; }
+        .ladder__step, .ladder__step:nth-of-type(n) { min-height: 92px; }
+      }
+
       .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
       .vision__inner { max-width: 760px; }
       .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
@@ -459,6 +490,27 @@
                 <p class="sched__anchor">Diligence that moves price is worth 1–2% of deal size.</p>
               </div>
               <div class="sched__price">1%<span class="sched__unit">of deal size</span></div>
+            </div>
+            <div class="ladder" role="group" aria-label="Screen pricing by book size">
+              <span class="visual__title ladder__lede">The ladder · screen pricing by book size</span>
+              <div class="ladder__step ladder__step--min">
+                <span class="ladder__size">Up to ~800 wellbores</span>
+                <span class="ladder__price">$50,000</span>
+                <span class="ladder__tag">The minimum — no smaller door</span>
+              </div>
+              <div class="ladder__step">
+                <span class="ladder__size">1,500 wellbores</span>
+                <span class="ladder__price">$90,000</span>
+              </div>
+              <div class="ladder__step">
+                <span class="ladder__size">5,000 wellbores</span>
+                <span class="ladder__price">$300,000</span>
+              </div>
+              <div class="ladder__step">
+                <span class="ladder__size">10,000 wellbores</span>
+                <span class="ladder__price">$600,000</span>
+              </div>
+              <p class="ladder__caption">$60 a wellbore, whatever the book. The bottom rung is $50,000 — success fees, interests, and underwriting sit on top of whichever rung you enter.</p>
             </div>
           </div>
 
