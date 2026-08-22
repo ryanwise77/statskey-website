@@ -218,7 +218,7 @@
       .ladder__step:nth-of-type(1) { min-height: 150px; }
       .ladder__step:nth-of-type(2) { min-height: 236px; }
       .ladder__step:nth-of-type(3) { min-height: 256px; }
-      .ladder__step:nth-of-type(4) { min-height: 276px; }
+      .ladder__step:nth-of-type(4) { min-height: 292px; }
       .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
       .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
       .ladder__price {
@@ -227,7 +227,9 @@
         background: linear-gradient(135deg, var(--teal), var(--blue));
         -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
       }
+      .ladder__fig { margin-top: 8px; font-size: 12px; line-height: 1.45; font-weight: 500; color: var(--text); }
       .ladder__sub { margin-top: 7px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+      .ladder__caption + .ladder__caption { margin-top: 0; }
       .ladder__tag { margin-top: 7px; font-size: 10.5px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--teal); }
       .ladder__caption { grid-column: 1 / -1; color: var(--muted); font-size: 12.8px; margin-top: 6px; }
       @media (max-width: 720px) {
@@ -471,11 +473,11 @@
             </div>
             <div class="sched__row sched__row--blue">
               <div class="sched__body">
-                <h3>Where the fee goes, and why compute scales</h3>
-                <p class="sched__desc">Compute is what turns the record into a calibrated ranking: more of it means more of your basin ingested, finer models, more blind wells scored, and retraining as each new result posts. Sixty cents of every dollar runs as that compute, dedicated to your program — owned GPUs and storage first, rented bursts when a test justifies them. Forty cents pays the people: preparation, review, and a named engineer who reviews every call.</p>
-                <p class="sched__anchor">At the bottom rung, one dedicated GPU and the storage under it; at the top, a cluster retraining continuously across a portfolio.</p>
+                <h3>Where the fee goes, and why the compute share rises</h3>
+                <p class="sched__desc">Compute is what turns the record into a calibrated ranking: more of it means more of your basin ingested, finer models, more blind wells scored, and retraining as each new result posts. At the baseline engagement, sixty cents of every dollar runs as that compute, dedicated to your program — owned GPUs and storage first, rented bursts when a test justifies them — and the share rises with the size of the engagement, because preparation and review do not scale with the spend while the model's appetite does. What remains pays the people: preparation, review, and a named engineer who reviews every call.</p>
+                <p class="sched__anchor">At a district, about two-thirds of every dollar is compute; at a basin, three-quarters; at a portfolio, most of it.</p>
               </div>
-              <div class="sched__price">60%<span class="sched__unit">runs as compute</span></div>
+              <div class="sched__price">60%<span class="sched__unit">compute at baseline · more with scale</span></div>
             </div>
             <div class="sched__row sched__row--teal">
               <div class="sched__body">
@@ -486,29 +488,33 @@
               <div class="sched__price">Earned<span class="sched__unit">after proof</span></div>
             </div>
             <div class="ladder" role="group" aria-label="Screen pricing by program size">
-              <span class="visual__title ladder__lede">The ladder · how compute scales with scope</span>
+              <span class="visual__title ladder__lede">The ladder · how compute scales with scope, and what it costs</span>
               <div class="ladder__step ladder__step--min">
                 <span class="ladder__size">Rung one · the backtest</span>
                 <span class="ladder__price">One field</span>
-                <span class="ladder__sub">Ingest the field's wells and seismic, train against wells with known outcomes, score the blind set — one dedicated GPU and its storage.</span>
-                <span class="ladder__tag">Where every engagement opens</span>
+                <span class="ladder__fig">Opens every engagement · one dedicated GPU and its storage</span>
+                <span class="ladder__sub">Ingest the field's wells and seismic, train against wells with known outcomes, score the blind set.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung two · full-book ranking</span>
                 <span class="ladder__price">A district</span>
-                <span class="ladder__sub">Every wellbore in scope across fields and formations; dedicated GPUs and a data lake; ranked decisions with evidence files.</span>
+                <span class="ladder__fig">≈ $250k · ≈ $160k compute (65%) · ≈ 65,000 GPU-hours</span>
+                <span class="ladder__sub">Multi-field, multi-formation model; K-fold backtests across fields; monthly refresh.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung three · continuous retraining</span>
                 <span class="ladder__price">A basin</span>
-                <span class="ladder__sub">Multi-district models that retrain as each new result posts; rented bursts for larger blind backtests.</span>
+                <span class="ladder__fig">≈ $500k · ≈ $375k compute (75%) · ≈ 150,000 GPU-hours</span>
+                <span class="ladder__sub">Basin-scale pretraining takes 5–20k hours; this covers it several times over, with hundreds of blind tests and continuous retraining — the rung where the constraint flips from compute to data.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung four · cluster scale</span>
                 <span class="ladder__price">A portfolio</span>
-                <span class="ladder__sub">Capital ranked across every operated area; a cluster retraining continuously, the model widening as the record does.</span>
+                <span class="ladder__fig">≈ $5M · ≈ $4.25M compute (85%) · ≈ 1.7M GPU-hours</span>
+                <span class="ladder__sub">Every operated area, weekly retraining, exhaustive testing — the same model everywhere, every week.</span>
               </div>
-              <p class="ladder__caption">Compute follows spend, and spend follows scope — sixty cents of every dollar, whatever the rung. Every engagement opens at the bottom rung, the backtest, credited against whatever follows. Training stops when the measured learning curve flattens: spend follows evidence of improvement, not a budget line. Upside terms are set after the bar clears, not before.</p>
+              <p class="ladder__caption">Three curves drive the math. Coverage grows with the data, linearly. Accuracy grows with the log of compute — ten times the training buys on the order of fifteen to twenty percent lower error, and only while the data supports it; on our own corpus the learning curve flattened well before the training budget did, which is why training stops when the curve flattens and spend follows evidence of improvement, not a budget line. Confidence grows with the square root of the tests — four times the blind backtests halve the error bar.</p>
+              <p class="ladder__caption">Half a million dollars buys everything a basin's data can teach; five million buys the same lesson across everything you operate, faster and more often. Hours are H100-equivalent at 2026 market rates; owned hardware carries the base load at near parity, without the queue. Every engagement opens at the bottom rung, the backtest, credited against whatever follows. Upside terms are set after the bar clears, not before.</p>
             </div>
           </div>
 
