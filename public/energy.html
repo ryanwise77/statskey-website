@@ -217,8 +217,8 @@
       .ladder__step:hover { border-color: rgba(48, 213, 200, 0.42); background: var(--panel-2); }
       .ladder__step:nth-of-type(1) { min-height: 150px; }
       .ladder__step:nth-of-type(2) { min-height: 236px; }
-      .ladder__step:nth-of-type(3) { min-height: 256px; }
-      .ladder__step:nth-of-type(4) { min-height: 292px; }
+      .ladder__step:nth-of-type(3) { min-height: 324px; }
+      .ladder__step:nth-of-type(4) { min-height: 348px; }
       .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
       .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
       .ladder__price {
@@ -474,8 +474,8 @@
             <div class="sched__row sched__row--blue">
               <div class="sched__body">
                 <h3>Where the fee goes, and why the compute share rises</h3>
-                <p class="sched__desc">Compute is what turns the record into a calibrated ranking: more of it means more of your basin ingested, finer models, more blind wells scored, and retraining as each new result posts. At the baseline engagement, sixty cents of every dollar runs as that compute, dedicated to your program — owned GPUs and storage first, rented bursts when a test justifies them — and the share rises with the size of the engagement, because preparation and review do not scale with the spend while the model's appetite does. What remains pays the people: preparation, review, and a named engineer who reviews every call.</p>
-                <p class="sched__anchor">At a district, about two-thirds of every dollar is compute; at a basin, three-quarters; at a portfolio, most of it.</p>
+                <p class="sched__desc">Compute is what turns the record into a calibrated ranking. What the model learns from the record is physics — how reflectivity answers to rock and fluid, how pressure and permeability set a well's decline, how a completion responds to the rock it meets — and more compute means more of that record learned, finer models, more blind wells scored, and retraining as each result posts. At the baseline engagement, sixty cents of every dollar runs as that compute, dedicated to your program — owned GPUs and storage first, rented bursts when a test justifies them — and the share rises modestly with the size of the engagement, because preparation and review do not scale with the spend while the model's appetite does. What remains pays the people: preparation, review, and a named engineer who reviews every call.</p>
+                <p class="sched__anchor">At a district, about two-thirds of every dollar is compute; at a basin, seven in ten; at a portfolio, three-quarters.</p>
               </div>
               <div class="sched__price">60%<span class="sched__unit">compute at baseline · more with scale</span></div>
             </div>
@@ -499,21 +499,21 @@
                 <span class="ladder__size">Rung two · full-book ranking</span>
                 <span class="ladder__price">A district</span>
                 <span class="ladder__fig">≈ $250k · ≈ $160k compute (65%) · ≈ 65,000 GPU-hours</span>
-                <span class="ladder__sub">Multi-field, multi-formation model; K-fold backtests across fields; monthly refresh.</span>
+                <span class="ladder__sub">Multi-field, multi-formation model; K-fold backtests across fields; monthly refresh. The physics it learns does not stop at the district line — this is the general model, reused by every rung above it, so the next district costs less than the first.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung three · continuous retraining</span>
                 <span class="ladder__price">A basin</span>
-                <span class="ladder__fig">≈ $500k · ≈ $375k compute (75%) · ≈ 150,000 GPU-hours</span>
+                <span class="ladder__fig">≈ $500k · ≈ $350k compute (70%) · ≈ 140,000 GPU-hours</span>
                 <span class="ladder__sub">Basin-scale pretraining takes 5–20k hours; this covers it several times over, with hundreds of blind tests and continuous retraining — the rung where the constraint flips from compute to data.</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">Rung four · cluster scale</span>
                 <span class="ladder__price">A portfolio</span>
-                <span class="ladder__fig">≈ $5M · ≈ $4.25M compute (85%) · ≈ 1.7M GPU-hours</span>
+                <span class="ladder__fig">≈ $5M · ≈ $3.75M compute (75%) · ≈ 1.5M GPU-hours</span>
                 <span class="ladder__sub">Every operated area, weekly retraining, exhaustive testing — the same model everywhere, every week.</span>
               </div>
-              <p class="ladder__caption">Three curves drive the math. Coverage grows with the data, linearly. Accuracy grows with the log of compute — ten times the training buys on the order of fifteen to twenty percent lower error, and only while the data supports it; on our own corpus the learning curve flattened well before the training budget did, which is why training stops when the curve flattens and spend follows evidence of improvement, not a budget line. Confidence grows with the square root of the tests — four times the blind backtests halve the error bar.</p>
+              <p class="ladder__caption">The physics is what generalizes. Seismic reflectivity answers to rock and fluid the same way in every district; decline is set by pressure and permeability everywhere; a completion responds to the rock it meets. The model learns those relationships from the record — not addresses — which is why a district-scale model carries to the next district with less compute, not more. Three curves then drive the math: coverage grows with the data, linearly; accuracy grows with the log of compute, and only while the data supports it — on our own corpus the learning curve flattened well before the training budget did, so training stops when the curve flattens and spend follows evidence of improvement, not a budget line; confidence grows with the square root of the blind tests — four times the tests halve the error bar.</p>
               <p class="ladder__caption">Half a million dollars buys everything a basin's data can teach; five million buys the same lesson across everything you operate, faster and more often. Hours are H100-equivalent at 2026 market rates; owned hardware carries the base load at near parity, without the queue. Every engagement opens at the bottom rung, the backtest, credited against whatever follows. Upside terms are set after the bar clears, not before.</p>
             </div>
           </div>
