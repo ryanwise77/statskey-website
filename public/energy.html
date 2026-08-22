@@ -215,10 +215,10 @@
         transition: border-color 0.25s ease, background 0.25s ease;
       }
       .ladder__step:hover { border-color: rgba(48, 213, 200, 0.42); background: var(--panel-2); }
-      .ladder__step:nth-of-type(1) { min-height: 102px; }
-      .ladder__step:nth-of-type(2) { min-height: 124px; }
-      .ladder__step:nth-of-type(3) { min-height: 146px; }
-      .ladder__step:nth-of-type(4) { min-height: 168px; }
+      .ladder__step:nth-of-type(1) { min-height: 118px; }
+      .ladder__step:nth-of-type(2) { min-height: 176px; }
+      .ladder__step:nth-of-type(3) { min-height: 198px; }
+      .ladder__step:nth-of-type(4) { min-height: 220px; }
       .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
       .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
       .ladder__price {
@@ -227,6 +227,7 @@
         background: linear-gradient(135deg, var(--teal), var(--blue));
         -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
       }
+      .ladder__sub { margin-top: 5px; font-size: 11.5px; color: var(--muted); }
       .ladder__tag { margin-top: 7px; font-size: 10.5px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--teal); }
       .ladder__caption { grid-column: 1 / -1; color: var(--muted); font-size: 12.8px; margin-top: 6px; }
       @media (max-width: 720px) {
@@ -461,24 +462,24 @@
             </div>
             <div class="sched__row sched__row--teal">
               <div class="sched__body">
-                <h3>Rank the program</h3>
-                <p class="sched__desc">Every decision in the program — drill, workover, recompletion, or pass — ranked with probability and production ranges, estimated cost, and the evidence behind each call, across the whole book it draws from. Priced on the capital declared for the term, because that is what it protects. $50,000 minimum.</p>
-                <p class="sched__anchor">A $25M program carries a $250,000 screen — one point, the same point an underwriter takes.</p>
+                <h3>Rank the program — one fixed rate</h3>
+                <p class="sched__desc">Every decision in the program — drill, workover, recompletion, or pass — ranked with probability and production ranges, estimated cost, and the evidence behind each call, across the whole book it draws from, for the full term. A fixed rate against the capital declared for the term: it does not move with hours, scope, or data volume. $50,000 minimum.</p>
+                <p class="sched__anchor">A $25M program is a $500,000 engagement, fixed at signing — $300,000 of it runs as compute on your program.</p>
               </div>
-              <div class="sched__price">1%<span class="sched__unit">of the program</span></div>
+              <div class="sched__price">2%<span class="sched__unit">of the program</span></div>
             </div>
             <div class="sched__row sched__row--blue">
               <div class="sched__body">
-                <h3>Success fee, only on action</h3>
-                <p class="sched__desc">Due when you action a decision the screen ranked — workover, recompletion, re-entry, or new well — within the term set in the master agreement. Sized to the engineering line on the AFE, not the contingency line: with the carry below, the total lands where a prospect generator's has always landed. Pass on a recommendation and it costs nothing.</p>
-                <p class="sched__anchor">A $2M well carries a $50,000 fee; a $250,000 workover, $6,250 — and zero if you pass.</p>
+                <h3>Where the fee goes</h3>
+                <p class="sched__desc">Sixty cents of every dollar runs as compute dedicated to your program — owned GPUs and storage first, rented bursts when a test justifies them — and it scales with the rung you enter: a larger program trains a larger model on more of your basin, for longer. Forty cents pays the people: preparation, review, and a named engineer who reviews every call.</p>
+                <p class="sched__anchor">$50,000 buys about one dedicated GPU for the term and the storage under it; $5,000,000 buys a cluster retraining continuously across your portfolio.</p>
               </div>
-              <div class="sched__price">2.5%<span class="sched__unit">of AFE</span></div>
+              <div class="sched__price">60%<span class="sched__unit">runs as compute</span></div>
             </div>
             <div class="sched__row sched__row--teal">
               <div class="sched__body">
                 <h3>Carried in the outcome</h3>
-                <p class="sched__desc">The same point again, carried: a small interest in each actioned decision — override, net-profits, or a fixed per-outcome payment, structured to the asset. We are paid when the well pays.</p>
+                <p class="sched__desc">A small interest in each actioned decision — override, net-profits, or a fixed per-outcome payment, structured to the asset. We are paid when the well pays.</p>
                 <p class="sched__anchor">Alignment by construction: our conviction rides on our own calls.</p>
               </div>
               <div class="sched__price">2.5%<span class="sched__unit">interest</span></div>
@@ -492,25 +493,29 @@
               <div class="sched__price">1%<span class="sched__unit">of deal size</span></div>
             </div>
             <div class="ladder" role="group" aria-label="Screen pricing by program size">
-              <span class="visual__title ladder__lede">The ladder · screen pricing by program size</span>
+              <span class="visual__title ladder__lede">The ladder · fee and dedicated compute by program size</span>
               <div class="ladder__step ladder__step--min">
-                <span class="ladder__size">Programs to $5M</span>
+                <span class="ladder__size">Programs to $2.5M</span>
                 <span class="ladder__price">$50,000</span>
+                <span class="ladder__sub">$30,000 dedicated compute</span>
                 <span class="ladder__tag">The minimum — no smaller door</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">$25M program</span>
-                <span class="ladder__price">$250,000</span>
+                <span class="ladder__price">$500,000</span>
+                <span class="ladder__sub">$300,000 dedicated compute</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">$100M program</span>
-                <span class="ladder__price">$1,000,000</span>
+                <span class="ladder__price">$2,000,000</span>
+                <span class="ladder__sub">$1.2M dedicated compute</span>
               </div>
               <div class="ladder__step">
                 <span class="ladder__size">$250M program</span>
-                <span class="ladder__price">$2,500,000</span>
+                <span class="ladder__price">$5,000,000</span>
+                <span class="ladder__sub">$3M dedicated compute</span>
               </div>
-              <p class="ladder__caption">One percent of the capital it ranks, whatever the program. Every engagement opens at the bottom rung — the $50,000 backtest, credited against the screen — and the balance follows the bar. Success fees, interests, and underwriting sit on top of whichever rung you enter.</p>
+              <p class="ladder__caption">Two percent of the program, fixed at signing. Every engagement opens at the bottom rung — the $50,000 backtest, credited against the fee — and the balance follows the bar. Sixty percent of whichever rung you enter runs as compute dedicated to your program; interests and underwriting sit on top.</p>
             </div>
           </div>
 
@@ -523,7 +528,7 @@
             <div class="card">
               <div class="card__n">02</div>
               <h3>No unpaid pilots. No day rates.</h3>
-              <p>Screens are priced on the program, decisions on the AFE, deals on deal size. The backtest is paid work, because it is the product. Hourly engagement converts an underwriter into a contractor; we decline it.</p>
+              <p>The fee is fixed on the program, deals on deal size; nothing is priced by the hour. The backtest is paid work, because it is the product. Hourly engagement converts an underwriter into a contractor; we decline it.</p>
             </div>
             <div class="card">
               <div class="card__n">03</div>
