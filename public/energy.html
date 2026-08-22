@@ -532,7 +532,7 @@
               <div class="order__n" aria-hidden="true">06</div>
               <div class="order__body">
                 <h3>Computing grows only as your data grows</h3>
-                <p class="order__desc">More data justifies a bigger model and more training. The returns are steady but diminishing: tenfold more computing removes roughly a third of the remaining error; tenfold more new data removes more; we stop training when improvement stops. Computing is sized to the data, not the other way around.</p>
+                <p class="order__desc">More data justifies a bigger model and more training. The returns are steady but diminishing: tenfold more computing removes roughly a third of the remaining error; tenfold more new data removes more; we stop training when improvement stops. For one operator’s portfolio that computing is small: tuning the already-trained model and re-ranking every well takes hours of machine time a year for a mid-size operator and a few weeks spread across a year for the largest — tens of dollars to a few thousand dollars of electricity or rented time. The cost of coverage is people: loading and checking each survey, building the test sets, and reviewing what the model ranks.</p>
                 <p class="order__src">Source: <a class="evidence-link" href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., scaling study, 2022 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">Norwegian shelf seismic model, 2026 ↗</a> · <a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20Articles/fb2025026.pdf" target="_blank" rel="noopener">TGS seismic model study, 2025 ↗</a></p>
               </div>
             </div>
@@ -555,7 +555,7 @@
               <div class="sched__body">
                 <h3>Scope sets the price</h3>
                 <p class="sched__desc">Size the engagement to the decisions you want ranked — one field, a district, a basin, a portfolio. At every level the output is the same kind of thing: each decision in scope ranked drill, wait, or pass, with likely production ranges, estimated cost, and the evidence behind each call. What grows with scope is how many decisions, how often they are refreshed, and how many blind wells — wells whose results the model was not shown — back them. Every engagement opens with the backtest on your own history.</p>
-                <p class="sched__anchor">The levels below are scopes, not a rate card; each fee is set per engagement. Fees cover computing and review, not billable hours.</p>
+                <p class="sched__anchor">The levels below are scopes, not a rate card. Each fee is set per engagement and follows how many surveys we load and how many fields we review — not machine time, which is small.</p>
               </div>
               <div class="sched__price">Per scope<span class="sched__unit">fixed fee</span></div>
             </div>
@@ -575,9 +575,9 @@
               <div class="sched__price">Post-test<span class="sched__unit">share of gains</span></div>
             </div>
             <div class="ladder" role="group" aria-labelledby="ladder-title">
-              <span class="visual__title ladder__lede" id="ladder-title">The levels · what you get at each scope, and what to expect</span>
+              <span class="visual__title ladder__lede" id="ladder-title">The levels · what you get at each scope, and what to expect — the whole portfolio is within reach from the start</span>
               <div class="ladder__step ladder__step--min">
-                <span class="ladder__size">Entry</span>
+                <span class="ladder__size">Start here</span>
                 <span class="ladder__price">One field</span>
                 <span class="ladder__fig">Opens every engagement</span>
                 <span class="ladder__k">What you get</span>
@@ -586,7 +586,7 @@
                 <span class="ladder__sub">A measured number, not a promise: production-forecast error of roughly 15–25% per well and under 2% for the field as a whole, plus a ranked list of candidates. With fewer than a hundred wells, any improvement over your current forecasting method will be too small to tell from chance — which is exactly what the backtest is designed to check.</span>
               </div>
               <div class="ladder__step">
-                <span class="ladder__size">Next</span>
+                <span class="ladder__size">Then</span>
                 <span class="ladder__price">A district</span>
                 <span class="ladder__fig">Several fields and formations · updated monthly</span>
                 <span class="ladder__k">What you get</span>
@@ -595,7 +595,7 @@
                 <span class="ladder__sub">Forecast error per well near 15–20% — about five percentage points better than standard planning forecasts — with consistent over- or under-forecasting corrected once several hundred wells are combined, and 11–47% lower error than standard decline forecasts, field by field.</span>
               </div>
               <div class="ladder__step">
-                <span class="ladder__size">Then</span>
+                <span class="ladder__size">Or</span>
                 <span class="ladder__price">A basin</span>
                 <span class="ladder__fig">Retrained as results come in · a blind test at every update</span>
                 <span class="ladder__k">What you get</span>
@@ -604,14 +604,15 @@
                 <span class="ladder__sub">Forecast error per well near 15%, about as low as it goes. The extra data lets the model separate smaller effects — exact well depth within the target layer (worth about +5% to −10% of three-year oil output in one study), well spacing, and rock quality — and gave 30–60% lower error than standard production-decline forecasts in a 20,000-well test.</span>
               </div>
               <div class="ladder__step">
-                <span class="ladder__size">At full scale</span>
-                <span class="ladder__price">A portfolio</span>
+                <span class="ladder__size">Where most should end up</span>
+                <span class="ladder__price">Your whole portfolio</span>
                 <span class="ladder__fig">Every operated area · retrained weekly</span>
                 <span class="ladder__k">What you get</span>
-                <span class="ladder__sub">The same model across everything you operate, retrained weekly and blind-tested everywhere at every update, with one tested model to score any asset you are offered.</span>
+                <span class="ladder__sub">The same model across everything you operate, retrained weekly and blind-tested everywhere at every update, with one tested model to score any asset you are offered. The machine time for this is hours to a few weeks a year on hardware we already own; the work is loading and checking each survey and reviewing each field’s rankings.</span>
                 <span class="ladder__k">What to expect</span>
                 <span class="ladder__sub">The basin-level results in every basin, with areas that have little data helped by data from the others. For exploration and acquisitions, no published model has yet shown an improvement in success rate; published evidence suggests 1–6 percentage points at most, so your own backtest is the only reliable figure.</span>
               </div>
+              <p class="ladder__caption">Covering your whole portfolio is within reach from the start. The expensive part — teaching the model what seismic and well data look like — was done once, on our own hardware, and is never repeated for a new client. What takes effort is loading and checking each survey and having qualified people review what the model ranks; that is where nearly all of the price goes, and it is why the price follows surveys and fields, not machines.</p>
               <p class="ladder__caption">What that is worth, on a forty-well program of $2M wells earning about $5M each over three years: avoiding the worst 10% of wells is worth about $3M; correcting a 20% over-forecast removes about $40M of forecast error across the program; better placement of each well within the target layer is worth $8–18M a year. These are published results, several from vendors; your backtest replaces them with the measured number. <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi forecasting study, 2026 ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2024-enhancing-production-efficiency-the-impact-of-precision-targeting-in-the-midland-basin/" target="_blank" rel="noopener">Midland well-placement study, 2024 ↗</a> · <a class="evidence-link" href="https://geoconvention.com/wp-content/uploads/abstracts/2024/106408-enhancing-sweet-spot-analysis-with-machine-learnin.pdf" target="_blank" rel="noopener">Montney well-placement study, 2024 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2106.11051" target="_blank" rel="noopener">MIT study on carrying models across counties ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2212.07563" target="_blank" rel="noopener">Prospect success-rate study, 2022 ↗</a></p>
             </div>
           </div>
