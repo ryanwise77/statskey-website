@@ -78,6 +78,8 @@ export default {
   build: {
     rollupOptions: {
       input: {
+      clinicians: resolve(__dirname, 'for-clinicians.html'),
+      clinician: resolve(__dirname, 'clinician.html'),
         main: resolve(__dirname, 'index.html'),
         privacy: resolve(__dirname, 'privacy.html'),
         terms: resolve(__dirname, 'terms.html'),

@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey for Clinicians | Patient-authorized context</title>
+    <meta
+      name="description"
+      content="Receive a focused, time-limited StatsKey record that your patient chose to share before their next visit."
+    />
+    <meta name="robots" content="noindex, follow" />
+    <meta
+      property="og:title"
+      content="StatsKey for Clinicians"
+    />
+    <meta
+      property="og:description"
+      content="Patient-authorized wellness context for asynchronous review."
+    />
+    <meta
+      property="og:url"
+      content="https://statskeybiometrics.com/for-clinicians"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      .clinical-hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(390px, 0.95fr);
+        gap: clamp(40px, 7vw, 90px);
+        align-items: center;
+      }
+
+      .clinical-window {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.055);
+        box-shadow: var(--shadow);
+      }
+
+      .clinical-window__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .clinical-window__dots {
+        display: flex;
+        gap: 5px;
+      }
+
+      .clinical-window__dots span {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .clinical-window__body {
+        padding: 22px;
+      }
+
+      .clinical-patient {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .clinical-patient__avatar {
+        display: grid;
+        width: 45px;
+        height: 45px;
+        place-items: center;
+        border-radius: 14px;
+        background: rgba(48, 213, 200, 0.12);
+        color: var(--cyan);
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .clinical-patient div {
+        display: grid;
+      }
+
+      .clinical-patient strong {
+        font-size: 13px;
+      }
+
+      .clinical-patient span {
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .clinical-status {
+        margin-left: auto;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: rgba(70, 226, 163, 0.1);
+        color: var(--green);
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .clinical-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 9px;
+        margin-top: 17px;
+      }
+
+      .clinical-metric {
+        padding: 13px;
+        border: 1px solid var(--line-soft);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .clinical-metric span {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--muted);
+        font-size: 9px;
+      }
+
+      .clinical-metric strong {
+        font-family: var(--font-display);
+        font-size: 18px;
+      }
+
+      .clinical-manifest {
+        display: grid;
+        gap: 7px;
+        margin-top: 17px;
+      }
+
+      .clinical-manifest div {
+        display: grid;
+        grid-template-columns: 7px 1fr auto;
+        gap: 9px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--ink-2);
+        font-size: 10px;
+      }
+
+      .clinical-manifest i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      .clinical-manifest small {
+        color: var(--muted);
+      }
+
+      .clinical-flow {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        counter-reset: clinical-step;
+      }
+
+      .clinical-flow article {
+        position: relative;
+        min-height: 230px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--panel);
+        counter-increment: clinical-step;
+      }
+
+      .clinical-flow article::before {
+        display: grid;
+        width: 35px;
+        height: 35px;
+        margin-bottom: 34px;
+        place-items: center;
+        border-radius: 12px;
+        background: rgba(110, 142, 255, 0.12);
+        color: var(--blue);
+        content: "0" counter(clinical-step);
+        font-family: var(--font-mono);
+        font-size: 10px;
+      }
+
+      .clinical-flow h3 {
+        margin-bottom: 9px;
+        font-family: var(--font-display);
+        font-size: 20px;
+        letter-spacing: -0.03em;
+      }
+
+      .clinical-flow p {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .clinical-boundary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .clinical-boundary article {
+        padding: 26px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--panel);
+      }
+
+      .clinical-boundary article:first-child {
+        border-color: rgba(70, 226, 163, 0.2);
+        background: rgba(70, 226, 163, 0.045);
+      }
+
+      .clinical-boundary article:last-child {
+        border-color: rgba(255, 206, 107, 0.2);
+        background: rgba(255, 206, 107, 0.04);
+      }
+
+      .clinical-boundary h3 {
+        margin-bottom: 13px;
+        font-family: var(--font-display);
+        font-size: 20px;
+      }
+
+      .clinical-boundary ul {
+        display: grid;
+        gap: 9px;
+        margin: 0;
+        padding-left: 19px;
+        color: var(--ink-2);
+        font-size: 13px;
+      }
+
+      .clinical-cta-card {
+        padding: clamp(32px, 6vw, 68px);
+        border: 1px solid rgba(110, 142, 255, 0.22);
+        border-radius: 28px;
+        background:
+          radial-gradient(circle at 90% 10%, rgba(48, 213, 200, 0.12), transparent 20rem),
+          radial-gradient(circle at 10% 90%, rgba(110, 142, 255, 0.13), transparent 24rem),
+          rgba(255, 255, 255, 0.045);
+        text-align: center;
+      }
+
+      .clinical-cta-card h2 {
+        max-width: 700px;
+        margin: 10px auto 13px;
+        font-family: var(--font-display);
+        font-size: clamp(30px, 5vw, 54px);
+        line-height: 1.05;
+        letter-spacing: -0.045em;
+      }
+
+      .clinical-cta-card > p {
+        max-width: 650px;
+        margin: 0 auto 25px;
+        color: var(--muted);
+      }
+
+      .clinical-preview-note {
+        max-width: 760px;
+        margin: 18px auto 0;
+        color: var(--muted-2);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 860px) {
+        .clinical-hero-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .clinical-flow {
+          grid-template-columns: 1fr;
+        }
+
+        .clinical-flow article {
+          min-height: 0;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .clinical-boundary,
+        .clinical-metrics {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="antialiased marketing-light">
+    <nav id="nav" class="site-nav">
+      <div class="site-nav__inner">
+        <a href="/" class="site-brand" aria-label="StatsKey home">
+          <span class="site-brand__mark"></span>
+          <span>StatsKey</span>
+        </a>
+        <div class="site-nav__links" aria-label="Primary navigation">
+          <a href="#how">How it works</a>
+          <a href="#boundary">Data boundary</a>
+          <a href="/for-dietitians">For dietitians</a>
+          <a href="/clinician/access">Clinician sign in</a>
+        </div>
+        <a class="site-nav__cta" href="/clinician/access?mode=signup">
+          Clinician sign up
+        </a>
+        <button
+          id="mobile-menu-btn"
+          class="site-menu-btn"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+      <div id="mobile-menu" class="site-mobile-menu hidden">
+        <a href="#how">How it works</a>
+        <a href="#boundary">Data boundary</a>
+        <a href="/for-dietitians">For dietitians</a>
+        <a href="/clinician/access">Clinician sign in</a>
+        <a href="/clinician/access?mode=signup">Clinician sign up</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero-section">
+        <div class="hero-orb hero-orb--blue"></div>
+        <div class="hero-orb hero-orb--data"></div>
+        <div class="page-shell clinical-hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow reveal">For physicians and care teams</div>
+            <h1 class="hero-title reveal d1">
+              See the record your patient chose to bring.
+            </h1>
+            <p class="hero-lede reveal d2">
+              StatsKey Care Sharing turns selected activity, nutrition,
+              workouts, sleep, vitals, glucose summaries, body measurements,
+              and blood panels into one focused record for the next visit.
+            </p>
+            <div class="hero-actions reveal d3">
+              <a
+                class="button button--primary"
+                href="/clinician/access?mode=signup"
+              >
+                Create clinician account
+              </a>
+              <a
+                class="button button--secondary"
+                href="/clinician/access"
+              >
+                Clinician sign in
+              </a>
+            </div>
+            <div class="hero-note reveal d3">
+              The patient controls the categories, record window, recipient
+              label, and expiration. Access can be revoked at any time.
+            </div>
+          </div>
+
+          <div class="clinical-window reveal d2" aria-label="Example patient record">
+            <div class="clinical-window__bar">
+              <span class="clinical-window__dots">
+                <span></span><span></span><span></span>
+              </span>
+              <span>Patient-authorized record</span>
+              <span>Secure portal</span>
+            </div>
+            <div class="clinical-window__body">
+              <div class="clinical-patient">
+                <span class="clinical-patient__avatar">AR</span>
+                <div>
+                  <strong>Alex Rivera</strong>
+                  <span>30-day record · generated today</span>
+                </div>
+                <span class="clinical-status">Active</span>
+              </div>
+              <div class="clinical-metrics">
+                <div class="clinical-metric">
+                  <span>Activity coverage</span>
+                  <strong>29 days</strong>
+                </div>
+                <div class="clinical-metric">
+                  <span>Workouts</span>
+                  <strong>14</strong>
+                </div>
+                <div class="clinical-metric">
+                  <span>Sleep records</span>
+                  <strong>27 nights</strong>
+                </div>
+                <div class="clinical-metric">
+                  <span>Glucose summaries</span>
+                  <strong>30 days</strong>
+                </div>
+              </div>
+              <div class="clinical-manifest">
+                <div><i></i><span>Daily activity</span><small>Included</small></div>
+                <div><i></i><span>Nutrition totals</span><small>Included</small></div>
+                <div><i></i><span>Vitals</span><small>Included</small></div>
+                <div><i></i><span>Blood panels</span><small>2 panels</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="statement-section">
+        <div class="page-shell">
+          <p class="statement-text reveal">
+            Less reconstruction. More time for the visit.
+          </p>
+        </div>
+      </section>
+
+      <section id="how" class="section-block">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="eyebrow">How it works</div>
+            <h2>Permission stays with the patient.</h2>
+            <p>
+              Care Sharing is deliberately small: one patient, one scoped
+              record, one professional account, one expiration.
+            </p>
+          </div>
+          <div class="clinical-flow">
+            <article class="reveal reveal-stagger-1">
+              <h3>The patient chooses.</h3>
+              <p>
+                In the iOS or Android app, the patient selects exactly which
+                categories and dates to share, names the intended office, and
+                confirms the disclosure.
+              </p>
+            </article>
+            <article class="reveal reveal-stagger-2">
+              <h3>You redeem once.</h3>
+              <p>
+                A one-time code binds the record to your verified email and
+                professional portal. The code cannot be reused by another
+                account.
+              </p>
+            </article>
+            <article class="reveal reveal-stagger-3">
+              <h3>Access ends cleanly.</h3>
+              <p>
+                The patient can revoke the share immediately. Otherwise it
+                closes automatically on the selected expiration date.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="boundary" class="section-block section-block--split">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="eyebrow">Designed with a boundary</div>
+            <h2>Useful context without pretending to be an EHR.</h2>
+            <p>
+              StatsKey is a consumer wellness record. The portal keeps that
+              provenance visible instead of presenting it as verified clinical
+              documentation.
+            </p>
+          </div>
+          <div class="clinical-boundary">
+            <article class="reveal reveal-stagger-1">
+              <h3>What the patient can share</h3>
+              <ul>
+                <li>Daily activity and sleep totals</li>
+                <li>Nutrition totals without meal names or notes</li>
+                <li>Workout summaries without routes or sensor streams</li>
+                <li>Vitals, glucose summaries, body metrics, and blood panels</li>
+                <li>Coverage and source information for every category</li>
+              </ul>
+            </article>
+            <article class="reveal reveal-stagger-2">
+              <h3>What this portal is not</h3>
+              <ul>
+                <li>Not an emergency or alerting service</li>
+                <li>Not continuous patient monitoring</li>
+                <li>Not an EHR, order system, or verified lab feed</li>
+                <li>Not a substitute for clinical assessment</li>
+                <li>Not a place for treatment instructions or messaging</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="page-shell">
+          <div class="clinical-cta-card reveal">
+            <div class="eyebrow">Professional portal</div>
+            <h2>Ready when your patient sends the code.</h2>
+            <p>
+              Create a separate clinician account with your professional email.
+              Your personal StatsKey account remains completely separate.
+            </p>
+            <div class="hero-actions" style="justify-content: center">
+              <a
+                class="button button--primary"
+                href="/clinician/access?mode=signup"
+              >
+                Clinician sign up
+              </a>
+              <a
+                class="button button--secondary"
+                href="/clinician/access"
+              >
+                Sign in
+              </a>
+            </div>
+            <p class="clinical-preview-note">
+              Private preview. Professional details are self-attested until the
+              credential-verification and regulated production environment are
+              approved. Do not use this preview for real patient information.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="page-shell site-footer__inner">
+        <span>StatsKey &copy; 2026</span>
+        <div>
+          <a href="/for-dietitians">For dietitians</a>
+          <a href="/clinician/access">Clinician portal</a>
+          <a href="/app/login">Personal sign in</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
