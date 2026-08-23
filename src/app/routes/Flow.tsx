@@ -9,8 +9,15 @@ import { useRecentWorkouts } from '../lib/data/useRecentWorkouts'
 import { useLatestGlucose } from '../lib/data/useLatestGlucose'
 import { dailyTotals } from '../lib/aggregates'
 import { buildSystemPrompt } from '../lib/ai/context'
-import { CHAT_MODELS, type ChatModelOption } from '../lib/ai/providers'
+import {
+  CHAT_MODELS,
+  describeModelRouting,
+  matchChatModel,
+  useChatModels,
+  type ChatModelOption,
+} from '../lib/ai/providers'
 import { runAgentTurn, type AgentStep } from '../lib/ai/agent'
+import { describeIntelligenceError } from '../lib/ai/intelligenceErrors'
 import { getScratchPad, updateScratchPad } from '../lib/ai/scratchPad'
 import { Markdown } from '../components/Markdown'
 import {
@@ -49,7 +56,15 @@ export function Flow() {
   const [messages, setMessages] = useState<ChatSessionMessage[]>([])
   const [title, setTitle] = useState<string>('')
   const [createdAt, setCreatedAt] = useState<Date>(new Date())
+  // The picker tracks Anthropic's live catalog: models the provider retires
+  // disappear and new ones appear without a site deploy.
+  const chatModels = useChatModels()
   const [model, setModel] = useState<ChatModelOption>(CHAT_MODELS[0])
+  useEffect(() => {
+    setModel((previous) => matchChatModel(chatModels, previous))
+  }, [chatModels])
+  const [errorAction, setErrorAction] = useState<{ label: string; to: string } | null>(null)
+  const [routingNote, setRoutingNote] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [liveSteps, setLiveSteps] = useState<AgentStep[]>([])
@@ -161,6 +176,7 @@ export function Flow() {
     setLiveSteps([])
     setLiveText('')
     setError(null)
+    setErrorAction(null)
     stopRequested.current = false
 
     const sessionTitle = title || titleFromFirstMessage(text)
@@ -185,7 +201,18 @@ export function Flow() {
         unlimitedAuto: model.label === 'Auto',
       })
 
-      const providerLabel = model.label === 'Auto' ? 'Auto · Claude' : model.providerLabel
+      // When the live catalog routed the request to a different model (for
+      // example a retired Opus → the newest Opus), say so and label the reply
+      // with the model that actually answered.
+      const note = describeModelRouting(result.modelRouting, chatModels)
+      setRoutingNote(note)
+      const servedOption = result.servedModel
+        ? chatModels.find((m) => m.label !== 'Auto' && m.modelId === result.servedModel)
+        : undefined
+      const providerLabel =
+        model.label === 'Auto'
+          ? 'Auto · Claude'
+          : (note && servedOption ? servedOption.label : model.providerLabel)
 
       const assistantMsg: ChatSessionMessage = {
         id: crypto.randomUUID(),
@@ -217,7 +244,9 @@ export function Flow() {
       }
       await saveChatSession(uid, session)
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
+      const described = describeIntelligenceError(e)
+      setError(described.message)
+      setErrorAction(described.action ?? null)
     } finally {
       setSending(false)
     }
@@ -264,9 +293,9 @@ export function Flow() {
             </button>
             {modelMenuOpen && (
               <div className="intel-menu" role="menu">
-                {CHAT_MODELS.map((m) => (
+                {chatModels.map((m) => (
                   <button
-                    key={m.label}
+                    key={`${m.provider}:${m.modelId}:${m.label}`}
                     role="menuitemradio"
                     aria-checked={model.label === m.label}
                     className={model.label === m.label ? 'active' : ''}
@@ -277,7 +306,7 @@ export function Flow() {
                   >
                     <span className="intel-menu__dot" style={{ background: m.dotColor }} />
                     <span className="intel-menu__name">{m.label}</span>
-                    <span className="intel-menu__hint">{MODEL_HINTS[m.label] ?? m.providerLabel}</span>
+                    <span className="intel-menu__hint">{m.hint ?? MODEL_HINTS[m.label] ?? m.providerLabel}</span>
                     {model.label === m.label && <span className="intel-menu__check">✓</span>}
                   </button>
                 ))}
@@ -387,7 +416,19 @@ export function Flow() {
         )}
       </div>
 
-      {error && <div className="error-banner">{error}</div>}
+      {error && (
+        <div className="error-banner">
+          {error}
+          {errorAction && (
+            <>
+              {' '}
+              <Link to={errorAction.to} className="link font-semibold">
+                {errorAction.label} →
+              </Link>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <div className="intel-composer">
@@ -409,11 +450,12 @@ export function Flow() {
             </button>
           )}
         </div>
-        <div className="flex justify-between text-[11px] text-text-muted px-1">
+        <div className="flex flex-wrap justify-between gap-x-3 text-[11px] text-text-muted px-1">
           <span>
             {model.label === 'Auto' ? 'Auto routing · ' : `${model.label} · `}
             grounded in your connected record
           </span>
+          {routingNote && <span className="text-right">{routingNote}</span>}
         </div>
       </div>
     </div>

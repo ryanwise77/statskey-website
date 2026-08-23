@@ -4,6 +4,7 @@ import {
   anthropicChat,
   type AnthropicContentBlock,
   type AnthropicMessage,
+  type AnthropicModelRouting,
   type AnthropicMonthlyUsage,
   type AnthropicToolUseBlock,
   type ClaudeModel,
@@ -46,6 +47,9 @@ export interface AgentTurnResult {
   monthlyUsage?: AnthropicMonthlyUsage
   citations: string[]
   rounds: number
+  /** Model that actually answered (Claude routes; after live-catalog routing). */
+  servedModel?: string
+  modelRouting?: AnthropicModelRouting
 }
 
 export interface AgentTurnParams {
@@ -151,6 +155,8 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
   const log = new StepLog(onStep)
   let creditsCharged = 0
   let monthlyUsage: AnthropicMonthlyUsage | undefined
+  let servedModel: string | undefined
+  let modelRouting: AnthropicModelRouting | undefined
   const citations = new Set<string>()
 
   const messages: AnthropicMessage[] = [
@@ -175,12 +181,23 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
     const toolUses = (resp.toolUse ?? []) as AnthropicToolUseBlock[]
     creditsCharged += resp.creditsCharged ?? 0
     if (resp.monthlyUsage) monthlyUsage = resp.monthlyUsage
+    if (resp.model) servedModel = resp.model
+    if (resp.modelRouting) modelRouting = resp.modelRouting
     for (const c of resp.citations ?? []) citations.add(c)
 
     if (toolUses.length === 0) {
       const content = text.trim() || preambles.join('\n\n').trim()
       await revealAnswer(content, onText, shouldStop)
-      return { content, steps: log.steps, creditsCharged, monthlyUsage, citations: [...citations], rounds: round + 1 }
+      return {
+        content,
+        steps: log.steps,
+        creditsCharged,
+        monthlyUsage,
+        citations: [...citations],
+        rounds: round + 1,
+        servedModel,
+        modelRouting,
+      }
     }
 
     if (text) preambles.push(text)
@@ -216,6 +233,8 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
         monthlyUsage,
         citations: [...citations],
         rounds: round + 1,
+        servedModel,
+        modelRouting,
       }
     }
   }
@@ -229,6 +248,8 @@ async function runClaudeTurn(params: AgentTurnParams): Promise<AgentTurnResult> 
     monthlyUsage,
     citations: [...citations],
     rounds: MAX_ROUNDS,
+    servedModel,
+    modelRouting,
   }
 }
 
