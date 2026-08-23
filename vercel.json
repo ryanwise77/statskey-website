@@ -231,14 +231,6 @@
       "destination": "/highriver.html"
     },
     {
-      "source": "/primer",
-      "destination": "/primer.html"
-    },
-    {
-      "source": "/primer/",
-      "destination": "/primer.html"
-    },
-    {
       "source": "/energy",
       "destination": "/energy.html"
     },
