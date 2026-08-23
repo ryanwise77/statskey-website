@@ -333,6 +333,7 @@
           <div class="actions">
             <a class="btn btn--primary" href="#scale">How it scales</a>
             <a class="btn btn--ghost" href="#service">The service</a>
+            <a class="btn btn--ghost" href="#well">One well</a>
             <a class="btn btn--ghost" href="#roi">Return on investment</a>
           </div>
           <div class="asof">Evidence reviewed August 22–23, 2026 · general terms at <a class="evidence-link" href="/energy">statskey.ai/energy</a></div>
@@ -396,7 +397,7 @@
               <div class="sched__body">
                 <h3>The card we already own</h3>
                 <p class="sched__desc">About 2,300 H100-equivalent hours a year. Covers your whole portfolio: blind tests by area, calibrated ranges, re-ranking as results post, basin-targeted 2.5D pretraining at 100 passes, unlimited outcome ensembles. This is the full information step — we estimate at least four-fifths of the outcome value available on a book of your size.</p>
-                <p class="sched__anchor">Certainty: high. Cost to you: none beyond the fee; no hardware proposed. Investment fit: every level below runs on this — it is where the large, measured gain is, and no client capital touches it.</p>
+                <p class="sched__anchor">Ours, already paid for. It runs the whole engagement at every investment level; you are not charged for it and you never buy it. This is where the large, measured gain is.</p>
               </div>
               <div class="sched__price">Tier 0<span class="sched__unit">now · one RTX 5090</span></div>
             </div>
@@ -404,7 +405,7 @@
               <div class="sched__body">
                 <h3>Every best-published point</h3>
                 <p class="sched__desc">About 12,000 H100-equivalent hours a year for $55–65k once (about $23–25k a year amortized; pays back against renting in two years; reusable across clients). Reaches the best published 2D point (~1% few-shot error — roughly half of Tier 0), 400-pass 2.5D training, 115–300M-parameter 3D with 96 GB contexts, three to five independent runs, and our own model-by-data grid scored on your backtest. Outcome error falls a further 3–10% of what is left — at the edge of what 300-odd test wells can detect.</p>
-                <p class="sched__anchor">Certainty: likely on seismic reading; plausible on outcomes. Investment fit: about one-eighth of a $500k-a-year engagement, or a line inside a multi-year one — and bought only after your test shows error still falling with computing.</p>
+                <p class="sched__anchor">Ours to buy, not yours: a one-time $55–65k purchase on our side, reusable across clients. A $500k-a-year engagement carries that purchase inside our margin about eight times over, which is why it needs no hardware line on your invoice. It does not cover more of your portfolio — Tier 0 already does — it trains the model harder on the same data. Bought only after your test shows error still falling with computing. Certainty: likely on seismic reading; plausible on outcomes.</p>
               </div>
               <div class="sched__price">Tier 1<span class="sched__unit">4× RTX PRO 6000 · ~5×</span></div>
             </div>
@@ -412,7 +413,7 @@
               <div class="sched__body">
                 <h3>The largest seismic models</h3>
                 <p class="sched__desc">About $82k in a burst: a 660M-parameter 3D model, large contexts, several seeds. The published benchmark is already saturated at that size; the expected outcome gain on a two-basin book (2–5% of the remaining error) is below what your backtest can resolve.</p>
-                <p class="sched__anchor">Certainty: speculative for you; a firm-wide asset, not a deliverable. Investment fit: only inside a $1.5M multi-year engagement, and only if Tier 1 moved your score.</p>
+                <p class="sched__anchor">Rented by us in a burst, on our side, and only inside a multi-year engagement after Tier 1 has moved your score. Certainty: speculative for you; a firm-wide asset, not a deliverable.</p>
               </div>
               <div class="sched__price">Tier 2<span class="sched__unit">rented ~30,000 H100 hours</span></div>
             </div>
@@ -451,6 +452,63 @@
             </div>
           </div>
           <div class="banner">Terms are the general ones: a fee for the work now with at least 60% of it going to the oil data; a share of the gains on a scale agreed alongside the pass bar, paid only after the test; no hardware proposed to you. Details at <a class="evidence-link" href="/energy">statskey.ai/energy</a>.</div>
+        </div>
+      </section>
+
+      <section class="section" id="well">
+        <div class="shell">
+          <div class="section__label">One well</div>
+          <h2 class="section__title">With robust data on one of your wells, what we add — and what stays with your engineers.</h2>
+          <p class="section__intro">Suppose we hold a well’s logs, completion, production, the seismic around it, and its offsets. Lever by lever, here is the physics that makes each decision predictable, the statistics that make it measurable, and the line between our work and your petroleum engineer’s. Grades: measured, model-inferred, or physically principled but not yet measured.</p>
+          <div class="order" role="region" aria-labelledby="well-title">
+            <div class="order__head">
+              <span class="visual__title" id="well-title">Drilling one well better</span>
+              <span class="head__note">we supply calibrated priors, effect sizes, and ranges from the whole record · your engineers make the call</span>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">01</div>
+              <div class="order__body">
+                <h3>Where to land in the zone</h3>
+                <p class="order__desc">Physics: the target’s thickness and porosity come from seismic inversion (impedance answers to porosity and lithology); its structure and dip from the reflectors (stay in zone, avoid faults and water); where fractures will open from the elastic properties (compressional and shear velocity and density give Young’s modulus and Poisson’s ratio — stress and brittleness). Statistics: offsets with known landings and outcomes give the size of the landing effect — in one basin study, top-half landings made about +5% and bottom-half about −10% of three-year oil (model-inferred, no confidence intervals). Our role: a map of expected rock quality along the planned path with ranges, and the expected production difference between candidate landings. The engineer chooses the target.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">02</div>
+              <div class="order__body">
+                <h3>How to complete it</h3>
+                <p class="order__desc">Physics: fracture geometry follows pumped volume and the stress it meets; productivity scales with conductive fracture area until fractures interfere, so returns diminish. Statistics: hundreds of offsets with completion records give the marginal-return curve for intensity in this rock, with its uncertainty; a Bakken study found operators captured only about 60% of the profit available from their input choices — real headroom, measured. Our role: the curve and where its knee is, for this rock. The engineer sets the design.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">03</div>
+              <div class="order__body">
+                <h3>How close to the next well</h3>
+                <p class="order__desc">Physics: an existing well has drawn down the pressure around it (material balance), so a child well placed inside that drainage recovers less; the penalty grows with proximity and time. Statistics: the degradation is non-linear and measured — the held-out Delaware study only reached 15% error against 20% once spacing was expressed correctly. Our role: the expected penalty for each candidate spacing, with a range.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">04</div>
+              <div class="order__body">
+                <h3>Steering while drilling</h3>
+                <p class="order__desc">Physics: the seismic model predicts the layer geometry ahead of the bit; logging-while-drilling then corrects it. Statistics: that is a prior from seismic and offsets and a posterior from the new measurements — Bayesian updating — and re-deciding as information arrives is worth more than deciding once (a 2026 portfolio study: +32% expected value over a one-shot plan). Our role: the prior and the update rule — a live target surface with uncertainty — alongside the directional team. Frontier: machine-learned geosteering exists commercially; seismic-model representations feeding it are unmeasured, and we say so.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">05</div>
+              <div class="order__body">
+                <h3>Your rock, specifically</h3>
+                <p class="order__desc">West Panhandle shallow gas: a century-old pressure sink, so deliverability is set by drawdown against line pressure — compression and the gathering you own are a first-order lever, and the Red Cave is tight, so fracture size is the drilling lever (upsized fracs roughly doubled recovery in the play). Marmaton horizontals: landing, lateral length, and completion intensity, with hundreds of public offsets to learn from. The Strawn CO2 flood: pattern and injection physics — sweep and CO2 utilization — where our role is smaller and the flood stays with your reservoir engineers.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">06</div>
+              <div class="order__body">
+                <h3>What the well will make</h3>
+                <p class="order__desc">Statistics: a model that has learned the record forecasts a planned well with 15% error against 20% for planning type curves on held-out wells, and gives a range that covers what it claims. Our role: that range, its measured reliability, and the ranking of the alternatives in front of you. The decision, and the well, are yours.</p>
+              </div>
+            </div>
+          </div>
+          <p class="small-note">Evidence grades: forecast error and spacing effects are measured on held-out wells; completion diminishing returns and the 60%-of-available-profit result are measured; the landing effect is model-inferred; seismic-derived geomechanics for stage placement and machine-learned steering are physically principled and commercially practiced but not yet measured on your acreage; seismic-model representations as inputs to any of these are the frontier and are scored, never assumed.</p>
         </div>
       </section>
 
