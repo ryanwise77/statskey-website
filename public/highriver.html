@@ -387,47 +387,45 @@
           </div>
           <p class="small-note"><a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20Articles/fb2025026.pdf" target="_blank" rel="noopener">TGS, scaling seismic foundation models (First Break 2025) ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">Norwegian shelf seismic model, 2026 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2309.02791" target="_blank" rel="noopener">Seismic foundation model, Geophysics 2025 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2102.01293" target="_blank" rel="noopener">Hernandez et al., transfer scaling ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi, held-out wells, 2026 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2106.11051" target="_blank" rel="noopener">MIT, models carried across counties ↗</a> · <a class="evidence-link" href="https://novilabs.com/blog/expanding-machine-learning-models-for-better-production-forecasting-in-emerging-shale-basins/" target="_blank" rel="noopener">Novi, 360→900 wells ↗</a></p>
 
-          <div class="order" role="region" aria-labelledby="pattern-title">
-            <div class="order__head">
-              <span class="visual__title" id="pattern-title">What you will see, and what it tells you to do</span>
-              <span class="head__note">measured on your wells · decisions follow the measurement</span>
+          <div class="sched" role="region" aria-labelledby="tiers-title">
+            <div class="sched__head">
+              <span class="visual__title" id="tiers-title">Computing tiers · what each buys on a two-basin book like yours</span>
+              <span class="head__note">costs at August 2026 prices · certainty graded</span>
             </div>
-            <div class="order__row">
-              <div class="order__n" aria-hidden="true">01</div>
-              <div class="order__body">
-                <h3>What you will see first</h3>
-                <p class="order__desc">A blind score on wells whose outcomes you already know, by area: how often the model’s top picks are the real top wells, its first-year forecast error, and whether its ranges are honest — within weeks, on the card we own. Where a model has a few hundred comparable wells to learn from, the published result is forecasts 15–35% better than standard planning methods; against the 3.9× gap between your best and worst new wells in the same field, a ranking that captures even part of that spread shows up immediately.</p>
+                        <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>The card we already own</h3>
+                <p class="sched__desc">About 2,300 H100-equivalent hours a year. Covers your whole portfolio: blind tests by area, calibrated ranges, re-ranking as results post, basin-targeted 2.5D pretraining at 100 passes, unlimited outcome ensembles. This is the full information step — we estimate at least four-fifths of the outcome value available on a book of your size.</p>
+                <p class="sched__anchor">Certainty: high. Cost to you: none beyond the fee; no hardware proposed.</p>
               </div>
+              <div class="sched__price">Tier 0<span class="sched__unit">now · one RTX 5090</span></div>
             </div>
-            <div class="order__row">
-              <div class="order__n" aria-hidden="true">02</div>
-              <div class="order__body">
-                <h3>The pattern that emerges</h3>
-                <p class="order__desc">Each time we train harder or add data, we re-score the same held-out wells. Two curves appear. Error against the wells the model has learned from is steep — each doubling removes roughly 5–10% of the error that can still be removed. Error against computing is shallow — a few percent per tenfold — and it flattens once your data has been learned. The first curve will be unmistakable inside the first engagement. The second is the question the engagement answers on your acreage.</p>
+                        <div class="sched__row sched__row--blue">
+              <div class="sched__body">
+                <h3>Every best-published point</h3>
+                <p class="sched__desc">About 12,000 H100-equivalent hours a year for $55–65k once (about $23–25k a year amortized; pays back against renting in two years; reusable across clients). Reaches the best published 2D point (~1% few-shot error — roughly half of Tier 0), 400-pass 2.5D training, 115–300M-parameter 3D with 96 GB contexts, three to five independent runs, and our own model-by-data grid scored on your backtest. Outcome error falls a further 3–10% of what is left — at the edge of what 300-odd test wells can detect.</p>
+                <p class="sched__anchor">Certainty: likely on seismic reading; plausible on outcomes. Bought only if your test shows error still falling with computing.</p>
               </div>
+              <div class="sched__price">Tier 1<span class="sched__unit">4× RTX PRO 6000 · ~5×</span></div>
             </div>
-            <div class="order__row">
-              <div class="order__n" aria-hidden="true">03</div>
-              <div class="order__body">
-                <h3>How strong the pattern can be</h3>
-                <p class="order__desc">With about 300 test wells the first-year error is known to about one percentage point; differences smaller than that are noise, and we say so rather than claim them. A strong result is a ranking correlation and a top-tenth lift that clearly beat your current method, with ranges that cover what they say they cover. A weak result is a ranking no better than your type curves — in which case you have paid for that answer and nothing else. Either way the number is yours, measured before capital moves, and it sharpens every month as your results post.</p>
+                        <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>The largest seismic models</h3>
+                <p class="sched__desc">About $82k in a burst: a 660M-parameter 3D model, large contexts, several seeds. The published benchmark is already saturated at that size; the expected outcome gain on a two-basin book (2–5% of the remaining error) is below what your backtest can resolve.</p>
+                <p class="sched__anchor">Certainty: speculative for you; a firm-wide asset, not a deliverable.</p>
               </div>
+              <div class="sched__price">Tier 2<span class="sched__unit">rented ~30,000 H100 hours</span></div>
             </div>
-            <div class="order__row">
-              <div class="order__n" aria-hidden="true">04</div>
-              <div class="order__body">
-                <h3>What it tells you to do with capital</h3>
-                <p class="order__desc">Where the ranking is clearly stronger than your current method in an area, capital follows the ranking there — the top of the list first, the bottom deferred — and the share of program dollars placed under it grows as the evidence does. Where it is not stronger, capital follows your current method and the model earns nothing in that area. Allocation tracks measured skill, by area, not a promise.</p>
+                        <div class="sched__row sched__row--blue">
+              <div class="sched__body">
+                <h3>Not for this book</h3>
+                <p class="sched__desc">1.8B-parameter-class models: the one measured in-domain comparison shows no gain over 660M, and nothing at that scale is measurable on 1,600 wells.</p>
+                <p class="sched__anchor">We do not propose it.</p>
               </div>
-            </div>
-            <div class="order__row">
-              <div class="order__n" aria-hidden="true">05</div>
-              <div class="order__body">
-                <h3>What it tells you about more computing — or more data</h3>
-                <p class="order__desc">If the slope of error against computing is flat within that one point on your wells, you are limited by information, not machines: the next dollar goes to data — more of your data types, licensed or partner 3D over uncovered acreage, partner wells pooled into training. If the slope is still falling, more computing pays, and it is bought in steps, each only after the previous step showed up in the score. No hardware is proposed before that, and none is needed to start.</p>
-              </div>
+              <div class="sched__price">Beyond<span class="sched__unit">100k–300k H100 hours</span></div>
             </div>
           </div>
+          <p class="small-note">Where it flattens: two floors on the data side — the error no model can remove, and the limit of a fixed public archive — both reached before Tier 2 on a book your size. What moves the floor is information: more of your data types (completion detail, pressure and flowback, logs and core), licensed or partner 3D over uncovered acreage, public log archives, and partner wells pooled into training.</p>
         </div>
       </section>
 
