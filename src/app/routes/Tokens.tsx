@@ -29,10 +29,10 @@ interface TokenPack {
   featured?: boolean
 }
 
-// Base prices match the value delivered by the iOS packs. Web checkout recovers
-// Stripe's published standard US online-card fee before applying StatsKey's
-// disclosed 0.5% net margin. The server independently calculates and enforces
-// the same amount; this client calculation is display-only.
+// Pack list prices match the iOS packs and already include StatsKey's margin
+// over provider cost, so web checkout charges exactly the list price — no
+// processing fee or extra margin is added. The server's catalog is the source
+// of truth for the charged amount; these values are display fallbacks.
 const TOKEN_PACKS: TokenPack[] = [
   {
     id: '1m',
@@ -69,36 +69,8 @@ const TOKEN_PACKS: TokenPack[] = [
   },
 ]
 
-const OWNER_MARGIN_BPS = 50
-const STRIPE_PROCESSING_BPS = 290
-const STRIPE_PROCESSING_FIXED_CENTS = 30
-
-function processingReserveCents(checkoutAmountCents: number): number {
-  return Math.ceil((checkoutAmountCents * STRIPE_PROCESSING_BPS) / 10_000)
-    + STRIPE_PROCESSING_FIXED_CENTS
-}
-
-function netMarginCents(basePriceCents: number): number {
-  return Math.ceil((basePriceCents * OWNER_MARGIN_BPS) / 10_000)
-}
-
-function checkoutUpliftCents(basePriceCents: number): number {
-  const targetNetMargin = netMarginCents(basePriceCents)
-  let checkoutAmount = Math.ceil(
-    ((basePriceCents + targetNetMargin + STRIPE_PROCESSING_FIXED_CENTS) * 10_000)
-      / (10_000 - STRIPE_PROCESSING_BPS)
-  )
-  while (
-    checkoutAmount - processingReserveCents(checkoutAmount) - basePriceCents
-      < targetNetMargin
-  ) {
-    checkoutAmount += 1
-  }
-  return checkoutAmount - basePriceCents
-}
-
 function checkoutTotalCents(pack: TokenPack): number {
-  return pack.basePriceCents + checkoutUpliftCents(pack.basePriceCents)
+  return pack.basePriceCents
 }
 
 function usd(cents: number): string {
@@ -541,9 +513,9 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
           )}
 
           <p className="text-[11px] leading-relaxed text-text-muted">
-            Every web pack price includes estimated Stripe processing and a 0.5% StatsKey net
-            margin. Actual processing fees can vary by payment method. If Stripe requires
-            authentication or a payment fails, automatic re-up pauses instead of retrying blindly.
+            Automatic re-ups charge the same pack list price shown below — nothing is added for
+            processing. If Stripe requires authentication or a payment fails, automatic re-up
+            pauses instead of retrying blindly.
             You can turn it off here at any time; a charge already processing may still complete.
           </p>
         </section>
@@ -582,10 +554,7 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
                   )}
                 </div>
                 <p className="text-[11px] text-text-muted">
-                  Includes estimated Stripe processing + {usd(
-                    tokenPackCatalog?.packs[pack.id]?.netOwnerMarginAmountCents
-                      ?? netMarginCents(pack.basePriceCents)
-                  )} StatsKey margin
+                  List price · no processing fee added at checkout
                 </p>
                 <p className="text-[12px] text-text-muted">{pack.bestFor}</p>
               </div>
