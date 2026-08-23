@@ -426,6 +426,54 @@
               <div class="sched__price">Beyond<span class="sched__unit">100k–300k H100 hours</span></div>
             </div>
           </div>
+
+          <div class="sched" role="region" aria-labelledby="hours-title">
+            <div class="sched__head">
+              <span class="visual__title" id="hours-title">Computing hours, by phase — and for your whole operation</span>
+              <span class="head__note">hours on the card we own (one card ≈ 8,760 a year) · from measured per-task costs · assumptions stated below</span>
+            </div>
+                        <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>Phase A · retrospective replay and first blind scores</h3>
+                <p class="sched__desc">Embed and interpret your surveys (seconds per cube; about two hours for five attributes); fine-tune the seismic reader to your 3D and well ties (about 100 hours across survey-tasks); fit the outcome, landing, completion, and spacing models (minutes); run leave-out-by-area backtests across ~20 fields (about 13 hours a round, two to three rounds); replay steering on ~30 horizontals with a 5–10-member prior (40–80 hours). About two weeks of card time inside a four-to-eight-week phase.</p>
+                <p class="sched__anchor">Tier 0. Adding our own model-by-data mini-grid on your backtest costs another 100–300 hours — still Tier 0.</p>
+              </div>
+              <div class="sched__price">150–300<span class="sched__unit">card-hours, once</span></div>
+            </div>
+                        <div class="sched__row sched__row--blue">
+              <div class="sched__body">
+                <h3>Phase B · shadow mode on 3–5 wells</h3>
+                <p class="sched__desc">Live prior and updates per well (under five hours each with ensembles) plus monthly model refreshes (10–15 hours a month). Predictions logged, not acted on.</p>
+                <p class="sched__anchor">Tier 0.</p>
+              </div>
+              <div class="sched__price">40–80<span class="sched__unit">card-hours, 2–4 months</span></div>
+            </div>
+                        <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>Phase C · advisory A/B on 6–12 wells</h3>
+                <p class="sched__desc">Per-well steering support, monthly refreshes, and quarterly blind-test rounds.</p>
+                <p class="sched__anchor">Tier 0.</p>
+              </div>
+              <div class="sched__price">120–240<span class="sched__unit">card-hours, 6–9 months</span></div>
+            </div>
+                        <div class="sched__row sched__row--blue">
+              <div class="sched__body">
+                <h3>Your whole operation, steady state</h3>
+                <p class="sched__desc">Monthly refresh of every model (120–180), quarterly blind tests (about 50), weekly re-ranking of every well (about 50), steering support at program pace of 20–30 wells a year (100–150), and twice-yearly embedding passes over all your surveys. About five percent of the card we already own — more than ninety percent of it stays free.</p>
+                <p class="sched__anchor">Tier 0. Coverage of your whole operation never needs more than this.</p>
+              </div>
+              <div class="sched__price">350–500<span class="sched__unit">card-hours a year</span></div>
+            </div>
+                        <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>If the slope shows: training the seismic prior harder</h3>
+                <p class="sched__desc">The only work that outgrows one card: 400-pass training of the seismic-to-geometry model on your 3D plus regional cubes (1,200–3,000 card-hours) times three to five independent runs for uncertainty. Half a year to two years on the card we own; days to weeks on the four-card box — which is why it exists, and why it is bought only after Phase D shows error still falling with computing.</p>
+                <p class="sched__anchor">Tier 1, our purchase, reusable. Not needed to cover your operation; needed to make the prior as good as the best published.</p>
+              </div>
+              <div class="sched__price">3,600–15,000<span class="sched__unit">card-hours, once, ours</span></div>
+            </div>
+          </div>
+          <p class="small-note">Assumptions behind the hours: about five 3D surveys (~250 GB post-stack, ~60 cubes of 1024³), ~20 fields, ~30 existing horizontals available to replay, 20–30 new wells a year, leave-out-by-area backtests at 13 card-hours a round, a 1024³ cube embedding in 12–20 seconds, per-well steering updates in seconds to minutes. One card-hour on our RTX 5090 is roughly a quarter of an H100 hour. If your survey count or program is larger, the hours scale with it and still sit well inside one card; only the Tier 1 training does not.</p>
           <p class="small-note">Where it flattens: two floors on the data side — the error no model can remove, and the limit of a fixed public archive — both reached before Tier 2 on a book your size. What moves the floor is information: more of your data types (completion detail, pressure and flowback, logs and core), licensed or partner 3D over uncovered acreage, public log archives, and partner wells pooled into training.</p>
         </div>
       </section>
