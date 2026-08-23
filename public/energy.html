@@ -533,7 +533,7 @@
               <div class="order__n" aria-hidden="true">06</div>
               <div class="order__body">
                 <h3>More computing buys more predictive power — and we stop when the curve flattens</h3>
-                <p class="order__desc">We train on everything you have with computing we already own; that is not the limit. More computing buys a larger model, trained longer and at higher resolution, on more of the public record alongside your own, with more blind tests behind every number. Predictive power rises with it along a measurable curve — steeply at first, then flattening where the data, not the machine, becomes the limit — and we stop training when improvement stops.</p>
+                <p class="order__desc">We train on everything you have with computing we already own; that is not the limit. Training the model harder buys small, steady, measurable gains that flatten where the data, not the machine, becomes the limit — the arithmetic is spelled out below the terms.</p>
                 <p class="order__src">Source: <a class="evidence-link" href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., scaling study, 2022 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">Norwegian shelf seismic model, 2026 ↗</a> · <a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20Articles/fb2025026.pdf" target="_blank" rel="noopener">TGS seismic model study, 2025 ↗</a></p>
               </div>
             </div>
@@ -606,6 +606,55 @@
               </div>
               <p class="ladder__caption">Returns flatten where the data, not the machine, is the limit: the error that computing can still remove shrinks by only a few percent for each tenfold increase, and a backtest on a portfolio this size cannot see differences smaller than about one point of error. What moves the floor is information — more of your data types (completions detail, pressure and flowback, logs and core), licensed or partner seismic over uncovered acreage, and partner wells pooled into training. Those are measured, large effects; more computing is a slow, steady one.</p>
               <p class="ladder__caption">What it is worth depends on the decisions it reaches. Each one-point improvement in the chance of success is worth the difference between a good well and a dry one, on every well the ranking changes; a continuous engagement adds the value of re-deciding as results come in; acquisition work adds the cost of an overpayment avoided. We do not quote a lift before your backtest measures one. <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">Value of information, SPE 110378 ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi forecasting study, 2026 ↗</a> · <a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20IMAGE%20Preliminary/IMAGE25_How_ViTs_Scale_on_Seismic_Sansal.pdf" target="_blank" rel="noopener">TGS, how seismic models scale, 2025 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">Norwegian shelf seismic model, 2026 ↗</a></p>
+            </div>
+          </div>
+
+          <div class="order" role="region" aria-labelledby="math-title">
+            <div class="order__head">
+              <span class="visual__title" id="math-title">The math, in plain words</span>
+              <span class="head__note">measured in oil and seismic where marked · otherwise from general machine-learning scaling studies</span>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">01</div>
+              <div class="order__body">
+                <h3>Error has two parts</h3>
+                <p class="order__desc">A part no model can remove — what the inputs do not contain — and a part that shrinks as the model sees more examples and is trained harder. Everything below is about the second part.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">02</div>
+              <div class="order__body">
+                <h3>More examples: the big lever</h3>
+                <p class="order__desc">Each doubling of the wells the model learns from removes roughly 5–10% of the removable error. Measured in oil: a model that went from about 360 to 900 wells lost a 20% forecast bias entirely.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">03</div>
+              <div class="order__body">
+                <h3>Harder training: the steady lever</h3>
+                <p class="order__desc">Each tenfold increase in computing removes a few percent of the removable error — about 1–3% per doubling — and stops helping once the data has been learned: a few passes over the same data are nearly free; beyond about sixteen they add nothing. Measured in seismic: interpretation error halves for each elevenfold increase when model and data grow together.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">04</div>
+              <div class="order__body">
+                <h3>The base model multiplies your data</h3>
+                <p class="order__desc">Because the model has already learned the public record, each of your wells teaches it more than it would teach a fresh model — roughly 30% more value per doubling of the base model’s size. This is why the smallest engagement already works and why the second field costs less than the first.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">05</div>
+              <div class="order__body">
+                <h3>So the order is fixed</h3>
+                <p class="order__desc">First dollars: put all of your data in one model — the large step. Next dollars: train it harder — small, steady, measured steps. We measure the slope on your own wells and stop when it flattens.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">06</div>
+              <div class="order__body">
+                <h3>Error into money</h3>
+                <p class="order__desc">A ranking is worth what it changes: each one-point improvement in the chance a well pays, times the gap between a good well and a dry one, times the wells it touches. Lower error means fewer bad wells drilled, and the good ones drilled first.</p>
+              </div>
             </div>
           </div>
 
