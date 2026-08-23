@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+  <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18341057139"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-18341057139');
+</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey Energy — Model-informed drilling, plainly</title>
+    <meta name="description" content="The physics, the statistics, and the mechanics of model-informed drilling, explained for someone with no background." />
+    <meta name="theme-color" content="#080b14" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="StatsKey Energy — Model-informed drilling, plainly" />
+    <meta property="og:description" content="A primer: how rock, sound, records, and statistics turn into a better drilling decision." />
+    <meta property="og:url" content="https://statskey.ai/primer" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #080b14;
+        --bg-soft: #0c1120;
+        --panel: rgba(255, 255, 255, 0.035);
+        --panel-2: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.09);
+        --border-soft: rgba(255, 255, 255, 0.06);
+        --text: #eaeef8;
+        --muted: #99a4bd;
+        --faint: #6c768f;
+        --teal: #30d5c8;
+        --blue: #6e8eff;
+        --violet: #9b7cff;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        line-height: 1.62;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        overflow-x: hidden;
+        position: relative;
+      }
+      /* faint ambient backdrop */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(620px circle at 78% -6%, rgba(48, 213, 200, 0.10), transparent 60%),
+          radial-gradient(720px circle at 8% 18%, rgba(110, 142, 255, 0.08), transparent 60%);
+        z-index: 0;
+        pointer-events: none;
+      }
+      h1, h2, h3, .brand, .eyebrow, .section__label, .btn, .pill, .stat__v {
+        font-family: "Space Grotesk", "Inter", sans-serif;
+      }
+      .shell { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+      a { color: inherit; }
+      a:focus-visible, .btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 6px; }
+
+      /* ---- header ---- */
+      header { border-bottom: 1px solid var(--border-soft); }
+      .header__inner { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; gap: 16px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+      .brand svg { display: block; flex: none; }
+      .brand__tag { color: var(--faint); font-weight: 500; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; font-family: "Inter", sans-serif; }
+      @media (max-width: 620px) { .brand__tag { display: none; } }
+
+      /* ---- hero ---- */
+      .hero { padding: 92px 0 76px; }
+      .hero__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal);
+        margin-bottom: 22px; font-weight: 500;
+      }
+      .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--teal); opacity: 0.6; }
+      h1 { font-size: clamp(36px, 5.4vw, 58px); line-height: 1.05; letter-spacing: -0.028em; font-weight: 600; }
+      .lede { margin-top: 22px; font-size: clamp(16.5px, 1.9vw, 19px); color: var(--muted); max-width: 540px; }
+      .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
+      .pill {
+        font-size: 12.5px; letter-spacing: 0.02em; color: var(--text);
+        border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; background: var(--panel);
+      }
+      .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font-weight: 600; font-size: 14.5px;
+        padding: 13px 22px; border-radius: 999px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      }
+      .btn--primary { color: #06121f; background: linear-gradient(135deg, var(--teal), var(--blue)); }
+      .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -12px rgba(48, 213, 200, 0.6); }
+      .btn--ghost { color: var(--text); border: 1px solid var(--border); }
+      .btn--ghost:hover { border-color: var(--teal); background: var(--panel); }
+
+      /* ---- hero visual ---- */
+      .visual {
+        position: relative; border: 1px solid var(--border); border-radius: 20px; padding: 22px;
+        background: linear-gradient(180deg, var(--panel-2), var(--panel)); overflow: hidden;
+      }
+      .visual__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+      .visual__title { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); font-family: "Space Grotesk", sans-serif; }
+      .live { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--muted); letter-spacing: 0.04em; }
+      .head__note { font-size: 11.5px; color: var(--muted); letter-spacing: 0.04em; }
+      .live span { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 0 rgba(48,213,200,0.5); animation: pulse 2.4s infinite; }
+      @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(48,213,200,0.5);} 70% { box-shadow: 0 0 0 8px rgba(48,213,200,0);} 100% { box-shadow: 0 0 0 0 rgba(48,213,200,0);} }
+      .visual svg { display: block; width: 100%; height: auto; }
+      .visual__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+      @media (max-width: 480px) { .visual__row { grid-template-columns: 1fr; } }
+      .stat { border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px 13px; background: rgba(255,255,255,0.02); }
+      .stat__k { font-size: 11px; letter-spacing: 0.04em; color: var(--faint); }
+      .stat__v { font-size: 18px; font-weight: 600; margin-top: 4px; letter-spacing: -0.01em; }
+
+      /* ---- sections ---- */
+      .section { padding: 60px 0; }
+      .section__label { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint); margin-bottom: 14px; }
+      .section__title { font-size: clamp(24px, 3.6vw, 33px); line-height: 1.12; letter-spacing: -0.022em; font-weight: 600; max-width: 720px; }
+      .section__intro { color: var(--muted); font-size: 16px; max-width: 600px; margin-top: 14px; }
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+      .card {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px;
+        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      }
+      .card:hover { border-color: rgba(110, 142, 255, 0.45); transform: translateY(-3px); background: var(--panel-2); }
+      .card__n { font-family: "Space Grotesk", sans-serif; font-size: 12.5px; color: var(--teal); letter-spacing: 0.12em; }
+      .card h3 { font-size: 19px; margin: 16px 0 10px; font-weight: 600; letter-spacing: -0.01em; }
+      .card p { color: var(--muted); font-size: 14.5px; }
+
+      /* ---- metric cards (big numbers) ---- */
+      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+      .metric {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 26px 24px;
+        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      }
+      .metric:hover { border-color: rgba(48, 213, 200, 0.42); transform: translateY(-3px); background: var(--panel-2); }
+      .metric__v {
+        font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 4.4vw, 41px); font-weight: 700;
+        line-height: 1; letter-spacing: -0.02em; width: fit-content;
+        background: var(--metric-grad, linear-gradient(135deg, var(--teal), var(--blue)));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .metric h3 { font-size: 15.5px; margin: 15px 0 7px; font-weight: 600; letter-spacing: -0.01em; }
+      .metric p { color: var(--muted); font-size: 13.8px; }
+      .metrics--teal { --metric-grad: linear-gradient(135deg, #30d5c8, #57e1d4); }
+      .metrics--blue { --metric-grad: linear-gradient(135deg, #6e8eff, #9b7cff); }
+
+      /* ---- banner / pull quote ---- */
+      .banner {
+        margin-top: 28px; border: 1px solid var(--border-soft); border-left: 3px solid var(--teal);
+        border-radius: 0 14px 14px 0; background: linear-gradient(90deg, rgba(48, 213, 200, 0.08), rgba(48, 213, 200, 0));
+        padding: 17px 24px; color: var(--text); font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(15px, 1.85vw, 17px); font-weight: 500; letter-spacing: -0.01em;
+      }
+      .banner--blue { border-left-color: var(--blue); background: linear-gradient(90deg, rgba(110, 142, 255, 0.08), rgba(110, 142, 255, 0)); }
+
+      /* ---- pricing schedule ---- */
+      .sched { margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); overflow: hidden; }
+      .sched__head {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+        padding: 16px 26px; border-bottom: 1px solid var(--border-soft); background: rgba(255,255,255,0.015);
+      }
+      .sched__row {
+        display: grid; grid-template-columns: 200px 1fr; gap: 4px 32px; padding: 26px;
+        border-bottom: 1px solid var(--border-soft); transition: background 0.25s ease;
+      }
+      .sched__row:last-child { border-bottom: none; }
+      .sched__row:hover { background: var(--panel-2); }
+      .sched__price {
+        font-family: "Space Grotesk", sans-serif; font-size: clamp(26px, 3.4vw, 32px); font-weight: 700;
+        line-height: 1.05; letter-spacing: -0.02em; width: fit-content; align-self: start;
+        grid-column: 1; grid-row: 1;
+        background: var(--sched-grad, linear-gradient(135deg, var(--teal), var(--blue)));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .sched__body { grid-column: 2; grid-row: 1; }
+      .sched__row--teal { --sched-grad: linear-gradient(135deg, #30d5c8, #57e1d4); }
+      .sched__row--blue { --sched-grad: linear-gradient(135deg, #6e8eff, #9b7cff); }
+      .sched__unit { display: block; margin-top: 5px; font-family: "Inter", sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+      .sched__row h3 { font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .sched__desc { color: var(--muted); font-size: 14.2px; margin-top: 7px; max-width: 640px; }
+      .sched__anchor { color: var(--muted); font-size: 12.8px; margin-top: 11px; }
+      .sched__anchor::before { content: "— "; color: var(--teal); }
+      @media (max-width: 720px) {
+        .sched__row { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
+        .sched__price { grid-row: 1; }
+        .sched__body { grid-column: 1; grid-row: 2; }
+      }
+
+      /* ---- the order of operations ---- */
+      .order { margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); overflow: hidden; }
+      .order__head {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+        padding: 16px 26px; border-bottom: 1px solid var(--border-soft); background: rgba(255,255,255,0.015);
+      }
+      .order__row {
+        display: grid; grid-template-columns: 56px 1fr; gap: 2px 22px; padding: 22px 26px;
+        border-bottom: 1px solid var(--border-soft); transition: background 0.25s ease;
+      }
+      .order__row:last-child { border-bottom: none; }
+      .order__row:hover { background: var(--panel-2); }
+      .order__n {
+        font-family: "Space Grotesk", sans-serif; font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;
+        width: fit-content; align-self: start; grid-column: 1; grid-row: 1;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .order__body { grid-column: 2; grid-row: 1; min-width: 0; }
+      .order__row h3 { font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .order__desc { color: var(--muted); font-size: 14.2px; margin-top: 9px; max-width: 720px; }
+      .order__src { margin-top: 8px; font-size: 12.3px; color: var(--muted); }
+      .order__src a { color: #aebcff; text-underline-offset: 3px; }
+      .order__src a:hover { color: var(--teal); }
+      @media (max-width: 720px) {
+        .order__row { grid-template-columns: 1fr; gap: 6px; padding: 20px 22px; }
+        .order__body { grid-column: 1; grid-row: 2; }
+      }
+
+      /* ---- the levels ---- */
+      .ladder {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: start;
+        padding: 20px 26px 24px; border-top: 1px solid var(--border-soft);
+      }
+      .ladder__lede { grid-column: 1 / -1; margin-bottom: 4px; }
+      .ladder--three { grid-template-columns: repeat(3, 1fr); }
+      .ladder__step {
+        border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02);
+        padding: 16px 16px 18px; display: flex; flex-direction: column;
+        transition: border-color 0.25s ease, background 0.25s ease;
+      }
+      .ladder__step:hover { border-color: rgba(48, 213, 200, 0.42); background: var(--panel-2); }
+      .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
+      .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+      .ladder__price {
+        font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: clamp(18px, 2.2vw, 22px);
+        letter-spacing: -0.01em; margin-top: 6px; width: fit-content;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .ladder__fig { margin-top: 8px; font-size: 12.5px; line-height: 1.45; font-weight: 500; color: var(--text); }
+      .ladder__k { margin-top: 12px; font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--teal); }
+      .ladder__sub { margin-top: 4px; font-size: 12.5px; line-height: 1.55; color: var(--muted); }
+      .ladder__caption { grid-column: 1 / -1; color: var(--muted); font-size: 13px; margin-top: 6px; }
+      .ladder__caption + .ladder__caption { margin-top: 0; }
+      @media (max-width: 1000px) { .ladder { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 720px) { .ladder { grid-template-columns: 1fr; padding: 18px 22px 22px; } }
+
+      .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
+      .vision__inner { max-width: 760px; }
+      .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
+      .vision p { margin-top: 18px; color: var(--muted); font-size: 16.5px; }
+      .vision .accent { color: var(--text); font-weight: 500; }
+
+      /* ---- evidence and disclaimer ---- */
+      .asof {
+        display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+        color: var(--faint); font-size: 12.5px;
+      }
+      .asof::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+      .evidence-link { color: #aebcff; text-underline-offset: 3px; }
+      .evidence-link:hover { color: var(--teal); }
+      .small-note { margin-top: 13px; color: var(--faint); font-size: 12.5px; line-height: 1.55; }
+      .disclaimer {
+        margin-top: 24px; padding: 16px 18px; border: 1px solid var(--border-soft);
+        border-radius: 12px; color: var(--faint); font-size: 12.5px; background: rgba(255,255,255,0.018);
+      }
+
+      footer { border-top: 1px solid var(--border-soft); padding: 30px 0 44px; }
+      .footer__inner { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; color: var(--faint); font-size: 13px; }
+      .footer__inner .dotsep { opacity: 0.4; }
+
+      @media (max-width: 860px) {
+        .hero__grid { grid-template-columns: 1fr; gap: 40px; }
+        .visual { order: 2; }
+      }
+      @media (max-width: 720px) {
+        .cards, .metrics { grid-template-columns: 1fr; }
+        .hero { padding: 62px 0 52px; }
+        .section { padding: 48px 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="shell header__inner">
+        <div class="brand">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <rect x="0.5" y="0.5" width="25" height="25" rx="7" stroke="url(#g)" stroke-opacity="0.5" />
+            <path d="M5 16.5 L10 13 L15 15 L21 9.5" stroke="url(#g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5 11 L10 8.5 L15 10.5 L21 6" stroke="#6e8eff" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <defs>
+              <linearGradient id="g" x1="3" y1="6" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#30d5c8" /><stop offset="1" stop-color="#6e8eff" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>StatsKey&nbsp;Energy</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="shell">
+          <span class="eyebrow">A primer · August 2026</span>
+          <h1>Model-informed drilling, explained plainly.</h1>
+          <p class="lede">
+            The physics of why a well pays, what seismic actually measures, how a model learns from the well record,
+            how you know whether it is right, what a prediction is worth, and the step-by-step mechanics of using one —
+            written for someone with no background in any of it.
+          </p>
+          <div class="actions">
+            <a class="btn btn--primary" href="#physics">The physics</a>
+            <a class="btn btn--ghost" href="#statistics">The statistics</a>
+            <a class="btn btn--ghost" href="#mechanics">The mechanics</a>
+          </div>
+          <div class="asof">Companion to <a class="evidence-link" href="/energy">statskey.ai/energy</a></div>
+        </div>
+      </section>
+
+      <section class="section" id="physics">
+        <div class="shell">
+          <div class="section__label">The physics</div>
+          <h2 class="section__title">Rock, sound, and records.</h2>
+          <div class="order" role="region" aria-labelledby="physics-title">
+            <div class="order__head"><span class="visual__title" id="physics-title">Why a well pays, and how we see underground</span><span class="head__note">no equations · the ideas that everything else rests on</span></div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">01</div>
+              <div class="order__body">
+                <h3>What a well is betting on</h3>
+                <p class="order__desc">Oil and gas sit in the tiny holes of buried rock, the way water sits in a sponge. Four things decide whether a well pays: how much hole space the rock has (porosity — how big the sponge is), how easily fluid moves through it (permeability — how connected the holes are), how thick the good rock is, and how much pressure is pushing the fluid toward the well. Pressure is the engine: a field that has been produced for decades is a tired balloon, and what comes out depends on how hard you can pull against what is left. In tight rock you also have to crack it open — hydraulic fracturing — and how far those cracks reach depends on how stiff and how stressed the rock is.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">02</div>
+              <div class="order__body">
+                <h3>What seismic actually measures</h3>
+                <p class="order__desc">Seismic is an ultrasound of the ground. A source makes a sound; it travels down, echoes off each boundary where the rock changes, and comes back. The time an echo takes gives depth; the strength of the echo gives how sharply the rock changed — stiffer or denser rock echoes harder. Because porosity, fluid, and stiffness all change how rock carries sound, the echoes carry information about the sponge, the fluid, and the crackability — blurred, because sound cannot resolve anything thinner than about a tenth of its wavelength, which underground is tens of feet. Seismic shows shape and contrast well, and properties only through inference.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">03</div>
+              <div class="order__body">
+                <h3>What the well record knows</h3>
+                <p class="order__desc">Every well ever drilled left a record: logs (measurements run down the hole — how the rock conducts electricity, how fast sound moves through it, how radioactive it is — which translate to porosity, fluid, and rock type at the wellbore), the completion (how it was drilled and fractured), and the production history month by month, reported to the state. Wells are the ground truth; seismic is the map between them. The record also shows how production falls over time (decline) and how neighboring wells interfered with each other.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="statistics">
+        <div class="shell">
+          <div class="section__label">The statistics</div>
+          <h2 class="section__title">Learning, testing, and worth.</h2>
+          <div class="order" role="region" aria-labelledby="stats-title">
+            <div class="order__head"><span class="visual__title" id="stats-title">How a model learns, how we check it, what it is worth</span><span class="head__note">the numbers are from published results · each one is measured somewhere</span></div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">04</div>
+              <div class="order__body">
+                <h3>How a model learns</h3>
+                <p class="order__desc">Show a model thousands of wells — their rock, their seismic, how they were completed, and what they produced — and it learns which combinations tend to pay. It is pattern-finding with bookkeeping: it never sees the future, only the regularities in the past. Two things make it better. More examples: each doubling of the wells it learns from removes roughly 5–10% of the error it could still lose. Harder training — a bigger model, trained longer, at higher resolution: each tenfold increase in computing removes a few percent more, and stops helping once the examples have been learned. That is why the first job is always to get all of an operator’s data in, and only then to train harder.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">05</div>
+              <div class="order__body">
+                <h3>Why a model trained elsewhere still helps here</h3>
+                <p class="order__desc">Rock obeys the same physics everywhere: sound answers to stiffness and fluid the same way in Texas as in Norway; pressure and permeability set decline in every field. A model that has learned those relationships from the public record arrives already knowing them, so each of a new operator’s wells teaches it more than it would teach a fresh model — about 30% more per doubling of the base model’s size. Moving to a truly different basin costs some accuracy (about ten points on one published task), which is measured and reported, not assumed.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">06</div>
+              <div class="order__body">
+                <h3>How we know whether it is right</h3>
+                <p class="order__desc">Before the model is trusted, it is scored on wells whose results are already known but were hidden from it — a blind test — area by area. Three numbers come out: how often its top picks were the real top wells; how far off its production forecasts were; and whether its stated ranges held (if it says “80% likely between these two numbers,” it should be right 80% of the time). Error bars matter: with about 300 test wells the forecast error is known to about one percentage point, so differences smaller than that are noise and are called noise. If the model does not beat the operator’s current method on that test, it has earned nothing and says so.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">07</div>
+              <div class="order__body">
+                <h3>What a prediction is worth</h3>
+                <p class="order__desc">A ranking is worth only what it changes. If it tells you to drill what you would have drilled anyway, it is worth nothing; if it is no better than a coin flip, it is worth nothing. Once it beats chance, value climbs fast: a signal that is right nine times in ten captures more than half the value of knowing the answer perfectly. The arithmetic is simple — each point of improvement in the chance a well pays, times the gap between a good well and a dry one, times the number of wells it touches. That is why coverage (how many decisions the ranking reaches) matters more than cleverness.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="mechanics">
+        <div class="shell">
+          <div class="section__label">The mechanics</div>
+          <h2 class="section__title">How a model informs a drilling program, step by step.</h2>
+          <div class="order" role="region" aria-labelledby="mech-title">
+            <div class="order__head"><span class="visual__title" id="mech-title">From data to a better decision</span><span class="head__note">the engineer decides · the model improves the odds and shows its work</span></div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">08</div>
+              <div class="order__body">
+                <h3>Step one — everything in</h3>
+                <p class="order__desc">All of the operator’s seismic, logs, completions, and production, plus the public record of every neighboring well, go into one model on hardware already running. Nothing is sampled; coverage is never the thing you pay to scale.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">09</div>
+              <div class="order__body">
+                <h3>Step two — the blind test</h3>
+                <p class="order__desc">The model is scored, area by area, on wells with known outcomes hidden from it, against a pass bar written down in advance. This happens before it ranks anything new.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">10</div>
+              <div class="order__body">
+                <h3>Step three — the ranking with ranges</h3>
+                <p class="order__desc">Every candidate decision — drill here, wait, pass; complete this way; space this far; land this deep — comes back with a likely production range, an estimated cost, and the evidence behind it. The engineer looks at the same map with better odds attached; the engineer decides.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">11</div>
+              <div class="order__body">
+                <h3>Step four — drill, measure, update</h3>
+                <p class="order__desc">As wells are drilled, their measurements come back in: logging-while-drilling corrects the seismic picture ahead of the bit (a prior becomes a posterior — old guess, new evidence, better guess), and the result of each well becomes a new example. The ranking is refreshed; the blind score is re-run; the error bars tighten. Re-deciding as information arrives beats deciding once.</p>
+              </div>
+            </div>
+            <div class="order__row">
+              <div class="order__n" aria-hidden="true">12</div>
+              <div class="order__body">
+                <h3>What it cannot do</h3>
+                <p class="order__desc">It cannot see information that is not in the inputs — wells outside seismic coverage, missing pressure or core data, what the rig crew does on the day. It cannot guarantee a well. It cannot replace the engineer’s judgment on a single well where the data are thin. It can make a large set of decisions right more often, show you by how much before capital moves, and tell you honestly when it cannot.</p>
+              </div>
+            </div>
+          </div>
+          <div class="banner">The whole thing in one sentence: put every record in, test the model blind on wells you already know, rank the decisions you face with honest ranges, let the engineer decide, drill, measure, and update — and pay for the upside only after the test shows it is real.</div>
+          <div class="disclaimer">This primer is educational. It is not a drilling recommendation, reserves estimate, title opinion, or investment advice. Published figures quoted here (5–10% per doubling of examples, a few percent per tenfold of computing, about 30% per doubling of base-model size, about ten points out-of-basin, nine-in-ten capturing more than half the value of perfect information) are from the studies linked on statskey.ai/energy.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer__inner">
+        <span>StatsKey Energy &copy; 2026</span>
+        <span>Evidence reviewed August 22, 2026 <span class="dotsep">·</span> statskey.ai/primer</span>
+      </div>
+    </footer>
+  </body>
+</html>
