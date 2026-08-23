@@ -240,6 +240,7 @@
         padding: 20px 26px 24px; border-top: 1px solid var(--border-soft);
       }
       .ladder__lede { grid-column: 1 / -1; margin-bottom: 4px; }
+      .ladder--three { grid-template-columns: repeat(3, 1fr); }
       .ladder__step {
         border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02);
         padding: 16px 16px 18px; display: flex; flex-direction: column;
@@ -574,10 +575,37 @@
               </div>
               <div class="sched__price">Post-test<span class="sched__unit">share of gains</span></div>
             </div>
-            <div class="ladder" role="group" aria-labelledby="ladder-title">
+            <div class="ladder ladder--three" role="group" aria-labelledby="ladder-title">
               <span class="visual__title ladder__lede" id="ladder-title">Computing scale · what more of it buys</span>
-              <p class="ladder__caption">Your whole portfolio is covered from the start, on the computing we already own; the expensive part — teaching the model what seismic and well data look like — was done once and is never repeated for a new client. More computing buys a larger model, trained longer and at higher resolution, on more of the public record alongside yours, with more blind tests behind every number. Predictive power rises with it along a measurable curve and flattens where your data, not the machine, is the limit. The scales, and what each is expected to buy, are set out with the backtest.</p>
-              <p class="ladder__caption">What it is worth depends on the decisions it reaches. Each one-point improvement in the chance of success is worth the difference between a good well and a dry one, on every well the ranking changes; a continuous engagement adds the value of re-deciding as results come in; acquisition work adds the cost of an overpayment avoided. We do not quote a lift before your backtest measures one. <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">Value of information, SPE 110378 ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi forecasting study, 2026 ↗</a></p>
+              <div class="ladder__step ladder__step--min">
+                <span class="ladder__size">Now · one card, already running</span>
+                <span class="ladder__price">Covers your whole portfolio</span>
+                <span class="ladder__fig">Trained on everything you hold plus the public record · a blind test by field · calibrated forecast ranges · re-ranked as results come in</span>
+                <span class="ladder__k">What you get</span>
+                <span class="ladder__sub">This is where the large, measured gain is: getting your seismic and well data into one model at all. Published results put such forecasts 15–35% better than standard decline methods, with a large jump in explained variance where wells sit inside seismic coverage, and pretraining beats starting from scratch with only a hundred labeled examples.</span>
+                <span class="ladder__k">What to expect</span>
+                <span class="ladder__sub">Most of the gain available to a two-basin portfolio — we estimate four-fifths or more — and the backtest that measures it on your own wells.</span>
+              </div>
+              <div class="ladder__step">
+                <span class="ladder__size">Next · a four-card workstation, about five times the computing</span>
+                <span class="ladder__price">Trains it harder</span>
+                <span class="ladder__fig">Longer training · higher resolution · 3D context · several independent runs for uncertainty</span>
+                <span class="ladder__k">What you get</span>
+                <span class="ladder__sub">Reaches every best-published point for a portfolio like yours: roughly half the remaining error in reading seismic from few labels, and a further gain in forecast error of a few percent of what is left — a gain we can only confirm by measuring it on your wells.</span>
+                <span class="ladder__k">What to expect</span>
+                <span class="ladder__sub">Better-calibrated uncertainty on wells outside seismic coverage, and a measurement of how much more computing helps on your data — the number that decides whether the next dollar goes to computing or to data.</span>
+              </div>
+              <div class="ladder__step">
+                <span class="ladder__size">Beyond · rented bursts for the largest models</span>
+                <span class="ladder__price">Not sold to you</span>
+                <span class="ladder__fig">Ten to a hundred times the computing</span>
+                <span class="ladder__k">What you get</span>
+                <span class="ladder__sub">Seismic models larger than any operator needs. The published benchmarks are already saturated at that size, and the expected forecast gain for a two-basin portfolio is smaller than the backtest can resolve.</span>
+                <span class="ladder__k">What to expect</span>
+                <span class="ladder__sub">Nothing we would charge you for. It is an asset we may build across many clients; if your backtest shows error still falling as computing rises, we revisit.</span>
+              </div>
+              <p class="ladder__caption">Returns flatten where the data, not the machine, is the limit: the error that computing can still remove shrinks by only a few percent for each tenfold increase, and a backtest on a portfolio this size cannot see differences smaller than about one point of error. What moves the floor is information — more of your data types (completions detail, pressure and flowback, logs and core), licensed or partner seismic over uncovered acreage, and partner wells pooled into training. Those are measured, large effects; more computing is a slow, steady one.</p>
+              <p class="ladder__caption">What it is worth depends on the decisions it reaches. Each one-point improvement in the chance of success is worth the difference between a good well and a dry one, on every well the ranking changes; a continuous engagement adds the value of re-deciding as results come in; acquisition work adds the cost of an overpayment avoided. We do not quote a lift before your backtest measures one. <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">Value of information, SPE 110378 ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi forecasting study, 2026 ↗</a> · <a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20IMAGE%20Preliminary/IMAGE25_How_ViTs_Scale_on_Seismic_Sansal.pdf" target="_blank" rel="noopener">TGS, how seismic models scale, 2025 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">Norwegian shelf seismic model, 2026 ↗</a></p>
             </div>
           </div>
 
