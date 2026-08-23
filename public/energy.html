@@ -472,8 +472,8 @@
             Every well you drill and every asset you buy is a bet on odds you cannot see directly.
             Your own records — every well, its measurements, surveys, and later repairs, with how
             each turned out — are the one source that can show how reliable any ranking is on your
-            acreage. That record already exists. Running it through the model, field by field, turns
-            a claim into a measured score.
+            acreage. That record already exists. Running all of it through the model turns a claim into a
+            measured score.
           </p>
           <p class="section__intro">
             This industry has always paid the people who reduce drilling risk out of the results, not
@@ -531,8 +531,8 @@
             <div class="order__row">
               <div class="order__n" aria-hidden="true">06</div>
               <div class="order__body">
-                <h3>Computing grows only as your data grows</h3>
-                <p class="order__desc">More data justifies a bigger model and more training. The returns are steady but diminishing: tenfold more computing removes roughly a third of the remaining error; tenfold more new data removes more; we stop training when improvement stops. For one operator’s portfolio that computing is small: tuning the already-trained model and re-ranking every well takes hours of machine time a year for a mid-size operator and a few weeks spread across a year for the largest — tens of dollars to a few thousand dollars of electricity or rented time. The cost of coverage is people: loading and checking each survey, building the test sets, and reviewing what the model ranks.</p>
+                <h3>More computing buys more predictive power — and we stop when the curve flattens</h3>
+                <p class="order__desc">We train on everything you have with computing we already own; that is not the limit. More computing buys a larger model, trained longer and at higher resolution, on more of the public record alongside your own, with more blind tests behind every number. Predictive power rises with it along a measurable curve — steeply at first, then flattening where the data, not the machine, becomes the limit — and we stop training when improvement stops.</p>
                 <p class="order__src">Source: <a class="evidence-link" href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al., scaling study, 2022 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">Norwegian shelf seismic model, 2026 ↗</a> · <a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20Articles/fb2025026.pdf" target="_blank" rel="noopener">TGS seismic model study, 2025 ↗</a></p>
               </div>
             </div>
@@ -553,11 +553,11 @@
             </div>
             <div class="sched__row sched__row--teal">
               <div class="sched__body">
-                <h3>Scope sets the price</h3>
-                <p class="sched__desc">Size the engagement to the decisions you want ranked — one field, a district, a basin, a portfolio. At every level the output is the same kind of thing: each decision in scope ranked drill, wait, or pass, with likely production ranges, estimated cost, and the evidence behind each call. What grows with scope is how many decisions are ranked, how many of your wells the model learns from, how often the ranking is refreshed, how many blind wells — wells whose results the model was not shown — back it, and how much review comes with it. Every engagement opens with the backtest on your own history.</p>
-                <p class="sched__anchor">The levels below are scopes, not a rate card. Each fee is set per engagement and follows how many surveys we load and how many fields we review — not machine time, which is small.</p>
+                <h3>One scope: your whole portfolio, from day one</h3>
+                <p class="sched__desc">We train on your entire portfolio from the start — every well, log, survey, completion, and production record you hold, plus the public regulator record — on computing we already own. Every decision in it is ranked drill, wait, or pass, with likely production ranges, estimated cost, and the evidence behind each call, and the model is scored blind on wells whose results you already know before it ranks anything new. What scales with spend is not coverage. It is how hard the model is trained — computing scale — how often the ranking is refreshed, and how much review comes with it.</p>
+                <p class="sched__anchor">Fees cover computing and review, not billable hours.</p>
               </div>
-              <div class="sched__price">Per scope<span class="sched__unit">fixed fee</span></div>
+              <div class="sched__price">All of it<span class="sched__unit">from day one</span></div>
             </div>
             <div class="sched__row sched__row--blue">
               <div class="sched__body">
@@ -575,45 +575,9 @@
               <div class="sched__price">Post-test<span class="sched__unit">share of gains</span></div>
             </div>
             <div class="ladder" role="group" aria-labelledby="ladder-title">
-              <span class="visual__title ladder__lede" id="ladder-title">The levels · what you get at each scope, and what to expect — the whole portfolio is within reach from the start</span>
-              <div class="ladder__step ladder__step--min">
-                <span class="ladder__size">Start here</span>
-                <span class="ladder__price">One field</span>
-                <span class="ladder__fig">Opens every engagement</span>
-                <span class="ladder__k">What you get</span>
-                <span class="ladder__sub">Your field’s wells, measurements, surveys, and repair history, plus the public regulator record, used to train the model — then scored on wells whose results were hidden from it. The model arrives already trained on the broad record, so it does not start from zero.</span>
-                <span class="ladder__k">What to expect</span>
-                <span class="ladder__sub">A measured number, not a promise: production-forecast error of roughly 15–25% per well and under 2% for the field as a whole, plus a ranked list of candidates. With fewer than a hundred wells, any improvement over your current forecasting method will be too small to tell from chance — which is exactly what the backtest is designed to check.</span>
-              </div>
-              <div class="ladder__step">
-                <span class="ladder__size">Then</span>
-                <span class="ladder__price">A district</span>
-                <span class="ladder__fig">Several fields and formations · updated monthly</span>
-                <span class="ladder__k">What you get</span>
-                <span class="ladder__sub">One model across several fields, tested on whole fields it has never seen, updated as new well results come in. Each new field costs less than the last, because the model has already learned your geology.</span>
-                <span class="ladder__k">What to expect</span>
-                <span class="ladder__sub">Forecast error per well near 15–20% — about five percentage points better than standard planning forecasts — with consistent over- or under-forecasting corrected once several hundred wells are combined, and 11–47% lower error than standard decline forecasts, field by field.</span>
-              </div>
-              <div class="ladder__step">
-                <span class="ladder__size">Or</span>
-                <span class="ladder__price">A basin</span>
-                <span class="ladder__fig">Retrained as results come in · a blind test at every update</span>
-                <span class="ladder__k">What you get</span>
-                <span class="ladder__sub">Enough computing to learn everything the basin’s record can teach — the level where data, not computing, becomes the limit — with a blind test at every update. Moving beyond the basin carries a measured, disclosed cost in accuracy.</span>
-                <span class="ladder__k">What to expect</span>
-                <span class="ladder__sub">Forecast error per well near 15%, about as low as it goes. The extra data lets the model separate smaller effects — exact well depth within the target layer (worth about +5% to −10% of three-year oil output in one study), well spacing, and rock quality — and gave 30–60% lower error than standard production-decline forecasts in a 20,000-well test.</span>
-              </div>
-              <div class="ladder__step">
-                <span class="ladder__size">Where most should end up</span>
-                <span class="ladder__price">Your whole portfolio</span>
-                <span class="ladder__fig">Every operated area · retrained weekly</span>
-                <span class="ladder__k">What you get</span>
-                <span class="ladder__sub">The same model across everything you operate, retrained weekly and blind-tested everywhere at every update, with one tested model to score any asset you are offered. The machine time for this is hours to a few weeks a year on hardware we already own; the work is loading and checking each survey and reviewing each field’s rankings.</span>
-                <span class="ladder__k">What to expect</span>
-                <span class="ladder__sub">The basin-level results in every basin, with areas that have little data helped by data from the others. For exploration and acquisitions, no published model has yet shown an improvement in success rate; published evidence suggests 1–6 percentage points at most, so your own backtest is the only reliable figure.</span>
-              </div>
-              <p class="ladder__caption">Covering your whole portfolio is within reach from the start. The expensive part — teaching the model what seismic and well data look like — was done once, on our own hardware, and is never repeated for a new client. What takes effort is loading and checking each survey and having qualified people review what the model ranks; that is where nearly all of the price goes, and it is why the price follows surveys and fields, not machines.</p>
-              <p class="ladder__caption">What it is worth depends on the decisions it reaches. Each one-point improvement in the chance of success is worth the difference between a good well and a dry one, on every well the ranking changes; a continuous engagement adds the value of re-deciding as results come in; acquisition work adds the cost of an overpayment avoided. Larger scopes reach more of those decisions and bring more of your wells into training, which is what drives forecast error down — so the value rises with scope while the machine cost does not. We do not quote a lift before your backtest measures one. <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">Value of information, SPE 110378 ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi forecasting study, 2026 ↗</a> · <a class="evidence-link" href="https://novilabs.com/blog/expanding-machine-learning-models-for-better-production-forecasting-in-emerging-shale-basins/" target="_blank" rel="noopener">Novi, more wells in training ↗</a></p>
+              <span class="visual__title ladder__lede" id="ladder-title">Computing scale · what more of it buys</span>
+              <p class="ladder__caption">Your whole portfolio is covered from the start, on the computing we already own; the expensive part — teaching the model what seismic and well data look like — was done once and is never repeated for a new client. More computing buys a larger model, trained longer and at higher resolution, on more of the public record alongside yours, with more blind tests behind every number. Predictive power rises with it along a measurable curve and flattens where your data, not the machine, is the limit. The scales, and what each is expected to buy, are set out with the backtest.</p>
+              <p class="ladder__caption">What it is worth depends on the decisions it reaches. Each one-point improvement in the chance of success is worth the difference between a good well and a dry one, on every well the ranking changes; a continuous engagement adds the value of re-deciding as results come in; acquisition work adds the cost of an overpayment avoided. We do not quote a lift before your backtest measures one. <a class="evidence-link" href="https://doi.org/10.2118/110378-MS" target="_blank" rel="noopener">Value of information, SPE 110378 ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi forecasting study, 2026 ↗</a></p>
             </div>
           </div>
 
