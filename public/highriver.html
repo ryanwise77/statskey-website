@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+  <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18341057139"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-18341057139');
+</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey Energy — High River</title>
+    <meta name="description" content="Prepared for High River Resources: what the public record already says about your portfolio, and three things we are almost certain pay." />
+    <meta name="theme-color" content="#080b14" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="StatsKey Energy — High River" />
+    <meta property="og:description" content="What your own record already says, and what we can do with it." />
+    <meta property="og:url" content="https://statskey.ai/highriver" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root {
+        --bg: #080b14;
+        --bg-soft: #0c1120;
+        --panel: rgba(255, 255, 255, 0.035);
+        --panel-2: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.09);
+        --border-soft: rgba(255, 255, 255, 0.06);
+        --text: #eaeef8;
+        --muted: #99a4bd;
+        --faint: #6c768f;
+        --teal: #30d5c8;
+        --blue: #6e8eff;
+        --violet: #9b7cff;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        line-height: 1.62;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        overflow-x: hidden;
+        position: relative;
+      }
+      /* faint ambient backdrop */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(620px circle at 78% -6%, rgba(48, 213, 200, 0.10), transparent 60%),
+          radial-gradient(720px circle at 8% 18%, rgba(110, 142, 255, 0.08), transparent 60%);
+        z-index: 0;
+        pointer-events: none;
+      }
+      h1, h2, h3, .brand, .eyebrow, .section__label, .btn, .pill, .stat__v {
+        font-family: "Space Grotesk", "Inter", sans-serif;
+      }
+      .shell { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+      a { color: inherit; }
+      a:focus-visible, .btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 6px; }
+
+      /* ---- header ---- */
+      header { border-bottom: 1px solid var(--border-soft); }
+      .header__inner { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; gap: 16px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+      .brand svg { display: block; flex: none; }
+      .brand__tag { color: var(--faint); font-weight: 500; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; font-family: "Inter", sans-serif; }
+      @media (max-width: 620px) { .brand__tag { display: none; } }
+
+      /* ---- hero ---- */
+      .hero { padding: 92px 0 76px; }
+      .hero__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal);
+        margin-bottom: 22px; font-weight: 500;
+      }
+      .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--teal); opacity: 0.6; }
+      h1 { font-size: clamp(36px, 5.4vw, 58px); line-height: 1.05; letter-spacing: -0.028em; font-weight: 600; }
+      .lede { margin-top: 22px; font-size: clamp(16.5px, 1.9vw, 19px); color: var(--muted); max-width: 540px; }
+      .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
+      .pill {
+        font-size: 12.5px; letter-spacing: 0.02em; color: var(--text);
+        border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; background: var(--panel);
+      }
+      .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font-weight: 600; font-size: 14.5px;
+        padding: 13px 22px; border-radius: 999px; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      }
+      .btn--primary { color: #06121f; background: linear-gradient(135deg, var(--teal), var(--blue)); }
+      .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -12px rgba(48, 213, 200, 0.6); }
+      .btn--ghost { color: var(--text); border: 1px solid var(--border); }
+      .btn--ghost:hover { border-color: var(--teal); background: var(--panel); }
+
+      /* ---- hero visual ---- */
+      .visual {
+        position: relative; border: 1px solid var(--border); border-radius: 20px; padding: 22px;
+        background: linear-gradient(180deg, var(--panel-2), var(--panel)); overflow: hidden;
+      }
+      .visual__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+      .visual__title { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); font-family: "Space Grotesk", sans-serif; }
+      .live { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--muted); letter-spacing: 0.04em; }
+      .head__note { font-size: 11.5px; color: var(--muted); letter-spacing: 0.04em; }
+      .live span { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 0 rgba(48,213,200,0.5); animation: pulse 2.4s infinite; }
+      @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(48,213,200,0.5);} 70% { box-shadow: 0 0 0 8px rgba(48,213,200,0);} 100% { box-shadow: 0 0 0 0 rgba(48,213,200,0);} }
+      .visual svg { display: block; width: 100%; height: auto; }
+      .visual__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+      @media (max-width: 480px) { .visual__row { grid-template-columns: 1fr; } }
+      .stat { border: 1px solid var(--border-soft); border-radius: 12px; padding: 12px 13px; background: rgba(255,255,255,0.02); }
+      .stat__k { font-size: 11px; letter-spacing: 0.04em; color: var(--faint); }
+      .stat__v { font-size: 18px; font-weight: 600; margin-top: 4px; letter-spacing: -0.01em; }
+
+      /* ---- sections ---- */
+      .section { padding: 60px 0; }
+      .section__label { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--faint); margin-bottom: 14px; }
+      .section__title { font-size: clamp(24px, 3.6vw, 33px); line-height: 1.12; letter-spacing: -0.022em; font-weight: 600; max-width: 720px; }
+      .section__intro { color: var(--muted); font-size: 16px; max-width: 600px; margin-top: 14px; }
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+      .card {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px;
+        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      }
+      .card:hover { border-color: rgba(110, 142, 255, 0.45); transform: translateY(-3px); background: var(--panel-2); }
+      .card__n { font-family: "Space Grotesk", sans-serif; font-size: 12.5px; color: var(--teal); letter-spacing: 0.12em; }
+      .card h3 { font-size: 19px; margin: 16px 0 10px; font-weight: 600; letter-spacing: -0.01em; }
+      .card p { color: var(--muted); font-size: 14.5px; }
+
+      /* ---- metric cards (big numbers) ---- */
+      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+      .metric {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 26px 24px;
+        transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+      }
+      .metric:hover { border-color: rgba(48, 213, 200, 0.42); transform: translateY(-3px); background: var(--panel-2); }
+      .metric__v {
+        font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 4.4vw, 41px); font-weight: 700;
+        line-height: 1; letter-spacing: -0.02em; width: fit-content;
+        background: var(--metric-grad, linear-gradient(135deg, var(--teal), var(--blue)));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .metric h3 { font-size: 15.5px; margin: 15px 0 7px; font-weight: 600; letter-spacing: -0.01em; }
+      .metric p { color: var(--muted); font-size: 13.8px; }
+      .metrics--teal { --metric-grad: linear-gradient(135deg, #30d5c8, #57e1d4); }
+      .metrics--blue { --metric-grad: linear-gradient(135deg, #6e8eff, #9b7cff); }
+
+      /* ---- banner / pull quote ---- */
+      .banner {
+        margin-top: 28px; border: 1px solid var(--border-soft); border-left: 3px solid var(--teal);
+        border-radius: 0 14px 14px 0; background: linear-gradient(90deg, rgba(48, 213, 200, 0.08), rgba(48, 213, 200, 0));
+        padding: 17px 24px; color: var(--text); font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(15px, 1.85vw, 17px); font-weight: 500; letter-spacing: -0.01em;
+      }
+      .banner--blue { border-left-color: var(--blue); background: linear-gradient(90deg, rgba(110, 142, 255, 0.08), rgba(110, 142, 255, 0)); }
+
+      /* ---- pricing schedule ---- */
+      .sched { margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); overflow: hidden; }
+      .sched__head {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+        padding: 16px 26px; border-bottom: 1px solid var(--border-soft); background: rgba(255,255,255,0.015);
+      }
+      .sched__row {
+        display: grid; grid-template-columns: 200px 1fr; gap: 4px 32px; padding: 26px;
+        border-bottom: 1px solid var(--border-soft); transition: background 0.25s ease;
+      }
+      .sched__row:last-child { border-bottom: none; }
+      .sched__row:hover { background: var(--panel-2); }
+      .sched__price {
+        font-family: "Space Grotesk", sans-serif; font-size: clamp(26px, 3.4vw, 32px); font-weight: 700;
+        line-height: 1.05; letter-spacing: -0.02em; width: fit-content; align-self: start;
+        grid-column: 1; grid-row: 1;
+        background: var(--sched-grad, linear-gradient(135deg, var(--teal), var(--blue)));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .sched__body { grid-column: 2; grid-row: 1; }
+      .sched__row--teal { --sched-grad: linear-gradient(135deg, #30d5c8, #57e1d4); }
+      .sched__row--blue { --sched-grad: linear-gradient(135deg, #6e8eff, #9b7cff); }
+      .sched__unit { display: block; margin-top: 5px; font-family: "Inter", sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+      .sched__row h3 { font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .sched__desc { color: var(--muted); font-size: 14.2px; margin-top: 7px; max-width: 640px; }
+      .sched__anchor { color: var(--muted); font-size: 12.8px; margin-top: 11px; }
+      .sched__anchor::before { content: "— "; color: var(--teal); }
+      @media (max-width: 720px) {
+        .sched__row { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
+        .sched__price { grid-row: 1; }
+        .sched__body { grid-column: 1; grid-row: 2; }
+      }
+
+      /* ---- the order of operations ---- */
+      .order { margin-top: 30px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); overflow: hidden; }
+      .order__head {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+        padding: 16px 26px; border-bottom: 1px solid var(--border-soft); background: rgba(255,255,255,0.015);
+      }
+      .order__row {
+        display: grid; grid-template-columns: 56px 1fr; gap: 2px 22px; padding: 22px 26px;
+        border-bottom: 1px solid var(--border-soft); transition: background 0.25s ease;
+      }
+      .order__row:last-child { border-bottom: none; }
+      .order__row:hover { background: var(--panel-2); }
+      .order__n {
+        font-family: "Space Grotesk", sans-serif; font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;
+        width: fit-content; align-self: start; grid-column: 1; grid-row: 1;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .order__body { grid-column: 2; grid-row: 1; min-width: 0; }
+      .order__row h3 { font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .order__desc { color: var(--muted); font-size: 14.2px; margin-top: 9px; max-width: 720px; }
+      .order__src { margin-top: 8px; font-size: 12.3px; color: var(--muted); }
+      .order__src a { color: #aebcff; text-underline-offset: 3px; }
+      .order__src a:hover { color: var(--teal); }
+      @media (max-width: 720px) {
+        .order__row { grid-template-columns: 1fr; gap: 6px; padding: 20px 22px; }
+        .order__body { grid-column: 1; grid-row: 2; }
+      }
+
+      /* ---- the levels ---- */
+      .ladder {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: start;
+        padding: 20px 26px 24px; border-top: 1px solid var(--border-soft);
+      }
+      .ladder__lede { grid-column: 1 / -1; margin-bottom: 4px; }
+      .ladder--three { grid-template-columns: repeat(3, 1fr); }
+      .ladder__step {
+        border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02);
+        padding: 16px 16px 18px; display: flex; flex-direction: column;
+        transition: border-color 0.25s ease, background 0.25s ease;
+      }
+      .ladder__step:hover { border-color: rgba(48, 213, 200, 0.42); background: var(--panel-2); }
+      .ladder__step--min { border-color: rgba(48, 213, 200, 0.45); }
+      .ladder__size { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+      .ladder__price {
+        font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: clamp(18px, 2.2vw, 22px);
+        letter-spacing: -0.01em; margin-top: 6px; width: fit-content;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .ladder__fig { margin-top: 8px; font-size: 12.5px; line-height: 1.45; font-weight: 500; color: var(--text); }
+      .ladder__k { margin-top: 12px; font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--teal); }
+      .ladder__sub { margin-top: 4px; font-size: 12.5px; line-height: 1.55; color: var(--muted); }
+      .ladder__caption { grid-column: 1 / -1; color: var(--muted); font-size: 13px; margin-top: 6px; }
+      .ladder__caption + .ladder__caption { margin-top: 0; }
+      @media (max-width: 1000px) { .ladder { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 720px) { .ladder { grid-template-columns: 1fr; padding: 18px 22px 22px; } }
+
+      .vision { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); background: linear-gradient(180deg, var(--bg-soft), var(--bg)); }
+      .vision__inner { max-width: 760px; }
+      .vision h2 { font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -0.022em; font-weight: 600; }
+      .vision p { margin-top: 18px; color: var(--muted); font-size: 16.5px; }
+      .vision .accent { color: var(--text); font-weight: 500; }
+
+      /* ---- evidence and disclaimer ---- */
+      .asof {
+        display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+        color: var(--faint); font-size: 12.5px;
+      }
+      .asof::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+      .evidence-link { color: #aebcff; text-underline-offset: 3px; }
+      .evidence-link:hover { color: var(--teal); }
+      .small-note { margin-top: 13px; color: var(--faint); font-size: 12.5px; line-height: 1.55; }
+      .disclaimer {
+        margin-top: 24px; padding: 16px 18px; border: 1px solid var(--border-soft);
+        border-radius: 12px; color: var(--faint); font-size: 12.5px; background: rgba(255,255,255,0.018);
+      }
+
+      footer { border-top: 1px solid var(--border-soft); padding: 30px 0 44px; }
+      .footer__inner { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; color: var(--faint); font-size: 13px; }
+      .footer__inner .dotsep { opacity: 0.4; }
+
+      @media (max-width: 860px) {
+        .hero__grid { grid-template-columns: 1fr; gap: 40px; }
+        .visual { order: 2; }
+      }
+      @media (max-width: 720px) {
+        .cards, .metrics { grid-template-columns: 1fr; }
+        .hero { padding: 62px 0 52px; }
+        .section { padding: 48px 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="shell header__inner">
+        <div class="brand">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <rect x="0.5" y="0.5" width="25" height="25" rx="7" stroke="url(#g)" stroke-opacity="0.5" />
+            <path d="M5 16.5 L10 13 L15 15 L21 9.5" stroke="url(#g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5 11 L10 8.5 L15 10.5 L21 6" stroke="#6e8eff" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <defs>
+              <linearGradient id="g" x1="3" y1="6" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#30d5c8" /><stop offset="1" stop-color="#6e8eff" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>StatsKey&nbsp;Energy</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="shell">
+          <span class="eyebrow">Prepared for High River Resources · August 2026</span>
+          <h1>What your own record already says — and what we can do with it.</h1>
+          <p class="lede">
+            Everything on this page comes from the public record (Texas Railroad Commission production,
+            lease, and wellbore data, which we hold in full) and from published research, read by StatsKey Energy.
+            It is not a drilling recommendation, a reserves estimate, or an offer of securities.
+          </p>
+          <div class="pill-row">
+            <span class="pill">Where to drill</span>
+            <span class="pill">How to drill</span>
+            <span class="pill">What to buy</span>
+          </div>
+          <div class="actions">
+            <a class="btn btn--primary" href="#record">Your record</a>
+            <a class="btn btn--ghost" href="#lanes">Three things that pay</a>
+            <a class="btn btn--ghost" href="#first">The first step</a>
+          </div>
+          <div class="asof">Record read August 22–23, 2026 · general terms at <a class="evidence-link" href="/energy">statskey.ai/energy</a></div>
+        </div>
+      </section>
+
+      <section class="section" id="record">
+        <div class="shell">
+          <div class="section__label">Your record</div>
+          <h2 class="section__title">Measured from the public record, before anyone asked you for a file.</h2>
+          <p class="section__intro">Operator no. 385674 and the leases it now holds, all operators, all years. These are counts and sums, not model output.</p>
+          <div class="metrics">
+            <div class="metric metrics--teal">
+              <div class="metric__v">1,606</div>
+              <h3>Wellbores you operate</h3>
+              <p>860 producing, 194 shut-in, 109 temporarily abandoned, 67 injection. King 520 · Carson 413 · Moore 285 · Ochiltree 178 · Hutchinson 120 · Potter 49.</p>
+            </div>
+            <div class="metric metrics--blue">
+              <div class="metric__v">839k bbl · 7.8 Bcf</div>
+              <h3>Reported in 2025</h3>
+              <p>About $70M of operated gross at 2025 prices. Anne Tandy (Strawn) is more than half the oil; West Panhandle is almost all the gas.</p>
+            </div>
+            <div class="metric metrics--teal">
+              <div class="metric__v">3.9×</div>
+              <h3>Best vs worst new wells, same field</h3>
+              <p>110 West Panhandle wells started since 2012 with full first-year records: top quartile averaged 75,000 Mcf in year one, bottom quartile 19,000. Ranking before drilling is where that spread turns into money.</p>
+            </div>
+          </div>
+          <div class="cards">
+                        <div class="card">
+              <div class="card__n">01</div>
+              <h3>Anne Tandy fell 24% in one year</h3>
+              <p>753,000 bbl in 2024 to 570,000 in 2025, pacing about 531,000 in 2026 against a history of roughly 5% a year. It is a CO2 flood, so this is an operating question, not geology — and at today’s prices it is on the order of $12M a year of gross revenue.</p>
+            </div>
+                        <div class="card">
+              <div class="card__n">02</div>
+              <h3>West Panhandle: the bottom quarter is leaking</h3>
+              <p>Across your 426 gas leases the median fell 12% from 2023 to 2025, but 108 leases grew while the bottom 106 ran about 800 MMcf a year below the field’s own median path. Same reservoir, same field: that is operations, not rock. Gas rose 12% the month after the takeover and then settled — the field responds when someone works it.</p>
+            </div>
+                        <div class="card">
+              <div class="card__n">03</div>
+              <h3>The bolt-ons are inside your own gathering</h3>
+              <p>Scout still produces 17 Bcf a year from 3,158 West Panhandle wellbores (613 shut-in) and is in harvest mode; BCE-Mach III has 1,741 wellbores (449 shut-in); Pantera 4.2 Bcf a year, down 24% in two years. All of it sits on the 1,062 miles you bought.</p>
+            </div>
+                        <div class="card">
+              <div class="card__n">04</div>
+              <h3>You now own a horizontal inventory</h3>
+              <p>The Quanah Panhandle package (effective December 2025) brought Marmaton, Cleveland, Hogshooter, and Des Moines acreage in Ochiltree, Lipscomb, and Hansford — about 200 operated horizontal locations were claimed in 2019, and modern completions there outperform legacy wells by three to four times. Mewbourne, Latigo, and Courson have drilled hundreds of offsets with public histories.</p>
+            </div>
+                        <div class="card">
+              <div class="card__n">05</div>
+              <h3>No permits on file</h3>
+              <p>The public record shows no new drilling permits under your operator number in the last 24 months. Whatever the program is, it has not started in public — which means the ranking can come before the first rig, not after.</p>
+            </div>
+                        <div class="card">
+              <div class="card__n">06</div>
+              <h3>Enough history to test on</h3>
+              <p>757 of your gas wells have monthly public histories, 740 with three years or more. That is a test set: a model can be scored on wells whose results are already known before it ranks anything you have not drilled.</p>
+            </div>
+          </div>
+          <p class="small-note">Sources: Texas RRC production, lease, and wellbore data sets (<a class="evidence-link" href="https://www.rrc.texas.gov/resource-center/research/data-sets-available-for-download/" target="_blank" rel="noopener">RRC data sets ↗</a>); <a class="evidence-link" href="https://www.hartenergy.com/news/marketed-quanah-texas-panhandle-horizontal-marmaton-assets-177368" target="_blank" rel="noopener">Quanah marketing, Hart Energy 2019 ↗</a>; <a class="evidence-link" href="https://oilgasleads.com/from-scout-to-high-river-1000-mile-pipeline-transfer-in-texas-panhandle-field/" target="_blank" rel="noopener">gathering transfer, RRC T-4 10716 ↗</a>; <a class="evidence-link" href="https://www.jonahenergy.com/jonah-energy-eiger-operating-and-burk-royalty-announce-acquisition-of-oil-and-gas-assets-in-the-western-anadarko-basin/" target="_blank" rel="noopener">Scout’s 2026 Anadarko divestiture ↗</a>. Prices assumed: $65/bbl, $2.30–3.00/Mcf; “gross” is operated gross before royalty and working-interest splits.</p>
+        </div>
+      </section>
+
+      <section class="section" id="lanes">
+        <div class="shell">
+          <div class="section__label">Three things that pay</div>
+          <h2 class="section__title">In order of how sure we are.</h2>
+          <p class="section__intro">Each is the same service we offer any operator — one model trained on your entire portfolio plus the public record — pointed at your decisions. Nothing here depends on a promise we cannot measure.</p>
+          <div class="order" role="region" aria-labelledby="lanes-title">
+            <div class="order__head">
+              <span class="visual__title" id="lanes-title">What we would do, and why it is safe money</span>
+              <span class="head__note">value that exists regardless of model skill, or that a cheap test measures first</span>
+            </div>
+                        <div class="order__row">
+              <div class="order__n" aria-hidden="true">01</div>
+              <div class="order__body">
+                <h3>What to buy — a full-record read on every target you look at</h3>
+                <p class="order__desc">You buy near existing operations, the Anadarko market has done more than $9 billion of deals since January 2025, and sellers’ forecasts run about a fifth high. We hold the complete Texas record, so a target gets a data-complete read in days: every lease and well’s history, decline against its field’s median path, shut-in and plugging exposure, and a check of the seller’s forecast against the record. We did your own book in minutes. One avoided 10% overpay on a $50M bolt-on is about $5M; the read costs a small fraction of that. This is money whether or not any model is clever, because the value is completeness.</p>
+                <p class="order__src">Published: <a class="evidence-link" href="https://doi.org/10.2307/2937955" target="_blank" rel="noopener">informed bidders out-earned uninformed ones in federal lease auctions ↗</a> · <a class="evidence-link" href="https://www.sodir.no/492205/globalassets/2-force/2024/02.06.-07.-making-good-decisions/presentations/2-2-reidar-bratvold---debiasing-production-forecasts_published-version.pdf" target="_blank" rel="noopener">Norwegian fields delivered ~20% under forecast in their first five years ↗</a></p>
+              </div>
+            </div>
+                        <div class="order__row">
+              <div class="order__n" aria-hidden="true">02</div>
+              <div class="order__body">
+                <h3>Where to drill — rank the program before the first rig</h3>
+                <p class="order__desc">Which 40 to 60 of roughly 200 Marmaton locations go first, and which Red Cave infills are worth a rig, is a ranking problem with a large spread: modern horizontal completions outperform legacy ones three to four times, and your own shallow wells show a 3.9× gap between the best and worst quarter in the same field. The public record holds hundreds of Marmaton and Cleveland horizontals and 757 of your own gas wells with histories. We score the model blind, area by area, on wells whose results are already known — ranking quality and first-year error — before it ranks anything new. If it does not beat your own method on that test, you have paid for exactly that answer and nothing else. If it does, the ranking runs on decisions of $4–6M each.</p>
+                <p class="order__src">Published: <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">model vs planning type curves on held-out wells: 15% vs 20% error ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2106.11051" target="_blank" rel="noopener">models trained on a basin’s other counties cut error 30–48% in thin counties ↗</a></p>
+              </div>
+            </div>
+                        <div class="order__row">
+              <div class="order__n" aria-hidden="true">03</div>
+              <div class="order__body">
+                <h3>How to drill — completion, lateral, landing, spacing from the offsets</h3>
+                <p class="order__desc">Bundled with the ranking: what the offset record says about completion size, lateral length, landing, and spacing for Marmaton horizontals (Mewbourne’s 2024–26 wells are the frontier); frac sizing in the Red Cave, where upsized fracs roughly doubled recovery; and pattern choices in the King County flood from your own flood history. Moderate certainty on each, realized through the ranking rather than sold on its own.</p>
+                <p class="order__src">Published: <a class="evidence-link" href="https://www.pfhcorp.com/en/the-project/the-red-cave-formation.html" target="_blank" rel="noopener">Red Cave recovery with upsized fracs ↗</a></p>
+              </div>
+            </div>
+          </div>
+          <div class="banner">Two measured findings go in the first read-out regardless of what you buy: the Anne Tandy step-down, and the West Panhandle bottom quarter. In this basin, working the existing wells demonstrably pays — Presidio reported 152 workovers at 64–97% returns in 2025 — but that is your operating team’s call, not our product.</div>
+          <p class="small-note"><a class="evidence-link" href="https://www.worldoil.com/news/2025/8/6/presidio-petroleum-to-go-public-via-strategic-merger-with-eqv-ventures/" target="_blank" rel="noopener">Presidio Petroleum, 2025 workover program ↗</a></p>
+        </div>
+      </section>
+
+      <section class="section" id="first">
+        <div class="shell">
+          <div class="section__label">The first step</div>
+          <h2 class="section__title">One paid backtest across your whole portfolio. Then decide.</h2>
+          <div class="sched" role="region" aria-labelledby="first-title">
+            <div class="sched__head">
+              <span class="visual__title" id="first-title">How it works</span>
+              <span class="head__note">fixed fee for the work · nothing more until the test clears a bar agreed first</span>
+            </div>
+            <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>Scope: all of it, from day one</h3>
+                <p class="sched__desc">We train on your entire portfolio — every well, log, survey, completion, and production record you hold, plus the public record — on computing we already own. You hand us the files; we hand back blind scores by area (ranking quality, first-year error, calibrated ranges) on wells whose results you already know, a ranked Marmaton and Red Cave inventory with the evidence behind each call, and a full-record read on the targets you name. The pass bar — which metric, which wells, which window — is written down before anything is scored.</p>
+                <p class="sched__anchor">We are not proposing that you buy any hardware. The card we own covers your portfolio; if your test shows error still falling as computing rises, we talk about more — not before.</p>
+              </div>
+              <div class="sched__price">All of it<span class="sched__unit">one test</span></div>
+            </div>
+            <div class="sched__row sched__row--blue">
+              <div class="sched__body">
+                <h3>Where the money goes</h3>
+                <p class="sched__desc">At least 60% of what you spend goes to the oil data — loading and checking your surveys, logs, and production; building the blind test sets; the computing on your corpus. The rest pays the people who prepare, review, and sign off. Fees buy computing and review, not billable hours.</p>
+              </div>
+              <div class="sched__price">60%+<span class="sched__unit">to the oil data</span></div>
+            </div>
+            <div class="sched__row sched__row--teal">
+              <div class="sched__body">
+                <h3>After the test</h3>
+                <p class="sched__desc">Pass it and the engagement continues: the ranking is refreshed as your results post, every deal you look at gets the full-record read, and a share of the gains applies on the scale agreed alongside the pass bar — set before scoring, paid after. Fail it and you have paid only for that answer. Your data is used only for your engagement and trains nothing for anyone else; the outputs are yours, the base model and methods are ours.</p>
+                <p class="sched__anchor">General terms, unchanged, at <a class="evidence-link" href="/energy">statskey.ai/energy</a>.</p>
+              </div>
+              <div class="sched__price">Earned<span class="sched__unit">after proof</span></div>
+            </div>
+          </div>
+          <div class="cards">
+                        <div class="card">
+              <div class="card__n">01</div>
+              <h3>What we promise</h3>
+              <p>Only what is measured across the industry: blind-holdout forecasts that beat standard planning forecasts by roughly 15–35%; calibrated ranges; a data-complete read on any Texas target. And a scored answer on your own wells before a dollar of capital moves.</p>
+            </div>
+                        <div class="card">
+              <div class="card__n">02</div>
+              <h3>What we measure</h3>
+              <p>Ranking quality by area (how often the model’s top picks are the real top wells), first-year production error, interval coverage — on your wells, results hidden — and whether more computing still lowers error on your data.</p>
+            </div>
+                        <div class="card">
+              <div class="card__n">03</div>
+              <h3>What we do not claim</h3>
+              <p>No production or value lift from computing scale, no exploration success-rate lift (no one has published one), and nothing before the test. If the record does not support it, it is not on this page.</p>
+            </div>
+          </div>
+          <div class="disclaimer">Prepared for High River Resources by StatsKey Energy from public records and published research. It is not a drilling recommendation, reserves estimate, title opinion, or investment advice, and not an offer of securities. Any decision requires independent engineering, geoscience, land, safety, legal, regulatory, environmental, and commercial review.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer__inner">
+        <span>StatsKey Energy &copy; 2026</span>
+        <span>Evidence reviewed August 22, 2026 <span class="dotsep">·</span> statskey.ai/highriver</span>
+      </div>
+    </footer>
+  </body>
+</html>

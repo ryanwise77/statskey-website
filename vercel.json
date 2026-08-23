@@ -1,88 +1,318 @@
 {
   "functions": {
-    "api/glucose-plan.js": { "maxDuration": 60 },
-    "api/libre-history.js": { "maxDuration": 30 },
-    "api/dietitian-lead.js": { "maxDuration": 15 }
+    "api/glucose-plan.js": {
+      "maxDuration": 60
+    },
+    "api/libre-history.js": {
+      "maxDuration": 30
+    },
+    "api/dietitian-lead.js": {
+      "maxDuration": 15
+    }
   },
   "headers": [
     {
       "source": "/.well-known/apple-app-site-association",
       "headers": [
-        { "key": "Content-Type", "value": "application/json" },
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/desktop", "destination": "/downloads/statskey/index.html" },
-    { "source": "/desktop/", "destination": "/downloads/statskey/index.html" },
-    { "source": "/friend/:token", "destination": "/friend/index.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/web-terms", "destination": "/web-terms.html" },
-    { "source": "/support", "destination": "/support.html" },
-    { "source": "/cbm", "destination": "/cbm/g1/index.html" },
-    { "source": "/cbm/", "destination": "/cbm/g1/index.html" },
-    { "source": "/cbm.html", "destination": "/cbm.html" },
-    { "source": "/cbm/viewer", "destination": "/cbm/g1/viewer/index.html" },
-    { "source": "/cbm/viewer/", "destination": "/cbm/g1/viewer/index.html" },
-    { "source": "/cbm/procurement", "destination": "/cbm/g1/build/index.html" },
-    { "source": "/cbm/procurement/", "destination": "/cbm/g1/build/index.html" },
-    { "source": "/ckm", "destination": "/ckm.html" },
-    { "source": "/ckm/", "destination": "/ckm/index.html" },
-    { "source": "/ckm/viewer", "destination": "/ckm/viewer/index.html" },
-    { "source": "/ckm/viewer/", "destination": "/ckm/viewer/index.html" },
-    { "source": "/ckm.html", "destination": "/ckm.html" },
-    { "source": "/cpm", "destination": "/cpm.html" },
-    { "source": "/cpm/", "destination": "/ckm/index.html" },
-    { "source": "/cpm/viewer", "destination": "/ckm/viewer/index.html" },
-    { "source": "/cpm/viewer/", "destination": "/ckm/viewer/index.html" },
-    { "source": "/cpm.html", "destination": "/cpm.html" },
-    { "source": "/hospital-ckm", "destination": "/hospital-ckm.html" },
-    { "source": "/hospital-ckm/", "destination": "/hospital-ckm/index.html" },
-    { "source": "/hospital-ckm/procurement", "destination": "/hospital-ckm/procurement/index.html" },
-    { "source": "/hospital-ckm/procurement/", "destination": "/hospital-ckm/procurement/index.html" },
-    { "source": "/hospital-ckm/viewer", "destination": "/hospital-ckm/viewer/index.html" },
-    { "source": "/hospital-ckm/viewer/", "destination": "/hospital-ckm/viewer/index.html" },
-    { "source": "/urine-aki", "destination": "/urine-aki.html" },
-    { "source": "/urine-aki/", "destination": "/urine-aki/index.html" },
-    { "source": "/urine-aki/viewer", "destination": "/urine-aki/viewer/index.html" },
-    { "source": "/urine-aki/viewer/", "destination": "/urine-aki/viewer/index.html" },
-    { "source": "/urine-aki/app", "destination": "/urine-aki/app/index.html" },
-    { "source": "/urine-aki/app/", "destination": "/urine-aki/app/index.html" },
-    { "source": "/prototype", "destination": "/prototype.html" },
-    { "source": "/prototype/", "destination": "/prototype/index.html" },
-    { "source": "/prototype.html", "destination": "/prototype.html" },
-    { "source": "/nike-statskey-presentation", "destination": "/nike-statskey-presentation.html" },
-    { "source": "/nike-statskey-presentation.html", "destination": "/nike-statskey-presentation.html" },
-    { "source": "/nike-run-club", "destination": "/nike-run-club/index.html" },
-    { "source": "/nike-run-club/", "destination": "/nike-run-club/index.html" },
-    { "source": "/esther-briefing", "destination": "/esther-briefing/index.html" },
-    { "source": "/esther-briefing/", "destination": "/esther-briefing/index.html" },
-    { "source": "/mindscape", "destination": "/mindscape/index.html" },
-    { "source": "/mindscape/", "destination": "/mindscape/index.html" },
-    { "source": "/bid/alaska-dotpf", "destination": "/bid/alaska-dotpf.html" },
-    { "source": "/bid/3d/viewer", "destination": "/bid/3d/viewer.html" },
-    { "source": "/energy", "destination": "/energy.html" },
-    { "source": "/energy/", "destination": "/energy.html" },
-    { "source": "/wellness", "destination": "/wellness.html" },
-    { "source": "/wellness/", "destination": "/wellness.html" },
-    { "source": "/gut", "destination": "/wellness.html" },
-    { "source": "/gut-health", "destination": "/wellness.html" },
-    { "source": "/join", "destination": "/join.html" },
-    { "source": "/join/", "destination": "/join.html" },
-    { "source": "/for-dietitians", "destination": "/for-dietitians.html" },
-    { "source": "/for-dietitians/", "destination": "/for-dietitians.html" },
-    { "source": "/for-dietitiana", "destination": "/for-dietitians.html" },
-    { "source": "/for-dietitian", "destination": "/for-dietitians.html" },
-    { "source": "/dietitians", "destination": "/for-dietitians.html" },
-    { "source": "/dietitians/", "destination": "/for-dietitians.html" },
-    { "source": "/glucose-plan", "destination": "/glucose-plan/index.html" },
-    { "source": "/glucose-plan/", "destination": "/glucose-plan/index.html" },
-    { "source": "/hardware", "destination": "/index.html" },
-    { "source": "/hardware/", "destination": "/index.html" },
-    { "source": "/__/auth/:path*", "destination": "https://statskey.firebaseapp.com/__/auth/:path*" },
-    { "source": "/app", "destination": "/app.html" },
-    { "source": "/app/:path*", "destination": "/app.html" }
+    {
+      "source": "/desktop",
+      "destination": "/downloads/statskey/index.html"
+    },
+    {
+      "source": "/desktop/",
+      "destination": "/downloads/statskey/index.html"
+    },
+    {
+      "source": "/friend/:token",
+      "destination": "/friend/index.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/web-terms",
+      "destination": "/web-terms.html"
+    },
+    {
+      "source": "/support",
+      "destination": "/support.html"
+    },
+    {
+      "source": "/cbm",
+      "destination": "/cbm/g1/index.html"
+    },
+    {
+      "source": "/cbm/",
+      "destination": "/cbm/g1/index.html"
+    },
+    {
+      "source": "/cbm.html",
+      "destination": "/cbm.html"
+    },
+    {
+      "source": "/cbm/viewer",
+      "destination": "/cbm/g1/viewer/index.html"
+    },
+    {
+      "source": "/cbm/viewer/",
+      "destination": "/cbm/g1/viewer/index.html"
+    },
+    {
+      "source": "/cbm/procurement",
+      "destination": "/cbm/g1/build/index.html"
+    },
+    {
+      "source": "/cbm/procurement/",
+      "destination": "/cbm/g1/build/index.html"
+    },
+    {
+      "source": "/ckm",
+      "destination": "/ckm.html"
+    },
+    {
+      "source": "/ckm/",
+      "destination": "/ckm/index.html"
+    },
+    {
+      "source": "/ckm/viewer",
+      "destination": "/ckm/viewer/index.html"
+    },
+    {
+      "source": "/ckm/viewer/",
+      "destination": "/ckm/viewer/index.html"
+    },
+    {
+      "source": "/ckm.html",
+      "destination": "/ckm.html"
+    },
+    {
+      "source": "/cpm",
+      "destination": "/cpm.html"
+    },
+    {
+      "source": "/cpm/",
+      "destination": "/ckm/index.html"
+    },
+    {
+      "source": "/cpm/viewer",
+      "destination": "/ckm/viewer/index.html"
+    },
+    {
+      "source": "/cpm/viewer/",
+      "destination": "/ckm/viewer/index.html"
+    },
+    {
+      "source": "/cpm.html",
+      "destination": "/cpm.html"
+    },
+    {
+      "source": "/hospital-ckm",
+      "destination": "/hospital-ckm.html"
+    },
+    {
+      "source": "/hospital-ckm/",
+      "destination": "/hospital-ckm/index.html"
+    },
+    {
+      "source": "/hospital-ckm/procurement",
+      "destination": "/hospital-ckm/procurement/index.html"
+    },
+    {
+      "source": "/hospital-ckm/procurement/",
+      "destination": "/hospital-ckm/procurement/index.html"
+    },
+    {
+      "source": "/hospital-ckm/viewer",
+      "destination": "/hospital-ckm/viewer/index.html"
+    },
+    {
+      "source": "/hospital-ckm/viewer/",
+      "destination": "/hospital-ckm/viewer/index.html"
+    },
+    {
+      "source": "/urine-aki",
+      "destination": "/urine-aki.html"
+    },
+    {
+      "source": "/urine-aki/",
+      "destination": "/urine-aki/index.html"
+    },
+    {
+      "source": "/urine-aki/viewer",
+      "destination": "/urine-aki/viewer/index.html"
+    },
+    {
+      "source": "/urine-aki/viewer/",
+      "destination": "/urine-aki/viewer/index.html"
+    },
+    {
+      "source": "/urine-aki/app",
+      "destination": "/urine-aki/app/index.html"
+    },
+    {
+      "source": "/urine-aki/app/",
+      "destination": "/urine-aki/app/index.html"
+    },
+    {
+      "source": "/prototype",
+      "destination": "/prototype.html"
+    },
+    {
+      "source": "/prototype/",
+      "destination": "/prototype/index.html"
+    },
+    {
+      "source": "/prototype.html",
+      "destination": "/prototype.html"
+    },
+    {
+      "source": "/nike-statskey-presentation",
+      "destination": "/nike-statskey-presentation.html"
+    },
+    {
+      "source": "/nike-statskey-presentation.html",
+      "destination": "/nike-statskey-presentation.html"
+    },
+    {
+      "source": "/nike-run-club",
+      "destination": "/nike-run-club/index.html"
+    },
+    {
+      "source": "/nike-run-club/",
+      "destination": "/nike-run-club/index.html"
+    },
+    {
+      "source": "/esther-briefing",
+      "destination": "/esther-briefing/index.html"
+    },
+    {
+      "source": "/esther-briefing/",
+      "destination": "/esther-briefing/index.html"
+    },
+    {
+      "source": "/mindscape",
+      "destination": "/mindscape/index.html"
+    },
+    {
+      "source": "/mindscape/",
+      "destination": "/mindscape/index.html"
+    },
+    {
+      "source": "/bid/alaska-dotpf",
+      "destination": "/bid/alaska-dotpf.html"
+    },
+    {
+      "source": "/bid/3d/viewer",
+      "destination": "/bid/3d/viewer.html"
+    },
+    {
+      "source": "/highriver",
+      "destination": "/highriver.html"
+    },
+    {
+      "source": "/highriver/",
+      "destination": "/highriver.html"
+    },
+    {
+      "source": "/energy",
+      "destination": "/energy.html"
+    },
+    {
+      "source": "/energy/",
+      "destination": "/energy.html"
+    },
+    {
+      "source": "/wellness",
+      "destination": "/wellness.html"
+    },
+    {
+      "source": "/wellness/",
+      "destination": "/wellness.html"
+    },
+    {
+      "source": "/gut",
+      "destination": "/wellness.html"
+    },
+    {
+      "source": "/gut-health",
+      "destination": "/wellness.html"
+    },
+    {
+      "source": "/join",
+      "destination": "/join.html"
+    },
+    {
+      "source": "/join/",
+      "destination": "/join.html"
+    },
+    {
+      "source": "/for-dietitians",
+      "destination": "/for-dietitians.html"
+    },
+    {
+      "source": "/for-dietitians/",
+      "destination": "/for-dietitians.html"
+    },
+    {
+      "source": "/for-dietitiana",
+      "destination": "/for-dietitians.html"
+    },
+    {
+      "source": "/for-dietitian",
+      "destination": "/for-dietitians.html"
+    },
+    {
+      "source": "/dietitians",
+      "destination": "/for-dietitians.html"
+    },
+    {
+      "source": "/dietitians/",
+      "destination": "/for-dietitians.html"
+    },
+    {
+      "source": "/glucose-plan",
+      "destination": "/glucose-plan/index.html"
+    },
+    {
+      "source": "/glucose-plan/",
+      "destination": "/glucose-plan/index.html"
+    },
+    {
+      "source": "/hardware",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/hardware/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/__/auth/:path*",
+      "destination": "https://statskey.firebaseapp.com/__/auth/:path*"
+    },
+    {
+      "source": "/app",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/app/:path*",
+      "destination": "/app.html"
+    }
   ]
 }
