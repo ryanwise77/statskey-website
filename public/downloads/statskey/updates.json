@@ -1,18 +1,19 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.32",
+  "latest": "0.21.33",
   "releases": [
     {
-      "version": "0.21.32",
+      "version": "0.21.33",
       "date": "2026-08-24",
       "platforms": [
         "macOS"
       ],
-      "title": "Complete remote instruction review",
-      "summary": "Detailed Intelligence-to-Mac tasks now accept the full Fleet protocol limit and show the exact instruction in a secure, scrollable desktop approval window.",
+      "title": "Reliable complete-instruction approval",
+      "summary": "Detailed Intelligence-to-Mac tasks now accept the full Fleet protocol limit, show the exact instruction, and reliably start from the secure approval control.",
       "highlights": [
         "Remote Intelligence requests may now use up to 32,000 characters instead of stopping at 1,200.",
         "The complete normalized instruction, execution contract, and signed authorization digest stay reviewable before approval.",
+        "Approve is carried by a one-purpose authenticated modal channel only after its controls are ready; programmatic clicks, spoofed frames, and replay are ignored.",
         "Cancel, Return, Escape, close, reload, and renderer failure remain fail-closed, while approvals remain FIFO and decline-safe."
       ]
     },
