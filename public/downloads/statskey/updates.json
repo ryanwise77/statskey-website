@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.29",
+  "latest": "0.21.30",
   "releases": [
+    {
+      "version": "0.21.30",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Verified autonomous completion",
+      "summary": "Delegated Mac tasks now stream live progress and finish only when their signed completion contract is independently proven.",
+      "highlights": [
+        "Direct Intelligence-to-Mac tasks show live, sanitized progress and verified terminal status.",
+        "Coding work requires attributable file changes and an exact red-to-green verification run before success.",
+        "Mixed-version workers, incomplete merges, tool-policy violations, and unverified external actions now fail closed."
+      ]
+    },
     {
       "version": "0.21.29",
       "date": "2026-08-24",
