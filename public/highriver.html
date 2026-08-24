@@ -350,133 +350,69 @@
           <div class="order" role="region" aria-labelledby="scale-title">
             <div class="order__head">
               <span class="visual__title" id="scale-title">The chain</span>
-              <span class="head__note">measured where marked · otherwise from general machine-learning scaling studies</span>
+              <span class="head__note">measured where marked · otherwise from measured scaling studies</span>
             </div>
                         <div class="order__row">
               <div class="order__n" aria-hidden="true">01</div>
               <div class="order__body">
                 <h3>Computing buys a better-read model</h3>
-                <p class="order__desc">More computing buys a larger model, trained longer and at higher resolution, on more of the public record. Measured in seismic: along the joint model-and-data frontier, interpretation error falls as roughly compute to the −0.28 — it halves for every elevenfold increase (5-shot error 11.5% → 1.0% over about 5,600×), with no saturation seen up to 85M parameters. Parameters buy more than data per log-unit at that scale. (TGS 2D grid, 2025.)</p>
+                <p class="order__desc">Measured in seismic: interpretation error falls as roughly compute to the −0.28 — halving for every elevenfold increase — with no saturation seen in the largest published grid. Training on the basin’s own archive beats a global model by 4–8 points; pretraining beats starting from scratch by 14–24 points where labels are scarce.</p>
               </div>
             </div>
                         <div class="order__row">
               <div class="order__n" aria-hidden="true">02</div>
               <div class="order__body">
-                <h3>Basin-targeted and higher-resolution training pays</h3>
-                <p class="order__desc">Measured: pretraining on the basin’s own archive beat a global model by 4–8 points on average and 7–17 points on amplitude and direct-hydrocarbon-indicator tasks; 2.5D context cost 4× the computing for +3.8 points, dense 3D 14× for +0.5 (Norwegian shelf model, 2026). Pretraining beat starting from scratch by 14–24 points with only 100 labels, and doubling input resolution added 7 (SFM, Geophysics 2025). Growing from 660M to 1.8B parameters left the held-out salt benchmark unchanged (TGS).</p>
+                <h3>A better-read model multiplies your data</h3>
+                <p class="order__desc">Because the model has already learned the public record, each of your wells teaches it more — about 30% more effective data per doubling of the base model’s size. That is why a backtest across your whole book works from day one.</p>
               </div>
             </div>
                         <div class="order__row">
               <div class="order__n" aria-hidden="true">03</div>
               <div class="order__body">
-                <h3>A better-read model multiplies your data</h3>
-                <p class="order__desc">Because the model has already learned the public record, each of your wells teaches it more than it would teach a fresh model — about 30% more effective data per doubling of the base model’s size (transfer scaling; borrowed exponent). That is why a backtest across your whole portfolio already works, and why the second area costs less to rank than the first.</p>
+                <h3>More effective data lowers forecast error</h3>
+                <p class="order__desc">Each doubling of the wells the model effectively learns from removes roughly 5–10% of the remaining error. Measured in oil: going from ~360 to ~900 wells erased a 20% forecast bias; models beat planning type curves 15% to 20% error on held-out wells; carried across counties, they cut error 30–48% where data is thin.</p>
               </div>
             </div>
                         <div class="order__row">
               <div class="order__n" aria-hidden="true">04</div>
               <div class="order__body">
-                <h3>Effective data lowers forecast error</h3>
-                <p class="order__desc">Each doubling of the wells the model effectively learns from removes roughly 5–10% of the error that is still removable (borrowed data exponent). Measured in oil: a model that went from about 360 to 900 wells lost a 20% forecast bias entirely; models beat planning type curves 15% to 20% error on held-out wells; models trained on a basin’s other counties cut error 30–48% in thin counties.</p>
-              </div>
-            </div>
-                        <div class="order__row">
-              <div class="order__n" aria-hidden="true">05</div>
-              <div class="order__body">
                 <h3>The composite, honestly</h3>
-                <p class="order__desc">Every tenfold of pretraining computing removes about 2–10% of the error still removable; out-of-basin transfer damps it further. The large, measured gain is information — seismic and well data in one model: forecasts 15–35% better than decline methods; seismic-derived features lifting explained variance from about 0.4 to 0.85–0.89 where wells sit inside 3D coverage; calibrated intervals 14% narrower at the same coverage. Computing on top is a slow, steady power law — and we stop when it flattens.</p>
+                <p class="order__desc">The large, measured gain is information — your seismic and well data in one model: forecasts 15–35% better than decline methods; explained variance from about 0.4 to 0.85 inside 3D coverage. Computing on top is a slow power law — each tenfold removes 2–10% of what remains — and we stop when your blind score says it has flattened.</p>
               </div>
             </div>
           </div>
           <p class="small-note"><a class="evidence-link" href="https://www.tgs.com/hubfs/2025%20Articles/fb2025026.pdf" target="_blank" rel="noopener">TGS, scaling seismic foundation models (First Break 2025) ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2603.23211" target="_blank" rel="noopener">Norwegian shelf seismic model, 2026 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2309.02791" target="_blank" rel="noopener">Seismic foundation model, Geophysics 2025 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2102.01293" target="_blank" rel="noopener">Hernandez et al., transfer scaling ↗</a> · <a class="evidence-link" href="https://novilabs.com/resources/urtec-2026-making-an-impact-machine-learning-ready-metrics-for-ultra-tight-infill-development/" target="_blank" rel="noopener">Devon / Novi, held-out wells, 2026 ↗</a> · <a class="evidence-link" href="https://arxiv.org/abs/2106.11051" target="_blank" rel="noopener">MIT, models carried across counties ↗</a> · <a class="evidence-link" href="https://novilabs.com/blog/expanding-machine-learning-models-for-better-production-forecasting-in-emerging-shale-basins/" target="_blank" rel="noopener">Novi, 360→900 wells ↗</a></p>
 
-          <div class="sched" role="region" aria-labelledby="tiers-title">
-            <div class="sched__head">
-              <span class="visual__title" id="tiers-title">Computing tiers · what each buys, and which level carries it</span>
-              <span class="head__note">all of it ours to buy or rent, never on your invoice · the level sets the computing · your backtest sets how hard it is pointed at your data</span>
-            </div>
-            <div class="sched__row sched__row--teal">
-              <div class="sched__body">
-                <h3>The card we already own</h3>
-                <p class="sched__desc">About 2,300 H100-equivalent hours a year. Covers your whole portfolio: blind tests by area, calibrated ranges, re-ranking as results post, basin-targeted 2.5D pretraining at 100 passes, unlimited outcome ensembles. This is the full information step — we estimate at least four-fifths of the outcome value available on a book of your size.</p>
-                <p class="sched__anchor">Ours, already paid for. It runs the whole engagement at every investment level; you are not charged for it and you never buy it. Certainty: high.</p>
-              </div>
-              <div class="sched__price">Tier 0<span class="sched__unit">now · one RTX 5090 · every level</span></div>
-            </div>
-            <div class="sched__row sched__row--blue">
-              <div class="sched__body">
-                <h3>A dedicated 80–96 GB card for your engagement</h3>
-                <p class="sched__desc">About three to four times the card we own, per hour — roughly 6,000 H100-hours a year at realistic utilization, of which your serving needs under 200. The rest trains the seismic prior harder on your data over the year: 400-pass 2.5D training on your surveys plus regional cubes (300–800 H100-hours a run), 115–300M-parameter 3D with the larger memory, three to five independent runs for uncertainty. Reaches the best published seismic-reading points over months rather than days; outcome error falls a further 3–10% of what is left — at the edge of what 300-odd test wells can detect.</p>
-                <p class="sched__anchor">Ours, bought used or rented for the year, inside the fee. Certainty: likely on seismic reading; plausible on outcomes. The slope we measure on your wells decides how hard it is pointed at training versus serving.</p>
-              </div>
-              <div class="sched__price">Tier 1<span class="sched__unit">one H100-class accelerator · from $150k a year</span></div>
-            </div>
-            <div class="sched__row sched__row--teal">
-              <div class="sched__body">
-                <h3>Everything in Tier 1, in days, plus our own scaling grid</h3>
-                <p class="sched__desc">About 12,000 H100-equivalent hours a year. The same training as Tier 1 in days instead of months, five seeds instead of three, continuous retraining as your results post, and our own model-by-data grid scored on your backtest — the measurement that decides where the next dollar goes. Reusable across clients.</p>
-                <p class="sched__anchor">Ours to buy, inside the fee; no hardware line on your invoice. Certainty: likely on seismic reading; plausible on outcomes.</p>
-              </div>
-              <div class="sched__price">Tier 2<span class="sched__unit">four-card box · from $500k a year</span></div>
-            </div>
-            <div class="sched__row sched__row--blue">
-              <div class="sched__body">
-                <h3>The largest seismic models, if your score earns them</h3>
-                <p class="sched__desc">About 30,000 H100-hours in a burst: a 660M-parameter 3D model, large contexts, several seeds. The published benchmark is already saturated at that size and the expected outcome gain on a two-basin book (2–5% of the remaining error) is below what your backtest can resolve — so it is rented only after Tier 2 has moved your score. 1.8B-parameter-class models are not proposed for this book: the one measured in-domain comparison shows no gain over 660M.</p>
-                <p class="sched__anchor">Ours to rent. Certainty: speculative for you; a firm-wide asset.</p>
-              </div>
-              <div class="sched__price">Tier 3<span class="sched__unit">rented bursts · inside $1.5M over 2–3 years</span></div>
-            </div>
-          </div>
           <div class="sched" role="region" aria-labelledby="hours-title">
             <div class="sched__head">
-              <span class="visual__title" id="hours-title">Computing hours, by phase — and for your whole operation</span>
-              <span class="head__note">hours on the card we own (one card ≈ 8,760 a year) · from measured per-task costs · assumptions stated below</span>
+              <span class="visual__title" id="hours-title">Computing, in hours</span>
+              <span class="head__note">one RTX 5090 ≈ 8,760 card-hours a year, each ≈ a quarter of an H100 hour · serving your whole operation never needs more than a twentieth of it</span>
             </div>
                         <div class="sched__row sched__row--teal">
               <div class="sched__body">
-                <h3>Phase A · retrospective replay and first blind scores</h3>
-                <p class="sched__desc">Embed and interpret your surveys (seconds per cube; about two hours for five attributes); fine-tune the seismic reader to your 3D and well ties (about 100 hours across survey-tasks); fit the outcome, landing, completion, and spacing models (minutes); run leave-out-by-area backtests across ~20 fields (about 13 hours a round, two to three rounds); replay steering on ~30 horizontals with a 5–10-member prior (40–80 hours). About two weeks of card time inside a four-to-eight-week phase.</p>
-                <p class="sched__anchor">Tier 0. Adding our own model-by-data mini-grid on your backtest costs another 100–300 hours — still Tier 0.</p>
+                <h3>Prove it</h3>
+                <p class="sched__desc">Replay your history and score it blind (150–300 hours), shadow three to five wells (40–80), advise on six to twelve (120–240). Weeks of card time inside a first year, on the card we own.</p>
               </div>
-              <div class="sched__price">150–300<span class="sched__unit">card-hours, once</span></div>
+              <div class="sched__price">300–600<span class="sched__unit">card-hours, first year</span></div>
             </div>
                         <div class="sched__row sched__row--blue">
               <div class="sched__body">
-                <h3>Phase B · shadow mode on 3–5 wells</h3>
-                <p class="sched__desc">Live prior and updates per well (under five hours each with ensembles) plus monthly model refreshes (10–15 hours a month). Predictions logged, not acted on.</p>
-                <p class="sched__anchor">Tier 0.</p>
-              </div>
-              <div class="sched__price">40–80<span class="sched__unit">card-hours, 2–4 months</span></div>
-            </div>
-                        <div class="sched__row sched__row--teal">
-              <div class="sched__body">
-                <h3>Phase C · advisory A/B on 6–12 wells</h3>
-                <p class="sched__desc">Per-well steering support, monthly refreshes, and quarterly blind-test rounds.</p>
-                <p class="sched__anchor">Tier 0.</p>
-              </div>
-              <div class="sched__price">120–240<span class="sched__unit">card-hours, 6–9 months</span></div>
-            </div>
-                        <div class="sched__row sched__row--blue">
-              <div class="sched__body">
-                <h3>Your whole operation, steady state</h3>
-                <p class="sched__desc">Monthly refresh of every model (120–180), quarterly blind tests (about 50), weekly re-ranking of every well (about 50), steering support at program pace of 20–30 wells a year (100–150), and twice-yearly embedding passes over all your surveys. About five percent of the card we already own — more than ninety percent of it stays free.</p>
-                <p class="sched__anchor">Tier 0. Coverage of your whole operation never needs more than this.</p>
+                <h3>Run it</h3>
+                <p class="sched__desc">Monthly refresh of every model, quarterly blind tests, weekly re-ranking of every well, steering at program pace, embedding passes over all your surveys — about five percent of the card we own.</p>
               </div>
               <div class="sched__price">350–500<span class="sched__unit">card-hours a year</span></div>
             </div>
                         <div class="sched__row sched__row--teal">
               <div class="sched__body">
-                <h3>Training the seismic prior harder — on the accelerator your level carries</h3>
-                <p class="sched__desc">The only work that outgrows the card we own: 400-pass training of the seismic-to-geometry model on your 3D plus regional cubes (1,200–3,000 card-hours a run) times three to five independent runs for uncertainty — about 1,000–4,000 H100-hours. A few months on the dedicated accelerator the $150k level carries; days to weeks on the four-card box the $500k level carries. How hard it is pointed at training is set by the slope Phase D measures on your wells.</p>
-                <p class="sched__anchor">Tiers 1–2, ours. Not needed to cover your operation; needed to make the prior as good as the best published.</p>
+                <h3>Train the prior harder</h3>
+                <p class="sched__desc">The only work that outgrows our card: 400-pass training of the seismic reader on your 3D plus regional cubes, three to five independent runs. Months on one dedicated accelerator; days on four. How much we buy is set by the slope your blind score measures.</p>
               </div>
-              <div class="sched__price">3,600–15,000<span class="sched__unit">card-hours, once, ours</span></div>
+              <div class="sched__price">1,000–4,000<span class="sched__unit">H100-hours, once, ours</span></div>
             </div>
           </div>
-          <p class="small-note">Assumptions behind the hours: about five 3D surveys (~250 GB post-stack, ~60 cubes of 1024³), ~20 fields, ~30 existing horizontals available to replay, 20–30 new wells a year, leave-out-by-area backtests at 13 card-hours a round, a 1024³ cube embedding in 12–20 seconds, per-well steering updates in seconds to minutes. One card-hour on our RTX 5090 is roughly a quarter of an H100 hour. If your survey count or program is larger, the hours scale with it and still sit well inside one card; only the Tier 1 training does not.</p>
-          <div class="banner">How the tiers connect to the investment levels: every level covers your whole operation — Tier 0 already serves all of it. What the money buys is how current the ranking stays, how many blind wells back it, how hard the prior is trained, and how much review and acquisition work comes with it. Computing scales with the level: the card we own at $50k; a dedicated H100-class accelerator at $150k a year; the four-card box at $500k; rented bursts on top at $1.5M — all ours to buy or rent, never on your invoice. Each level lists what you are paying for: the computing hours and what they execute, and the people-hours that onboard, check, label, and review. Serving your whole operation takes only a few hundred of those hours; the rest of the computing trains the prior harder, and the slope we measure on your wells decides how hard.</div>
-          <p class="small-note">Where it flattens: two floors on the data side — the error no model can remove, and the limit of a fixed public archive — both reached before Tier 2 on a book your size. What moves the floor is information: more of your data types (completion detail, pressure and flowback, logs and core), licensed or partner 3D over uncovered acreage, public log archives, and partner wells pooled into training.</p>
+          <div class="banner">Every level of investment covers your whole operation — the card we already own serves all of it in a few hundred hours a year and carries the full information step, which we estimate holds at least four-fifths of the value available on a book your size. What the money sets is how current the ranking stays, how many blind wells back it, how hard the prior is trained, and how much review and acquisition work comes with it. The computing that does this is ours — bought or rented inside the fee, never a line on your invoice.</div>
+          <p class="small-note">Hours assume about five 3D surveys, ~20 fields, ~30 replayable horizontals, and 20–30 new wells a year; a larger book scales them and still sits inside one card. Two floors set where training harder stops paying — the error no model can remove, and the limit of a fixed public archive. What moves the floor is information: more of your data types, licensed 3D over uncovered acreage, partner wells pooled into training.</p>
+
         </div>
       </section>
 
@@ -755,37 +691,37 @@
           <div class="sched" role="region" aria-labelledby="roi-title">
             <div class="sched__head">
               <span class="visual__title" id="roi-title">Investment → what it buys → expected return</span>
-              <span class="head__note">what you are paying for is listed on each level: the computing hours and what they execute, the people-hours and what they execute, and what is delivered · expected value is the central estimate with its range · likelihood is the chance the return exceeds the spend</span>
+              <span class="head__note">each level lists what you are paying for — computing hours and people-hours · expected value is the central estimate with its range · likelihood is the chance the return exceeds the spend</span>
             </div>
                         <div class="sched__row sched__row--teal">
               <div class="sched__body">
-                <h3>The whole book, ranked once, blind-scored, one read-out</h3>
-                <p class="sched__desc">Every decision in the book ranked once — the public record of all ~1,600 wellbores is already in the model, and the pass over your own surveys and logs goes as far as the files you share, deepest on the basin that carries the book. Training on all of it from the start also crosses the line (~900 comparable wells) where models in this business have been shown to stop being biased — one reason we never sample. Internal holdout only; no refresh, no acquisition work. Expected value $0–2.5M, central about $0.5M — still dominated by which calls are acted on, because the ranking is not maintained after it is delivered. Likelihood of a positive return: about 45–60%. You are paying for: roughly 250–400 card-hours of computing — embedding and reading the surveys you share, fine-tuning the seismic reader to your wells, one ranking pass over the whole book, two to three rounds of blind tests, a steering replay on your existing horizontals if you share the surveys — and roughly 300–450 person-hours — checking your files against the public record we already hold, building the test sets, one read-out. Delivered: the whole book ranked once with ranges, its blind scores, the read-out.</p>
-                <p class="sched__anchor">Return multiple: 0–50×, central ~10×, widely dispersed. Computing: Tier 0 — serving the whole book takes a few hundred card-hours on the card we own; coverage was never the constraint. Where the return comes from: almost entirely the information step — your data in one model — acted on once; computing scale adds nothing measurable at this size. What this level does not buy: refreshes, acquisition reads, or repeat blind tests — the ranking ages as results post.</p>
+                <h3>The whole book, ranked once, blind-scored</h3>
+                <p class="sched__desc">Every decision in the book ranked once — the public record of all ~1,600 wellbores is already in the model; the pass over your own surveys and logs goes as deep as the files you share. Expected value $0–2.5M, central about $0.5M; likelihood positive about 45–60% — it turns on which calls are acted on, because the ranking is not maintained. You are paying for roughly 250–400 card-hours on the card we own and 300–450 person-hours checking your files, building the blind tests, and writing the read-out.</p>
+                <p class="sched__anchor">Return multiple: 0–50×, central ~10×, widely dispersed. What it does not buy: refreshes, acquisition reads, repeat blind tests — the ranking ages as results post.</p>
               </div>
               <div class="sched__price">$50k<span class="sched__unit">one test</span></div>
             </div>
                         <div class="sched__row sched__row--blue">
               <div class="sched__body">
-                <h3>The whole book, kept current: refreshed twice, blind-tested, two reviews</h3>
-                <p class="sched__desc">The same whole book, held live for a year: labels and test sets built properly per task, the ranking refreshed twice as results post, two review sessions, and the seismic prior trained harder on dedicated hardware. Expected value $0.5–4M, central about $1.5M. Likelihood positive: about 60–70%. You are paying for: a dedicated H100-class accelerator for the year — roughly 6,000 H100-hours, of which about 100 execute the setup, two refreshes, and their blind tests, and the rest train the seismic prior harder on your surveys and wells (three runs, 400 passes) — and roughly 700–1,000 person-hours — every record onboarded and checked, labels and test sets per task, two review sessions. Delivered: the whole book ranked with ranges and evidence, refreshed twice, with its blind scores.</p>
-                <p class="sched__anchor">Return multiple: 3–25×, central ~10×. One data-subscription line item in size. Computing: Tier 0 plus a dedicated H100-class accelerator (Tier 1) for the year. Where the return comes from: the information step (roughly three-quarters), staying current with deeper checking and review (most of the rest), and the harder-trained prior (a small, measured increment).</p>
+                <h3>The whole book, kept current</h3>
+                <p class="sched__desc">The same book held live: refreshed twice as results post, blind-tested each time, two review sessions. Expected value $0.5–4M, central about $1.5M; likelihood positive about 60–70%. You are paying for a dedicated H100-class accelerator for the year — ~6,000 H100-hours, of which serving needs under 200 and the rest trains the seismic prior harder on your surveys — and 700–1,000 person-hours of onboarding, labeling, and review.</p>
+                <p class="sched__anchor">Return multiple: 3–25×, central ~10×. One data-subscription line item in size. Mostly the information step; staying current and review carry most of the rest; the harder-trained prior is a small, measured increment.</p>
               </div>
               <div class="sched__price">$150k<span class="sched__unit">a year</span></div>
             </div>
                         <div class="sched__row sched__row--teal">
               <div class="sched__body">
-                <h3>Whole corpus, monthly retraining, quarterly blind tests, 2–4 acquisition reads, embedded review</h3>
-                <p class="sched__desc">The whole book at program pace: re-ranked monthly as results post; the acquisition screen on the deals you look at; re-deciding built in. Expected value $3–12M, central about $6M: roughly $2.4–10M from capital allocation across the program, $1–1.75M from the producing base, $1–2M from one overpay avoided in five. Likelihood positive: about 75–85%. You are paying for: the four-card box — about 12,000 H100-equivalent hours a year, of which a few hundred execute the monthly refresh of every model, quarterly blind tests, weekly re-ranking of every well, steering support at program pace, and embedding passes over all your surveys, and the rest train the prior harder (five seeds, 400 passes, 3D with the large memory) and run our scaling grid on your backtest — and roughly 2,000–3,000 person-hours a year — every survey and record onboarded and checked, labels and test sets per basin and task, two to four acquisition reads, embedded review with your asset team. Delivered: the whole corpus re-ranked monthly with ranges and evidence, quarterly blind scores, the acquisition reads, the steering prior on the wells you drill.</p>
-                <p class="sched__anchor">Return multiple: 6–24×, central ~12×. The sweet spot — the same whole book, now moving at the speed of the program. Fee ≈ 0.7% of revenue, 0.2% of the program. Computing: Tier 2, the four-card box. Where the return comes from: the information step (about half), program pace plus acquisition reads and re-deciding (about two-fifths), computing scale (at most a tenth, measured on your score).</p>
+                <h3>The whole book at program pace, with the acquisition screen</h3>
+                <p class="sched__desc">Re-ranked monthly as results post; quarterly blind tests; steering support on the wells you drill; two to four acquisition reads; embedded review with your asset team. Expected value $3–12M, central about $6M — capital allocation across the program, the producing base, and one overpay avoided in five. Likelihood positive about 75–85%. You are paying for the four-card box — ~12,000 H100-equivalent hours, a few hundred serving, the rest training five-seed 3D priors and running our scaling grid on your backtest — and 2,000–3,000 person-hours a year.</p>
+                <p class="sched__anchor">Return multiple: 6–24×, central ~12×. Fee ≈ 0.7% of revenue, 0.2% of the program. The sweet spot: the same book, moving at the speed of the program.</p>
               </div>
               <div class="sched__price">$500k<span class="sched__unit">a year</span></div>
             </div>
                         <div class="sched__row sched__row--blue">
               <div class="sched__body">
                 <h3>The above, sustained</h3>
-                <p class="sched__desc">Every new survey and well onboarded, the live program re-ranked monthly, the full acquisition pipeline, field-level review, multi-year blind tests. Adds the re-deciding term (a two-stage plan raised expected value 34% and cut worst-case loss 59% over a one-shot plan in a 2026 study). Expected value $8–30M over the term, central about $15M. Likelihood positive: about 80–90% — only if the program really executes over the term. You are paying for: the four-card box for the term, plus rented bursts for the largest models if your score earns them; and roughly 6,000–9,000 person-hours over the term — every new survey and well onboarded, the full acquisition pipeline read, field-level review. Delivered: everything above, sustained, with multi-year blind tests.</p>
-                <p class="sched__anchor">Return multiple: 5–20×, central ~10×; the multiple flattens while the absolute return and certainty keep rising. Computing: the four-card box for the term, with rented bursts (Tier 3) if your score earns them. Where the return comes from: the same split, with re-deciding as results post adding the largest new term; computing scale stays a small, measured increment.</p>
+                <p class="sched__desc">Every new survey and well onboarded, the full acquisition pipeline read, field-level review, multi-year blind tests, and re-deciding as results post — the term a 2026 study priced at +34% expected value and −59% worst-case loss over a one-shot plan. Expected value $8–30M over the term, central about $15M; likelihood positive about 80–90% if the program executes. You are paying for the four-card box for the term — rented bursts for the largest models only if your score earns them; the one measured comparison shows no gain past 660M parameters — and 6,000–9,000 person-hours.</p>
+                <p class="sched__anchor">Return multiple: 5–20×, central ~10× — the multiple flattens while the absolute return and certainty keep rising.</p>
               </div>
               <div class="sched__price">$1.5M<span class="sched__unit">over 2–3 years</span></div>
             </div>
