@@ -1,11 +1,188 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.9",
+  "latest": "0.21.26",
   "releases": [
+    {
+      "version": "0.21.26",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Unattended orchestration hardening",
+      "summary": "Keeps Mac mini work visible and collaborative while preventing stalled local indexing and ensuring native task authorization remains usable.",
+      "highlights": [
+        "Native Fleet job review now stays onscreen while retaining digest-bound exact authorization.",
+        "Shared Mac mini tasks report collaborative workspace phases consistently in the live Intelligence timeline.",
+        "Workspace file changes are coalesced so remote viewing no longer triggers minute-by-minute full rescans.",
+        "Background indexing now uses a 30-minute safety refresh and remains single-flight under heavy sync activity.",
+        "Delegated tool allowlists, six-task scheduling, redaction, retry guards, and merge behavior remain covered by 204 tests."
+      ]
+    },
+    {
+      "version": "0.21.25",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Direct Mac mini Intelligence",
+      "summary": "Run an ordinary Intelligence tab on the Mac mini, follow sanitized progress and file changes locally, and open its encrypted screen in a lightweight fullscreen controller.",
+      "highlights": [
+        "Choose This Mac, Mac mini · collaborate live, or Mac mini · isolated copy from the Intelligence header.",
+        "Remote-owned tabs send the actual prompt to the mini and restore their live task card after a tab or app reload.",
+        "Delegation enforces a six-task turn cap, signed tool allowlists, decline-safe retries, and stricter remote-output redaction.",
+        "The fullscreen screen controller keeps frame memory bounded and falls back safely if its renderer stalls.",
+        "Mac input readiness reports missing Accessibility permission instead of silently claiming control."
+      ]
+    },
+    {
+      "version": "0.21.24",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Intelligence run convergence",
+      "summary": "Intelligence now recognizes pending nudges, bounds answer-only evidence loops, and finishes with a tool-free handoff instead of extending the action log.",
+      "highlights": [
+        "A nudge now resumes the unfinished implementation with its original completion contract.",
+        "Answer-only evidence work switches to final synthesis after six tool rounds or 24 completed actions.",
+        "Intermediate direct-provider decisions have a five-minute absolute limit while final handoffs retain their longer allowance.",
+        "Live activity reports completed actions without presenting a growing log length as a fixed finish line."
+      ]
+    },
+    {
+      "version": "0.21.23",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Reliable remote screen startup",
+      "summary": "Fleet remote sessions now start the capture command, restore live viewer state, and fail cleanly instead of showing a permanent black panel.",
+      "highlights": [
+        "Narrowly authorizes video-only capture for StatsKey's registered hidden screen renderer.",
+        "Waits for a real capture track before marking a remote session active.",
+        "Restores relay and stream-header state even when connection events arrive before the viewer mounts.",
+        "Ends failed or timed-out capture commands instead of leaving zombie sessions."
+      ]
+    },
+    {
+      "version": "0.21.22",
+      "date": "2026-08-23",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Live Intelligence delegation",
+      "summary": "Watch and control Mac mini work directly inside Intelligence while local work continues.",
+      "highlights": [
+        "Persistent live task cards show state, current activity, sanitized remote output, and observed files.",
+        "Refresh and cancel controls work directly from Intelligence without another chat message.",
+        "Adaptive polling supports six concurrent tasks without abandoning audited agent supervision.",
+        "Approval-window failures no longer masquerade as user declines."
+      ]
+    },
+    {
+      "version": "0.21.21",
+      "date": "2026-08-23",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Visible, verifiable Intelligence approvals",
+      "summary": "Delegate from Intelligence with foregrounded, compact native approvals that keep controls visible, bind the complete job by digest, and distinguish cancellation from client failure.",
+      "highlights": [
+        "Delegate to another enrolled machine directly from an Intelligence chat while local work continues.",
+        "Compact exact-job approval sheets keep Approve and Cancel visible above the macOS Dock.",
+        "A SHA-256 digest binds every normalized job field, including any previewed prompt tail.",
+        "Window, renderer, and validation failures remain retryable and no longer appear as user declines."
+      ]
+    },
+    {
+      "version": "0.21.20",
+      "date": "2026-08-23",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Intelligence delegation that stays visible",
+      "summary": "Delegate directly from Intelligence with native approvals that foreground StatsKey, distinguish cancellation from client failures, and remain retryable when approval UI is unavailable.",
+      "highlights": [
+        "Delegate to another enrolled machine directly from an Intelligence chat while local work continues in the same run.",
+        "Fleet approval sheets now foreground StatsKey and serialize concurrent prompts.",
+        "Window, renderer, and validation failures no longer masquerade as a user decline.",
+        "Cancelled approvals stay fail-closed without repeated prompts in the same turn."
+      ]
+    },
+    {
+      "version": "0.21.16",
+      "date": "2026-08-23",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Live sync and task delegation across your machines",
+      "summary": "Mirror a folder live between your enrolled machines from the Cockpit, hand a plain-English task to another machine and watch it run, and get more reliable Mac fleet workers.",
+      "highlights": [
+        "Start a live sync from a Cockpit device card to mirror a folder between two machines in real time.",
+        "Delegate a plain-English task to another machine from the Cockpit and follow its progress live.",
+        "Fleet workers on macOS now report available memory correctly.",
+        "Remote screen sessions add a Screen Share button on the Cockpit device card."
+      ]
+    },
+    {
+      "version": "0.21.13",
+      "date": "2026-08-21",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Organize workspace files in place",
+      "summary": "The Workspace now has a Files panel on the right: browse, create, rename, delete, and drag-and-drop files and folders without leaving the editor.",
+      "highlights": [
+        "Organize workspace files from the right-side Files panel.",
+        "Create, rename, delete, and drag-and-drop files and folders in place."
+      ]
+    },
+    {
+      "version": "0.21.12",
+      "date": "2026-08-21",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Cockpit in the sidebar",
+      "summary": "The Cockpit now sits in the desktop sidebar for one-click access to your machines, alongside the tab bar.",
+      "highlights": [
+        "Cockpit is always reachable from the desktop sidebar."
+      ]
+    },
+    {
+      "version": "0.21.11",
+      "date": "2026-08-20",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Cockpit: your machines in one view",
+      "summary": "The new Cockpit tab shows your enrolled machines as cards with one-click remote sessions, task runs, and file browsing, plus a one-time optional introduction for new desktop users.",
+      "highlights": [
+        "The Cockpit tab shows your machines as cards with remote session, task, and file actions.",
+        "New desktop users get a one-time optional Cockpit introduction; chat stays the default landing.",
+        "Create a project folder with just a name from the Cockpit or the workspace start page."
+      ]
+    },
+    {
+      "version": "0.21.10",
+      "date": "2026-08-20",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Fleet remote sessions",
+      "summary": "StatsKey can now open a remote desktop session to your enrolled Windows workers from the Fleet tab, end-to-end encrypted through your own relay.",
+      "highlights": [
+        "Remote desktop sessions to enrolled Windows workers from the Fleet tab.",
+        "Sessions are approved per device and encrypted end to end through your own relay — no third-party service.",
+        "Ubuntu worker service attestation now refreshes continuously instead of expiring in place."
+      ]
+    },
     {
       "version": "0.21.9",
       "date": "2026-08-17",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Helpers that stay in step",
       "summary": "Investigators follow the active model and provider route by default, with one quiet advanced control for choosing any available StatsKey or My key route.",
       "highlights": [
@@ -18,22 +195,29 @@
     },
     {
       "version": "0.21.8",
-      "date": "2026-08-17",
-      "platforms": ["Windows"],
-      "title": "Helpers that follow your lead on Windows",
-      "summary": "The Windows preview now lets investigators inherit the active model and provider route by default, with a quiet advanced control for choosing a different configured model.",
-      "highlights": [
-        "Investigators inherit the main model and provider route by default.",
-        "An advanced Helper model control can assign a different configured model without cluttering the everyday interface.",
-        "Final responses stay active while the configured provider remains healthy.",
-        "Native Windows checks bind the public installer to install, restart, workspace, terminal, browser, and update-readiness proof."
+      "date": "2026-08-19",
+      "platforms": [
+        "Windows",
+        "Linux"
       ],
-      "windowsSigning": "unsigned-preview"
+      "title": "Windows and Ubuntu desktop previews",
+      "summary": "The Windows preview keeps investigators on the active model route by default, and the Ubuntu 26.04 LTS x64 preview adds an explicit DEB package with secure storage checks and fail-closed Fleet control.",
+      "highlights": [
+        "Windows investigators inherit the main model and provider route by default.",
+        "Native Windows checks bind the public installer to install, restart, workspace, terminal, browser, and update-readiness proof.",
+        "Ubuntu 26.04 LTS x64 has an explicit DEB package and native release-proof contract.",
+        "Credentials are refused when Electron falls back to unprotected basic-text storage.",
+        "Ubuntu can control Fleet while unattended worker execution remains disabled pending a protected service."
+      ],
+      "windowsSigning": "unsigned-preview",
+      "linuxSigning": "unsigned-preview"
     },
     {
       "version": "0.21.7",
       "date": "2026-08-17",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Helpers that follow your lead",
       "summary": "Investigators now follow your chosen model unless you quietly customize them, final answers stay active while providers are healthy, and releases use one guarded path from build to launch.",
       "highlights": [
@@ -46,7 +230,9 @@
     {
       "version": "0.21.6",
       "date": "2026-08-16",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Public boundary correction",
       "summary": "A focused Mac correction removes a residual private-machine command path from the public package and strengthens the checks that guard future releases.",
       "highlights": [
@@ -58,7 +244,9 @@
     {
       "version": "0.21.5",
       "date": "2026-08-16",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "A clearer, more approachable workspace",
       "summary": "The mode chooser is now fully visible and easier to understand, StatsKey can open its own source for reviewable customization, and public packages remove Founder-only interfaces.",
       "highlights": [
@@ -73,7 +261,9 @@
     {
       "version": "0.21.4",
       "date": "2026-08-16",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Consent controls that stay reachable",
       "summary": "The Intelligence disclosure now fits every supported desktop window without trapping the workspace or hiding its controls.",
       "highlights": [
@@ -86,7 +276,9 @@
     {
       "version": "0.21.3",
       "date": "2026-08-16",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Clean recovery when a provider pauses",
       "summary": "StatsKey now preserves completed workspace work and ends the active pass cleanly when a model provider reaches its response deadline.",
       "highlights": [
@@ -99,7 +291,9 @@
     {
       "version": "0.21.2",
       "date": "2026-08-15",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Work that stays with its workspace",
       "summary": "StatsKey now keeps active tasks bound to the workspace where they started, while bringing billing, provider access, and third-party tools into one clearer setup.",
       "highlights": [
@@ -112,7 +306,9 @@
     {
       "version": "0.19.1",
       "date": "2026-08-13",
-      "platforms": ["Windows"],
+      "platforms": [
+        "Windows"
+      ],
       "windowsSigning": "unsigned-preview",
       "title": "Windows, tested where it runs",
       "summary": "The Windows preview now passes a native install, launch, restart, workspace, terminal, browser, and update-readiness gate before it can be published.",
@@ -126,7 +322,9 @@
     {
       "version": "0.19.0",
       "date": "2026-08-13",
-      "platforms": ["macOS"],
+      "platforms": [
+        "macOS"
+      ],
       "title": "Proof you can inspect",
       "summary": "StatsKey can now exercise mobile work directly and only calls implementation complete when the saved result and its verification agree.",
       "highlights": [
@@ -139,7 +337,10 @@
     {
       "version": "0.18.34",
       "date": "2026-08-07",
-      "platforms": ["macOS", "Windows"],
+      "platforms": [
+        "macOS",
+        "Windows"
+      ],
       "title": "Desktop preview",
       "summary": "The first public StatsKey workspace preview.",
       "highlights": [

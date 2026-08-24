@@ -565,7 +565,7 @@
           <a
             class="button button--primary"
             data-target="mac-arm64"
-            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.9/StatsKey-0.21.9-mac-arm64.dmg"
+            href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.26/StatsKey-0.21.26-mac-arm64.dmg"
           >
             Download for Apple Silicon <span aria-hidden="true">↓</span>
           </a>
@@ -576,7 +576,7 @@
           >Download for Windows <span aria-hidden="true">↓</span></a>
           <a class="button" href="#why">Why StatsKey</a>
         </div>
-        <p class="hero__note">Mac 0.21.9 · signed and Apple notarized · Windows 0.21.8 preview</p>
+        <p class="hero__note">Mac 0.21.26 · signed and Apple notarized · Windows 0.21.8 preview</p>
       </header>
 
       <section class="shell product-wrap" aria-label="StatsKey in action">
@@ -690,7 +690,7 @@
             <h2>What StatsKey can do today.</h2>
             <p>
               A maintained, plain-language list of the current Mac app’s capabilities.
-              The Windows preview remains on 0.19.1. Each release updates this
+              The Windows preview remains on 0.21.8. Each release updates this
               catalog and the version history below.
             </p>
           </div>
@@ -844,7 +844,7 @@
       <section class="download" id="download">
         <div class="shell">
           <div class="section-heading">
-            <span class="kicker" id="release-status">Mac 0.21.9 · Windows 0.21.8</span>
+            <span class="kicker" id="release-status">Mac 0.21.26 · Windows 0.21.8 · Ubuntu 0.21.8 preview</span>
             <h2>Start with the outcome.</h2>
             <p>Bring a project. Tell StatsKey what finished looks like. Stay in the conversation.</p>
           </div>
@@ -852,18 +852,23 @@
             <a
               class="button button--primary"
               data-target="mac-arm64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.9/StatsKey-0.21.9-mac-arm64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.26/StatsKey-0.21.26-mac-arm64.dmg"
             >Download for Apple Silicon ↓</a>
             <a
               class="button"
               data-target="win-x64"
               href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.8/StatsKey-0.21.8-win-x64.exe"
             >Download for Windows ↓</a>
+            <a
+              class="button"
+              data-target="linux-x64"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.8/StatsKey-0.21.8-linux-x64.deb"
+            >Download for Ubuntu ↓</a>
           </div>
           <div class="download__links">
             <a
               data-target="mac-x64"
-              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.9/StatsKey-0.21.9-mac-x64.dmg"
+              href="https://storage.googleapis.com/statskey-workbench-downloads/releases/0.21.26/StatsKey-0.21.26-mac-x64.dmg"
             >Intel Mac</a>
             <a href="#capabilities">Capabilities</a>
             <a href="#updates">What’s new</a>
@@ -873,6 +878,12 @@
             On Mac, open the DMG and drag StatsKey to Applications. The app and disk image
             are signed and notarized by Apple. On Windows, SmartScreen may require
             <strong>More info → Run anyway</strong> while the Windows preview is unsigned.
+          </div>
+          <div class="notice">
+            The Ubuntu 26.04 LTS x64 package is an unsigned preview: install it with
+            <code>sudo apt install ./StatsKey-0.21.8-linux-x64.deb</code>. Ubuntu has
+            unsigned packages, and automatic updates and unattended Fleet jobs are disabled
+            until signed package trust and the protected worker service are in place.
           </div>
         </div>
       </section>
@@ -888,18 +899,24 @@
     </footer>
 
     <script>
-      const macVersion = "0.21.9";
+      const macVersion = "0.21.26";
       const windowsVersion = "0.21.8";
+      const linuxVersion = "0.21.8";
       const releaseRoot = (version) =>
         `https://storage.googleapis.com/statskey-workbench-downloads/releases/${version}`;
       const targets = {
         "mac-arm64": { version: macVersion, file: `StatsKey-${macVersion}-mac-arm64.dmg`, label: "Download for Apple Silicon" },
         "mac-x64": { version: macVersion, file: `StatsKey-${macVersion}-mac-x64.dmg`, label: "Download for Intel Mac" },
         "win-x64": { version: windowsVersion, file: `StatsKey-${windowsVersion}-win-x64.exe`, label: "Download for Windows" },
+        "linux-x64": { version: linuxVersion, file: `StatsKey-${linuxVersion}-linux-x64.deb`, label: "Download for Ubuntu" },
       };
 
       const userAgent = navigator.userAgent.toLowerCase();
-      const preferredTarget = userAgent.includes("windows") ? "win-x64" : "mac-arm64";
+      const preferredTarget = userAgent.includes("windows")
+        ? "win-x64"
+        : userAgent.includes("linux") && !userAgent.includes("android")
+          ? "linux-x64"
+          : "mac-arm64";
       const preferred = targets[preferredTarget];
 
       const navDownload = document.getElementById("nav-download");
@@ -907,7 +924,7 @@
         navDownload.href = `${releaseRoot(preferred.version)}/${preferred.file}`;
       }
 
-      for (const version of new Set([macVersion, windowsVersion])) {
+      for (const version of new Set([macVersion, windowsVersion, linuxVersion])) {
         fetch(`${releaseRoot(version)}/release-manifest.json`, { cache: "no-store" })
           .then((response) => {
             if (!response.ok) throw new Error("Release manifest unavailable");
