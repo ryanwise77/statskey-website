@@ -1,7 +1,22 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.28",
+  "latest": "0.21.29",
   "releases": [
+    {
+      "version": "0.21.29",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Remote control that recovers",
+      "summary": "Makes Mac remote control recover live from permission changes, identifies macOS-protected login screens, opens the native Screen Sharing fallback, and clears abandoned pre-approval runs.",
+      "highlights": [
+        "Locked Macs are identified explicitly instead of presenting wallpaper as an interactive login screen.",
+        "Accessibility and lock state are rechecked live, so input resumes without reconnecting after a valid grant.",
+        "Each remote session now uses an isolated input-helper endpoint with stricter protocol diagnostics.",
+        "Declined or interrupted pre-approval Mac mini runs no longer leave permanent Waiting to start cards."
+      ]
+    },
     {
       "version": "0.21.28",
       "date": "2026-08-24",
