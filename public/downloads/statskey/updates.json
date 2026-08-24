@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.26",
+  "latest": "0.21.27",
   "releases": [
+    {
+      "version": "0.21.27",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Quiet background orchestration",
+      "summary": "Pauses decorative Intelligence motion when StatsKey is hidden, unfocused, or locked, keeping Fleet and live sync available without wasting local GPU.",
+      "highlights": [
+        "Hidden, unfocused, and locked Intelligence windows stop decorative repainting while Fleet and live sync continue.",
+        "Animations resume immediately when StatsKey returns to focus.",
+        "The six-task ceiling, shared collaboration, output redaction, decline guards, and event-driven indexing remain unchanged."
+      ]
+    },
     {
       "version": "0.21.26",
       "date": "2026-08-24",
