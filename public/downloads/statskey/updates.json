@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.27",
+  "latest": "0.21.28",
   "releases": [
+    {
+      "version": "0.21.28",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Lean live-sync bootstrap",
+      "summary": "Coalesces overlapping Fleet manifest scans during connect and invalidates the shared snapshot on every real file mutation, reducing laptop and Mac mini resource pressure without weakening sync freshness.",
+      "highlights": [
+        "One sync manifest scan now serves overlapping connect, announce, and comparison requests.",
+        "Local changes and inbound apply or delete operations invalidate stale snapshots before publication.",
+        "Direct path reads and scheduled safety reconciliations remain disk-fresh."
+      ]
+    },
     {
       "version": "0.21.27",
       "date": "2026-08-24",
