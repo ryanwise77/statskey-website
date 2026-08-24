@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.30",
+  "latest": "0.21.31",
   "releases": [
+    {
+      "version": "0.21.31",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Verified remote handoffs",
+      "summary": "Direct Mac mini Intelligence turns now preserve controller-verified completion evidence needed to render a truthful terminal status live and after reload.",
+      "highlights": [
+        "A verified remote workspace change now ends with Done instead of a contradictory Needs attention badge.",
+        "The evidence is emitted only after the worker result matches the authorized completion and verification contract.",
+        "Legacy, incomplete, zero-change, conflicting, exhausted, and red-green-mismatched jobs continue to fail closed."
+      ]
+    },
     {
       "version": "0.21.30",
       "date": "2026-08-24",
