@@ -37,6 +37,10 @@
         align-items: center;
       }
 
+      .clinical-hero-grid > * {
+        min-width: 0;
+      }
+
       .clinical-window {
         overflow: hidden;
         border: 1px solid var(--line);
@@ -94,6 +98,7 @@
 
       .clinical-patient div {
         display: grid;
+        min-width: 0;
       }
 
       .clinical-patient strong {
@@ -103,9 +108,11 @@
       .clinical-patient span {
         color: var(--muted);
         font-size: 10px;
+        overflow-wrap: anywhere;
       }
 
       .clinical-status {
+        flex: 0 0 auto;
         margin-left: auto;
         padding: 5px 8px;
         border-radius: 999px;
@@ -328,6 +335,12 @@
       @media (max-width: 860px) {
         .clinical-hero-grid {
           grid-template-columns: 1fr;
+          gap: 40px;
+        }
+
+        .clinical-window {
+          width: min(100%, 680px);
+          margin-inline: auto;
         }
 
         .professional-audiences {
@@ -344,10 +357,187 @@
       }
 
       @media (max-width: 620px) {
+        .clinical-hero-grid .hero-title,
+        .clinical-cta-card h2,
+        .section-heading h2 {
+          text-wrap: balance;
+        }
+
+        body.marketing-light main .hero-section {
+          padding: 88px 0 52px;
+        }
+
+        body.marketing-light main .statement-section {
+          padding: 58px 0;
+        }
+
+        body.marketing-light main .section-block {
+          padding: 64px 0;
+        }
+
+        .clinical-hero-grid {
+          gap: 30px;
+        }
+
+        body.marketing-light .clinical-hero-grid .hero-title {
+          font-size: clamp(2.65rem, 12.5vw, 3.25rem);
+          line-height: 0.96;
+        }
+
+        body.marketing-light .clinical-hero-grid .hero-lede {
+          margin-top: 20px;
+          font-size: 1.08rem;
+          line-height: 1.52;
+        }
+
+        body.marketing-light .clinical-hero-grid .hero-actions {
+          gap: 9px;
+          margin-top: 26px;
+        }
+
+        .clinical-hero-grid .hero-note {
+          margin-top: 14px;
+          font-size: 13px;
+          line-height: 1.55;
+        }
+
+        .clinical-window {
+          border-radius: 22px;
+        }
+
+        .clinical-window__bar {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          gap: 12px;
+          padding: 12px 14px;
+          font-size: 10px;
+          line-height: 1.35;
+        }
+
+        .clinical-window__bar > span:last-child {
+          text-align: right;
+        }
+
+        .clinical-window__dots {
+          display: none;
+        }
+
+        .clinical-window__body {
+          padding: 16px;
+        }
+
+        .clinical-patient {
+          gap: 10px;
+          padding-bottom: 15px;
+        }
+
+        .clinical-patient__avatar {
+          width: 40px;
+          height: 40px;
+          flex: 0 0 40px;
+          border-radius: 12px;
+        }
+
+        .clinical-metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+          margin-top: 14px;
+        }
+
+        .clinical-metric {
+          min-width: 0;
+          padding: 11px;
+        }
+
+        .clinical-metric span {
+          font-size: 10px;
+          line-height: 1.35;
+        }
+
+        .clinical-metric strong {
+          font-size: 17px;
+        }
+
+        .clinical-manifest {
+          gap: 6px;
+          margin-top: 14px;
+        }
+
+        .clinical-manifest div {
+          padding: 9px;
+          font-size: 11px;
+        }
+
         .clinical-boundary,
-        .clinical-metrics,
         .professional-audiences {
           grid-template-columns: 1fr;
+        }
+
+        .professional-audiences article,
+        .clinical-flow article,
+        .clinical-boundary article {
+          min-height: 0;
+          padding: 20px;
+        }
+
+        .professional-audiences span {
+          margin-bottom: 18px;
+          font-size: 11px;
+        }
+
+        .professional-audiences h3,
+        .clinical-flow h3,
+        .clinical-boundary h3 {
+          font-size: 19px;
+        }
+
+        .professional-audiences p,
+        .clinical-flow p,
+        .clinical-boundary ul {
+          font-size: 15px;
+          line-height: 1.6;
+        }
+
+        .clinical-flow article::before {
+          margin-bottom: 22px;
+        }
+
+        .clinical-cta-card {
+          padding: 30px 20px;
+          border-radius: 22px;
+        }
+
+        .clinical-cta-card h2 {
+          font-size: clamp(2rem, 10vw, 2.65rem);
+          line-height: 1.08;
+        }
+
+        .clinical-cta-card > p {
+          margin-bottom: 22px;
+        }
+
+        .clinical-preview-note {
+          font-size: 12.5px;
+        }
+      }
+
+      @media (max-width: 620px) and (max-height: 650px) {
+        body.marketing-light main .hero-section {
+          padding-top: 76px;
+        }
+      }
+
+      @media (max-width: 350px) {
+        body.marketing-light .clinical-hero-grid .hero-lede {
+          font-size: 1rem;
+        }
+
+        .clinical-status {
+          padding-inline: 6px;
+        }
+
+        .clinical-window__body {
+          padding: 14px;
         }
       }
     </style>
@@ -374,7 +564,6 @@
           aria-label="Open menu"
           aria-expanded="false"
         >
-          <span></span>
           <span></span>
           <span></span>
         </button>
