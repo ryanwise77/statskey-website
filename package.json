@@ -10,6 +10,7 @@
     "refresh:founder-history": "node scripts/refresh-founder-history.mjs",
     "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",
     "test:firestore-failover": "node --test scripts/firestore-failover.test.ts",
+    "test:standby-auth": "node --test scripts/standby-auth.test.ts",
     "preview": "vite preview",
     "check:deploy": "node scripts/check-deploy-ready.mjs"
   },

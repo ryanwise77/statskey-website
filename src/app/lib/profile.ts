@@ -8,6 +8,8 @@ import {
 import type { User } from 'firebase/auth'
 import { db } from './firebase'
 
+export type ProfileUser = Pick<User, 'uid' | 'displayName' | 'email'>
+
 // Mirrors biometrics/StatsKey/Models/UserProfile.swift exactly. Field names
 // and enum raw values must match, otherwise iOS decoding will fall back to
 // defaults or fail.
@@ -75,7 +77,7 @@ export interface SocialProfile {
   avatarURL?: string
 }
 
-function defaultProfile(user: User): UserProfile {
+function defaultProfile(user: ProfileUser): UserProfile {
   const now = new Date()
   return {
     id: user.uid,
@@ -223,6 +225,17 @@ export async function loadProfile(uid: string): Promise<UserProfile | undefined>
   return decodeProfile(snap.data() as Record<string, unknown>, uid)
 }
 
+/**
+ * Read the canonical profile without performing legacy migration writes.
+ * Emergency read-only mode uses this path so merely opening the app cannot
+ * create, migrate, or delete documents on the standby.
+ */
+export async function loadProfileReadOnly(uid: string): Promise<UserProfile | undefined> {
+  const snap = await getDoc(doc(db, 'users', uid))
+  if (!snap.exists()) return undefined
+  return decodeProfile(snap.data() as Record<string, unknown>, uid)
+}
+
 export async function saveProfile(uid: string, profile: UserProfile): Promise<void> {
   const payload = encodeProfile({ ...profile, id: uid })
   await setDoc(doc(db, 'users', uid), payload, { merge: true })
@@ -234,7 +247,7 @@ export async function saveProfile(uid: string, profile: UserProfile): Promise<vo
  * and defaults iOS uses so the iOS app cannot tell a web-created user from
  * an iOS-created one.
  */
-export async function ensureProfile(user: User): Promise<UserProfile> {
+export async function ensureProfile(user: ProfileUser): Promise<UserProfile> {
   const existing = await loadProfile(user.uid)
   let profile = existing
   if (!profile) {

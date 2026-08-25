@@ -51,6 +51,7 @@ function gatewayHealth(overrides: Record<string, unknown> = {}) {
       maxLagSeconds: 120,
       fresh: true,
     },
+    auth: { reachable: true, issuer: 'https://auth.statskey.ai' },
     routes: { firestore: '/', functions: '/functions' },
     ...overrides,
   }
@@ -220,6 +221,27 @@ describe('mirror health and freshness', () => {
       parseMirrorHealth(gatewayHealth({ routes: { firestore: '/firestore' } }), NOW),
       null
     )
+    assert.equal(parseMirrorHealth(gatewayHealth({ auth: undefined }), NOW), null)
+    assert.equal(
+      parseMirrorHealth(
+        gatewayHealth({
+          auth: { reachable: false, issuer: 'https://auth.statskey.ai' },
+        }),
+        NOW
+      ),
+      null
+    )
+    assert.equal(
+      parseMirrorHealth(
+        gatewayHealth({
+          auth: { reachable: true, issuer: 'https://wrong-issuer.example' },
+        }),
+        NOW
+      ),
+      null
+    )
+    assert.equal(parseMirrorHealth(gatewayHealth({ writable: undefined }), NOW), null)
+    assert.equal(parseMirrorHealth(gatewayHealth({ mode: 'mirror' }), NOW), null)
   })
 })
 

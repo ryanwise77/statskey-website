@@ -46,13 +46,14 @@ const LEGACY_MIRROR_HOST_KEY = 'statskey.mirrorHost'
 const MIRROR_HEALTH_KEY = 'statskey.mirrorHealth'
 const HEALTH_PATH = '/.well-known/statskey-emergency-health'
 const PROBE_URL =
-  'https://firestore.googleapis.com/v1/projects/statskey/databases/(default)/documents/publicFounderReplicas/founder'
+  'https://firestore.googleapis.com/v1/projects/statskey/databases/(default)/documents/publicFounderReplicas/founder?mask.fieldPaths=schemaVersion'
 const PROBE_INTERVAL_MS = 30_000
 const FAILS_TO_SWITCH = 2
 const SUCCESSES_TO_RECOVER = 2
 const PROBE_TIMEOUT_MS = 6_000
 const MAX_HEALTH_REPORT_AGE_MS = 5 * 60_000
 const CLOCK_SKEW_SECONDS = 30
+const EXPECTED_STANDBY_AUTH_ISSUER = 'https://auth.statskey.ai'
 
 function buildEmergencyOrigin(): string {
   const env = import.meta.env as ImportMetaEnv | undefined
@@ -208,13 +209,23 @@ export function parseMirrorHealth(
   const status = String(root.status ?? '').toLowerCase()
   const ready = status === 'ready' || status === 'ok' || root.healthy === true
   if (!ready) return null
+  if (isGatewayV1 && root.mode !== 'standby') return null
   if (root.mode != null && root.mode !== 'standby' && root.mode !== 'mirror') {
     return null
   }
+  if (isGatewayV1 && typeof root.writable !== 'boolean') return null
 
   const mirror = asRecord(root.mirror) ?? root
   const routes = asRecord(root.routes)
   if (isGatewayV1 && routes?.firestore !== '/') return null
+  const standbyAuth = asRecord(root.auth)
+  if (
+    isGatewayV1 &&
+    (standbyAuth?.reachable !== true ||
+      standbyAuth.issuer !== EXPECTED_STANDBY_AUTH_ISSUER)
+  ) {
+    return null
+  }
   const reachable = mirror.reachable ?? mirror.healthy
   if (reachable !== true) return null
   const explicitlyFresh = mirror.fresh ?? root.fresh

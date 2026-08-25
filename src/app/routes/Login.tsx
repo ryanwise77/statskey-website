@@ -13,6 +13,7 @@ export function Login() {
     sendPasswordReset,
     error,
     loading,
+    emergencyMode,
   } = useAuth()
   const location = useLocation()
   const [busy, setBusy] = useState<null | 'email' | 'google' | 'apple' | 'reset'>(null)
@@ -118,7 +119,9 @@ export function Login() {
           <p className="text-text-secondary text-[14px]">
             {resetMode
               ? 'We’ll email you a secure password reset link.'
-              : 'Use the same account as the iOS app.'}
+              : emergencyMode
+                ? 'Emergency mode is active. Use email and password, or your prepared standby session will open automatically.'
+                : 'Use the same account as the iOS app.'}
           </p>
         </div>
 
@@ -202,17 +205,19 @@ export function Login() {
                     >
                       Password
                     </label>
-                    <button
-                      className="link text-[12px]"
-                      type="button"
-                      onClick={() => {
-                        setResetMode(true)
-                        setResetSent(false)
-                        setLocalError(null)
-                      }}
-                    >
-                      Forgot password?
-                    </button>
+                    {!emergencyMode && (
+                      <button
+                        className="link text-[12px]"
+                        type="button"
+                        onClick={() => {
+                          setResetMode(true)
+                          setResetSent(false)
+                          setLocalError(null)
+                        }}
+                      >
+                        Forgot password?
+                      </button>
+                    )}
                   </span>
                   <input
                     id="login-password"
@@ -234,31 +239,35 @@ export function Login() {
                 </button>
               </form>
 
-              <div className="flex items-center gap-3 my-5" aria-hidden>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-text-muted text-[11px] font-medium">OR</span>
-                <div className="h-px flex-1 bg-white/10" />
-              </div>
+              {!emergencyMode && (
+                <>
+                  <div className="flex items-center gap-3 my-5" aria-hidden>
+                    <div className="h-px flex-1 bg-white/10" />
+                    <span className="text-text-muted text-[11px] font-medium">OR</span>
+                    <div className="h-px flex-1 bg-white/10" />
+                  </div>
 
-              <div className="space-y-3">
-                <button
-                  className="btn btn-secondary w-full"
-                  onClick={() => go('google')}
-                  disabled={busy !== null}
-                >
-                  <GoogleIcon />
-                  <span>{busy === 'google' ? 'Signing in…' : 'Continue with Google'}</span>
-                </button>
+                  <div className="space-y-3">
+                    <button
+                      className="btn btn-secondary w-full"
+                      onClick={() => go('google')}
+                      disabled={busy !== null}
+                    >
+                      <GoogleIcon />
+                      <span>{busy === 'google' ? 'Signing in…' : 'Continue with Google'}</span>
+                    </button>
 
-                <button
-                  className="btn btn-secondary w-full"
-                  onClick={() => go('apple')}
-                  disabled={busy !== null}
-                >
-                  <AppleIcon />
-                  <span>{busy === 'apple' ? 'Signing in…' : 'Continue with Apple'}</span>
-                </button>
-              </div>
+                    <button
+                      className="btn btn-secondary w-full"
+                      onClick={() => go('apple')}
+                      disabled={busy !== null}
+                    >
+                      <AppleIcon />
+                      <span>{busy === 'apple' ? 'Signing in…' : 'Continue with Apple'}</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </>
           )}
 

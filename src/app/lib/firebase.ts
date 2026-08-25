@@ -23,6 +23,11 @@ import {
   currentMode,
   type EmergencyEndpoint,
 } from './firestoreFailover'
+import {
+  createStandbyFirestoreCredentialsProvider,
+  standbyAuth,
+  type StandbyFirestoreCredentialsProvider,
+} from './standbyAuth'
 import { getFunctions, type Functions } from 'firebase/functions'
 
 // The Firebase web API key is not a secret. Access is enforced by Firestore
@@ -124,10 +129,34 @@ function getConfiguredFirestore(
     // HTTPS reverse proxy. Firestore settings support both HTTPS/WSS and LAN
     // HTTP, preserve bracketed IPv6 authorities, and keep native SDK paths at
     // the configured origin root.
-    return initializeFirestore(app, {
+    type FirestoreSettingsWithPrivateProvider = Parameters<
+      typeof initializeFirestore
+    >[1] & {
+      credentials?: {
+        type: 'provider'
+        client: StandbyFirestoreCredentialsProvider
+      }
+    }
+    const settings = {
       ignoreUndefinedProperties: true,
-      ...(endpoint ? { host: endpoint.host, ssl: endpoint.ssl } : {}),
-    })
+      ...(endpoint
+        ? {
+            host: endpoint.host,
+            ssl: endpoint.ssl,
+            credentials: {
+              type: 'provider' as const,
+              client: createStandbyFirestoreCredentialsProvider(standbyAuth),
+            },
+          }
+        : {}),
+    } satisfies FirestoreSettingsWithPrivateProvider
+    // Firebase 10.14 supports this provider setting at runtime but omits it
+    // from the public FirestoreSettings declaration. Keep the compatibility
+    // boundary local and narrow; the provider contract is tested directly.
+    return initializeFirestore(
+      app,
+      settings as Parameters<typeof initializeFirestore>[1]
+    )
   } catch {
     return getFirestore(app)
   }
