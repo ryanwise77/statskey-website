@@ -1,23 +1,7 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.35",
+  "latest": "0.21.34",
   "releases": [
-    {
-      "version": "0.21.35",
-      "date": "2026-08-24",
-      "platforms": [
-        "macOS"
-      ],
-      "title": "Polished answers and openable result files",
-      "summary": "Makes Intelligence answers easier to read and gives generated workspace files safe Preview, Source, Canvas, Open PDF, and Reveal controls.",
-      "highlights": [
-        "Intelligence answers now render consistent headings, paragraphs, lists, task lists, tables, quotes, and code blocks in light and dark themes.",
-        "Generated Markdown and source files can be previewed in place, viewed as source, or opened safely in the workspace editor.",
-        "Planning sources open as read-only Canvas or Source views, while PDF results open in the system viewer or reveal their exact location.",
-        "HTTP and HTTPS sources show their real hostname; local file links stay confined to the currently bound workspace.",
-        "Update installation now waits until local and Mac mini agent work is idle instead of forcing a restart through active work."
-      ]
-    },
     {
       "version": "0.21.34",
       "date": "2026-08-24",
