@@ -1,7 +1,23 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.33",
+  "latest": "0.21.34",
   "releases": [
+    {
+      "version": "0.21.34",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Readable whole-workspace delegation",
+      "summary": "Run Intelligence on a Mac mini across an entire synchronized workspace, follow readable live progress, and open or preview remote Markdown results in place.",
+      "highlights": [
+        "Run one Intelligence tab on the Mac mini against one folder or the entire live workspace, in shared collaboration or an isolated merge-back copy.",
+        "Remote answers render as readable chat; generated Markdown files open in the workspace editor and preview inline on demand.",
+        "Progress uses larger type, opaque high-contrast surfaces, explicit success/error labels, and a bounded low-memory event feed.",
+        "Every authorized root is listed and signed; partial, broader, duplicate, nested, unreadable, or legacy-worker scopes fail closed.",
+        "Six-task capacity, the decline-retry guard, signed tool allowlists, output redaction, and completion contracts remain enforced."
+      ]
+    },
     {
       "version": "0.21.33",
       "date": "2026-08-24",
