@@ -3,24 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StatsKey for Clinicians | Patient-authorized context</title>
+    <title>StatsKey Care | Shared wellness context for professionals</title>
     <meta
       name="description"
-      content="Receive a focused, time-limited StatsKey record that your patient chose to share before their next visit."
+      content="Review a focused, time-limited StatsKey wellness record that a client or patient chose to share."
     />
-    <meta name="robots" content="noindex, follow" />
+    <meta name="robots" content="index, follow" />
     <meta
       property="og:title"
-      content="StatsKey for Clinicians"
+      content="StatsKey Care"
     />
     <meta
       property="og:description"
-      content="Patient-authorized wellness context for asynchronous review."
+      content="User-authorized wellness context for nutrition, fitness, and care professionals."
     />
     <meta
       property="og:url"
-      content="https://statskeybiometrics.com/for-clinicians"
+      content="https://statskey.ai/care"
     />
+    <link rel="canonical" href="https://statskey.ai/care" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -215,6 +216,43 @@
         line-height: 1.65;
       }
 
+      .professional-audiences {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .professional-audiences article {
+        min-height: 190px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--panel);
+      }
+
+      .professional-audiences span {
+        display: inline-flex;
+        margin-bottom: 28px;
+        color: var(--blue);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .professional-audiences h3 {
+        margin-bottom: 9px;
+        font-family: var(--font-display);
+        font-size: 18px;
+        letter-spacing: -0.03em;
+      }
+
+      .professional-audiences p {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
       .clinical-boundary {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -292,6 +330,10 @@
           grid-template-columns: 1fr;
         }
 
+        .professional-audiences {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
         .clinical-flow {
           grid-template-columns: 1fr;
         }
@@ -303,7 +345,8 @@
 
       @media (max-width: 620px) {
         .clinical-boundary,
-        .clinical-metrics {
+        .clinical-metrics,
+        .professional-audiences {
           grid-template-columns: 1fr;
         }
       }
@@ -313,17 +356,17 @@
     <nav id="nav" class="site-nav">
       <div class="site-nav__inner">
         <a href="/" class="site-brand" aria-label="StatsKey home">
-          <span class="site-brand__mark"></span>
+          <img class="site-brand__mark" src="/statskey-desktop-logo.svg?v=6" alt="" width="26" height="26" />
           <span>StatsKey</span>
         </a>
         <div class="site-nav__links" aria-label="Primary navigation">
           <a href="#how">How it works</a>
+          <a href="#audiences">Who it’s for</a>
           <a href="#boundary">Data boundary</a>
-          <a href="/for-dietitians">For dietitians</a>
-          <a href="/clinician/access">Clinician sign in</a>
+          <a href="/clinician/access">Professional sign in</a>
         </div>
         <a class="site-nav__cta" href="/clinician/access?mode=signup">
-          Clinician sign up
+          Create account
         </a>
         <button
           id="mobile-menu-btn"
@@ -338,10 +381,10 @@
       </div>
       <div id="mobile-menu" class="site-mobile-menu hidden">
         <a href="#how">How it works</a>
+        <a href="#audiences">Who it’s for</a>
         <a href="#boundary">Data boundary</a>
-        <a href="/for-dietitians">For dietitians</a>
-        <a href="/clinician/access">Clinician sign in</a>
-        <a href="/clinician/access?mode=signup">Clinician sign up</a>
+        <a href="/clinician/access">Professional sign in</a>
+        <a href="/clinician/access?mode=signup">Create account</a>
       </div>
     </nav>
 
@@ -351,42 +394,43 @@
         <div class="hero-orb hero-orb--data"></div>
         <div class="page-shell clinical-hero-grid">
           <div class="hero-copy">
-            <div class="eyebrow reveal">For physicians and care teams</div>
+            <div class="eyebrow reveal">For nutrition, fitness, and care professionals</div>
             <h1 class="hero-title reveal d1">
-              See the record your patient chose to bring.
+              See the record someone chose to share with you.
             </h1>
             <p class="hero-lede reveal d2">
-              StatsKey Care Sharing turns selected activity, nutrition,
+              StatsKey Care Sharing brings selected activity, nutrition,
               workouts, sleep, vitals, glucose summaries, body measurements,
-              and blood panels into one focused record for the next visit.
+              and blood panels into one focused view for an upcoming
+              consultation, coaching session, or visit.
             </p>
             <div class="hero-actions reveal d3">
               <a
                 class="button button--primary"
                 href="/clinician/access?mode=signup"
               >
-                Create clinician account
+                Create professional account
               </a>
               <a
                 class="button button--secondary"
                 href="/clinician/access"
               >
-                Clinician sign in
+                Professional sign in
               </a>
             </div>
             <div class="hero-note reveal d3">
-              The patient controls the categories, record window, recipient
+              The person sharing controls the categories, record window, recipient
               label, and expiration. Access can be revoked at any time.
             </div>
           </div>
 
-          <div class="clinical-window reveal d2" aria-label="Example patient record">
+          <div class="clinical-window reveal d2" aria-label="Example shared wellness record">
             <div class="clinical-window__bar">
               <span class="clinical-window__dots">
                 <span></span><span></span><span></span>
               </span>
-              <span>Patient-authorized record</span>
-              <span>Secure portal</span>
+              <span>User-authorized record</span>
+              <span>Time-limited access</span>
             </div>
             <div class="clinical-window__body">
               <div class="clinical-patient">
@@ -429,8 +473,44 @@
       <section class="statement-section">
         <div class="page-shell">
           <p class="statement-text reveal">
-            Less reconstruction. More time for the visit.
+            Less reconstruction. More time for the conversation.
           </p>
+        </div>
+      </section>
+
+      <section id="audiences" class="section-block section-block--split">
+        <div class="page-shell">
+          <div class="section-heading reveal">
+            <div class="eyebrow">Who it’s for</div>
+            <h2>One shared view. Many professional conversations.</h2>
+            <p>
+              The same person-authorized structure supports nutrition,
+              coaching, coordination, and clinical review without blurring
+              the boundary between wellness data and medical records.
+            </p>
+          </div>
+          <div class="professional-audiences">
+            <article class="reveal reveal-stagger-1">
+              <span>Care</span>
+              <h3>Physicians &amp; advanced practice clinicians</h3>
+              <p>Review selected trends and coverage before a visit.</p>
+            </article>
+            <article class="reveal reveal-stagger-2">
+              <span>Nutrition</span>
+              <h3>Dietitians &amp; nutritionists</h3>
+              <p>See nutrition totals, micronutrient coverage, and glucose context.</p>
+            </article>
+            <article class="reveal reveal-stagger-3">
+              <span>Coordination</span>
+              <h3>Diabetes educators &amp; care coordinators</h3>
+              <p>Bring daily patterns into focused follow-up conversations.</p>
+            </article>
+            <article class="reveal reveal-stagger-4">
+              <span>Performance</span>
+              <h3>Health coaches &amp; performance professionals</h3>
+              <p>Connect selected fueling, activity, training, and recovery context.</p>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -438,34 +518,34 @@
         <div class="page-shell">
           <div class="section-heading reveal">
             <div class="eyebrow">How it works</div>
-            <h2>Permission stays with the patient.</h2>
+            <h2>Permission stays with the person sharing.</h2>
             <p>
-              Care Sharing is deliberately small: one patient, one scoped
+              Care Sharing is deliberately small: one person, one scoped
               record, one professional account, one expiration.
             </p>
           </div>
           <div class="clinical-flow">
             <article class="reveal reveal-stagger-1">
-              <h3>The patient chooses.</h3>
+              <h3>They choose what to share.</h3>
               <p>
-                In the iOS or Android app, the patient selects exactly which
-                categories and dates to share, names the intended office, and
-                confirms the disclosure.
+                In the iOS or Android app, the person selects exactly which
+                categories and dates to share, names the intended professional
+                or organization, and confirms the disclosure.
               </p>
             </article>
             <article class="reveal reveal-stagger-2">
-              <h3>You redeem once.</h3>
+              <h3>You redeem it once.</h3>
               <p>
                 A one-time code binds the record to your verified email and
-                professional portal. The code cannot be reused by another
+                professional account. The code cannot be reused by another
                 account.
               </p>
             </article>
             <article class="reveal reveal-stagger-3">
               <h3>Access ends cleanly.</h3>
               <p>
-                The patient can revoke the share immediately. Otherwise it
-                closes automatically on the selected expiration date.
+                The person who shared the record can revoke access immediately.
+                Otherwise it closes automatically on the selected expiration date.
               </p>
             </article>
           </div>
@@ -476,16 +556,16 @@
         <div class="page-shell">
           <div class="section-heading reveal">
             <div class="eyebrow">Designed with a boundary</div>
-            <h2>Useful context without pretending to be an EHR.</h2>
+            <h2>Useful wellness context, clearly separated from clinical records.</h2>
             <p>
-              StatsKey is a consumer wellness record. The portal keeps that
-              provenance visible instead of presenting it as verified clinical
-              documentation.
+              StatsKey is a consumer wellness record. The professional view
+              keeps its source and coverage visible instead of presenting it as
+              verified clinical documentation.
             </p>
           </div>
           <div class="clinical-boundary">
             <article class="reveal reveal-stagger-1">
-              <h3>What the patient can share</h3>
+              <h3>What can be shared</h3>
               <ul>
                 <li>Daily activity and sleep totals</li>
                 <li>Nutrition totals without meal names or notes</li>
@@ -495,12 +575,12 @@
               </ul>
             </article>
             <article class="reveal reveal-stagger-2">
-              <h3>What this portal is not</h3>
+              <h3>What StatsKey Care is not</h3>
               <ul>
                 <li>Not an emergency or alerting service</li>
-                <li>Not continuous patient monitoring</li>
+                <li>Not continuous monitoring</li>
                 <li>Not an EHR, order system, or verified lab feed</li>
-                <li>Not a substitute for clinical assessment</li>
+                <li>Not a substitute for professional judgment or clinical assessment</li>
                 <li>Not a place for treatment instructions or messaging</li>
               </ul>
             </article>
@@ -511,18 +591,18 @@
       <section class="section-block">
         <div class="page-shell">
           <div class="clinical-cta-card reveal">
-            <div class="eyebrow">Professional portal</div>
-            <h2>Ready when your patient sends the code.</h2>
+            <div class="eyebrow">StatsKey Care</div>
+            <h2>Ready when a client or patient sends a code.</h2>
             <p>
-              Create a separate clinician account with your professional email.
-              Your personal StatsKey account remains completely separate.
+              Create a separate professional account using your work email.
+              Your personal StatsKey account remains separate.
             </p>
             <div class="hero-actions" style="justify-content: center">
               <a
                 class="button button--primary"
                 href="/clinician/access?mode=signup"
               >
-                Clinician sign up
+                Create professional account
               </a>
               <a
                 class="button button--secondary"
@@ -532,9 +612,10 @@
               </a>
             </div>
             <p class="clinical-preview-note">
-              Private preview. Professional details are self-attested until the
-              credential-verification and regulated production environment are
-              approved. Do not use this preview for real patient information.
+              Preview access only. Professional details are self-attested;
+              credential verification and the regulated production environment
+              are not yet approved. Do not use this preview for real client or
+              patient information.
             </p>
           </div>
         </div>
@@ -545,8 +626,8 @@
       <div class="page-shell site-footer__inner">
         <span>StatsKey &copy; 2026</span>
         <div>
-          <a href="/for-dietitians">For dietitians</a>
-          <a href="/clinician/access">Clinician portal</a>
+          <a href="/care">StatsKey Care</a>
+          <a href="/clinician/access">Professional portal</a>
           <a href="/app/login">Personal sign in</a>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>

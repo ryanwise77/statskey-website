@@ -8,6 +8,16 @@ const DEV_REWRITES = {
   '/web-terms': '/web-terms.html',
   '/join': '/join.html',
   '/join/': '/join.html',
+  '/care': '/for-clinicians.html',
+  '/care/': '/for-clinicians.html',
+  '/doctor': '/for-clinicians.html',
+  '/doctor/': '/for-clinicians.html',
+  '/professionals': '/for-clinicians.html',
+  '/professionals/': '/for-clinicians.html',
+  '/for-clinicians': '/for-clinicians.html',
+  '/for-clinicians/': '/for-clinicians.html',
+  '/for-dietitians': '/for-dietitians.html',
+  '/for-dietitians/': '/for-dietitians.html',
   '/wellness': '/wellness.html',
   '/wellness/': '/wellness.html',
   '/cbm': '/cbm.html',
@@ -64,6 +74,8 @@ function devRewritePlugin() {
         const target = DEV_REWRITES[path]
         if (target) {
           req.url = qs ? `${target}?${qs}` : target
+        } else if (path === '/clinician' || path.startsWith('/clinician/')) {
+          req.url = qs ? `/clinician.html?${qs}` : '/clinician.html'
         } else if (path === '/app' || path.startsWith('/app/')) {
           req.url = qs ? `/app.html?${qs}` : '/app.html'
         }

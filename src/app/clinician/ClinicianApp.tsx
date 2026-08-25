@@ -54,7 +54,7 @@ const professionalRoles = [
   { id: 'registeredNurse', label: 'Registered nurse' },
   { id: 'registeredDietitian', label: 'Registered dietitian' },
   { id: 'careCoordinator', label: 'Care coordinator' },
-  { id: 'other', label: 'Other professional' },
+  { id: 'other', label: 'Nutritionist, coach, or other professional' },
 ]
 
 const specialtyOptions: Array<{
@@ -196,11 +196,11 @@ function ClinicianBootstrap() {
     return (
       <CenteredCard
         eyebrow="Private preview"
-        title="The clinician portal is not enabled here."
+        title="The professional portal is not enabled here."
       >
         <p>{error}</p>
         <p className="cp-muted">
-          No patient information was opened. This environment stays closed
+          No shared information was opened. This environment stays closed
           until the clinical data controls are approved.
         </p>
         <div className="cp-actions">
@@ -217,7 +217,7 @@ function ClinicianBootstrap() {
       </CenteredCard>
     )
   }
-  if (!context) return <FullPageStatus label="Opening clinician portal…" />
+  if (!context) return <FullPageStatus label="Opening professional portal…" />
   if (!context.registered || !context.profile || !context.profile.specialty) {
     return (
       <ProfileSetup
@@ -272,7 +272,7 @@ function AccessPage() {
   const [notice, setNotice] = useState<string | null>(null)
   const [localError, setLocalError] = useState<string | null>(() =>
     location.hash.length > 1 && !patientCode
-      ? 'This care-share link is incomplete or invalid. Ask the patient for a fresh code.'
+      ? 'This care-share link is incomplete or invalid. Ask the person sharing for a fresh code.'
       : null
   )
   const hasPendingCode = isCareShareCode(patientCode)
@@ -284,7 +284,7 @@ function AccessPage() {
     setLocalError(null)
     clearError()
     if (patientCode.trim() && !savePendingCareShareCode(patientCode)) {
-      setLocalError('Enter the complete care-share code from your patient.')
+      setLocalError('Enter the complete care-share code you received.')
       setBusy(false)
       return
     }
@@ -335,17 +335,18 @@ function AccessPage() {
         <BrandLockup />
         <div className="cp-access__story-copy">
           <span className="cp-eyebrow">Professional access</span>
-          <h1>Patient context, shared on their terms.</h1>
+          <h1>Shared context, on their terms.</h1>
           <p>
-            Review a time-limited record a patient chose to send before their
-            next visit. Every share is scoped, single-use, and revocable.
+            Review a time-limited record a client or patient chose to send
+            before a conversation or visit. Every share is scoped, single-use,
+            and revocable.
           </p>
         </div>
         <div className="cp-trust-list">
           <TrustPoint
             icon="01"
-            title="Patient authorized"
-            text="The patient chooses categories, dates, recipient label, and expiration."
+            title="Person authorized"
+            text="The person sharing chooses categories, dates, recipient label, and expiration."
           />
           <TrustPoint
             icon="02"
@@ -365,8 +366,8 @@ function AccessPage() {
           {hasPendingCode && (
             <div className="cp-code-waiting">
               <span className="cp-code-waiting__icon">✓</span>
-              Your patient’s care-share code is waiting. Sign in or create your
-              professional account to redeem it.
+              A care-share code is waiting. Sign in or create your professional
+              account to redeem it.
             </div>
           )}
           <div className="cp-segmented" aria-label="Professional account">
@@ -387,7 +388,7 @@ function AccessPage() {
           </div>
 
           <div className="cp-access-card__heading">
-            <span className="cp-eyebrow">Clinician portal</span>
+            <span className="cp-eyebrow">Professional portal</span>
             <h2>
               {mode === 'signin'
                 ? 'Welcome back.'
@@ -395,7 +396,7 @@ function AccessPage() {
             </h2>
             <p>
               {mode === 'signin'
-                ? 'Use your professional account—not a patient StatsKey login.'
+                ? 'Use your professional account—not a personal StatsKey login.'
                 : 'Start with a verified email, then add your practice details.'}
             </p>
           </div>
@@ -436,7 +437,7 @@ function AccessPage() {
                 required
               />
             </FormField>
-            <FormField label="Patient care-share code (optional)">
+            <FormField label="Care-share code (optional)">
               <input
                 autoCapitalize="none"
                 autoComplete="off"
@@ -444,7 +445,7 @@ function AccessPage() {
                 inputMode="text"
                 maxLength={96}
                 onChange={(event) => setPatientCode(event.target.value)}
-                placeholder="Paste the code from your patient"
+                placeholder="Paste the code you received"
                 spellCheck={false}
                 value={patientCode}
               />
@@ -454,14 +455,16 @@ function AccessPage() {
               </small>
             </FormField>
 
-            {(error || notice) && (
+            {(error || localError || notice) && (
               <div
                 className={`cp-message ${
-                  error ? 'cp-message--error' : 'cp-message--success'
+                  error || localError
+                    ? 'cp-message--error'
+                    : 'cp-message--success'
                 }`}
                 role="status"
               >
-                {error || notice}
+                {error || localError || notice}
               </div>
             )}
 
@@ -560,18 +563,16 @@ function VerifyEmailPage() {
       </div>
       <p>
         We sent a verification link to <strong>{user?.email}</strong>. This
-        keeps professional access separate from ordinary patient accounts. The
-        link returns to the clinician portal on iPhone, iPad, and Android.
+        keeps professional access separate from personal accounts. The
+        link returns to the professional portal on iPhone, iPad, and Android.
       </p>
-            {(error || localError || notice) && (
+      {(error || notice) && (
         <div
           className={`cp-message ${
-                  error || localError
-                    ? 'cp-message--error'
-                    : 'cp-message--success'
+            error ? 'cp-message--error' : 'cp-message--success'
           }`}
         >
-                {error || localError || notice}
+          {error || notice}
         </div>
       )}
       <div className="cp-actions cp-actions--stack-mobile">
@@ -682,7 +683,7 @@ function ProfileSetup({
         <h1>Shape the portal around your practice.</h1>
         <p className="cp-lede">
           Your role and specialty determine the first dashboard StatsKey
-          prepares. You will review that layout before any patient record can
+          prepares. You will review that layout before any shared record can
           appear.
         </p>
 
@@ -810,7 +811,7 @@ function ProfileSetup({
           <div className="cp-credential-note">
             <strong>Credential verification is optional for signup</strong>
             <p>
-              You can finish signup, receive patient codes, and use the
+              You can finish signup, receive care-share codes, and use the
               professional portal without a verification check. If you submit
               a credential, it remains pending until matched to the issuing
               registry. Dietitian registrations use the{' '}
@@ -834,7 +835,7 @@ function ProfileSetup({
               required
             />
             <span>
-              I will use patient-authorized records only for asynchronous
+              I will use person-authorized records only for asynchronous
               review. I understand this preview is not an EHR, emergency
               service, or continuous monitoring system.
             </span>
@@ -892,7 +893,7 @@ function DashboardSetup({
       patientCode.trim() &&
       !savePendingCareShareCode(patientCode)
     ) {
-      setError('Enter the complete care-share code from your patient.')
+      setError('Enter the complete care-share code you received.')
       return
     }
     if (!embedded && !patientCode.trim()) clearPendingCareShareCode()
@@ -923,7 +924,7 @@ function DashboardSetup({
       </h1>
       <p className="cp-lede">
         StatsKey selected these modules from your role and specialty. Adjust
-        them now or return here later. This setup contains no patient data.
+        them now or return here later. This setup contains no shared data.
       </p>
 
       <div className="cp-dashboard-module-grid">
@@ -952,21 +953,21 @@ function DashboardSetup({
       {!embedded && (
         <div className="cp-onboarding-share-code">
           <div>
-            <span className="cp-eyebrow">Optional patient handoff</span>
-            <h2>Already have a patient code?</h2>
+            <span className="cp-eyebrow">Optional care share</span>
+            <h2>Already have a share code?</h2>
             <p>
               Enter it now. After setup, StatsKey will take you directly to
               secure redemption.
             </p>
           </div>
-          <FormField label="Patient care-share code">
+          <FormField label="Care-share code">
             <input
               autoCapitalize="none"
               autoComplete="off"
               autoCorrect="off"
               maxLength={96}
               onChange={(event) => setPatientCode(event.target.value)}
-              placeholder="Paste the code from your patient"
+              placeholder="Paste the code you received"
               spellCheck={false}
               value={patientCode}
             />
@@ -1015,7 +1016,7 @@ function DashboardSetup({
           ? 'Saving workspace…'
           : embedded
             ? 'Save dashboard'
-            : 'Open clinician portal'}
+            : 'Open professional portal'}
       </button>
     </>
   )
@@ -1077,10 +1078,10 @@ function PortalShell({
             ) : null}
           </div>
         </div>
-        <nav className="cp-sidebar__nav" aria-label="Clinician portal">
+        <nav className="cp-sidebar__nav" aria-label="Professional portal">
           <NavLink to="/" end>
             <PortalIcon symbol="⌂" />
-            Patient records
+            Shared records
           </NavLink>
           {profile.canReceiveShares && (
             <NavLink to="/redeem">
@@ -1237,8 +1238,8 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
           !profile.canReceiveShares
             ? 'Finish primary-source credential verification before inviting clients or receiving records.'
             : profile.cdrNumber
-            ? `CDR# ${profile.cdrNumber}. Review only the records patients deliberately shared with your professional account.`
-            : 'Review only the records patients deliberately shared with your professional account.'
+            ? `CDR# ${profile.cdrNumber}. Review only the records people deliberately shared with your professional account.`
+            : 'Review only the records people deliberately shared with your professional account.'
         }
         action={
           profile.canReceiveShares ? (
@@ -1268,8 +1269,8 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
             <span className="cp-eyebrow">{specialtyName(profile)} workspace</span>
             <h2>Your dashboard emphasis</h2>
             <p>
-              Prepared before patient data arrives. These modules change
-              presentation, never a patient’s sharing permissions.
+              Prepared before shared data arrives. These modules change
+              presentation, never someone’s sharing permissions.
             </p>
           </div>
           <Link className="cp-button cp-button--secondary" to="/setup">
@@ -1397,9 +1398,9 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
                       className={`cp-pairing-state cp-pairing-state--${request.status}`}
                     >
                       {request.status === 'confirmed'
-                        ? 'Confirmed · waiting for patient authorization'
+                        ? 'Confirmed · waiting for authorization'
                         : request.status === 'revoked'
-                          ? 'Disconnected by patient'
+                          ? 'Disconnected by the person sharing'
                           : 'Not confirmed'}
                     </div>
                   )}
@@ -1413,14 +1414,14 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
       <section className="cp-panel cp-records-panel">
         <div className="cp-panel__header">
           <div>
-            <span className="cp-eyebrow">Patient inbox</span>
+            <span className="cp-eyebrow">Shared records</span>
             <h2>Shared records</h2>
           </div>
           <button
             className="cp-icon-button"
             onClick={() => void load()}
             disabled={loading}
-            aria-label="Refresh patient records"
+            aria-label="Refresh shared records"
           >
             ↻
           </button>
@@ -1430,15 +1431,15 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
           <div className="cp-message cp-message--error">{error}</div>
         )}
         {loading ? (
-          <InlineLoading label="Refreshing patient records…" />
+          <InlineLoading label="Refreshing shared records…" />
         ) : shares.length === 0 ? (
           <div className="cp-empty">
             <div className="cp-empty__icon">＋</div>
-            <h3>No patient records yet.</h3>
+            <h3>No shared records yet.</h3>
             <p>
               {profile.canReceiveShares
-                ? 'A confirmed pairing still contains no health data. Ask the patient to create a scoped Care Share when they are ready.'
-                : 'Patient records remain unavailable until primary-source credential verification is complete.'}
+                ? 'A confirmed pairing still contains no health data. Ask the person to create a scoped Care Share when they are ready.'
+                : 'Shared records remain unavailable until primary-source credential verification is complete.'}
             </p>
             {profile.canReceiveShares && (
               <Link className="cp-button cp-button--secondary" to="/redeem">
@@ -1455,10 +1456,10 @@ function Dashboard({ profile }: { profile: ClinicianProfile }) {
                 to={`/shares/${share.id}`}
               >
                 <div className="cp-record-row__avatar">
-                  {initials(share.patientDisplayName || 'Patient')}
+                  {initials(share.patientDisplayName || 'Shared')}
                 </div>
                 <div className="cp-record-row__main">
-                  <strong>{share.patientDisplayName || 'Patient record'}</strong>
+                  <strong>{share.patientDisplayName || 'Shared record'}</strong>
                   <span>
                     For {share.recipientLabel} ·{' '}
                     {categoryLabel(share.categoryIDs.length)} ·{' '}
@@ -1497,7 +1498,7 @@ function RedeemShare() {
     setError(
       nextCode
         ? null
-        : 'This care-share link is incomplete or invalid. Ask the patient for a fresh code.'
+        : 'This care-share link is incomplete or invalid. Ask the person sharing for a fresh code.'
     )
   }, [location.hash])
 
@@ -1521,7 +1522,7 @@ function RedeemShare() {
     try {
       const pendingCode = savePendingCareShareCode(token)
       if (!pendingCode) {
-        setError('Enter the complete care-share code from your patient.')
+        setError('Enter the complete care-share code you received.')
         return
       }
       const result = await redeemClinicalShare(pendingCode)
@@ -1538,8 +1539,8 @@ function RedeemShare() {
     <main className="cp-page cp-page--narrow">
       <PageHeader
         eyebrow="One-time access"
-        title="Redeem a patient care share."
-        description="Paste the code from your patient. It can be used once and binds the record to this professional account."
+        title="Redeem a care share."
+        description="Paste the code you received. It can be used once and binds the record to this professional account."
       />
       <section className="cp-panel cp-redeem-card">
         <div className="cp-redeem-card__icon">⌁</div>
@@ -1548,7 +1549,7 @@ function RedeemShare() {
           Codes are case-sensitive. Spaces added for readability are fine.
         </p>
         <form className="cp-form" onSubmit={redeem}>
-          <FormField label="Patient-provided code">
+          <FormField label="Care-share code">
             <input
               className="cp-code-input"
               value={token}
@@ -1660,7 +1661,7 @@ function ShareDetail() {
     return (
       <main className="cp-page cp-page--narrow">
         <Link className="cp-back-link" to="/">
-          ← Patient records
+          ← Shared records
         </Link>
         <section className="cp-panel cp-empty">
           <h2>Record unavailable.</h2>
@@ -1673,14 +1674,14 @@ function ShareDetail() {
   return (
     <main className="cp-page">
       <Link className="cp-back-link" to="/">
-        ← Patient records
+        ← Shared records
       </Link>
       <PageHeader
-        eyebrow="Patient-authorized record"
+        eyebrow="Person-authorized record"
         title={
           snapshot?.patient.displayName ||
           summary.patientDisplayName ||
-          'Patient record'
+          'Shared record'
         }
         description={`${dateRange(
           summary.rangeStart,
@@ -1694,7 +1695,7 @@ function ShareDetail() {
           <div className="cp-boundary-card__icon">⊘</div>
           <h2>This record is {summary.status}.</h2>
           <p>
-            The patient’s authorization no longer permits access. Previously
+            The sharing authorization no longer permits access. Previously
             opened data is not available from this portal.
           </p>
         </section>
@@ -1745,8 +1746,8 @@ function AcknowledgementCard({
       <span className="cp-eyebrow">Before opening</span>
       <h2>Acknowledge the record boundary.</h2>
       <p>
-        This is a patient-authorized StatsKey wellness record for asynchronous
-        review. It may include patient-entered and device-synced information.
+        This is a person-authorized StatsKey wellness record for asynchronous
+        review. It may include manually entered and device-synced information.
       </p>
       <div className="cp-scope-grid">
         <ScopeItem
@@ -1769,7 +1770,7 @@ function AcknowledgementCard({
       <ul className="cp-boundary-list">
         <li>Not an EHR or source of verified clinical orders.</li>
         <li>Not for emergencies, alerts, or continuous monitoring.</li>
-        <li>Use only for the patient-authorized review purpose.</li>
+        <li>Use only for the authorized review purpose.</li>
       </ul>
       {error && <div className="cp-message cp-message--error">{error}</div>}
       <button
@@ -1794,7 +1795,7 @@ function ClinicalRecord({
     <>
       <section className="cp-record-hero">
         <div>
-          <span className="cp-record-hero__label">Shared by patient</span>
+          <span className="cp-record-hero__label">Shared by the account holder</span>
           <h2>{snapshot.patient.displayName}</h2>
           <p>{snapshot.disclosure.source}</p>
         </div>
@@ -2245,7 +2246,7 @@ function SnapshotRecordCard({
                   {formatValue(result.valueReported)}{' '}
                   <small>{String(result.unitReported || '')}</small>
                 </strong>
-                {result.needsReview === true && <em>Patient review flag</em>}
+                {result.needsReview === true && <em>Review flag</em>}
               </div>
             )
           })}
@@ -2325,7 +2326,7 @@ function BrandLockup() {
       <span className="cp-brand__mark" />
       <span>
         <strong>StatsKey</strong>
-        <small>Clinician portal</small>
+        <small>Professional portal</small>
       </span>
     </Link>
   )
@@ -2600,5 +2601,5 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function message(error: unknown): string {
   return error instanceof Error
     ? error.message
-    : 'The clinician portal could not complete that request.'
+    : 'The professional portal could not complete that request.'
 }

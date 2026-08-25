@@ -400,7 +400,7 @@ function clinicalErrorMessage(error: unknown): string {
     case 'appCheck/initial-throttle':
       return 'This browser could not be verified. Refresh and try again.'
     default:
-      return message || 'The clinician portal could not complete that request.'
+      return message || 'The professional portal could not complete that request.'
   }
 }
 

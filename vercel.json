@@ -263,6 +263,30 @@
       "destination": "/join.html"
     },
     {
+      "source": "/care",
+      "destination": "/for-clinicians.html"
+    },
+    {
+      "source": "/care/",
+      "destination": "/for-clinicians.html"
+    },
+    {
+      "source": "/doctor",
+      "destination": "/for-clinicians.html"
+    },
+    {
+      "source": "/doctor/",
+      "destination": "/for-clinicians.html"
+    },
+    {
+      "source": "/professionals",
+      "destination": "/for-clinicians.html"
+    },
+    {
+      "source": "/professionals/",
+      "destination": "/for-clinicians.html"
+    },
+    {
       "source": "/for-dietitians",
       "destination": "/for-dietitians.html"
     },
