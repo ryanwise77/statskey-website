@@ -14,12 +14,15 @@ import {
   type Auth,
 } from 'firebase/auth'
 import {
-  connectFirestoreEmulator,
   getFirestore,
   initializeFirestore,
   type Firestore,
 } from 'firebase/firestore'
-import { currentMode, mirrorHost } from './firestoreFailover'
+import {
+  configuredEmergencyEndpoint,
+  currentMode,
+  type EmergencyEndpoint,
+} from './firestoreFailover'
 import { getFunctions, type Functions } from 'firebase/functions'
 
 // The Firebase web API key is not a secret. Access is enforced by Firestore
@@ -44,16 +47,11 @@ export const firebaseApp: FirebaseApp =
 
 export const appCheck: AppCheck | null = getConfiguredAppCheck(firebaseApp)
 export const auth: Auth = getConfiguredAuth(firebaseApp)
-export const db: Firestore = getConfiguredFirestore(firebaseApp)
-
-// Self-hosted redundancy: when the failover controller has flipped the app to
-// mirror mode (Google interrupted), bind Firestore to the statskey-server
-// mirror instead. This must run before the first Firestore operation, which
-// module-init order guarantees. See lib/firestoreFailover.ts.
-if (typeof window !== 'undefined' && currentMode() === 'mirror') {
-  const [mirrorHostname, mirrorPort] = mirrorHost().split(':')
-  connectFirestoreEmulator(db, mirrorHostname, Number(mirrorPort) || 8380)
-}
+const emergencyEndpoint =
+  typeof window !== 'undefined' && currentMode() === 'mirror'
+    ? configuredEmergencyEndpoint()
+    : null
+export const db: Firestore = getConfiguredFirestore(firebaseApp, emergencyEndpoint)
 export const functions: Functions = getFunctions(firebaseApp)
 
 function getConfiguredAppCheck(app: FirebaseApp): AppCheck | null {
@@ -117,9 +115,19 @@ function getConfiguredAuth(app: FirebaseApp): Auth {
   }
 }
 
-function getConfiguredFirestore(app: FirebaseApp): Firestore {
+function getConfiguredFirestore(
+  app: FirebaseApp,
+  endpoint: EmergencyEndpoint | null
+): Firestore {
   try {
-    return initializeFirestore(app, { ignoreUndefinedProperties: true })
+    // `connectFirestoreEmulator` hardcodes plaintext and cannot target an
+    // HTTPS reverse proxy. Firestore settings support both HTTPS/WSS and LAN
+    // HTTP, preserve bracketed IPv6 authorities, and keep native SDK paths at
+    // the configured origin root.
+    return initializeFirestore(app, {
+      ignoreUndefinedProperties: true,
+      ...(endpoint ? { host: endpoint.host, ssl: endpoint.ssl } : {}),
+    })
   } catch {
     return getFirestore(app)
   }

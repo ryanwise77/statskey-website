@@ -9,6 +9,7 @@
     "build:founder-history": "node scripts/build-founder-history.mjs",
     "refresh:founder-history": "node scripts/refresh-founder-history.mjs",
     "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",
+    "test:firestore-failover": "node --test scripts/firestore-failover.test.ts",
     "preview": "vite preview",
     "check:deploy": "node scripts/check-deploy-ready.mjs"
   },
