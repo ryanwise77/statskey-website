@@ -1,7 +1,24 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.34",
+  "latest": "0.21.35",
   "releases": [
+    {
+      "version": "0.21.35",
+      "date": "2026-08-24",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Polished answers, previews, and openable results",
+      "summary": "Makes Intelligence answers and browser results easier to review, gives generated files safe preview and reveal controls, and turns Mac mini preflight failures into clear, recoverable actions.",
+      "highlights": [
+        "Intelligence answers use clean structured formatting, and controlled-browser captures appear as private static visual cards without another foreground window.",
+        "Generated Markdown and source files can be previewed in place, viewed as source, or opened safely in the workspace editor.",
+        "Planning sources open as read-only Canvas or Source views, while PDF results open in the system viewer or reveal their exact location.",
+        "HTTP and HTTPS sources show their real hostname; local file links stay confined to the currently bound workspace.",
+        "The Intelligence header can start or retry exact-scope Live Sync, while update installation waits until local and Mac mini agent work is idle before restarting.",
+        "Local images, PDFs, and binary attachments no longer cancel Mac mini turns: bounded text and metadata continue, and the UI clearly says media bytes stay on this Mac."
+      ]
+    },
     {
       "version": "0.21.34",
       "date": "2026-08-24",
