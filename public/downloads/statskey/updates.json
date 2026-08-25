@@ -1,7 +1,37 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.35",
+  "latest": "0.21.37",
   "releases": [
+    {
+      "version": "0.21.37",
+      "date": "2026-08-25",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Reliable autonomous execution",
+      "summary": "Intelligence now carries remote and local execution tasks through the action phase instead of stopping after investigation.",
+      "highlights": [
+        "Crew research no longer consumes the lead agent's execution budget.",
+        "Mixed implementation and deployment work keeps its terminal and action tools available.",
+        "Unverified terminal-unavailable handoffs are rejected and resumed automatically under every approval preference."
+      ]
+    },
+    {
+      "version": "0.21.36",
+      "date": "2026-08-25",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Autonomous Intelligence that finishes",
+      "summary": "Execute tasks now continue past preliminary checks, preserve truthful completion status, and present remote progress and file changes in a clearer Workboard.",
+      "highlights": [
+        "Multi-step installs and deployments retain their tools through a bounded completion loop instead of stopping after six decision cycles.",
+        "An earlier successful probe can no longer promote an explicitly unfinished job to Done.",
+        "Intelligence shows live crew progress, readable delegated output, and clickable file-change totals with additions and deletions.",
+        "Provider explanations survive tab switches while remaining outside durable active-run storage.",
+        "Entire-workspace Mac mini collaboration preserves every approved synchronized root."
+      ]
+    },
     {
       "version": "0.21.35",
       "date": "2026-08-24",
