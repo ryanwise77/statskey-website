@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StatsKey Network | Beat Visa on total cost</title>
-    <meta name="description" content="The StatsKey offer: replace Visa only where a rights-equivalent, fully loaded alternative is provably cheaper—and retain Visa everywhere else." />
-    <meta property="og:title" content="StatsKey Network | Beat Visa on total cost" />
-    <meta property="og:description" content="One open-book cost test. Replace Visa where the complete alternative wins; retain Visa wherever it does not." />
+    <title>StatsKey Network | Beat Visa and Mastercard on total cost</title>
+    <meta name="description" content="Replace Visa or Mastercard only where a rights-equivalent, fully loaded alternative is provably cheaper—and retain the incumbent everywhere else." />
+    <meta property="og:title" content="StatsKey Network | Beat Visa and Mastercard on total cost" />
+    <meta property="og:description" content="Preserve the rights, expose every cost, and let the lower complete cost win." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://statskey.ai/network" />
     <meta name="twitter:card" content="summary" />
@@ -102,50 +102,50 @@
         <div class="network-orb network-orb--two" aria-hidden="true"></div>
         <div class="page-shell network-hero__grid">
           <div class="network-hero__copy reveal">
-            <div class="eyebrow">The Visa replacement offer</div>
-            <h1>Beat Visa on total cost. Or don’t switch.</h1>
-            <p>The buying rule is one subtraction. Start with the merchant’s actual, fully loaded Visa cost. On a $100 payment, StatsKey’s planning software fee is $0.11. What remains is the ceiling for the rail, sponsor bank, processor, compliance, losses, liquidity, operations, certification, recourse, and a required safety margin.</p>
+            <div class="eyebrow">The Visa + Mastercard replacement offer</div>
+            <h1>Beat Visa and Mastercard on total cost. Or don’t switch.</h1>
+            <p>For each matched payment, start with the merchant’s actual, fully loaded cost of accepting it through Visa or Mastercard, net of rebates. Compare it with a rights-equivalent alternative that includes the rail, sponsor bank, processor, compliance, losses, liquidity, operations, certification, disputes, recourse, StatsKey software, and a required safety margin.</p>
             <div class="network-hero__actions">
               <a class="button button--primary" href="#economics">Run the cost test</a>
               <a class="button button--secondary" href="#control-plane">Inspect the control plane</a>
             </div>
-            <p class="network-boundary"><span></span><strong>The offer is conditional.</strong> Deliver equivalent rights for less—or leave Visa in place.</p>
+            <p class="network-boundary"><span></span><strong>The offer is conditional.</strong> Deliver equivalent rights for less—or leave that network in place.</p>
           </div>
 
-          <div class="visa-math-card reveal d2" aria-label="Visa replacement cost test">
+          <div class="visa-math-card reveal d2" aria-label="Visa and Mastercard replacement cost test">
             <div class="visa-math-card__head">
-              <span>Visa replacement test</span>
+              <span>Visa + Mastercard replacement test</span>
               <small>Comparable $100 payment</small>
             </div>
             <div class="visa-math-card__equation">
               <div class="visa-math-card__line">
-                <div><span>Merchant’s actual Visa total</span><small>Matched cohort, net of rebates</small></div>
-                <strong>V</strong>
+                <div><span>Incumbent route’s proven floor</span><small>N ∈ {Visa, Mastercard} · matched cohort, net of rebates</small></div>
+                <strong>N<sup>lower</sup></strong>
               </div>
               <div class="visa-math-card__operator" aria-hidden="true">−</div>
               <div class="visa-math-card__line">
                 <div><span>StatsKey planning software</span><small>0.08% × $100 + $0.03</small></div>
                 <strong>$0.11</strong>
               </div>
-              <div class="visa-math-card__operator" aria-hidden="true">=</div>
+              <div class="visa-math-card__operator" aria-hidden="true">⇒</div>
               <div class="visa-math-card__line visa-math-card__line--result">
-                <div><span>Budget for everything else</span><small>Before the required safety margin</small></div>
-                <strong>V − $0.11</strong>
+                <div><span>Strict ceiling for everything else</span><small>R is the fully loaded non-StatsKey stack</small></div>
+                <strong>R &lt; N<sup>lower</sup> − $0.11 − M</strong>
               </div>
             </div>
             <div class="visa-math-card__rule">
-              <code>R + $0.11 + M &lt; V</code>
-              <p><strong>R</strong> is the fully loaded non-StatsKey stack. <strong>M</strong> is the safety margin.</p>
+              <code>A<sup>upper</sup>(x) + M(x) &lt; N<sup>lower</sup>(x)</code>
+              <p>Because A(x) ≤ A<sup>upper</sup>(x) and N<sup>lower</sup>(x) ≤ N(x), transitivity makes A(x) &lt; N(x) unavoidable while the premises hold.</p>
               <div>
-                <span><small>True</small><strong>Replace Visa</strong></span>
-                <span><small>False or unproved</small><strong>Retain Visa</strong></span>
+                <span><small>True + rights-equivalent</small><strong>Replace that network</strong></span>
+                <span><small>False, incomplete, or unproved</small><strong>Retain it</strong></span>
               </div>
             </div>
             <div class="visa-math-card__example">
-              <strong>Illustrative merchant input—not Visa pricing.</strong>
-              <p>If the merchant’s records show $3.20 on a comparable $100 payment, $3.09 remains before margin for every non-StatsKey component. That is a cost ceiling, not projected savings.</p>
+              <strong>Illustrative merchant input—not Visa or Mastercard pricing.</strong>
+              <p>If matched records establish a $3.20 incumbent-route floor on a comparable $100 payment, $3.09 remains before margin for every non-StatsKey component. That is a cost ceiling, not projected savings.</p>
             </div>
-            <p class="visa-math-card__boundary"><strong>The buying rule is simple. The infrastructure is not.</strong> Live replacement still requires contracted sponsor, rail, processing, compliance, liquidity, loss allocation, and certification.</p>
+            <p class="visa-math-card__boundary"><strong>The certainty is deductive and conditional.</strong> The inequality proves the cost conclusion; it does not prove its premises or production readiness. Live replacement still requires contracted sponsor, rail, processing, compliance, liquidity, loss allocation, recourse, and certification.</p>
             <div class="visa-math-card__formula">
               <span>Any amount x</span>
               <code>S(x) = 0.0008x + $0.03</code>
@@ -159,9 +159,9 @@
           <div class="network-section-heading reveal">
             <div>
               <div class="eyebrow">The bid is in the architecture</div>
-              <h2>Price every consequence. Hide none.</h2>
+              <h2>Make every avoidable dollar contestable.</h2>
             </div>
-            <p>A low sticker fee is not a low-cost system. StatsKey counts software, operator, sponsor, loss, returns, disputes, liquidity, operations, transition, payer friction, and public externalities before it calls a route cheaper.</p>
+            <p>Competition does not need a slogan. Preserve the rights, expose every cost, and let the lower complete cost win. StatsKey counts software, operator, sponsor, loss, returns, disputes, liquidity, operations, transition, payer friction, and public externalities before it calls a route cheaper.</p>
           </div>
           <div class="network-metrics reveal d1">
             <article><span>Planning software rate</span><strong>8 bps + $0.03</strong><small>Visible, editable model—not a binding quote</small></article>
@@ -174,11 +174,11 @@
       <section class="network-proof-section">
         <div class="page-shell network-proof-grid">
           <article class="network-proof reveal">
-            <p class="network-proof__kicker">CONDITIONAL GUARANTEE</p>
-            <h2>Cheaper means proved cheaper.</h2>
-            <p>The router may switch only when an eligible alternative's conservative upper cost, plus a required margin, is below the incumbent's conservative lower cost.</p>
-            <code>C<sub>alternative</sub><sup>upper</sup> + margin &lt; C<sub>incumbent</sub><sup>lower</sup></code>
-            <div class="network-proof__outcome"><span>If every premise is current and true</span><strong>The conclusion follows by construction.</strong></div>
+            <p class="network-proof__kicker">CONDITIONAL DEDUCTIVE CERTAINTY</p>
+            <h2>Once the premises hold, the conclusion cannot flip.</h2>
+            <p>The router may switch only when the complete alternative’s conservative upper cost, plus a positive margin, is below the incumbent route’s conservative lower cost.</p>
+            <code>A<sub>actual</sub> ≤ A<sup>upper</sup> &lt; A<sup>upper</sup> + M &lt; N<sup>lower</sup> ≤ N<sub>actual</sub></code>
+            <div class="network-proof__outcome"><span>If every premise is current, comparable, and true</span><strong>Alternative cost is lower by transitivity.</strong></div>
           </article>
           <div class="network-premises reveal d2">
             <div class="network-premises__head"><span>Premise ledger</span><small>Every send rechecks it</small></div>
@@ -188,7 +188,7 @@
               <li><span>03</span><div><strong>Fresh evidence</strong><small>Reachability, fraud, liquidity, recovery</small></div><em>required</em></li>
               <li><span>04</span><div><strong>Stakeholder floors</strong><small>No savings manufactured by exporting harm</small></div><em>required</em></li>
             </ul>
-            <p>This is a guarantee of the decision under stated premises—not a claim that an alternative will always exist or always beat the incumbent.</p>
+            <p>This is certainty of the cost conclusion under stated premises—not proof that the premises are true, that an eligible alternative always exists, or that production readiness has been achieved.</p>
           </div>
         </div>
       </section>
