@@ -121,7 +121,7 @@
 .network-hero__grid {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.04fr) minmax(420px, 0.76fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(480px, 0.9fr);
   align-items: center;
   gap: clamp(46px, 7vw, 90px);
 }
@@ -130,10 +130,10 @@
   max-width: 760px;
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(4.15rem, 7.2vw, 7.1rem);
+  font-size: clamp(3.75rem, 6.4vw, 6.45rem);
   font-weight: 540;
   letter-spacing: -0.065em;
-  line-height: 0.88;
+  line-height: 0.9;
 }
 
 .network-hero__copy > p:not(.network-boundary) {
@@ -173,6 +173,219 @@
 .network-boundary strong {
   color: #176a52;
   font-weight: 650;
+}
+
+.visa-math-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(19, 87, 167, 0.2);
+  border-radius: 28px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 32px 80px rgba(42, 91, 151, 0.16);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.visa-math-card::before {
+  content: "";
+  position: absolute;
+  top: -150px;
+  right: -140px;
+  width: 360px;
+  height: 360px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(52, 163, 238, 0.16), transparent 68%);
+  pointer-events: none;
+}
+
+.visa-math-card__head,
+.visa-math-card__formula {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.visa-math-card__head {
+  min-height: 42px;
+  padding: 0 5px 13px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.visa-math-card__head > span {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.visa-math-card__head > small {
+  color: var(--muted);
+  font-size: inherit;
+}
+
+.visa-math-card__equation {
+  position: relative;
+  padding: 11px 0 4px;
+}
+
+.visa-math-card__line {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 10px;
+}
+
+.visa-math-card__line div {
+  display: grid;
+  gap: 4px;
+}
+
+.visa-math-card__line span {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.visa-math-card__line small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.visa-math-card__line > strong {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 580;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.visa-math-card__line--result {
+  border: 1px solid rgba(0, 102, 204, 0.16);
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(235, 246, 255, 0.94), rgba(248, 252, 255, 0.9));
+}
+
+.visa-math-card__line--result > strong {
+  color: var(--blue);
+}
+
+.visa-math-card__operator {
+  height: 12px;
+  padding-left: 12px;
+  color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 12px;
+}
+
+.visa-math-card__rule {
+  margin-top: 10px;
+  border-radius: 17px;
+  padding: 17px;
+  background: linear-gradient(145deg, #071d38, #0a4373);
+  color: #fff;
+}
+
+.visa-math-card__rule > code {
+  display: block;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 1.7vw, 1.23rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.visa-math-card__rule > p {
+  margin-top: 8px;
+  color: #bcd4e8;
+  font-size: 10px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.visa-math-card__rule > p strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.visa-math-card__rule > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.visa-math-card__rule > div > span {
+  display: grid;
+  gap: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 11px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.visa-math-card__rule small {
+  color: #92b4d0;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.visa-math-card__rule > div strong {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.visa-math-card__example {
+  margin: 13px 4px 0;
+}
+
+.visa-math-card__example > strong {
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.visa-math-card__example p,
+.visa-math-card__boundary {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.visa-math-card__boundary {
+  margin: 11px 4px 0;
+  padding-top: 11px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.visa-math-card__boundary strong {
+  color: var(--ink-2);
+  font-weight: 650;
+}
+
+.visa-math-card__formula {
+  margin: 11px 4px 0;
+  color: var(--muted);
+}
+
+.visa-math-card__formula code {
+  color: var(--blue);
+  font-size: 10px;
+  letter-spacing: -0.02em;
+  text-transform: none;
 }
 
 .decision-card {
@@ -907,6 +1120,10 @@
     max-width: 720px;
   }
 
+  .visa-math-card {
+    max-width: 760px;
+  }
+
   .network-proof {
     min-height: 500px;
   }
@@ -994,6 +1211,28 @@
   .decision-card {
     border-radius: 22px;
     padding: 10px;
+  }
+
+  .visa-math-card {
+    border-radius: 22px;
+    padding: 13px;
+  }
+
+  .visa-math-card__head > small {
+    display: none;
+  }
+
+  .visa-math-card__line {
+    gap: 12px;
+    padding-inline: 8px;
+  }
+
+  .visa-math-card__line > strong {
+    font-size: 1.18rem;
+  }
+
+  .visa-math-card__rule {
+    padding: 15px 12px;
   }
 
   .decision-flow li {

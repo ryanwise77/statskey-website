@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StatsKey Network | The payment decision, made legible</title>
-    <meta name="description" content="StatsKey Network is a working, deterministic payment control-plane sandbox: prove the eligible low-cost route, preserve rights, and retain the incumbent whenever the proof fails." />
-    <meta property="og:title" content="StatsKey Network | The payment decision, made legible" />
-    <meta property="og:description" content="A working payment control-plane sandbox with open-book economics, fail-closed routing, and an explicit sponsor boundary." />
+    <title>StatsKey Network | Beat Visa on total cost</title>
+    <meta name="description" content="The StatsKey offer: replace Visa only where a rights-equivalent, fully loaded alternative is provably cheaper—and retain Visa everywhere else." />
+    <meta property="og:title" content="StatsKey Network | Beat Visa on total cost" />
+    <meta property="og:description" content="One open-book cost test. Replace Visa where the complete alternative wins; retain Visa wherever it does not." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://statskey.ai/network" />
     <meta name="twitter:card" content="summary" />
@@ -102,31 +102,53 @@
         <div class="network-orb network-orb--two" aria-hidden="true"></div>
         <div class="page-shell network-hero__grid">
           <div class="network-hero__copy reveal">
-            <div class="eyebrow">Payment infrastructure, made legible</div>
-            <h1>The payment decision is software.</h1>
-            <p>StatsKey Network proves the least-cost eligible route, preserves payer and merchant protections, and leaves the incumbent in place whenever authority, evidence, or the arithmetic is incomplete.</p>
+            <div class="eyebrow">The Visa replacement offer</div>
+            <h1>Beat Visa on total cost. Or don’t switch.</h1>
+            <p>The buying rule is one subtraction. Start with the merchant’s actual, fully loaded Visa cost. On a $100 payment, StatsKey’s planning software fee is $0.11. What remains is the ceiling for the rail, sponsor bank, processor, compliance, losses, liquidity, operations, certification, recourse, and a required safety margin.</p>
             <div class="network-hero__actions">
-              <a class="button button--primary" href="#control-plane">Use the working control plane</a>
-              <a class="button button--secondary" href="#economics">Inspect the economics</a>
+              <a class="button button--primary" href="#economics">Run the cost test</a>
+              <a class="button button--secondary" href="#control-plane">Inspect the control plane</a>
             </div>
-            <p class="network-boundary"><span></span><strong>Software is working.</strong> Bank, processor, rail, and customer endpoints are simulated.</p>
+            <p class="network-boundary"><span></span><strong>The offer is conditional.</strong> Deliver equivalent rights for less—or leave Visa in place.</p>
           </div>
 
-          <div class="decision-card reveal d2" aria-label="StatsKey Network decision contract">
-            <div class="decision-card__head">
-              <span>Decision contract</span>
-              <small><i></i> Fail closed</small>
+          <div class="visa-math-card reveal d2" aria-label="Visa replacement cost test">
+            <div class="visa-math-card__head">
+              <span>Visa replacement test</span>
+              <small>Comparable $100 payment</small>
             </div>
-            <ol class="decision-flow">
-              <li><span>01</span><div><strong>Intent</strong><small>One authorized instruction</small></div><em>bound</em></li>
-              <li><span>02</span><div><strong>Rights + authority</strong><small>Lawful, reachable, protected</small></div><em>gate</em></li>
-              <li><span>03</span><div><strong>All-in cost proof</strong><small>Upper bound clears the margin</small></div><em>prove</em></li>
-              <li><span>04</span><div><strong>Route or retain</strong><small>No blind retry; one ledger truth</small></div><em>decide</em></li>
-            </ol>
-            <div class="decision-card__result">
-              <span>Current sponsor gate</span>
-              <strong>Retain incumbent</strong>
-              <small>Correct behavior until partner authority exists.</small>
+            <div class="visa-math-card__equation">
+              <div class="visa-math-card__line">
+                <div><span>Merchant’s actual Visa total</span><small>Matched cohort, net of rebates</small></div>
+                <strong>V</strong>
+              </div>
+              <div class="visa-math-card__operator" aria-hidden="true">−</div>
+              <div class="visa-math-card__line">
+                <div><span>StatsKey planning software</span><small>0.08% × $100 + $0.03</small></div>
+                <strong>$0.11</strong>
+              </div>
+              <div class="visa-math-card__operator" aria-hidden="true">=</div>
+              <div class="visa-math-card__line visa-math-card__line--result">
+                <div><span>Budget for everything else</span><small>Before the required safety margin</small></div>
+                <strong>V − $0.11</strong>
+              </div>
+            </div>
+            <div class="visa-math-card__rule">
+              <code>R + $0.11 + M &lt; V</code>
+              <p><strong>R</strong> is the fully loaded non-StatsKey stack. <strong>M</strong> is the safety margin.</p>
+              <div>
+                <span><small>True</small><strong>Replace Visa</strong></span>
+                <span><small>False or unproved</small><strong>Retain Visa</strong></span>
+              </div>
+            </div>
+            <div class="visa-math-card__example">
+              <strong>Illustrative merchant input—not Visa pricing.</strong>
+              <p>If the merchant’s records show $3.20 on a comparable $100 payment, $3.09 remains before margin for every non-StatsKey component. That is a cost ceiling, not projected savings.</p>
+            </div>
+            <p class="visa-math-card__boundary"><strong>The buying rule is simple. The infrastructure is not.</strong> Live replacement still requires contracted sponsor, rail, processing, compliance, liquidity, loss allocation, and certification.</p>
+            <div class="visa-math-card__formula">
+              <span>Any amount x</span>
+              <code>S(x) = 0.0008x + $0.03</code>
             </div>
           </div>
         </div>
