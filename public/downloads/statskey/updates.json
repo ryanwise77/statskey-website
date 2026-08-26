@@ -1,7 +1,24 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.37",
+  "latest": "0.21.38",
   "releases": [
+    {
+      "version": "0.21.38",
+      "date": "2026-08-25",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Failure-aware autonomous execution",
+      "summary": "Intelligence now repairs failed execution directly, preserves exact safe target receipts, and requires the requested outcome before marking work complete.",
+      "highlights": [
+        "A failed terminal or remote action immediately closes broad search and returns the lead agent to a bounded correction-and-verification lane.",
+        "Identical failed commands are suppressed across automatic passes, while corrected commands and one retry for transient network failures remain available.",
+        "A later file edit, directory listing, or harmless probe can no longer erase a failed deployment or satisfy an unrelated external objective.",
+        "Mixed create-and-deploy requests require both persisted workspace changes and a verified external apply-and-postcondition receipt.",
+        "Live Workboards show completed, failed, and total attempts, and terminal failures report their actual exit code or signal.",
+        "Update discovery now checks every 30 minutes and can safely supersede a stale downloaded update without restarting active work."
+      ]
+    },
     {
       "version": "0.21.37",
       "date": "2026-08-25",
