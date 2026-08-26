@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatsKey Network | The payment decision, made legible</title>
+    <meta name="description" content="StatsKey Network is a working, deterministic payment control-plane sandbox: prove the eligible low-cost route, preserve rights, and retain the incumbent whenever the proof fails." />
+    <meta property="og:title" content="StatsKey Network | The payment decision, made legible" />
+    <meta property="og:description" content="A working payment control-plane sandbox with open-book economics, fail-closed routing, and an explicit sponsor boundary." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://statskey.ai/network" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/statskey-desktop-logo.svg?v=6" />
+    <link rel="apple-touch-icon" href="/statskey-desktop-logo.svg?v=6" />
+  </head>
+  <body class="antialiased marketing-light network-marketing">
+    <nav id="nav" class="site-nav">
+      <div class="site-nav__inner">
+        <a href="/" class="site-brand" aria-label="StatsKey home">
+          <img class="site-brand__mark" src="/statskey-desktop-logo.svg?v=6" alt="" width="26" height="26" />
+          <span>StatsKey</span>
+        </a>
+        <div class="site-nav__links" aria-label="Primary navigation">
+          <a href="/#positioning">Why StatsKey</a>
+          <details class="site-nav__menu">
+            <summary>Explore</summary>
+            <div class="site-nav__menu-panel">
+              <a href="/wellness"><span>Wellness</span><small>Nutrition, training, and the private journal</small></a>
+              <a href="/hardware"><span>Hardware</span><small>Documented research concepts and build studies</small></a>
+              <a href="/mindscape"><span>Mindscape</span><small>A spatial canvas for connected thinking</small></a>
+            </div>
+          </details>
+          <a class="site-nav__current" href="/network" aria-current="page">Network</a>
+          <a href="/app/tokens">Store</a>
+          <span class="site-nav__apps" aria-label="Download StatsKey">
+            <a class="site-nav__app-link" data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" aria-label="Download StatsKey on the App Store">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.25.07 2.12.69 2.86.74 1.1-.22 2.15-.85 3.32-.77 1.4.11 2.45.67 3.15 1.68-2.89 1.73-2.2 5.53.45 6.6-.53 1.39-1.21 2.77-1.78 4.72ZM12.03 7.25C11.88 5.18 13.57 3.47 15.5 3.3c.27 2.39-2.17 4.17-3.47 3.95Z" /></svg>
+              <span>iOS</span>
+            </a>
+            <a class="site-nav__app-link" data-store="play" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener" aria-label="Get StatsKey on Google Play">
+              <svg viewBox="0 0 24 26" aria-hidden="true">
+                <path fill="#34A853" d="M1.5 1.4v23.2L14.8 13 1.5 1.4Z" />
+                <path fill="#4285F4" d="m1.5 1.4 15.3 8.5-2 3.1L1.5 1.4Z" />
+                <path fill="#EA4335" d="m1.5 24.6 15.3-8.5-2-3.1L1.5 24.6Z" />
+                <path fill="#FBBC04" d="m16.8 9.9 5.4 3.1-5.4 3.1-2-3.1 2-3.1Z" />
+              </svg>
+              <span>Android</span>
+            </a>
+            <a class="site-nav__app-link" href="/desktop" aria-label="Download the StatsKey desktop preview">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+                <path d="M8 21h8M12 17v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              <span>Desktop</span>
+            </a>
+          </span>
+          <a href="/care">Professionals</a>
+          <a href="/app/login">Sign in</a>
+        </div>
+        <a class="site-nav__cta" href="/app/signup">Sign up</a>
+        <button id="mobile-menu-btn" class="site-menu-btn" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+      <div id="mobile-menu" class="site-mobile-menu hidden" role="navigation" aria-label="Mobile navigation" aria-hidden="true">
+        <a href="/#positioning">Why StatsKey</a>
+        <a href="/wellness">Wellness</a>
+        <a href="/hardware">Hardware</a>
+        <a href="/network" aria-current="page">Network</a>
+        <a href="/app/tokens">Store</a>
+        <a data-store="ios" href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener">Get the iOS app</a>
+        <a data-store="play" href="https://play.google.com/store/apps/details?id=com.statskey.biometrics" target="_blank" rel="noopener">Get the Android app</a>
+        <a href="/desktop">Get the desktop preview</a>
+        <a href="/mindscape">Mindscape</a>
+        <a href="/care">Professionals</a>
+        <a href="/app/login">Sign in</a>
+        <a href="/app/signup">Sign up</a>
+      </div>
+    </nav>
+
+    <main>
+      <header class="network-page-header">
+        <div class="page-shell network-page-header__inner">
+          <div>
+            <span>StatsKey Network</span>
+            <small>Working sandbox · no funds move</small>
+          </div>
+          <nav class="network-tabs" aria-label="StatsKey Network pages">
+            <a href="#overview" data-network-tab="overview" aria-current="page">Overview</a>
+            <a href="#control-plane" data-network-tab="control-plane">Control plane</a>
+            <a href="#economics" data-network-tab="economics">Economics</a>
+          </nav>
+        </div>
+      </header>
+
+      <section class="network-hero" id="overview">
+        <div class="network-orb network-orb--one" aria-hidden="true"></div>
+        <div class="network-orb network-orb--two" aria-hidden="true"></div>
+        <div class="page-shell network-hero__grid">
+          <div class="network-hero__copy reveal">
+            <div class="eyebrow">Payment infrastructure, made legible</div>
+            <h1>The payment decision is software.</h1>
+            <p>StatsKey Network proves the least-cost eligible route, preserves payer and merchant protections, and leaves the incumbent in place whenever authority, evidence, or the arithmetic is incomplete.</p>
+            <div class="network-hero__actions">
+              <a class="button button--primary" href="#control-plane">Use the working control plane</a>
+              <a class="button button--secondary" href="#economics">Inspect the economics</a>
+            </div>
+            <p class="network-boundary"><span></span><strong>Software is working.</strong> Bank, processor, rail, and customer endpoints are simulated.</p>
+          </div>
+
+          <div class="decision-card reveal d2" aria-label="StatsKey Network decision contract">
+            <div class="decision-card__head">
+              <span>Decision contract</span>
+              <small><i></i> Fail closed</small>
+            </div>
+            <ol class="decision-flow">
+              <li><span>01</span><div><strong>Intent</strong><small>One authorized instruction</small></div><em>bound</em></li>
+              <li><span>02</span><div><strong>Rights + authority</strong><small>Lawful, reachable, protected</small></div><em>gate</em></li>
+              <li><span>03</span><div><strong>All-in cost proof</strong><small>Upper bound clears the margin</small></div><em>prove</em></li>
+              <li><span>04</span><div><strong>Route or retain</strong><small>No blind retry; one ledger truth</small></div><em>decide</em></li>
+            </ol>
+            <div class="decision-card__result">
+              <span>Current sponsor gate</span>
+              <strong>Retain incumbent</strong>
+              <small>Correct behavior until partner authority exists.</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="network-principles">
+        <div class="page-shell">
+          <div class="network-section-heading reveal">
+            <div>
+              <div class="eyebrow">The bid is in the architecture</div>
+              <h2>Price every consequence. Hide none.</h2>
+            </div>
+            <p>A low sticker fee is not a low-cost system. StatsKey counts software, operator, sponsor, loss, returns, disputes, liquidity, operations, transition, payer friction, and public externalities before it calls a route cheaper.</p>
+          </div>
+          <div class="network-metrics reveal d1">
+            <article><span>Planning software rate</span><strong>8 bps + $0.03</strong><small>Visible, editable model—not a binding quote</small></article>
+            <article><span>Routing preference</span><strong>None</strong><small>The proof decides; no paid steering</small></article>
+            <article><span>Unproved savings</span><strong>$0</strong><small>The incumbent remains until the full stack clears</small></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="network-proof-section">
+        <div class="page-shell network-proof-grid">
+          <article class="network-proof reveal">
+            <p class="network-proof__kicker">CONDITIONAL GUARANTEE</p>
+            <h2>Cheaper means proved cheaper.</h2>
+            <p>The router may switch only when an eligible alternative's conservative upper cost, plus a required margin, is below the incumbent's conservative lower cost.</p>
+            <code>C<sub>alternative</sub><sup>upper</sup> + margin &lt; C<sub>incumbent</sub><sup>lower</sup></code>
+            <div class="network-proof__outcome"><span>If every premise is current and true</span><strong>The conclusion follows by construction.</strong></div>
+          </article>
+          <div class="network-premises reveal d2">
+            <div class="network-premises__head"><span>Premise ledger</span><small>Every send rechecks it</small></div>
+            <ul>
+              <li><span>01</span><div><strong>Lawful authority</strong><small>Sponsor, rail, jurisdiction, and purpose</small></div><em>required</em></li>
+              <li><span>02</span><div><strong>Equivalent rights</strong><small>Disclosure, error resolution, refunds, recourse</small></div><em>required</em></li>
+              <li><span>03</span><div><strong>Fresh evidence</strong><small>Reachability, fraud, liquidity, recovery</small></div><em>required</em></li>
+              <li><span>04</span><div><strong>Stakeholder floors</strong><small>No savings manufactured by exporting harm</small></div><em>required</em></li>
+            </ul>
+            <p>This is a guarantee of the decision under stated premises—not a claim that an alternative will always exist or always beat the incumbent.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="network-capabilities">
+        <div class="page-shell">
+          <div class="network-section-heading reveal">
+            <div>
+              <div class="eyebrow">One control plane</div>
+              <h2>The lifecycle, not a checkout button.</h2>
+            </div>
+            <p>The sandbox exercises the software authority boundary across the payment lifecycle. Live delivery still requires contracted financial institutions, processors, rail access, compliance operations, certification, and liquidity.</p>
+          </div>
+          <div class="capability-grid reveal d1">
+            <article><span>01</span><h3>Authorize</h3><p>Intent binding, payer authority, risk evidence, sanctions gates, and idempotency.</p></article>
+            <article><span>02</span><h3>Route</h3><p>Eligibility before ranking, bounded costs, deterministic choice, and incumbent fallback.</p></article>
+            <article><span>03</span><h3>Account</h3><p>Immutable balanced journals, holds, captures, fees, reversals, and provisional credit.</p></article>
+            <article><span>04</span><h3>Settle</h3><p>Clearing instructions, liquidity gates, finality evidence, and exception-safe recovery.</p></article>
+            <article><span>05</span><h3>Reconcile</h3><p>External evidence ingestion, unknown-state queries, breaks, aging, and operator cases.</p></article>
+            <article><span>06</span><h3>Resolve</h3><p>Returns, disputes, refunds, token compromise, audit trails, and consumer recourse.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="sponsor-proposal">
+        <div class="page-shell sponsor-proposal__card reveal">
+          <div>
+            <div class="eyebrow">Sponsor proposal</div>
+            <h2>First United, by proposal—not assumption.</h2>
+          </div>
+          <div>
+            <p>StatsKey proposes First United Bank and Trust Company of Durant, Oklahoma as the sponsor bank for a governed program. The proposal is to place deposits, bank-core balances, liquidity, compliance, and settlement controls with the regulated institution while StatsKey supplies the decision and evidence software.</p>
+            <p class="sponsor-proposal__boundary"><strong>No relationship is represented.</strong> This build does not claim sponsorship, live accounts, rail access, licensed acquiring, approvals, production credentials, or settlement authority.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="network-console-section" id="working-console">
+        <div class="page-shell">
+          <div class="network-console-heading reveal">
+            <div>
+              <div class="eyebrow">Working product</div>
+              <h2>Interrogate the decision.</h2>
+              <p>Change the scenario, amount, policy, or evidence. The browser sandbox runs the same deterministic contract and exposes why it routed—or why it refused.</p>
+            </div>
+            <a class="network-open-external" href="https://statskey-network.fleaflickerflacking.chatgpt.site/" target="_blank" rel="noopener">Open full-screen <span>↗</span></a>
+          </div>
+
+          <div class="network-console reveal d1">
+            <div class="network-console__bar">
+              <span class="network-console__lights" aria-hidden="true"><i></i><i></i><i></i></span>
+              <nav aria-label="Working product views">
+                <button type="button" data-console-view="control-plane" aria-pressed="true">Control plane</button>
+                <button type="button" data-console-view="economics" aria-pressed="false">Economics</button>
+              </nav>
+              <span id="network-console-status" role="status">Loading sandbox…</span>
+            </div>
+            <div class="network-console__viewport">
+              <iframe
+                id="network-console-frame"
+                title="Interactive StatsKey Network control plane"
+                src="https://statskey-network.fleaflickerflacking.chatgpt.site/"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+                allow="clipboard-write"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+              ></iframe>
+            </div>
+            <div class="network-console__foot">
+              <span><i></i> Working deterministic software</span>
+              <span>External endpoints simulated</span>
+              <span>No money moves</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="network-close">
+        <div class="page-shell network-close__card reveal">
+          <div>
+            <div class="eyebrow">A quieter kind of infrastructure</div>
+            <h2>Use the cheapest route that can carry the whole promise.</h2>
+            <p>Not the lowest operator fee. Not the fastest happy path. The lowest total cost that preserves authority, protections, accounting truth, and recoverability.</p>
+          </div>
+          <div class="network-close__actions">
+            <a class="button button--primary" href="#control-plane">Run a scenario</a>
+            <a class="button button--secondary" href="#economics">Open the cost model</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="page-shell site-footer__inner">
+        <span>StatsKey &copy; 2026</span>
+        <div>
+          <a href="/wellness">Wellness</a>
+          <a href="/mindscape">Mindscape</a>
+          <a href="/hardware">Hardware</a>
+          <a href="/network" aria-current="page">Network</a>
+          <a href="/care">Health professionals</a>
+          <a href="https://statskeybiometrics.com/support">Support</a>
+          <a href="https://statskeybiometrics.com/privacy">Privacy</a>
+          <a href="https://statskeybiometrics.com/terms">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/network.js"></script>
+  </body>
+</html>

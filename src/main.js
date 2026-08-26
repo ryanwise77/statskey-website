@@ -53,6 +53,22 @@ if (nav) {
   }, { passive: true })
 }
 
+const navMenus = Array.from(document.querySelectorAll('.site-nav__menu'))
+document.addEventListener('click', (event) => {
+  navMenus.forEach((menu) => {
+    if (!menu.contains(event.target)) menu.removeAttribute('open')
+  })
+})
+
+navMenus.forEach((menu) => {
+  menu.addEventListener('toggle', () => {
+    if (!menu.open) return
+    navMenus.forEach((candidate) => {
+      if (candidate !== menu) candidate.removeAttribute('open')
+    })
+  })
+})
+
 const menuBtn = document.getElementById('mobile-menu-btn')
 const mobileMenu = document.getElementById('mobile-menu')
 const menuLinks = Array.from(mobileMenu?.querySelectorAll('a') || [])

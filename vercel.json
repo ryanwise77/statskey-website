@@ -276,6 +276,14 @@
       "destination": "/wellness.html"
     },
     {
+      "source": "/network",
+      "destination": "/network.html"
+    },
+    {
+      "source": "/network/",
+      "destination": "/network.html"
+    },
+    {
       "source": "/gut",
       "destination": "/wellness.html"
     },
