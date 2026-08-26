@@ -1,7 +1,21 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.38",
+  "latest": "0.21.39",
   "releases": [
+    {
+      "version": "0.21.39",
+      "date": "2026-08-25",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Immediate failure-lane enforcement",
+      "summary": "Intelligence now applies failure recovery within the same tool batch and keeps failed external commands blocked across unrelated edits.",
+      "highlights": [
+        "A failed action immediately removes broad search from later calls in the same provider response.",
+        "Unrelated workspace edits no longer re-enable the exact failed external command; focused test retries remain available after fixes.",
+        "The guarded release suite now always exercises terminal receipts and durable chat-session evidence."
+      ]
+    },
     {
       "version": "0.21.38",
       "date": "2026-08-25",
