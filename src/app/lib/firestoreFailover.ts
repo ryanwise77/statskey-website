@@ -3,7 +3,8 @@
 // Firestore instances cannot be safely retargeted while listeners are active,
 // so the selected backend is persisted and applied at boot by firebase.ts. A
 // sustained primary failure followed by a fresh mirror health response changes
-// that selection and reloads the app. Recovery uses the same mechanism.
+// that selection and reloads the app. Recovery is intentionally operator-
+// controlled so the app cannot fail back before mirror writes are reconciled.
 //
 // There is intentionally no built-in emergency address. Public builds remain
 // primary-only unless a public HTTPS origin is supplied at build time through
@@ -49,7 +50,6 @@ const PROBE_URL =
   'https://firestore.googleapis.com/v1/projects/statskey/databases/(default)/documents/publicFounderReplicas/founder?mask.fieldPaths=schemaVersion'
 const PROBE_INTERVAL_MS = 30_000
 const FAILS_TO_SWITCH = 2
-const SUCCESSES_TO_RECOVER = 2
 const PROBE_TIMEOUT_MS = 6_000
 const MAX_HEALTH_REPORT_AGE_MS = 5 * 60_000
 const CLOCK_SKEW_SECONDS = 30
@@ -217,7 +217,12 @@ export function parseMirrorHealth(
 
   const mirror = asRecord(root.mirror) ?? root
   const routes = asRecord(root.routes)
-  if (isGatewayV1 && routes?.firestore !== '/') return null
+  if (
+    isGatewayV1 &&
+    (routes?.firestore !== '/' || routes.functions !== '/functions')
+  ) {
+    return null
+  }
   const standbyAuth = asRecord(root.auth)
   if (
     isGatewayV1 &&
@@ -226,6 +231,8 @@ export function parseMirrorHealth(
   ) {
     return null
   }
+  const standbyFunctions = asRecord(root.functions)
+  if (isGatewayV1 && standbyFunctions?.reachable !== true) return null
   const reachable = mirror.reachable ?? mirror.healthy
   if (reachable !== true) return null
   const explicitlyFresh = mirror.fresh ?? root.fresh
@@ -400,7 +407,6 @@ export function startFailoverController(deps: FailoverDeps = {}): FailoverContro
   const probeMirror =
     deps.probeMirror ?? ((target: EmergencyEndpoint) => fetchMirrorHealth(target, now()))
   let fails = 0
-  let successes = 0
   let stopped = false
   let transitioning = false
   let interval: ReturnType<typeof setInterval> | undefined
@@ -418,13 +424,13 @@ export function startFailoverController(deps: FailoverDeps = {}): FailoverContro
     return { enabled: false, stop, tick: async () => {} }
   }
 
-  const transition = (mode: FirestoreMode) => {
+  const transitionToMirror = () => {
     if (transitioning || stopped) return
     transitioning = true
     if (interval !== undefined) clearInterval(interval)
     interval = undefined
-    storage.setItem(MODE_KEY, mode)
-    deps.onModeChange?.(mode)
+    storage.setItem(MODE_KEY, 'mirror')
+    deps.onModeChange?.('mirror')
     reload()
   }
 
@@ -447,27 +453,17 @@ export function startFailoverController(deps: FailoverDeps = {}): FailoverContro
       saveMirrorHealth(storage, health, endpoint.origin)
       deps.onMirrorHealth?.(health)
       if (!health) return
-      transition('mirror')
+      transitionToMirror()
       return
     }
 
-    // Keep validating the selected mirror while independently looking for a
-    // sustained primary recovery. If both are impaired, do not bounce users
-    // onto a known-down primary; report degraded mirror health and stay put.
-    const [googleUp, health] = await Promise.all([
-      probeGoogle(),
-      probeMirror(endpoint),
-    ])
+    // Mirror mode stays pinned until an operator has reconciled any emergency
+    // writes and explicitly changes the persisted mode. A recovered primary is
+    // not enough to make an automatic failback safe.
+    const health = await probeMirror(endpoint)
     if (stopped || transitioning) return
     saveMirrorHealth(storage, health, endpoint.origin)
     deps.onMirrorHealth?.(health)
-
-    if (!googleUp) {
-      successes = 0
-      return
-    }
-    successes += 1
-    if (successes >= SUCCESSES_TO_RECOVER) transition('primary')
   }
 
   const tick = (): Promise<void> => {

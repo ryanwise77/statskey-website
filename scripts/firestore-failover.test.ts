@@ -52,6 +52,7 @@ function gatewayHealth(overrides: Record<string, unknown> = {}) {
       fresh: true,
     },
     auth: { reachable: true, issuer: 'https://auth.statskey.ai' },
+    functions: { reachable: true },
     routes: { firestore: '/', functions: '/functions' },
     ...overrides,
   }
@@ -221,6 +222,13 @@ describe('mirror health and freshness', () => {
       parseMirrorHealth(gatewayHealth({ routes: { firestore: '/firestore' } }), NOW),
       null
     )
+    assert.equal(
+      parseMirrorHealth(
+        gatewayHealth({ routes: { firestore: '/', functions: '/wrong-functions' } }),
+        NOW
+      ),
+      null
+    )
     assert.equal(parseMirrorHealth(gatewayHealth({ auth: undefined }), NOW), null)
     assert.equal(
       parseMirrorHealth(
@@ -240,14 +248,20 @@ describe('mirror health and freshness', () => {
       ),
       null
     )
+    assert.equal(parseMirrorHealth(gatewayHealth({ functions: undefined }), NOW), null)
+    assert.equal(
+      parseMirrorHealth(gatewayHealth({ functions: { reachable: false } }), NOW),
+      null
+    )
     assert.equal(parseMirrorHealth(gatewayHealth({ writable: undefined }), NOW), null)
     assert.equal(parseMirrorHealth(gatewayHealth({ mode: 'mirror' }), NOW), null)
   })
 })
 
 describe('automatic failover transitions', () => {
-  it('moves primary -> fresh mirror -> recovered primary with reload boundaries', async () => {
+  it('moves primary -> fresh mirror and stays pinned after primary recovery', async () => {
     let googleUp = false
+    let mirrorProbes = 0
     let reloads = 0
     const first = start({
       google: () => googleUp,
@@ -268,6 +282,10 @@ describe('automatic failover transitions', () => {
     const second = start({
       storage: first.storage,
       google: () => googleUp,
+      mirror: () => {
+        mirrorProbes += 1
+        return health()
+      },
       reload: () => {
         reloads += 1
       },
@@ -275,8 +293,10 @@ describe('automatic failover transitions', () => {
     await second.controller.tick()
     assert.equal(currentMode(first.storage, ''), 'mirror')
     await second.controller.tick()
-    assert.equal(currentMode(first.storage, ''), 'primary')
-    assert.equal(reloads, 2)
+    await second.controller.tick()
+    assert.equal(currentMode(first.storage, ''), 'mirror')
+    assert.equal(mirrorProbes, 3)
+    assert.equal(reloads, 1)
   })
 
   it('refuses a stale mirror and switches when a later health check is fresh', async () => {
