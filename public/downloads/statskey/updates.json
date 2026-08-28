@@ -1,7 +1,22 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.39",
+  "latest": "0.21.43",
   "releases": [
+    {
+      "version": "0.21.43",
+      "date": "2026-08-28",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Sees it through",
+      "summary": "Tasks now survive restarts and finish: workspace references outlive app relaunches, remote-machine failures fall back to running locally, finished work is no longer mislabeled as failure, and stop/resume no longer fight each other.",
+      "highlights": [
+        "Resumed tasks keep working after a restart \u2014 no more expired reference dead-ends",
+        "If the Mac mini can't take a task, it runs on this Mac instead of stopping",
+        "Honest endings: real failures say so; finished-but-unverified work is not branded a failure",
+        "Auto-resume is race-free and properly capped"
+      ]
+    },
     {
       "version": "0.21.39",
       "date": "2026-08-25",
@@ -207,7 +222,7 @@
       "title": "Direct Mac mini Intelligence",
       "summary": "Run an ordinary Intelligence tab on the Mac mini, follow sanitized progress and file changes locally, and open its encrypted screen in a lightweight fullscreen controller.",
       "highlights": [
-        "Choose This Mac, Mac mini · collaborate live, or Mac mini · isolated copy from the Intelligence header.",
+        "Choose This Mac, Mac mini \u00b7 collaborate live, or Mac mini \u00b7 isolated copy from the Intelligence header.",
         "Remote-owned tabs send the actual prompt to the mini and restore their live task card after a tab or app reload.",
         "Delegation enforces a six-task turn cap, signed tool allowlists, decline-safe retries, and stricter remote-output redaction.",
         "The fullscreen screen controller keeps frame memory bounded and falls back safely if its renderer stalls.",
@@ -353,7 +368,7 @@
       "summary": "StatsKey can now open a remote desktop session to your enrolled Windows workers from the Fleet tab, end-to-end encrypted through your own relay.",
       "highlights": [
         "Remote desktop sessions to enrolled Windows workers from the Fleet tab.",
-        "Sessions are approved per device and encrypted end to end through your own relay — no third-party service.",
+        "Sessions are approved per device and encrypted end to end through your own relay \u2014 no third-party service.",
         "Ubuntu worker service attestation now refreshes continuously instead of expiring in place."
       ]
     },
