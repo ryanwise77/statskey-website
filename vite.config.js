@@ -60,6 +60,8 @@ const DEV_REWRITES = {
   '/bid/3d/viewer': '/bid/3d/viewer.html',
   '/energy': '/energy.html',
   '/energy/': '/energy.html',
+  '/highriver': '/highriver.html',
+  '/highriver/': '/highriver.html',
   '/glucose-plan': '/glucose-plan/index.html',
   '/glucose-plan/': '/glucose-plan/index.html',
   '/hardware': '/index.html',
