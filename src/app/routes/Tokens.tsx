@@ -517,6 +517,9 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
             processing. If Stripe requires authentication or a payment fails, automatic re-up
             pauses instead of retrying blindly.
             You can turn it off here at any time; a charge already processing may still complete.
+            Safe limits: at most two automatic attempts per day and never more than your monthly
+            guardrail. You get an email when re-up is enabled, each time it re-ups, if a charge
+            fails, when the monthly guardrail is reached, and when you turn it off.
           </p>
         </section>
       )}
