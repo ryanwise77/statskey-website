@@ -384,6 +384,22 @@
       "destination": "/for-clinicians.html"
     },
     {
+      "source": "/clinician/record/:record",
+      "destination": "/api/care-record?record=:record"
+    },
+    {
+      "source": "/clinician/record/:record/",
+      "destination": "/api/care-record?record=:record"
+    },
+    {
+      "source": "/clinician/record/:record/index.html",
+      "destination": "/api/care-record?record=:record"
+    },
+    {
+      "source": "/clinician/record/:record/raw/:file",
+      "destination": "/api/care-record?record=:record&file=:file"
+    },
+    {
       "source": "/clinician",
       "destination": "/clinician.html"
     },
