@@ -11,6 +11,7 @@ import { db } from '../firebase'
 import {
   decodeGlucose,
   decodeMeal,
+  decodeSavedRoute,
   decodeWeightEntry,
   decodeWellness,
   decodeWorkout,
@@ -19,7 +20,18 @@ import { dailyTotals, mealTotal, mealDisplayName } from '../aggregates'
 import { bristolSummary, computeGIBurdenScore } from '../gi'
 import { localDateString } from '../firestore'
 import { NUTRIENT_KEYS } from '../types'
-import type { GlucoseReading, Meal, WellnessEntry, WorkoutSession, WeightEntry, Split } from '../types'
+import type { GlucoseReading, Meal, SavedRoute, WellnessEntry, WorkoutSession, WeightEntry, Split } from '../types'
+import {
+  fmtLocalDate,
+  fmtLocalTime,
+  localTimeZoneName,
+  nearbySavedRoute,
+  sourceLabel,
+  timeOfDayLabel,
+  workoutEndDate,
+  workoutEndPoint,
+  workoutStartPoint,
+} from './workoutContext'
 import type { AnthropicToolDef } from './anthropic'
 import { getScratchPad, updateScratchPad } from './scratchPad'
 
@@ -109,13 +121,15 @@ export const AGENT_TOOLS: AnthropicToolDef[] = [
   },
   {
     name: 'get_workouts',
-    description: 'Get workout sessions with distance, pace, heart rate, and split counts. Supports limit or date range.',
+    description:
+      'Get workout sessions newest first: local start/end time and time of day, sport, title, distance, duration, pace or speed, heart rate, elevation, start/end coordinates, recording source, and any saved route the session started on. Supports limit, a local date range, and sport_type.',
     input_schema: {
       type: 'object',
       properties: {
-        limit: { type: 'integer' },
-        start_date: { type: 'string', description: 'YYYY-MM-DD' },
-        end_date: { type: 'string', description: 'YYYY-MM-DD' },
+        limit: { type: 'integer', description: 'Default 20 (max 200 with a date range).' },
+        start_date: { type: 'string', description: 'YYYY-MM-DD (local)' },
+        end_date: { type: 'string', description: 'YYYY-MM-DD (local)' },
+        sport_type: { type: 'string', description: 'Filter by sport, e.g. running, walking, cycling, eBike, hiking.' },
       },
       required: [],
     },
@@ -258,6 +272,7 @@ export class AgentDataCache {
   private weightsP: Promise<WeightEntry[]> | null = null
   private waterP: Promise<Map<string, number>> | null = null
   private indexP: Promise<IndexChunk[]> | null = null
+  private routesP: Promise<SavedRoute[]> | null = null
 
   constructor(private uid: string) {}
 
@@ -289,6 +304,14 @@ export class AgentDataCache {
       )
     ).then((snap) => snap.docs.map((d) => decodeWorkout(d.data() as Record<string, unknown>, d.id, this.uid)))
     return this.workoutsP
+  }
+
+  /** Saved routes, used to name where a session started. Never blocks a workout answer. */
+  routes(): Promise<SavedRoute[]> {
+    this.routesP ??= getDocs(query(collection(db, 'users', this.uid, 'routes'), fsLimit(200)))
+      .then((snap) => snap.docs.map((d) => decodeSavedRoute(d.data() as Record<string, unknown>, d.id)))
+      .catch(() => [] as SavedRoute[])
+    return this.routesP
   }
 
   wellness(): Promise<WellnessEntry[]> {
@@ -718,8 +741,15 @@ async function getWorkouts(cache: AgentDataCache, input: Record<string, unknown>
   const start = typeof input.start_date === 'string' ? new Date(`${input.start_date}T00:00:00`) : null
   const end = typeof input.end_date === 'string' ? new Date(`${input.end_date}T23:59:59`) : null
   if (start) workouts = workouts.filter((w) => w.startDate >= start && (!end || w.startDate <= end))
-  const limit = start ? 200 : int(input.limit, 20)
-  return { items: workouts.slice(0, limit).map(compactWorkout) }
+  const sport = typeof input.sport_type === 'string' ? input.sport_type.trim().toLowerCase() : ''
+  if (sport) workouts = workouts.filter((w) => w.sportType.toLowerCase().includes(sport))
+  const limit = start ? Math.min(200, int(input.limit, 200)) : int(input.limit, 20)
+  const routes = await cache.routes()
+  return {
+    timezone: localTimeZoneName(),
+    total_matching: workouts.length,
+    items: workouts.slice(0, limit).map((w) => ({ ...compactWorkout(w), nearby_saved_route: nearbySavedRoute(w, routes) })),
+  }
 }
 
 async function resolveWorkout(
@@ -735,8 +765,11 @@ async function resolveWorkout(
 async function getWorkoutDetail(cache: AgentDataCache, input: Record<string, unknown>): Promise<ToolResult> {
   const w = await resolveWorkout(cache, input)
   if (!w) return { error: 'Workout not found' }
+  const routes = await cache.routes()
   return {
     workout: compactWorkout(w),
+    timezone: localTimeZoneName(),
+    nearby_saved_route: nearbySavedRoute(w, routes),
     source: w.source,
     is_indoor: w.isIndoor,
     availability: {
@@ -920,6 +953,14 @@ function compactWorkout(w: WorkoutSession): ToolResult {
     title: w.title || w.sportType,
     sportType: w.sportType,
     startDate: w.startDate.toISOString(),
+    start_local: `${fmtLocalDate(w.startDate)} ${fmtLocalTime(w.startDate)}`,
+    end_local: fmtLocalTime(workoutEndDate(w)),
+    time_of_day: timeOfDayLabel(w.startDate),
+    source: sourceLabel(w.source),
+    is_indoor: w.isIndoor,
+    start_point: workoutStartPoint(w),
+    end_point: workoutEndPoint(w),
+    route_points_inline: w.routeCoordinates.length,
     distance_mi: Math.round(w.distance * 100) / 100,
     duration_min: Math.round(w.duration / 60),
     moving_min: Math.round((w.movingTime || w.duration) / 60),
@@ -928,6 +969,8 @@ function compactWorkout(w: WorkoutSession): ToolResult {
     max_hr: w.maxHeartRate > 0 ? Math.round(w.maxHeartRate) : null,
     calories: Math.round(w.calories),
     elevation_gain_ft: Math.round(w.elevationGain),
+    elevation_loss_ft: Math.round(w.elevationLoss),
+    avg_speed_mph: w.averageSpeed > 0 ? Math.round(w.averageSpeed * 10) / 10 : null,
     split_count: w.splits.length,
     perceived_effort: w.perceivedEffort ?? null,
   }

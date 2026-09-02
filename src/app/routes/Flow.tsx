@@ -136,6 +136,7 @@ export function Flow() {
         todayTotals: totals,
         todayWater: waterState.water,
         recentWorkouts: workoutsState.workouts,
+        recentWorkoutsError: workoutsState.error,
         latestGlucose: glucoseState.reading,
         memoryNotes,
         toolsEnabled: true,
@@ -148,6 +149,7 @@ export function Flow() {
       totals,
       waterState.water,
       workoutsState.workouts,
+      workoutsState.error,
       glucoseState.reading,
       memoryNotes,
     ]

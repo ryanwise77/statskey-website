@@ -9,6 +9,7 @@ import type {
   WorkoutSession,
 } from '../types'
 import type { UserProfile as Profile } from '../profile'
+import { formatWorkoutContextLine, localTimeZoneName } from './workoutContext'
 
 /**
  * Builds the plain-text system prompt for the web Intelligence agent,
@@ -27,6 +28,8 @@ export interface ContextInputs {
   todayTotals: DailyTotals
   todayWater: WaterDoc | null
   recentWorkouts: WorkoutSession[]
+  /** Error from the recent-workouts listener, so the model is told instead of silently seeing nothing. */
+  recentWorkoutsError?: string | null
   latestGlucose: GlucoseReading | null
   /** Persistent scratch-pad memory (users/{uid}/settings/aiScratchPad). */
   memoryNotes?: string
@@ -180,17 +183,22 @@ export function buildSystemPrompt(inputs: ContextInputs): string {
     )
   }
 
-  if (inputs.recentWorkouts.length > 0) {
-    const wLines = ['--- RECENT WORKOUTS ---']
-    for (const w of inputs.recentWorkouts.slice(0, 10)) {
-      const dur = w.duration > 0 ? `${Math.round(w.duration / 60)}m` : ''
-      const dist = w.distance > 0 ? `${w.distance.toFixed(2)} mi` : ''
-      wLines.push(
-        `  ${w.startDate.toLocaleDateString()} ${w.sportType} ${dist}${dist && dur ? ' in ' : ''}${dur}${w.calories > 0 ? ` · ${Math.round(w.calories)} cal` : ''}`
-      )
-    }
-    sections.push(wLines.join('\n'))
+  const wLines = [`--- RECENT WORKOUTS (newest first · local times in ${localTimeZoneName()}) ---`]
+  if (inputs.recentWorkoutsError) {
+    wLines.push(
+      `Recent workouts could not be loaded (${inputs.recentWorkoutsError}). If asked about training, say the workout record is unavailable right now — do not guess.`
+    )
+  } else if (inputs.recentWorkouts.length === 0) {
+    wLines.push(
+      'No workouts are recorded in the last year. If the user says they trained, the session has not synced from their device yet — say so rather than guessing.'
+    )
+  } else {
+    wLines.push(
+      'Each line: local date, start–end time (time of day), sport and title, distance in duration, avg pace or speed, heart rate, elevation gain, calories, start coordinates (lat,lon), recording source, workout id. Use get_workout_detail with the id for splits, pauses, HR zones, route points and nearby saved route; use get_workouts (date range or sport_type) for anything older than these.'
+    )
+    for (const w of inputs.recentWorkouts.slice(0, 10)) wLines.push(formatWorkoutContextLine(w))
   }
+  sections.push(wLines.join('\n'))
 
   return sections.join('\n\n')
 }

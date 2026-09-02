@@ -233,8 +233,10 @@ function buildDailyLog(
       if (water != null && water > 0) lines.push(`  Water: ${Math.round(water)} fl oz`)
       for (const w of dayWorkouts) {
         lines.push(
-          `  Workout: ${w.sportType} ${w.distance > 0 ? `${w.distance.toFixed(1)} mi ` : ''}${
-            w.duration > 0 ? `${Math.round(w.duration / 60)}min ` : ''
+          `  ${fmtTime(w.startDate)} Workout: ${w.sportType}${w.title ? ` "${w.title}"` : ''} ${
+            w.distance > 0 ? `${w.distance.toFixed(1)} mi ` : ''
+          }${w.duration > 0 ? `${Math.round(w.duration / 60)}min ` : ''}${
+            w.averageHeartRate > 0 ? `avg HR ${Math.round(w.averageHeartRate)} ` : ''
           }${w.calories > 0 ? `${Math.round(w.calories)} cal` : ''}`.trimEnd()
         )
       }
