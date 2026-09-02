@@ -1,7 +1,23 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.43",
+  "latest": "0.21.53",
   "releases": [
+    {
+      "version": "0.21.53",
+      "date": "2026-09-02",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Calendar planning and a hardened agent sandbox",
+      "summary": "See what you ate and trained on any day, plan meals and workouts like calendar events or let Intelligence fill the week, and run agents inside a macOS sandbox that cannot reach your credentials.",
+      "highlights": [
+        "Calendar shows meals you logged and workouts you recorded on past days, with calories, macros, and distance",
+        "Plan meals and workouts on any day like events: Event, Meal, and Workout in the create card, quick-add, drag to move; meals sync to the iPhone Meal Planner",
+        "Plan with Intelligence fills days with meals and workouts grounded in your targets, food history, and training, previewed before saving",
+        "Security: agent terminals, project hooks, and workspace MCP servers run in a macOS sandbox that cannot read credentials or plant startup files",
+        "Security: fleet jobs, provider-key handoffs, and autonomy changes always ask; project hooks never auto-run; Electron 43.5.1 with fuses and tighter entitlements"
+      ]
+    },
     {
       "version": "0.21.43",
       "date": "2026-08-28",
