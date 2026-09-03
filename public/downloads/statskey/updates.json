@@ -1,7 +1,24 @@
 {
   "schemaVersion": 1,
-  "latest": "0.21.53",
+  "latest": "0.21.54",
   "releases": [
+    {
+      "version": "0.21.54",
+      "date": "2026-09-03",
+      "platforms": [
+        "macOS"
+      ],
+      "title": "Calendar planning, completion contract, hardened agent sandbox",
+      "summary": "See what you ate and trained on any day, plan meals and workouts like calendar events or let Intelligence fill the week, get verified agent completion, and run agents inside a macOS sandbox that cannot reach your credentials.",
+      "highlights": [
+        "Calendar shows meals you logged and workouts you recorded on past days, with calories, macros, and distance",
+        "Plan meals and workouts on any day like events: Event, Meal, and Workout in the create card, quick-add, drag to move; meals sync to the iPhone Meal Planner",
+        "Plan with Intelligence fills days with meals and workouts grounded in your targets, food history, and training, previewed before saving",
+        "Completion contract: agent runs end with verified proof of work, corrective passes when verification fails, and clean recovery when a Fleet delegation is unavailable",
+        "Security: agent terminals, project hooks, and workspace MCP servers run in a macOS sandbox that cannot read credentials or plant startup files",
+        "Security: fleet jobs, provider-key handoffs, and autonomy changes always ask; project hooks never auto-run; Electron 43.5.1 with fuses and tighter entitlements"
+      ]
+    },
     {
       "version": "0.21.53",
       "date": "2026-09-02",
