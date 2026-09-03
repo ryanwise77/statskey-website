@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">StatsKey — Energy intelligence for your body</title>
+  <desc id="description">StatsKey connects nutrition, activity, sleep, and wellness data.</desc>
+  <defs>
+    <linearGradient id="background" x1="80" y1="40" x2="1120" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.52" stop-color="#F6FAFF"/>
+      <stop offset="1" stop-color="#E9F3FF"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2389ED"/>
+      <stop offset="1" stop-color="#0868C7"/>
+    </linearGradient>
+    <linearGradient id="signal" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1582E8"/>
+      <stop offset="1" stop-color="#39B9A6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(1065 120) rotate(132) scale(470 440)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BBDFFF" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#E7F3FF" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0V36" fill="none" stroke="#1676D2" stroke-opacity="0.055"/>
+    </pattern>
+    <filter id="shadow" x="690" y="28" width="510" height="590" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#205A8F" flood-opacity="0.16"/>
+    </filter>
+    <filter id="softShadow" x="-30" y="-30" width="160" height="160" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0B68BE" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect x="720" width="480" height="630" fill="url(#grid)"/>
+  <circle cx="1150" cy="570" r="214" fill="#1379D9" fill-opacity="0.045"/>
+  <circle cx="1110" cy="525" r="128" fill="#20A995" fill-opacity="0.05"/>
+
+  <g filter="url(#softShadow)" transform="translate(68 72)">
+    <rect width="88" height="88" rx="21" fill="url(#brand)"/>
+    <g transform="scale(1.375)" fill="#FFFFFF">
+      <rect x="29" y="39" width="5" height="12" rx="1.4"/>
+      <rect x="38" y="33" width="5" height="18" rx="1.4"/>
+      <rect x="47" y="27" width="5" height="24" rx="1.4"/>
+    </g>
+    <g transform="scale(1.375)" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="20" cy="41" r="10"/>
+      <path d="m27 35 8-8 4.5 3.5L51.5 18.5"/>
+      <path d="m45.5 18.5 7.5-1-1 7.5"/>
+    </g>
+  </g>
+  <text x="180" y="132" fill="#0C2036" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="43" font-weight="700" letter-spacing="-1.4">StatsKey</text>
+  <text x="181" y="158" fill="#577085" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" letter-spacing="2.2">ENERGY INTELLIGENCE</text>
+
+  <text x="68" y="276" fill="#0B1F35" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.6">
+    <tspan x="68" dy="0">Your body is a dataset.</tspan>
+    <tspan x="68" dy="72">Make it legible.</tspan>
+  </text>
+  <text x="70" y="435" fill="#4C667C" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="25" font-weight="400" letter-spacing="-0.25">
+    <tspan x="70" dy="0">Nutrition, training, sleep, and wellness —</tspan>
+    <tspan x="70" dy="34">connected with the evidence behind every number.</tspan>
+  </text>
+
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#31526D">
+    <g transform="translate(70 524)">
+      <rect width="106" height="40" rx="20" fill="#E7F2FD" stroke="#C8E1F7"/>
+      <circle cx="20" cy="20" r="5" fill="#1676D2"/>
+      <text x="33" y="25">Nutrition</text>
+    </g>
+    <g transform="translate(188 524)">
+      <rect width="98" height="40" rx="20" fill="#E7F2FD" stroke="#C8E1F7"/>
+      <circle cx="20" cy="20" r="5" fill="#268FD9"/>
+      <text x="33" y="25">Activity</text>
+    </g>
+    <g transform="translate(298 524)">
+      <rect width="88" height="40" rx="20" fill="#E8F6F3" stroke="#C7E8E1"/>
+      <circle cx="20" cy="20" r="5" fill="#2AA58E"/>
+      <text x="33" y="25">Sleep</text>
+    </g>
+    <g transform="translate(398 524)">
+      <rect width="104" height="40" rx="20" fill="#E8F6F3" stroke="#C7E8E1"/>
+      <circle cx="20" cy="20" r="5" fill="#38B19C"/>
+      <text x="33" y="25">Wellness</text>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="748" y="64" width="404" height="502" rx="34" fill="#FFFFFF" fill-opacity="0.94"/>
+    <rect x="748.5" y="64.5" width="403" height="501" rx="33.5" fill="none" stroke="#FFFFFF"/>
+  </g>
+  <text x="790" y="113" fill="#7990A4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="2">YOUR SIGNALS</text>
+  <circle cx="1102" cy="107" r="5" fill="#34B39D"/>
+  <text x="1089" y="112" text-anchor="end" fill="#638098" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="600">CONNECTED</text>
+
+  <g fill="none" stroke="url(#signal)" stroke-width="3" stroke-linecap="round" stroke-opacity="0.62">
+    <path d="M947 246 836 190"/>
+    <path d="M960 240 1062 184"/>
+    <path d="M942 272 828 352"/>
+    <path d="M968 272 1070 357"/>
+  </g>
+  <g fill="#FFFFFF" stroke="#CFE4F5" stroke-width="2">
+    <rect x="784" y="152" width="120" height="76" rx="18"/>
+    <rect x="1000" y="146" width="112" height="76" rx="18"/>
+    <rect x="780" y="329" width="124" height="76" rx="18"/>
+    <rect x="1000" y="334" width="116" height="76" rx="18"/>
+  </g>
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif" text-anchor="middle">
+    <g transform="translate(844 177)">
+      <circle r="8" fill="#1676D2" fill-opacity="0.14"/>
+      <circle r="3" fill="#1676D2"/>
+      <text y="34" fill="#34536D" font-size="14" font-weight="600">Nutrition</text>
+    </g>
+    <g transform="translate(1056 171)">
+      <circle r="8" fill="#268FD9" fill-opacity="0.14"/>
+      <circle r="3" fill="#268FD9"/>
+      <text y="34" fill="#34536D" font-size="14" font-weight="600">Activity</text>
+    </g>
+    <g transform="translate(842 354)">
+      <circle r="8" fill="#2AA58E" fill-opacity="0.14"/>
+      <circle r="3" fill="#2AA58E"/>
+      <text y="34" fill="#34536D" font-size="14" font-weight="600">Sleep</text>
+    </g>
+    <g transform="translate(1058 359)">
+      <circle r="8" fill="#38B19C" fill-opacity="0.14"/>
+      <circle r="3" fill="#38B19C"/>
+      <text y="34" fill="#34536D" font-size="14" font-weight="600">Wellness</text>
+    </g>
+  </g>
+
+  <circle cx="955" cy="258" r="72" fill="#F2F8FE" stroke="#C9E2F7" stroke-width="2"/>
+  <circle cx="955" cy="258" r="54" fill="url(#brand)"/>
+  <g transform="translate(923 226)" fill="#FFFFFF">
+    <rect x="29" y="39" width="5" height="12" rx="1.4"/>
+    <rect x="38" y="33" width="5" height="18" rx="1.4"/>
+    <rect x="47" y="27" width="5" height="24" rx="1.4"/>
+  </g>
+  <g transform="translate(923 226)" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="20" cy="41" r="10"/>
+    <path d="m27 35 8-8 4.5 3.5L51.5 18.5"/>
+    <path d="m45.5 18.5 7.5-1-1 7.5"/>
+  </g>
+
+  <rect x="790" y="456" width="320" height="70" rx="18" fill="#F2F8FE"/>
+  <path d="M816 500c24-11 42-18 61-14 18 4 30 12 48 7 21-6 30-25 51-22 18 3 29 18 47 14 17-4 27-17 58-29" fill="none" stroke="url(#signal)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="1081" cy="456" r="6" fill="#33AD99"/>
+</svg>
