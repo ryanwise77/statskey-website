@@ -17,6 +17,7 @@ import { FriendDetail } from './routes/FriendDetail'
 import { MessageThread } from './routes/MessageThread'
 import { TrainingRoutes } from './routes/TrainingRoutes'
 import { Tokens, TokensTest } from './routes/Tokens'
+import { WorkbenchAuth } from './routes/WorkbenchAuth'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Shell } from './components/Shell'
 import { useAuth } from './lib/auth'
@@ -35,6 +36,10 @@ export function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      {/* iOS "Manage re-up on web" opens /app/workbench-auth?embed=1&next=/tokens
+          with a one-time handoff code in the URL fragment; the route consumes
+          it via consumeWebSignInHandoff and continues to `next`. */}
+      <Route path="/workbench-auth" element={<WorkbenchAuth />} />
       <Route
         element={
           <ProtectedRoute>
