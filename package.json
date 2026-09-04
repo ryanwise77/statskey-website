@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/check-nudge-portal.mjs",
+    "test:nudge-author": "node --test scripts/nudge-author.test.ts scripts/founder-journey.test.mjs",
     "build:founder-history": "node scripts/build-founder-history.mjs",
     "refresh:founder-history": "node scripts/refresh-founder-history.mjs",
     "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",

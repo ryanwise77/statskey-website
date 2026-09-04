@@ -13,13 +13,16 @@ import {
   onIdTokenChanged,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  signInWithCustomToken,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut as fbSignOut,
   type User,
 } from 'firebase/auth'
 import { onSnapshot, doc } from 'firebase/firestore'
-import { auth, db } from './firebase'
+import { httpsCallable } from 'firebase/functions'
+import { auth, db, functions } from './firebase'
+import { hasNudgeAuthorClaims, NUDGE_AUTHOR_UID } from './nudgeAuthor'
 import {
   ensureProfile,
   loadProfile,
@@ -42,12 +45,14 @@ export type AppUser = Pick<
 
 interface AuthState {
   user: AppUser | null
+  nudgeAuthor: boolean
   profile: UserProfile | null
   profileLoaded: boolean
   loading: boolean
   error: string | null
   emergencyMode: boolean
   signInWithEmail: (email: string, password: string) => Promise<void>
+  signInAsMillerAuthor: (identifier: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   signInWithApple: () => Promise<void>
   sendPasswordReset: (email: string) => Promise<void>
@@ -60,6 +65,7 @@ const AuthContext = createContext<AuthState | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const emergencyMode = currentMode() === 'mirror'
   const [user, setUser] = useState<AppUser | null>(null)
+  const [nudgeAuthor, setNudgeAuthor] = useState(false)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [profileLoaded, setProfileLoaded] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -98,8 +104,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const applyAuthState = async (next: User | null) => {
       const generation = ++authGeneration
-      if (!emergencyMode) {
-        if (!cancelled && generation === authGeneration) setUser(next)
+      let isNudgeAuthor = false
+      if (next && (!emergencyMode || next.uid === NUDGE_AUTHOR_UID)) {
+        try {
+          const token = await next.getIdTokenResult()
+          isNudgeAuthor = hasNudgeAuthorClaims(token.claims)
+        } catch (e) {
+          if (!cancelled && generation === authGeneration) setError(toMessage(e))
+        }
+      }
+      if (!emergencyMode || isNudgeAuthor) {
+        if (!cancelled && generation === authGeneration) {
+          setNudgeAuthor(isNudgeAuthor)
+          setUser(next)
+        }
       } else {
         let session = null
         try {
@@ -108,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // An expired session that cannot be refreshed is not authentication.
         }
         if (!cancelled && generation === authGeneration) {
+          setNudgeAuthor(false)
           setUser(
             session
               ? next?.uid === session.uid
@@ -145,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [emergencyMode])
 
   useEffect(() => {
-    if (!user) {
+    if (!user || nudgeAuthor) {
       setProfile(null)
       setProfileLoaded(true)
       return
@@ -198,16 +217,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true
       unsub()
     }
-  }, [user])
+  }, [user, nudgeAuthor])
 
   const api = useMemo<AuthState>(
     () => ({
       user,
+      nudgeAuthor,
       profile,
       profileLoaded,
       loading,
       error,
       emergencyMode,
+      async signInAsMillerAuthor(identifier, password) {
+        setError(null)
+        setLoading(true)
+        try {
+          const signIn = httpsCallable<
+            { identifier: string; password: string },
+            { token: string; destination: string }
+          >(functions, 'millerNudgeAuthorSignIn', {
+            limitedUseAppCheckTokens: true,
+          })
+          const response = await signIn({ identifier: identifier.trim(), password })
+          const result = await signInWithCustomToken(auth, response.data.token)
+          const token = await result.user.getIdTokenResult()
+          if (!hasNudgeAuthorClaims(token.claims)) {
+            await fbSignOut(auth)
+            throw new Error('Nudge Studio access was not granted.')
+          }
+          standbyAuth.clearSession()
+          setNudgeAuthor(true)
+          setUser(result.user)
+        } catch (e) {
+          setError(toMessage(e))
+          throw e
+        } finally {
+          setLoading(false)
+        }
+      },
       async signInWithEmail(email, password) {
         setError(null)
         setLoading(true)
@@ -291,6 +338,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Clear first so an in-flight bootstrap/refresh cannot restore the
         // standby session after the user explicitly signs out.
         standbyAuth.clearSession()
+        setNudgeAuthor(false)
         setUser(null)
         await fbSignOut(auth)
       },
@@ -303,7 +351,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(next)
       },
     }),
-    [user, profile, profileLoaded, loading, error, emergencyMode]
+    [user, nudgeAuthor, profile, profileLoaded, loading, error, emergencyMode]
   )
 
   return <AuthContext.Provider value={api}>{children}</AuthContext.Provider>
@@ -338,6 +386,14 @@ function toMessage(err: unknown): string {
       return 'Email and password sign-in is currently unavailable.'
     case 'auth/popup-closed-by-user':
       return 'The sign-in window was closed before completion.'
+    case 'functions/unauthenticated':
+    case 'functions/permission-denied':
+      return 'Incorrect email or password.'
+    case 'functions/resource-exhausted':
+      return 'Too many attempts. Wait a few minutes and try again.'
+    case 'appCheck/recaptcha-error':
+    case 'appCheck/initial-throttle':
+      return 'Could not verify this browser. Refresh the page and try again.'
   }
   if (err instanceof Error) return err.message
   return String(err)
@@ -350,6 +406,10 @@ function isReadOnlyMirror(): boolean {
 async function provisionStandbySession(user: User): Promise<void> {
   if (currentMode() !== 'primary' || !standbyAuth.endpoint()) return
   try {
+    const token = await user.getIdTokenResult()
+    // Author accounts only edit public copy through their scoped callables.
+    // They must not acquire a health-data standby session.
+    if (hasNudgeAuthorClaims(token.claims)) return
     const priorSession = standbyAuth.readSession()
     if (priorSession && priorSession.uid !== user.uid) standbyAuth.clearSession()
     const idToken = await user.getIdToken()

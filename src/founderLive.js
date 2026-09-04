@@ -1,4 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
+import { currentFounderJourneyNote } from './founderJourney.js'
 import {
   ReCaptchaEnterpriseProvider,
   initializeAppCheck,
@@ -66,6 +67,7 @@ const SPORT_LABELS = {
 
 const state = {
   root: null,
+  journey: null,
   workouts: [],
   historyWorkouts: null,
   historyLoading: false,
@@ -99,6 +101,8 @@ const state = {
   route: null,
   routeLoading: false,
   unsubscribeRoot: null,
+  unsubscribeJourney: null,
+  journeyWeekTimer: null,
   unsubscribeWorkouts: null,
   unsubscribeMeals: null,
   unsubscribeRoute: null,
@@ -364,6 +368,21 @@ function connectLiveRecord() {
       console.warn('Founder live meals unavailable', error.code)
     }
   )
+
+  state.unsubscribeJourney = onSnapshot(
+    doc(database, 'publicFounderReplicas', 'founder', 'journey', 'current'),
+    (snapshot) => {
+      state.journey = snapshot.exists() ? snapshot.data() : null
+      renderJourneyNote()
+    },
+    (error) => {
+      console.warn('Founder journey note unavailable', error.code)
+      state.journey = null
+      renderJourneyNote()
+    }
+  )
+  // Hide last week's note at the same Chicago calendar boundary as the studio.
+  state.journeyWeekTimer = window.setInterval(renderJourneyNote, 60_000)
 
   state.unsubscribeWorkouts = onSnapshot(
     workoutsReference(),
@@ -2085,10 +2104,26 @@ function renderTrainingRecord() {
 }
 
 function render() {
+  renderJourneyNote()
   renderScreen()
   renderNutritionScreen()
   renderLongitudinalRecord()
   renderArchive()
+}
+
+function renderJourneyNote() {
+  const card = elements.journeyNote
+  if (!card) return
+  const journey = state.root?.published === true &&
+    state.root?.trainingPlanPublished === true
+    ? currentFounderJourneyNote(state.journey)
+    : null
+  card.hidden = journey === null
+  card.innerHTML = journey ? `
+    <header><strong>Week ${integer(journey.weekNumber)} · Miller week note</strong>
+      <time>${escapeHTML(dateLabel(journey.weekStartDay, { short: true, year: false }))}–${escapeHTML(dateLabel(journey.weekEndDay, { short: true, year: false }))}</time></header>
+    <p>${escapeHTML(journey.note)}</p>
+  ` : ''
 }
 
 function positionActivityAtYearSummary() {
@@ -2229,6 +2264,7 @@ export function initFounderLive() {
   if (!stage) return
   elements = {
     stage,
+    journeyNote: document.getElementById('founder-journey-note'),
     screen: document.getElementById('founder-live-screen'),
     title: document.getElementById('founder-live-title'),
     back: document.getElementById('founder-live-back'),
@@ -2243,6 +2279,11 @@ export function initFounderLive() {
     updated: document.getElementById('founder-live-updated'),
   }
   if (Object.values(elements).some((element) => element == null)) return
+
+  window.addEventListener('beforeunload', () => {
+    state.unsubscribeJourney?.()
+    window.clearInterval(state.journeyWeekTimer)
+  }, { once: true })
 
   elements.back.addEventListener('click', () => {
     stopRouteListener()

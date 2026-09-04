@@ -18,6 +18,8 @@ import { MessageThread } from './routes/MessageThread'
 import { TrainingRoutes } from './routes/TrainingRoutes'
 import { Tokens, TokensTest } from './routes/Tokens'
 import { WorkbenchAuth } from './routes/WorkbenchAuth'
+import { NudgeStudio } from './routes/NudgeStudio'
+import { NudgeAuthorRoute } from './components/NudgeAuthorRoute'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Shell } from './components/Shell'
 import { useAuth } from './lib/auth'
@@ -36,6 +38,14 @@ export function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route
+        path="/agency/nudge-studio"
+        element={<Navigate to="/nudge-studio" replace />}
+      />
+      <Route
+        path="/nudge-studio"
+        element={<NudgeAuthorRoute><NudgeStudio /></NudgeAuthorRoute>}
+      />
       {/* iOS "Manage re-up on web" opens /app/workbench-auth?embed=1&next=/tokens
           with a one-time handoff code in the URL fragment; the route consumes
           it via consumeWebSignInHandoff and continues to `next`. */}

@@ -2,14 +2,14 @@ import { Navigate, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuth } from '../lib/auth'
 
-export function ProtectedRoute({ children }: { children: ReactNode }) {
+export function NudgeAuthorRoute({ children }: { children: ReactNode }) {
   const { user, nudgeAuthor, loading } = useAuth()
   const location = useLocation()
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-text-secondary text-sm">
-        Loading…
+        Opening Nudge Studio…
       </div>
     )
   }
@@ -18,8 +18,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     return <Navigate to="/login" replace state={{ from: location }} />
   }
 
-  if (nudgeAuthor) {
-    return <Navigate to="/nudge-studio" replace />
+  if (!nudgeAuthor) {
+    return <Navigate to="/" replace />
   }
 
   return <>{children}</>

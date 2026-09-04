@@ -1160,6 +1160,25 @@ a { color: inherit; text-decoration: none; }
   line-height: 1;
 }
 
+.founder-journey-note {
+  max-width: 920px;
+  margin: 0 auto 24px;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+}
+
+.founder-journey-note header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+
+.founder-journey-note time { font-size: 14px; opacity: .7; }
+.founder-journey-note p { margin: 12px 0 0; font-size: 16px; line-height: 1.6; }
+
 .founder-live-suite__head p {
   max-width: 620px;
   margin-top: 12px;

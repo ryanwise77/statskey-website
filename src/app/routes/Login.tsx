@@ -1,13 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
+import { isNudgeAuthorIdentifier } from '../lib/nudgeAuthor'
 
 const REDIRECT_PATH_KEY = 'statskey.login.redirectPath'
 
 export function Login() {
   const {
     user,
+    nudgeAuthor,
     signInWithEmail,
+    signInAsMillerAuthor,
     signInWithGoogle,
     signInWithApple,
     sendPasswordReset,
@@ -27,6 +30,10 @@ export function Login() {
   useEffect(() => { setLocalError(error) }, [error])
 
   if (user && !loading) {
+    if (nudgeAuthor) {
+      sessionStorage.removeItem(REDIRECT_PATH_KEY)
+      return <Navigate to="/nudge-studio" replace />
+    }
     const redirectPath =
       sessionStorage.getItem(REDIRECT_PATH_KEY) ??
       (from ? `${from.pathname}${from.search ?? ''}${from.hash ?? ''}` : null) ??
@@ -76,7 +83,11 @@ export function Login() {
     setLocalError(null)
     try {
       rememberRedirect()
-      await signInWithEmail(normalizedEmail, password)
+      if (isNudgeAuthorIdentifier(normalizedEmail)) {
+        await signInAsMillerAuthor(normalizedEmail, password)
+      } else {
+        await signInWithEmail(normalizedEmail, password)
+      }
     } catch {
       // error surfaced via context state
     } finally {
@@ -188,7 +199,7 @@ export function Login() {
                   <input
                     id="login-email"
                     className="input"
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     autoComplete="email"
