@@ -1104,6 +1104,15 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
 }
 
+.clinician-preview-card {
+  margin: 1.25rem 0;
+  padding: 1.1rem;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+}
+.clinician-preview-card .button { max-width: 100%; white-space: normal; }
+.clinician-preview-card p { margin: .8rem 0 0; font-size: 1rem; line-height: 1.55; }
+
 .experiment-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(326px, 460px);
