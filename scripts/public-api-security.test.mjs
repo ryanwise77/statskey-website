@@ -20,6 +20,9 @@ function response() {
 
 test('public JSON boundary accepts website form submissions and Node callers', async () => {
   assert.deepEqual(await readPublicJsonBody({ headers, body: { name: 'Test' } }, 100), { name: 'Test' });
+  for (const origin of ['https://www.statskey.ai', 'https://statskeybiometrics.com']) {
+    assert.deepEqual(await readPublicJsonBody({ headers: { ...headers, origin }, body: { name: 'Test' } }, 100), { name: 'Test' });
+  }
   assert.deepEqual(await readPublicJsonBody({ headers: { 'content-type': 'application/json; charset=utf-8' }, body: '{"name":"Test"}' }, 100), { name: 'Test' });
 });
 
@@ -27,6 +30,7 @@ test('cross-site JSON-shaped text forms cannot trigger public operations', async
   for (const requestHeaders of [
     { 'content-type': 'text/plain' },
     { ...headers, origin: 'https://attacker.example' },
+    { ...headers, origin: 'https://statskeybiometrics.com.attacker.example' },
     { ...headers, origin: 'null' },
     { 'content-type': 'application/json', 'sec-fetch-site': 'cross-site' },
   ]) {
