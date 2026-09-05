@@ -27,6 +27,7 @@ const PRIVATE_HEADERS = {
   'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
   'Referrer-Policy': 'no-referrer',
   'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
 }
 
 function reply(status, body) {

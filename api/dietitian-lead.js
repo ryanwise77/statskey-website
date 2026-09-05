@@ -1,3 +1,5 @@
+import { readPublicJsonBody, sendPublicRequestError, setPrivateResponseHeaders } from '../lib/public-api-request.js';
+
 // Serverless lead-capture endpoint for the /for-dietitians practitioner page.
 // This is OPT-IN / transactional only: it records a form the person chose to
 // submit and notifies the founder. It never sends cold mail, so it is within
@@ -29,23 +31,7 @@ function escapeHtml(s) {
   ));
 }
 
-async function readJsonBody(req) {
-  if (req.body !== undefined) {
-    if (typeof req.body === 'string') {
-      if (req.body.length > MAX_BODY_BYTES) return undefined;
-      try { return JSON.parse(req.body); } catch { return undefined; }
-    }
-    return req.body;
-  }
-  let size = 0;
-  const chunks = [];
-  for await (const chunk of req) {
-    size += chunk.length;
-    if (size > MAX_BODY_BYTES) return undefined;
-    chunks.push(chunk);
-  }
-  try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { return undefined; }
-}
+
 
 async function notify(lead) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -78,11 +64,18 @@ async function notify(lead) {
 }
 
 export default async function handler(req, res) {
+  setPrivateResponseHeaders(res);
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method_not_allowed' });
     return;
   }
-  const body = await readJsonBody(req);
+  let body;
+  try {
+    body = await readPublicJsonBody(req, MAX_BODY_BYTES);
+  } catch (error) {
+    sendPublicRequestError(res, error);
+    return;
+  }
   if (!body || typeof body !== 'object') {
     res.status(400).json({ error: 'bad_request' });
     return;

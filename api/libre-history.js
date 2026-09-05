@@ -1,3 +1,5 @@
+import { readPublicJsonBody, sendPublicRequestError, setPrivateResponseHeaders } from '../lib/public-api-request.js';
+
 // Stateless proxy: signs in to Abbott's LibreLink Up API with the patient's
 // own Libre app credentials, fetches up to 90 days of glucose history, and
 // returns ONLY derived summary numbers. Credentials and tokens are never
@@ -221,29 +223,21 @@ function summarize(readings) {
   };
 }
 
-async function readJsonBody(req) {
-  if (req.body !== undefined) {
-    if (typeof req.body === 'string') {
-      try { return JSON.parse(req.body); } catch { return undefined; }
-    }
-    return req.body;
-  }
-  let size = 0;
-  const chunks = [];
-  for await (const chunk of req) {
-    size += chunk.length;
-    if (size > 4096) return undefined;
-    chunks.push(chunk);
-  }
-  try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { return undefined; }
-}
+
 
 export default async function handler(req, res) {
+  setPrivateResponseHeaders(res);
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method_not_allowed' });
     return;
   }
-  const body = await readJsonBody(req);
+  let body;
+  try {
+    body = await readPublicJsonBody(req, 4096);
+  } catch (error) {
+    sendPublicRequestError(res, error);
+    return;
+  }
   const email = body && typeof body.email === 'string' ? body.email.trim() : '';
   const password = body && typeof body.password === 'string' ? body.password : '';
   if (!email || !password || email.length > 254 || password.length > 128) {
