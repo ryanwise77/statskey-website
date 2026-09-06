@@ -8,7 +8,7 @@ const de = {
   __title: 'Datenschutzerklärung — StatsKey',
   'lp-title': 'Datenschutzerklärung',
   'lp-date':
-    'Gültig ab: 5. September 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
+    'Gültig ab: 6. September 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Einleitung</h2>
@@ -92,6 +92,7 @@ const de = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">7. Weitergabe von Daten</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">Keine öffentliche Offenlegung.</strong> StatsKey und sein Gründer werden deine Standortdaten oder Informationen zu deinem Wohlbefinden, deiner Gesundheit oder Fitness, die dich identifizieren oder sich vernünftigerweise mit dir verknüpfen lassen, weder veröffentlichen noch auf andere Weise öffentlich weitergeben. Dies umfasst öffentliche Beiträge, Werbung, Vorführungen und Fallstudien. Du kannst deine eigenen Daten weiterhin auf Wunsch privat mit von dir ausgewählten Personen teilen. Die notwendige Verarbeitung durch Dienstleister und gesetzlich vorgeschriebene Offenlegungen unterliegen weiterhin unserer <a href="/privacy" class="text-accent hover:underline">Datenschutzerklärung</a>.</p>
             <ul class="list-disc pl-5 space-y-2">
               <li><strong class="text-text-primary">Kein Verkauf:</strong> Wir verkaufen deine personenbezogenen Daten nicht. Wir geben keine Daten an Dritte für kontextübergreifende verhaltensbasierte Werbung weiter.</li>
               <li><strong class="text-text-primary">Dienstleister:</strong> Weitergabe nur, soweit zur Bereitstellung der Anwendung erforderlich, unter Vertraulichkeits- und Sicherheitsverpflichtungen.</li>
@@ -197,7 +198,7 @@ const ja = {
   __title: 'プライバシーポリシー — StatsKey',
   'lp-title': 'プライバシーポリシー',
   'lp-date':
-    '発効日：2026年9月5日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
+    '発効日：2026年9月6日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. はじめに</h2>
@@ -281,6 +282,7 @@ const ja = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">7. データの共有</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">公開しないことへの確約。</strong> StatsKeyおよびその創業者は、お客様の位置情報、またはお客様を特定できる、もしくは合理的にお客様と結び付けられるウェルネス・健康・フィットネス情報を公開したり、その他の方法で公に共有したりしません。これには、公開の投稿、広告、デモンストレーション、事例紹介が含まれます。お客様ご自身のデータは、引き続きお客様が選んだ相手と非公開で共有できます。サービス提供者による必要な処理および法律で義務付けられた開示には、引き続き当社の<a href="/privacy" class="text-accent hover:underline">プライバシーポリシー</a>が適用されます。</p>
             <ul class="list-disc pl-5 space-y-2">
               <li><strong class="text-text-primary">販売しません:</strong> 当社はお客様の個人データを販売しません。コンテキストを越えた行動ターゲティング広告のために第三者とデータを共有することはありません。</li>
               <li><strong class="text-text-primary">サービスプロバイダー:</strong> アプリの提供に必要な範囲でのみ、機密保持およびセキュリティの義務のもとで共有します。</li>
@@ -386,7 +388,7 @@ const pt = {
   __title: 'Política de Privacidade — StatsKey',
   'lp-title': 'Política de Privacidade',
   'lp-date':
-    'Data de vigência: 5 de setembro de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
+    'Data de vigência: 6 de setembro de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Introdução</h2>
@@ -470,6 +472,7 @@ const pt = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">7. Compartilhamento de Dados</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">Sem divulgação pública.</strong> O StatsKey e seu fundador não publicarão nem compartilharão publicamente de outra forma seus dados de localização ou informações de bem-estar, saúde ou condicionamento físico que identifiquem você ou que possam ser razoavelmente associadas a você. Isso inclui publicações públicas, publicidade, demonstrações e estudos de caso. Você pode continuar optando por compartilhar seus próprios dados de forma privada com pessoas que escolher. O tratamento necessário por prestadores de serviços e as divulgações exigidas por lei continuam sujeitos à nossa <a href="/privacy" class="text-accent hover:underline">Política de Privacidade</a>.</p>
             <ul class="list-disc pl-5 space-y-2">
               <li><strong class="text-text-primary">Sem venda:</strong> Não vendemos seus dados pessoais. Não compartilhamos dados com terceiros para publicidade comportamental entre contextos.</li>
               <li><strong class="text-text-primary">Prestadores de serviço:</strong> Compartilhados apenas conforme necessário para fornecer o aplicativo, sujeitos a obrigações de confidencialidade e segurança.</li>
@@ -575,7 +578,7 @@ const es = {
   __title: 'Política de Privacidad — StatsKey',
   'lp-title': 'Política de Privacidad',
   'lp-date':
-    'Fecha de entrada en vigor: 5 de septiembre de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
+    'Fecha de entrada en vigor: 6 de septiembre de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Introducción</h2>
@@ -659,6 +662,7 @@ const es = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">7. Compartición de datos</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">Sin divulgación pública.</strong> StatsKey y su fundador no publicarán ni compartirán públicamente de otro modo tus datos de ubicación ni información de bienestar, salud o actividad física que te identifique o que pueda vincularse razonablemente contigo. Esto incluye publicaciones públicas, publicidad, demostraciones y estudios de casos. Puedes seguir eligiendo compartir tus propios datos de forma privada con las personas que selecciones. El tratamiento necesario por parte de proveedores de servicios y las divulgaciones exigidas por la ley siguen sujetos a nuestra <a href="/privacy" class="text-accent hover:underline">Política de Privacidad</a>.</p>
             <ul class="list-disc pl-5 space-y-2">
               <li><strong class="text-text-primary">Sin venta:</strong> No vendemos tus datos personales. No compartimos datos con terceros para publicidad conductual de contexto cruzado.</li>
               <li><strong class="text-text-primary">Proveedores de servicios:</strong> Se comparten solo en la medida necesaria para prestar la aplicación, con obligaciones de confidencialidad y seguridad.</li>

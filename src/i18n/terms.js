@@ -8,7 +8,7 @@ const pt = {
   __title: 'Termos de Serviço — StatsKey',
   'lp-title': 'Termos de Serviço',
   'lp-date':
-    'Em vigor a partir de: 30 de junho de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
+    'Em vigor a partir de: 6 de setembro de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Aceitação dos Termos</h2>
@@ -104,6 +104,7 @@ const pt = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">9. Propriedade Intelectual</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">Sem divulgação pública.</strong> O StatsKey e seu fundador não publicarão nem compartilharão publicamente de outra forma seus dados de localização ou informações de bem-estar, saúde ou condicionamento físico que identifiquem você ou que possam ser razoavelmente associadas a você. Isso inclui publicações públicas, publicidade, demonstrações e estudos de caso. Você pode continuar optando por compartilhar seus próprios dados de forma privada com pessoas que escolher. O tratamento necessário por prestadores de serviços e as divulgações exigidas por lei continuam sujeitos à nossa <a href="/privacy" class="text-accent hover:underline">Política de Privacidade</a>.</p>
             <ul class="list-disc pl-5 space-y-2">
               <li>O StatsKey, seu design, código, conteúdo, marcas registradas e todos os materiais originais são propriedade exclusiva do StatsKey e são protegidos por leis de direitos autorais, marcas registradas e outras leis de propriedade intelectual.</li>
               <li>Você mantém a titularidade dos seus dados pessoais.</li>
@@ -226,7 +227,7 @@ const es = {
   __title: 'Términos del Servicio — StatsKey',
   'lp-title': 'Términos del Servicio',
   'lp-date':
-    'Fecha de entrada en vigor: 30 de junio de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
+    'Fecha de entrada en vigor: 6 de septiembre de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Aceptación de los Términos</h2>
@@ -322,6 +323,7 @@ const es = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">9. Propiedad intelectual</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">Sin divulgación pública.</strong> StatsKey y su fundador no publicarán ni compartirán públicamente de otro modo tus datos de ubicación ni información de bienestar, salud o actividad física que te identifique o que pueda vincularse razonablemente contigo. Esto incluye publicaciones públicas, publicidad, demostraciones y estudios de casos. Puedes seguir eligiendo compartir tus propios datos de forma privada con las personas que selecciones. El tratamiento necesario por parte de proveedores de servicios y las divulgaciones exigidas por la ley siguen sujetos a nuestra <a href="/privacy" class="text-accent hover:underline">Política de Privacidad</a>.</p>
             <ul class="list-disc pl-5 space-y-2">
               <li>StatsKey, su diseño, código, contenido, marcas comerciales y todos los materiales originales son propiedad exclusiva de StatsKey y están protegidos por las leyes de derechos de autor, marcas y otras leyes de propiedad intelectual.</li>
               <li>Conservas la titularidad de tus datos personales.</li>
@@ -444,7 +446,7 @@ const de = {
   __title: 'Nutzungsbedingungen — StatsKey',
   'lp-title': 'Nutzungsbedingungen',
   'lp-date':
-    'Gültig ab: 30. Juni 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
+    'Gültig ab: 6. September 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Annahme der Bedingungen</h2>
@@ -540,6 +542,7 @@ const de = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">9. Geistiges Eigentum</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">Keine öffentliche Offenlegung.</strong> StatsKey und sein Gründer werden deine Standortdaten oder Informationen zu deinem Wohlbefinden, deiner Gesundheit oder Fitness, die dich identifizieren oder sich vernünftigerweise mit dir verknüpfen lassen, weder veröffentlichen noch auf andere Weise öffentlich weitergeben. Dies umfasst öffentliche Beiträge, Werbung, Vorführungen und Fallstudien. Du kannst deine eigenen Daten weiterhin auf Wunsch privat mit von dir ausgewählten Personen teilen. Die notwendige Verarbeitung durch Dienstleister und gesetzlich vorgeschriebene Offenlegungen unterliegen weiterhin unserer <a href="/privacy" class="text-accent hover:underline">Datenschutzerklärung</a>.</p>
             <ul class="list-disc pl-5 space-y-2">
               <li>StatsKey, sein Design, Code, Inhalt, seine Marken und alle Originalmaterialien sind das ausschließliche Eigentum von StatsKey und durch Urheber-, Marken- und andere Gesetze zum geistigen Eigentum geschützt.</li>
               <li>Du behältst das Eigentum an deinen personenbezogenen Daten.</li>
@@ -662,7 +665,7 @@ const ja = {
   __title: '利用規約 — StatsKey',
   'lp-title': '利用規約',
   'lp-date':
-    '発効日: 2026年6月30日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
+    '発効日: 2026年9月6日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. 規約への同意</h2>
@@ -758,6 +761,7 @@ const ja = {
 
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">9. 知的財産</h2>
+            <p class="mb-3" data-public-disclosure-commitment="true"><strong class="text-text-primary">公開しないことへの確約。</strong> StatsKeyおよびその創業者は、お客様の位置情報、またはお客様を特定できる、もしくは合理的にお客様と結び付けられるウェルネス・健康・フィットネス情報を公開したり、その他の方法で公に共有したりしません。これには、公開の投稿、広告、デモンストレーション、事例紹介が含まれます。お客様ご自身のデータは、引き続きお客様が選んだ相手と非公開で共有できます。サービス提供者による必要な処理および法律で義務付けられた開示には、引き続き当社の<a href="/privacy" class="text-accent hover:underline">プライバシーポリシー</a>が適用されます。</p>
             <ul class="list-disc pl-5 space-y-2">
               <li>StatsKey、そのデザイン、コード、コンテンツ、商標、およびすべてのオリジナル素材は、StatsKeyの独占的財産であり、著作権、商標、その他の知的財産法によって保護されています。</li>
               <li>お客様は、ご自身の個人データの所有権を保持します。</li>
