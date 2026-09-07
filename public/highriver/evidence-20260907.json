@@ -1,0 +1,118 @@
+{
+  "as_of_utc": "2026-09-07T17:36:33.471178+00:00",
+  "production_scorecard_generated_at_utc": "2026-09-07T11:47:41.646406+00:00",
+  "headline": "Early evidence for production-risk screening. Target oil estimates still need calibration.",
+  "short_answer": "There is a promising statistical signal for predicting sustained zero-production periods. We do not yet have a validated remaining-oil or acquisition-value result.",
+  "findings": [
+    {
+      "id": "production-event",
+      "title": "A useful early signal for production risk",
+      "status": "Nominal statistical support",
+      "summary": "On the future-time test, the model reduced log loss for a sustained zero-production event by 61.4% relative to a training-cohort event-rate baseline.",
+      "target": "A 90-day spell with no reported oil or gas production, completed by the forecast horizon. The event remains recorded after a later restart.",
+      "metric": "log loss (lower is better)",
+      "model": 0.20109649154057938,
+      "baseline": 0.5214853497619033,
+      "relative_loss_reduction_pct": 61.43774860935311,
+      "paired_difference": -0.32038885822132396,
+      "paired_difference_nominal_95_ci": [
+        -0.33518676904265576,
+        -0.3064154195339222
+      ],
+      "entities": 8027,
+      "repeated_entity_date_horizon_rows": 298162,
+      "method": "500 whole-entity bootstrap resamples; nominal 95% interval; no multiple-comparison adjustment or p-value.",
+      "limitations": [
+        "The baseline is an event-rate prior, not a strong history-based event model.",
+        "The target does not establish permanent abandonment, equipment failure or depleted reserves.",
+        "The estimate concerns the evaluated public-data cohort; target-area and commercial validation are pending.",
+        "The percentage is a reduction in log loss, not classification accuracy, operational savings or barrel accuracy."
+      ]
+    },
+    {
+      "id": "production-volume",
+      "title": "Production volumes remain a work in progress",
+      "status": "Combined quality gate not passed",
+      "summary": "The current general model does not consistently beat simple production baselines. Future-time oil, gas, water and uptime are worse on their primary loss comparisons.",
+      "oil_example": {
+        "metric": "RMSLE (lower is better)",
+        "model": 0.5660951195905042,
+        "baseline": 0.4893747837313676,
+        "baseline_name": "Decision-time persistence",
+        "paired_mean_squared_log_loss_difference": 0.08097600547206439,
+        "paired_difference_nominal_95_ci": [
+          0.06482895139251663,
+          0.09969042595875491
+        ]
+      },
+      "limitations": [
+        "The paired interval is for the mean squared-log-loss difference, not the RMSLE difference.",
+        "Some individual transfer comparisons improve; they do not establish a consistent forecasting edge."
+      ]
+    },
+    {
+      "id": "seismic",
+      "title": "Seismic representation learning shows development progress",
+      "status": "Development evidence",
+      "summary": "An independently audited development candidate improved retrieval top-1 by 3.83 percentage points against the prior checkpoint.",
+      "retrieval_top1_improvement_percentage_points": 3.826678,
+      "nominal_95_ci_percentage_points": [
+        2.1050344,
+        6.6189234
+      ],
+      "completed_candidates": 144,
+      "development_gate_passes": 22,
+      "development_gate_rejections": 122,
+      "execution_failures": 0,
+      "two_training_seed_configurations_passing": 11,
+      "limitations": [
+        "Only three repeatedly used survey clusters.",
+        "Nominal intervals do not correct for the 144-candidate search.",
+        "Evaluation seeds repeat crop and augmentation sampling.",
+        "This measures seismic representation quality, not High River remaining oil or recoverable barrels."
+      ]
+    },
+    {
+      "id": "specialists",
+      "title": "Task-specific production models are being tested",
+      "status": "Running at observation time",
+      "completed_jobs": 6,
+      "registered_jobs": 28,
+      "task_configurations": 7,
+      "architecture_seed_pairs": 4,
+      "summary": "Final selection and paired comparisons follow completion of the registered experiment.",
+      "result_available": false
+    }
+  ],
+  "validation_limits": {
+    "whole_portfolio_ready": false,
+    "remaining_oil_estimate_available": false,
+    "acquisition_value_validated": false,
+    "training_eligible_operating_strata": [
+      "Raton",
+      "San Juan",
+      "Uinta"
+    ],
+    "missing_operating_strata": [
+      "Texas Panhandle",
+      "Eastern Shelf",
+      "Green River"
+    ],
+    "holdout_note": "Area and basin protocols share test identities; the operator protocol has entity overlap with training. Four protocol reports are not four independent confirmations.",
+    "prior_champion_comparison": "Not comparable on the required matched identities and labels."
+  },
+  "data_progress": {
+    "summary": "Public operator records, lease and well production histories, survey-catalog geometry and historical well logs have narrowed the inputs for a targeted pilot.",
+    "remaining_gap": "No verified complete package yet joins target-overlapping seismic, usable well ties, measured reservoir properties and allocated depletion history."
+  },
+  "pilot_request": {
+    "title": "Start with one agreed field or acquisition package",
+    "data": [
+      "Target boundary and permission to use the data for the agreed pilot",
+      "Seismic and logs with well ties",
+      "Formation-specific rock and fluid measurements",
+      "Allocated production, injection and pressure histories"
+    ],
+    "evaluation": "Freeze the decision date and target holdout, then compare an engineering baseline with and without the additional data."
+  }
+}
