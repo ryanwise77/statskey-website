@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
-import { currentFounderJourneyNote } from './founderJourney.js'
+import { currentFounderJourneyNote, founderNoteHeading, founderNoteLanguage } from './founderJourney.js'
 import {
   ReCaptchaEnterpriseProvider,
   initializeAppCheck,
@@ -2114,15 +2114,26 @@ function render() {
 function renderJourneyNote() {
   const card = elements.journeyNote
   if (!card) return
+  let savedLanguage
+  try { savedLanguage = localStorage.getItem('sk_lang') } catch (_) {}
+  const language = founderNoteLanguage(
+    new URLSearchParams(window.location.search).get('lang'),
+    savedLanguage,
+    navigator.language,
+  )
   const journey = state.root?.published === true &&
     state.root?.trainingPlanPublished === true
-    ? currentFounderJourneyNote(state.journey)
+    ? currentFounderJourneyNote(state.journey, new Date(), language)
     : null
   card.hidden = journey === null
+  card.lang = language
+  const noteDate = (day) => new Intl.DateTimeFormat(language, {
+    timeZone: 'UTC', month: 'short', day: 'numeric',
+  }).format(new Date(`${day}T00:00:00Z`))
   card.innerHTML = journey ? `
-    <header><strong>Week ${integer(journey.weekNumber)} · Miller week note</strong>
-      <time>${escapeHTML(dateLabel(journey.weekStartDay, { short: true, year: false }))}–${escapeHTML(dateLabel(journey.weekEndDay, { short: true, year: false }))}</time></header>
-    <p>${escapeHTML(journey.note)}</p>
+    <header><strong>${escapeHTML(founderNoteHeading(journey.weekNumber, language))}</strong>
+      <time>${escapeHTML(noteDate(journey.weekStartDay))}–${escapeHTML(noteDate(journey.weekEndDay))}</time></header>
+    <p lang="${journey.noteLanguage}">${escapeHTML(journey.note)}</p>
   ` : ''
 }
 
@@ -2279,6 +2290,11 @@ export function initFounderLive() {
     updated: document.getElementById('founder-live-updated'),
   }
   if (Object.values(elements).some((element) => element == null)) return
+
+  window.addEventListener('languagechange', renderJourneyNote)
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'sk_lang') renderJourneyNote()
+  })
 
   window.addEventListener('beforeunload', () => {
     state.unsubscribeJourney?.()

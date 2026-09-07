@@ -274,7 +274,10 @@ export function NudgeStudio() {
       cloudDraftRef.current = activeSerialized
       currentDraftRef.current = activeSerialized
       clearLocalNudgeDraft()
-      setStudio(next)
+      setStudio((current) => ({
+        ...next,
+        founderJourneyWeek: next.founderJourneyWeek ?? current?.founderJourneyWeek ?? studio.founderJourneyWeek,
+      }))
       setDrafts(cloneDrafts(next.active.slots))
       setDraftBaseRevision(next.active.revision)
       setDraftSavedAt(next.active.publishedAtMillis)
@@ -301,7 +304,10 @@ export function NudgeStudio() {
     setNotice(null)
     try {
       const next = await rollbackNudges(studio.active.revision, target.revision)
-      setStudio(next)
+      setStudio((current) => ({
+        ...next,
+        founderJourneyWeek: next.founderJourneyWeek ?? current?.founderJourneyWeek ?? studio.founderJourneyWeek,
+      }))
       if (preserveDraft) {
         setDraftWarning(
           `Your saved draft is still here. Review it against live revision ${next.active.revision} before publishing.`
@@ -428,7 +434,9 @@ export function NudgeStudio() {
             </h1>
             <p className="text-text-secondary text-[14px] leading-relaxed mt-3">
               These messages appear in the iPhone app, recording notifications, and
-              Apple Watch. Publishing is immediate, revisioned, and reversible.
+              Apple Watch. Write in English; publishing automatically prepares
+              German, Spanish, Hindi, Japanese, and Brazilian Portuguese copy
+              for each reader&apos;s selected language.
             </p>
           </div>
           <div className="panel lg:min-w-[270px] !p-4">
@@ -474,8 +482,9 @@ export function NudgeStudio() {
                 studio.founderJourneyWeek.weekStartDay,
                 studio.founderJourneyWeek.weekEndDay
               )}
-              . Write the agency note that appears beneath Ryan&apos;s live training
-              week on the public Olympic Marathon screen.
+              . Write the note that appears beneath Ryan&apos;s live training
+              week on the public Olympic Marathon screen. It is automatically
+              translated when you publish and follows the reader&apos;s website language.
             </p>
 
             <label className="block mt-5">
@@ -506,7 +515,7 @@ export function NudgeStudio() {
                 onClick={publishWeekNote}
               >
                 {weekNotePublishing
-                  ? 'Publishing…'
+                  ? 'Translating and publishing…'
                   : `Publish Week ${studio.founderJourneyWeek.weekNumber} note`}
               </button>
               <span className="text-text-muted text-[11px]">
@@ -627,7 +636,8 @@ export function NudgeStudio() {
             <h2 className="font-display text-[18px] font-bold">Review and publish</h2>
             <p className="text-text-muted text-[11px] leading-relaxed mt-1">
               Drafts save as you write. Publishing separately checks every surface,
-              pressure-based wording, and product language.
+              pressure-based wording, product language, and all six languages.
+              If translation fails, your saved draft and live revision stay intact.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
@@ -650,7 +660,7 @@ export function NudgeStudio() {
               onClick={publish}
             >
               {action === 'publish'
-                ? 'Publishing…'
+                ? 'Translating and publishing…'
                 : `Publish revision ${studio.active.revision + 1}`}
             </button>
           </div>

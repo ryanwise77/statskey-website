@@ -6,6 +6,8 @@ export interface NudgeCopy {
   body: string
 }
 
+export type NudgeLanguage = 'de' | 'es' | 'hi' | 'ja' | 'pt-BR'
+
 export interface NudgeSlotDefinition {
   label: string
   description: string
@@ -21,6 +23,7 @@ export interface NudgeRevision {
   locale: 'en'
   revision: number
   slots: Record<string, NudgeCopy>
+  localizations?: Partial<Record<NudgeLanguage, { slots: Record<string, NudgeCopy> }>>
   publishedAtMillis: number | null
   publishedBy: string | null
   action: 'publish' | 'rollback'
@@ -48,6 +51,7 @@ export interface FounderJourneyWeekNoteState {
     text: string
     revision: number
     publishedAtMillis: number | null
+    noteLocalizations?: Partial<Record<NudgeLanguage, string>>
   }
 }
 
@@ -57,6 +61,11 @@ export interface NudgeStudioState {
   history: NudgeRevision[]
   draft?: NudgeDraft | null
   founderJourneyWeek: FounderJourneyWeekNoteState
+}
+
+// Existing recording publishers do not return the separate weekly-note state.
+export type NudgeMutationState = Omit<NudgeStudioState, 'founderJourneyWeek'> & {
+  founderJourneyWeek?: FounderJourneyWeekNoteState
 }
 
 export interface LocalNudgeDraft {
@@ -91,20 +100,23 @@ const publishFounderJourneyWeekNoteCall = httpsCallable<
   FounderJourneyWeekNoteState
 >(functions, 'publishFounderJourneyWeekNote', {
   limitedUseAppCheckTokens: true,
+  timeout: 70000,
 })
 
 const publishCall = httpsCallable<
   { expectedRevision: number; slots: Record<string, NudgeCopy> },
-  NudgeStudioState
+  NudgeMutationState
 >(functions, 'publishRecordingNudges', {
   limitedUseAppCheckTokens: true,
+  timeout: 70000,
 })
 
 const rollbackCall = httpsCallable<
   { expectedRevision: number; targetRevision: number },
-  NudgeStudioState
+  NudgeMutationState
 >(functions, 'rollbackRecordingNudges', {
   limitedUseAppCheckTokens: true,
+  timeout: 70000,
 })
 
 export async function loadNudgeStudio(): Promise<NudgeStudioState> {
@@ -207,7 +219,7 @@ export function clearLocalNudgeDraft(): void {
 export async function publishNudges(
   expectedRevision: number,
   slots: Record<string, NudgeCopy>
-): Promise<NudgeStudioState> {
+): Promise<NudgeMutationState> {
   const result = await publishCall({ expectedRevision, slots })
   return result.data
 }
@@ -215,7 +227,7 @@ export async function publishNudges(
 export async function rollbackNudges(
   expectedRevision: number,
   targetRevision: number
-): Promise<NudgeStudioState> {
+): Promise<NudgeMutationState> {
   const result = await rollbackCall({ expectedRevision, targetRevision })
   return result.data
 }
