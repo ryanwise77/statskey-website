@@ -120,7 +120,7 @@ export function WorkbenchAuth() {
       return
     }
     if (!state) {
-      setError('Sign-in request is missing its security check. Start again from the desktop app.')
+      setError('Sign-in request is missing its security check. Start again from StatsKey on your computer.')
       return
     }
     let cancelled = false

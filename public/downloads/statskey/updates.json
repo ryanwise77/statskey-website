@@ -428,7 +428,7 @@
         "Windows",
         "Linux"
       ],
-      "title": "Windows and Ubuntu desktop previews",
+      "title": "Windows and Ubuntu previews",
       "summary": "The Windows preview keeps investigators on the active model route by default, and the Ubuntu 26.04 LTS x64 preview adds an explicit DEB package with secure storage checks and fail-closed Fleet control.",
       "highlights": [
         "Windows investigators inherit the main model and provider route by default.",
@@ -569,7 +569,7 @@
         "macOS",
         "Windows"
       ],
-      "title": "Desktop preview",
+      "title": "StatsKey preview",
       "summary": "The first public StatsKey workspace preview.",
       "highlights": [
         "Project workspaces, local tools, model choices, and update delivery.",

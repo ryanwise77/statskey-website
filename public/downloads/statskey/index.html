@@ -7,10 +7,10 @@
     <meta name="color-scheme" content="light" />
     <meta
       name="description"
-      content="StatsKey Desktop stays on the job, shows its progress, accepts redirection, and hands back verified work."
+      content="StatsKey stays on the job, shows its progress, accepts redirection, and hands back verified work."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="StatsKey Desktop — Intelligence that finishes the work" />
+    <meta property="og:title" content="StatsKey — Intelligence that finishes the work" />
     <meta
       property="og:description"
       content="See the work. Steer it live. Review a clean, verified handoff."
@@ -19,13 +19,13 @@
     <meta property="og:image" content="https://statskey.ai/downloads/statskey/og.png" />
     <link rel="canonical" href="https://statskey.ai/desktop" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="StatsKey Desktop — Intelligence that finishes the work" />
+    <meta name="twitter:title" content="StatsKey — Intelligence that finishes the work" />
     <meta
       name="twitter:description"
       content="See the work. Steer it live. Review a clean, verified handoff."
     />
     <meta name="twitter:image" content="https://statskey.ai/downloads/statskey/og.png" />
-    <title>StatsKey Desktop — Intelligence that finishes the work</title>
+    <title>StatsKey — Intelligence that finishes the work</title>
     <link rel="icon" type="image/svg+xml" href="/statskey-desktop-logo.svg" />
     <style>
       :root {
@@ -109,7 +109,7 @@
         box-shadow: 0 5px 14px rgba(8, 120, 228, 0.25);
       }
 
-      .brand span { color: #8190a5; font-weight: 500; }
+      .brand__computer { width: 24px; height: 24px; color: var(--blue-dark); }
 
       .nav__actions {
         display: flex;
@@ -508,7 +508,6 @@
         .shell { width: min(100% - 24px, 1160px); }
         .nav .button { min-height: 40px; padding: 0 14px; font-size: 13px; }
         .nav__link { display: none; }
-        .brand span { display: none; }
         .hero { padding: 64px 0 42px; }
         h1 { font-size: clamp(44px, 14vw, 62px); }
         .hero__lead { font-size: 18px; }
@@ -543,7 +542,11 @@
       <div class="shell nav__inner">
         <a class="brand" href="/">
           <img src="/statskey-desktop-logo.svg" alt="" />
-          StatsKey <span>/ Desktop</span>
+          StatsKey
+          <svg class="brand__computer" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 21h8M12 17v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
         </a>
         <div class="nav__actions">
           <a class="nav__link" href="#capabilities">Capabilities</a>
@@ -555,7 +558,7 @@
 
     <main id="main">
       <header class="shell hero">
-        <p class="eyebrow">StatsKey Desktop</p>
+        <p class="eyebrow">StatsKey</p>
         <h1>Intelligence that finishes the work.</h1>
         <p class="hero__lead">
           Give StatsKey the outcome. Follow its progress in plain English, steer it
