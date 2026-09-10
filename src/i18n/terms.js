@@ -8,11 +8,12 @@ const pt = {
   __title: 'Termos de Serviço — StatsKey',
   'lp-title': 'Termos de Serviço',
   'lp-date':
-    'Em vigor a partir de: 6 de setembro de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
+    'Em vigor a partir de: 9 de setembro de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Aceitação dos Termos</h2>
             <p>Ao baixar, instalar, acessar ou usar o StatsKey ("o Aplicativo"), você concorda em se vincular a estes Termos de Serviço ("Termos"). Se você não concordar com todos estes Termos, não deve usar o Aplicativo. Reservamo-nos o direito de modificar estes Termos a qualquer momento. O uso contínuo do Aplicativo após quaisquer alterações constitui aceitação dos Termos revisados.</p>
+            <p class="mt-3" data-ai-terms-acceptance="true">A <a href="#ai-data-policy" class="text-accent hover:underline">Política de Dados de IA da Seção 5A</a> faz parte destes Termos. Quando a tela de cadastro solicitar expressamente que você aceite estes Termos e autorize o processamento por IA, marcar essa caixa concede a permissão de IA descrita abaixo. O simples uso do Aplicativo ou a aceitação de uma versão anterior destes Termos não concede essa permissão.</p>
           </section>
 
           <section>
@@ -53,6 +54,33 @@ const pt = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5. Aviso sobre Conteúdo Gerado por IA</h2>
             <p>O StatsKey usa serviços de inteligência artificial de terceiros (incluindo, entre outros, Google Gemini, Anthropic Claude, OpenAI ChatGPT, xAI Grok e outros provedores que possamos selecionar) para analisar fotos de alimentos, estimar conteúdo nutricional, gerar conteúdo de treino ou nutrição e gerar respostas conversacionais sobre seus dados de saúde. Se você ativar os recursos relevantes, as respostas conversacionais de IA podem usar registros históricos de saúde sincronizados, incluindo registros de glicose importados do Apple Health, de provedores de CGM ou de outras fontes e copiados para sua conta StatsKey usando o Firebase / Google Cloud Platform. O conteúdo gerado por IA é fornecido "no estado em que se encontra" (as-is). Não fazemos declarações nem garantias quanto à sua exatidão, integridade, confiabilidade, atualidade, segurança ou adequação a qualquer finalidade. Os resultados de IA podem conter erros, alucinações, omissões, informações desatualizadas ou enganosas. Você deve verificar de forma independente qualquer informação gerada por IA antes de confiar nela e não deve confiar em resultados de IA para decisões médicas, clínicas, de dosagem de insulina, de emergência, jurídicas, financeiras ou críticas para a segurança. Provedores de IA, modelos, prompts, roteamento, limites e disponibilidade podem mudar a qualquer momento sem aviso prévio.</p>
+          </section>
+
+          <section id="ai-data-policy" class="scroll-mt-28" data-ai-disclosure-version="5">
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5A. Política de Dados de IA</h2>
+            <p class="mb-3">O StatsKey usa serviços de inteligência de terceiros para análise de fotos de alimentos, buscas e conversas do StatsKey Intelligence, geração de planos de treino, informações nutricionais e recursos semelhantes. Após sua permissão explícita, o StatsKey pode enviar conteúdo relevante a um ou mais dos provedores listados abaixo para criar um índice de busca privado ou gerar uma resposta. Leia as políticas de privacidade deles antes de concordar.</p>
+            <h3 class="font-semibold text-text-primary mb-2">Provedores de IA e suas políticas de privacidade</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li><a href="https://policies.google.com/privacy" class="text-accent hover:underline">Google Gemini and Vertex AI — Google LLC</a></li>
+              <li><a href="https://www.anthropic.com/legal/privacy" class="text-accent hover:underline">Anthropic Claude — Anthropic, PBC</a></li>
+              <li><a href="https://openai.com/policies/row-privacy-policy/" class="text-accent hover:underline">OpenAI ChatGPT — OpenAI OpCo, LLC</a></li>
+              <li><a href="https://x.ai/legal/privacy-policy" class="text-accent hover:underline">xAI Grok — xAI Corp.</a></li>
+              <li><a href="https://platform.kimi.ai/docs/agreement/userprivacy" class="text-accent hover:underline">Kimi — MOONSHOT AI PTE. LTD.</a></li>
+            </ul>
+            <h3 class="font-semibold text-text-primary mb-2">Dados que podem ser enviados, conforme o recurso e as categorias de compartilhamento que você ativar</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li>Mensagens e comandos que você digitar no StatsKey Intelligence.</li>
+              <li>Fotos que você tirar ou selecionar para análise de alimentos ou rótulos nutricionais.</li>
+              <li>Texto extraído no seu dispositivo de documentos que você anexar explicitamente a uma conversa do Intelligence.</li>
+              <li>Valores confirmados de exames de sangue, somente quando você ativar a categoria de compartilhamento Blood Panels (exames de sangue).</li>
+              <li>Resumos dos seus registros de nutrição, peso, hidratação e suplementos.</li>
+              <li>Resumos dos seus treinos, ritmo, frequência cardíaca e plano de treino.</li>
+              <li>Resumos compactos do índice de busca derivados dos registros que você ativar.</li>
+              <li>Dados básicos do perfil fornecidos na configuração inicial: nome, sexo biológico, peso, altura e objetivos.</li>
+            </ul>
+            <p class="mb-3"><strong class="text-text-primary">Sua permissão e controles.</strong> A aceitação explícita no cadastro pode ativar o Intelligence assim que sua conta for criada. A permissão se aplica à divulgação de IA vigente e não substitui suas escolhas de compartilhamento de dados nem as permissões do dispositivo. Contas infantis são excluídas do processamento de IA por terceiros. Contas existentes sem permissão vigente devem concordar explicitamente antes do início do processamento de IA; uma recusa ou revogação anterior não é alterada pelo uso contínuo nem por esta atualização dos Termos. Alterações substanciais na lista de provedores, nas categorias de dados ou no resumo de retenção exigem nova permissão antes do processamento alterado.</p>
+            <p class="mb-3"><strong class="text-text-primary">Armazenamento e retenção.</strong> O StatsKey armazena resumos compactos derivados do índice de busca na sua conta e pode atualizá-los quando os registros ativados mudarem. Os provedores processam o conteúdo transmitido conforme suas próprias políticas de privacidade, incluindo suas práticas de retenção. Desativar o Intelligence solicita a exclusão do índice de busca derivado; seus registros originais salvos continuam disponíveis conforme nossa <a href="/privacy" class="text-accent hover:underline">Política de Privacidade</a>.</p>
+            <p class="mb-3"><strong class="text-text-primary">Retirar a permissão.</strong> Você pode desativar o Intelligence nos Ajustes a qualquer momento. Isso desativa o StatsKey Intelligence, a análise de fotos de alimentos, a leitura de rótulos nutricionais, a geração de planos de treino e as informações inteligentes. A entrada manual de alimentos, a leitura de códigos de barras, o registro de treinos e seus dados salvos continuam funcionando. O processamento de IA exige novamente sua permissão explícita antes de ser retomado.</p>
           </section>
 
           <section>
@@ -227,11 +255,12 @@ const es = {
   __title: 'Términos del Servicio — StatsKey',
   'lp-title': 'Términos del Servicio',
   'lp-date':
-    'Fecha de entrada en vigor: 6 de septiembre de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
+    'Fecha de entrada en vigor: 9 de septiembre de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Aceptación de los Términos</h2>
             <p>Al descargar, instalar, acceder o usar StatsKey («la Aplicación»), aceptas quedar obligado por estos Términos del Servicio («Términos»). Si no aceptas todos estos Términos, no debes usar la Aplicación. Nos reservamos el derecho de modificar estos Términos en cualquier momento. El uso continuado de la Aplicación tras cualquier cambio constituye la aceptación de los Términos revisados.</p>
+            <p class="mt-3" data-ai-terms-acceptance="true">La <a href="#ai-data-policy" class="text-accent hover:underline">Política de datos de IA de la Sección 5A</a> forma parte de estos Términos. Cuando la pantalla de registro le pida expresamente que acepte estos Términos y autorice el procesamiento de IA, marcar esa casilla otorga el permiso de IA que se describe a continuación. El simple uso de la Aplicación o la aceptación de una versión anterior de estos Términos no otorga ese permiso.</p>
           </section>
 
           <section>
@@ -272,6 +301,33 @@ const es = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5. Aviso sobre contenido generado por IA</h2>
             <p>StatsKey utiliza servicios de inteligencia artificial de terceros (incluidos, entre otros, Google Gemini, Anthropic Claude, OpenAI ChatGPT, xAI Grok y otros proveedores que podamos seleccionar) para analizar fotos de alimentos, estimar el contenido nutricional, generar contenido de entrenamiento o nutrición y generar respuestas conversacionales sobre tus datos de salud. Si activas las funciones correspondientes, las respuestas conversacionales de IA pueden usar registros históricos de salud sincronizados, incluidos registros de glucosa importados de Apple Health, de proveedores de MCG o de otras fuentes y respaldados en tu cuenta de StatsKey mediante Firebase / Google Cloud Platform. El contenido generado por IA se proporciona «tal cual». No formulamos declaraciones ni garantías sobre su exactitud, integridad, fiabilidad, vigencia, seguridad o idoneidad para ningún fin. Los resultados de IA pueden contener errores, alucinaciones, omisiones, información desactualizada o engañosa. Debes verificar de forma independiente cualquier información generada por IA antes de confiar en ella, y no debes basarte en los resultados de IA para decisiones médicas, clínicas, de dosificación de insulina, de emergencia, legales, financieras o críticas para la seguridad. Los proveedores de IA, los modelos, las indicaciones, el enrutamiento, los límites y la disponibilidad pueden cambiar en cualquier momento sin previo aviso.</p>
+          </section>
+
+          <section id="ai-data-policy" class="scroll-mt-28" data-ai-disclosure-version="5">
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5A. Política de datos de IA</h2>
+            <p class="mb-3">StatsKey utiliza servicios de inteligencia de terceros para analizar fotos de alimentos, realizar búsquedas y conversaciones de StatsKey Intelligence, generar planes de entrenamiento, ofrecer información nutricional y funciones similares. Tras obtener su permiso explícito, StatsKey puede enviar contenido pertinente a uno o más de los proveedores indicados a continuación para crear un índice de búsqueda privado o elaborar una respuesta. Revise sus políticas de privacidad antes de aceptar.</p>
+            <h3 class="font-semibold text-text-primary mb-2">Proveedores de IA y sus políticas de privacidad</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li><a href="https://policies.google.com/privacy" class="text-accent hover:underline">Google Gemini and Vertex AI — Google LLC</a></li>
+              <li><a href="https://www.anthropic.com/legal/privacy" class="text-accent hover:underline">Anthropic Claude — Anthropic, PBC</a></li>
+              <li><a href="https://openai.com/policies/row-privacy-policy/" class="text-accent hover:underline">OpenAI ChatGPT — OpenAI OpCo, LLC</a></li>
+              <li><a href="https://x.ai/legal/privacy-policy" class="text-accent hover:underline">xAI Grok — xAI Corp.</a></li>
+              <li><a href="https://platform.kimi.ai/docs/agreement/userprivacy" class="text-accent hover:underline">Kimi — MOONSHOT AI PTE. LTD.</a></li>
+            </ul>
+            <h3 class="font-semibold text-text-primary mb-2">Datos que pueden enviarse, según la función y las categorías de intercambio que active</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li>Mensajes e instrucciones que escriba en StatsKey Intelligence.</li>
+              <li>Fotos que tome o seleccione para analizar alimentos o etiquetas nutricionales.</li>
+              <li>Texto extraído en su dispositivo de documentos que adjunte expresamente a una conversación de Intelligence.</li>
+              <li>Valores confirmados de análisis de sangre, solo si activa la categoría de intercambio Blood Panels (análisis de sangre).</li>
+              <li>Resúmenes de sus registros de nutrición, peso, hidratación y suplementos.</li>
+              <li>Resúmenes de sus entrenamientos, ritmo, frecuencia cardíaca y plan de entrenamiento.</li>
+              <li>Resúmenes compactos del índice de búsqueda derivados de los registros que active.</li>
+              <li>Datos básicos del perfil que facilite durante la configuración: nombre, sexo biológico, peso, altura y objetivos.</li>
+            </ul>
+            <p class="mb-3"><strong class="text-text-primary">Su permiso y controles.</strong> La aceptación explícita durante el registro puede activar Intelligence en cuanto se cree su cuenta. El permiso se aplica a la divulgación de IA vigente y no anula sus selecciones de intercambio de datos ni los permisos del dispositivo. Las cuentas infantiles quedan excluidas del procesamiento de IA de terceros. Las cuentas existentes sin permiso vigente deben aceptarlo expresamente antes de iniciar el procesamiento de IA; una negativa o revocación anterior no cambia por el uso continuado ni por esta actualización de los Términos. Los cambios sustanciales en la lista de proveedores, las categorías de datos o el resumen de conservación requieren un nuevo permiso antes del procesamiento modificado.</p>
+            <p class="mb-3"><strong class="text-text-primary">Almacenamiento y conservación.</strong> StatsKey almacena resúmenes compactos derivados del índice de búsqueda en su cuenta y puede actualizarlos cuando cambien los registros activados. Los proveedores procesan el contenido transmitido según sus propias políticas de privacidad, incluidas sus prácticas de conservación. Desactivar Intelligence solicita la eliminación del índice de búsqueda derivado; sus registros originales guardados siguen disponibles conforme a nuestra <a href="/privacy" class="text-accent hover:underline">Política de Privacidad</a>.</p>
+            <p class="mb-3"><strong class="text-text-primary">Retirar el permiso.</strong> Puede desactivar Intelligence en Ajustes en cualquier momento. Esto desactiva StatsKey Intelligence, el análisis de fotos de alimentos, el escaneo de etiquetas nutricionales, la generación de planes de entrenamiento y la información inteligente. La entrada manual de alimentos, el escaneo de códigos de barras, el registro de entrenamientos y sus datos guardados siguen funcionando. El procesamiento de IA necesita de nuevo su permiso explícito antes de reanudarse.</p>
           </section>
 
           <section>
@@ -446,11 +502,12 @@ const de = {
   __title: 'Nutzungsbedingungen — StatsKey',
   'lp-title': 'Nutzungsbedingungen',
   'lp-date':
-    'Gültig ab: 6. September 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
+    'Gültig ab: 9. September 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Annahme der Bedingungen</h2>
             <p>Durch das Herunterladen, Installieren, den Zugriff auf oder die Nutzung von StatsKey („die Anwendung“) erklärst du dich mit diesen Nutzungsbedingungen („Bedingungen“) einverstanden. Wenn du nicht allen diesen Bedingungen zustimmst, darfst du die Anwendung nicht nutzen. Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern. Deine fortgesetzte Nutzung der Anwendung nach Änderungen gilt als Annahme der überarbeiteten Bedingungen.</p>
+            <p class="mt-3" data-ai-terms-acceptance="true">Die <a href="#ai-data-policy" class="text-accent hover:underline">KI-Datenrichtlinie in Abschnitt 5A</a> ist Bestandteil dieser Bedingungen. Wenn Sie auf dem Registrierungsbildschirm ausdrücklich aufgefordert werden, diese Bedingungen anzunehmen und die KI-Verarbeitung zu erlauben, erteilen Sie durch Aktivieren dieses Kontrollkästchens die unten beschriebene KI-Einwilligung. Die bloße Nutzung der Anwendung oder die Annahme einer früheren Fassung dieser Bedingungen erteilt diese Einwilligung nicht.</p>
           </section>
 
           <section>
@@ -491,6 +548,33 @@ const de = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5. Hinweis zu KI-generierten Inhalten</h2>
             <p>StatsKey nutzt KI-Dienste von Drittanbietern (einschließlich, aber nicht beschränkt auf Google Gemini, Anthropic Claude, OpenAI ChatGPT, xAI Grok und andere Anbieter, die wir auswählen können), um Essensfotos zu analysieren, den Nährwertgehalt zu schätzen, Trainings- oder Ernährungsinhalte zu erstellen und dialogbasierte Antworten zu deinen Gesundheitsdaten zu erzeugen. Wenn du die entsprechenden Funktionen aktivierst, können KI-Dialogantworten synchronisierte historische Gesundheitsdaten verwenden, einschließlich Glukosedaten, die aus Apple Health, von CGM-Anbietern oder aus anderen Quellen importiert und über Firebase / Google Cloud Platform in deinem StatsKey-Konto gesichert wurden. KI-generierte Inhalte werden „wie besehen“ bereitgestellt. Wir geben keine Zusicherungen oder Garantien hinsichtlich ihrer Genauigkeit, Vollständigkeit, Zuverlässigkeit, Aktualität, Sicherheit oder Eignung für einen bestimmten Zweck. KI-Ergebnisse können Fehler, Halluzinationen, Auslassungen, veraltete oder irreführende Informationen enthalten. Du solltest jede von KI generierte Information unabhängig überprüfen, bevor du dich darauf verlässt, und du darfst dich nicht auf KI-Ergebnisse für medizinische, klinische, Insulindosierungs-, Notfall-, rechtliche, finanzielle oder sicherheitskritische Entscheidungen verlassen. KI-Anbieter, Modelle, Prompts, Routing, Limits und Verfügbarkeit können sich jederzeit ohne Vorankündigung ändern.</p>
+          </section>
+
+          <section id="ai-data-policy" class="scroll-mt-28" data-ai-disclosure-version="5">
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5A. KI-Datenrichtlinie</h2>
+            <p class="mb-3">StatsKey nutzt Intelligenzdienste Dritter für die Analyse von Lebensmittelfotos, Suchen und Gespräche in StatsKey Intelligence, die Erstellung von Trainingsplänen, Ernährungseinblicke und ähnliche Funktionen. Nach Ihrer ausdrücklichen Einwilligung kann StatsKey relevante Inhalte an einen oder mehrere der unten aufgeführten Anbieter senden, um einen privaten Suchindex zu erstellen oder eine Antwort zu berechnen. Lesen Sie deren Datenschutzrichtlinien, bevor Sie zustimmen.</p>
+            <h3 class="font-semibold text-text-primary mb-2">KI-Anbieter und ihre Datenschutzrichtlinien</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li><a href="https://policies.google.com/privacy" class="text-accent hover:underline">Google Gemini and Vertex AI — Google LLC</a></li>
+              <li><a href="https://www.anthropic.com/legal/privacy" class="text-accent hover:underline">Anthropic Claude — Anthropic, PBC</a></li>
+              <li><a href="https://openai.com/policies/row-privacy-policy/" class="text-accent hover:underline">OpenAI ChatGPT — OpenAI OpCo, LLC</a></li>
+              <li><a href="https://x.ai/legal/privacy-policy" class="text-accent hover:underline">xAI Grok — xAI Corp.</a></li>
+              <li><a href="https://platform.kimi.ai/docs/agreement/userprivacy" class="text-accent hover:underline">Kimi — MOONSHOT AI PTE. LTD.</a></li>
+            </ul>
+            <h3 class="font-semibold text-text-primary mb-2">Daten, die je nach Funktion und den von Ihnen aktivierten Freigabekategorien gesendet werden können</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li>Nachrichten und Eingaben, die Sie in StatsKey Intelligence eingeben.</li>
+              <li>Fotos, die Sie zur Analyse von Lebensmitteln oder Nährwertetiketten aufnehmen oder auswählen.</li>
+              <li>Auf Ihrem Gerät extrahierter Text aus Dokumenten, die Sie ausdrücklich an ein Intelligence-Gespräch anhängen.</li>
+              <li>Bestätigte Blutwerte, nur wenn Sie die Freigabekategorie Blood Panels (Blutwerte) aktivieren.</li>
+              <li>Zusammenfassungen Ihrer Ernährungs-, Gewichts-, Flüssigkeits- und Nahrungsergänzungsaufzeichnungen.</li>
+              <li>Zusammenfassungen Ihrer Trainings, Ihres Tempos, Ihrer Herzfrequenz und Ihres Trainingsplans.</li>
+              <li>Kompakte Suchindex-Zusammenfassungen aus den von Ihnen aktivierten Aufzeichnungen.</li>
+              <li>Grundlegende Profildaten aus der Ersteinrichtung: Name, biologisches Geschlecht, Gewicht, Größe und Ziele.</li>
+            </ul>
+            <p class="mb-3"><strong class="text-text-primary">Ihre Einwilligung und Einstellungen.</strong> Die ausdrückliche Zustimmung bei der Registrierung kann Intelligence aktivieren, sobald Ihr Konto erstellt wurde. Die Einwilligung gilt für die aktuelle KI-Offenlegung und setzt weder Ihre Datenfreigaben noch Geräteberechtigungen außer Kraft. Kinderkonten sind von der KI-Verarbeitung durch Dritte ausgeschlossen. Bestehende Konten ohne aktuelle Einwilligung müssen ausdrücklich zustimmen, bevor die KI-Verarbeitung beginnt; eine frühere Ablehnung oder ein Widerruf wird durch die weitere Nutzung oder diese Aktualisierung der Bedingungen nicht geändert. Wesentliche Änderungen der Anbieterliste, Datenkategorien oder Angaben zur Aufbewahrung erfordern eine erneute Einwilligung vor der geänderten Verarbeitung.</p>
+            <p class="mb-3"><strong class="text-text-primary">Speicherung und Aufbewahrung.</strong> StatsKey speichert kompakte abgeleitete Suchindex-Zusammenfassungen in Ihrem Konto und kann sie aktualisieren, wenn sich aktivierte Aufzeichnungen ändern. Anbieter verarbeiten übermittelte Inhalte gemäß ihren eigenen Datenschutzrichtlinien, einschließlich ihrer Aufbewahrungspraktiken. Das Deaktivieren von Intelligence fordert die Löschung des abgeleiteten Suchindexes an; Ihre gespeicherten Ursprungsdaten bleiben gemäß unserer <a href="/privacy" class="text-accent hover:underline">Datenschutzrichtlinie</a> verfügbar.</p>
+            <p class="mb-3"><strong class="text-text-primary">Einwilligung widerrufen.</strong> Sie können Intelligence jederzeit in den Einstellungen deaktivieren. Dadurch werden StatsKey Intelligence, die Analyse von Lebensmittelfotos, das Scannen von Nährwertetiketten, die Erstellung von Trainingsplänen und intelligente Einblicke ausgeschaltet. Die manuelle Lebensmitteleingabe, das Scannen von Barcodes, die Trainingsaufzeichnung und Ihre gespeicherten Daten funktionieren weiterhin. Vor der Wiederaufnahme der KI-Verarbeitung ist Ihre ausdrückliche Einwilligung erneut erforderlich.</p>
           </section>
 
           <section>
@@ -665,11 +749,12 @@ const ja = {
   __title: '利用規約 — StatsKey',
   'lp-title': '利用規約',
   'lp-date':
-    '発効日: 2026年9月6日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
+    '発効日: 2026年9月9日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. 規約への同意</h2>
             <p>StatsKey（以下「本アプリケーション」）をダウンロード、インストール、アクセス、または利用することにより、お客様は本利用規約（以下「本規約」）に拘束されることに同意するものとします。これらの規約のすべてに同意されない場合は、本アプリケーションを利用してはなりません。当社は、本規約をいつでも変更する権利を留保します。変更後に本アプリケーションを継続して利用することは、改訂後の規約への同意を構成します。</p>
+            <p class="mt-3" data-ai-terms-acceptance="true"><a href="#ai-data-policy" class="text-accent hover:underline">第5A条のAIデータポリシー</a>は本規約の一部です。登録画面で本規約への同意とAI処理の許可を明示的に求められた場合、そのチェックボックスを選択すると、以下に記載するAI処理を許可したことになります。アプリケーションの利用や以前の版の規約への同意だけでは、この許可を与えたことにはなりません。</p>
           </section>
 
           <section>
@@ -710,6 +795,33 @@ const ja = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5. AIが生成したコンテンツに関する免責事項</h2>
             <p>StatsKeyは、食べ物の写真の分析、栄養成分の推定、トレーニングまたは栄養に関するコンテンツの生成、健康データに関する対話形式の応答の生成のために、第三者の人工知能サービス（Google Gemini、Anthropic Claude、OpenAI ChatGPT、xAI Grok、および当社が選択するその他のプロバイダーを含みますが、これらに限られません）を利用します。該当する機能を有効にした場合、AIの対話形式の応答は、Apple Health、CGMプロバイダー、その他のソースからインポートされ、Firebase / Google Cloud Platformを使用してStatsKeyアカウントにバックアップされた血糖記録を含む、同期された過去の健康記録を使用することがあります。AIが生成したコンテンツは「現状有姿（as-is）」で提供されます。当社は、その正確性、完全性、信頼性、適時性、安全性、または特定の目的への適合性について、いかなる表明も保証も行いません。AIの出力には、誤り、ハルシネーション、欠落、古い情報、または誤解を招く情報が含まれる場合があります。AIが生成した情報に依拠する前に、独自に検証する必要があり、医療、臨床、インスリン投与量、緊急、法律、財務、または安全に関わる決定にAIの出力を依拠してはなりません。AIプロバイダー、モデル、プロンプト、ルーティング、制限、提供状況は、予告なくいつでも変更されることがあります。</p>
+          </section>
+
+          <section id="ai-data-policy" class="scroll-mt-28" data-ai-disclosure-version="5">
+            <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">5A. AIデータポリシー</h2>
+            <p class="mb-3">StatsKeyは、食品写真の分析、StatsKey Intelligenceの検索と会話、トレーニングプランの生成、栄養に関するインサイトなどに第三者のインテリジェンスサービスを使用します。明示的な許可を得た後、StatsKeyは非公開の検索インデックスの作成や回答の生成のために、関連するコンテンツを以下の1社以上のプロバイダーに送信することがあります。同意する前に各社のプライバシーポリシーをご確認ください。</p>
+            <h3 class="font-semibold text-text-primary mb-2">AIプロバイダーとプライバシーポリシー</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li><a href="https://policies.google.com/privacy" class="text-accent hover:underline">Google Gemini and Vertex AI — Google LLC</a></li>
+              <li><a href="https://www.anthropic.com/legal/privacy" class="text-accent hover:underline">Anthropic Claude — Anthropic, PBC</a></li>
+              <li><a href="https://openai.com/policies/row-privacy-policy/" class="text-accent hover:underline">OpenAI ChatGPT — OpenAI OpCo, LLC</a></li>
+              <li><a href="https://x.ai/legal/privacy-policy" class="text-accent hover:underline">xAI Grok — xAI Corp.</a></li>
+              <li><a href="https://platform.kimi.ai/docs/agreement/userprivacy" class="text-accent hover:underline">Kimi — MOONSHOT AI PTE. LTD.</a></li>
+            </ul>
+            <h3 class="font-semibold text-text-primary mb-2">利用する機能と有効にした共有カテゴリに応じて送信されることがあるデータ</h3>
+            <ul class="list-disc pl-5 space-y-2 mb-3">
+              <li>StatsKey Intelligenceに入力したメッセージとプロンプト。</li>
+              <li>食品や栄養成分表示の分析のために撮影または選択した写真。</li>
+              <li>Intelligenceの会話に明示的に添付した文書から、端末上で抽出されたテキスト。</li>
+              <li>Blood Panels（血液検査）共有カテゴリを有効にした場合に限り、確認済みの血液検査値。</li>
+              <li>栄養、体重、水分補給、サプリメントの記録の要約。</li>
+              <li>ワークアウト、ペース、心拍数、トレーニングプランの要約。</li>
+              <li>有効にした記録から作成した、コンパクトな検索インデックスの要約。</li>
+              <li>初期設定で提供した基本プロフィール情報：名前、生物学的性別、体重、身長、目標。</li>
+            </ul>
+            <p class="mb-3"><strong class="text-text-primary">許可と設定。</strong> 登録時の明示的な同意により、アカウントの作成直後からIntelligenceを有効にできます。許可は現在のAI開示内容に適用され、データ共有の選択や端末のアクセス許可を上書きしません。子ども用アカウントは第三者によるAI処理の対象外です。現在有効な許可のない既存アカウントでは、AI処理の開始前に明示的な同意が必要です。以前の拒否や撤回は、継続利用や本規約の更新によって変更されません。プロバイダー一覧、データカテゴリ、保存に関する説明に重要な変更がある場合は、変更後の処理を始める前に改めて許可を求めます。</p>
+            <p class="mb-3"><strong class="text-text-primary">保存と保持。</strong> StatsKeyは、派生したコンパクトな検索インデックスの要約をアカウント内に保存し、有効にした記録が変更された後に更新することがあります。各プロバイダーは、保存に関する取り扱いを含む、それぞれのプライバシーポリシーに従って送信されたコンテンツを処理します。Intelligenceを無効にすると、派生した検索インデックスの削除が要求されます。保存済みの元の記録は、当社の<a href="/privacy" class="text-accent hover:underline">プライバシーポリシー</a>に従って引き続き利用できます。</p>
+            <p class="mb-3"><strong class="text-text-primary">許可の撤回。</strong> 設定からいつでもIntelligenceを無効にできます。これにより、StatsKey Intelligence、食品写真の分析、栄養成分表示のスキャン、トレーニングプランの生成、インテリジェントなインサイトが停止します。食品の手入力、バーコードのスキャン、ワークアウトの記録、保存済みのデータは引き続き利用できます。AI処理の再開には、改めて明示的な許可が必要です。</p>
           </section>
 
           <section>
