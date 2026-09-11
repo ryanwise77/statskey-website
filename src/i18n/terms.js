@@ -8,12 +8,12 @@ const pt = {
   __title: 'Termos de Serviço — StatsKey',
   'lp-title': 'Termos de Serviço',
   'lp-date':
-    'Em vigor a partir de: 9 de setembro de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
+    'Em vigor a partir de: 11 de setembro de 2026<span class="block mt-2 italic">Esta tradução para o português é apenas informativa. Em caso de divergência, prevalece a versão original em inglês.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Aceitação dos Termos</h2>
             <p>Ao baixar, instalar, acessar ou usar o StatsKey ("o Aplicativo"), você concorda em se vincular a estes Termos de Serviço ("Termos"). Se você não concordar com todos estes Termos, não deve usar o Aplicativo. Reservamo-nos o direito de modificar estes Termos a qualquer momento. O uso contínuo do Aplicativo após quaisquer alterações constitui aceitação dos Termos revisados.</p>
-            <p class="mt-3" data-ai-terms-acceptance="true">A <a href="#ai-data-policy" class="text-accent hover:underline">Política de Dados de IA da Seção 5A</a> faz parte destes Termos. Quando a tela de cadastro solicitar expressamente que você aceite estes Termos e autorize o processamento por IA, marcar essa caixa concede a permissão de IA descrita abaixo. O simples uso do Aplicativo ou a aceitação de uma versão anterior destes Termos não concede essa permissão.</p>
+            <p class="mt-3" data-ai-terms-acceptance="true">A <a href="#ai-data-policy" class="text-accent hover:underline">Política de Dados de IA da Seção 5A</a> faz parte destes Termos. Aceitar apenas estes Termos não autoriza o processamento por IA. O Intelligence exige uma permissão explícita, de acordo com o aviso vigente no aplicativo.</p>
           </section>
 
           <section>
@@ -78,7 +78,7 @@ const pt = {
               <li>Resumos compactos do índice de busca derivados dos registros que você ativar.</li>
               <li>Dados básicos do perfil fornecidos na configuração inicial: nome, sexo biológico, peso, altura e objetivos.</li>
             </ul>
-            <p class="mb-3"><strong class="text-text-primary">Sua permissão e controles.</strong> A aceitação explícita no cadastro pode ativar o Intelligence assim que sua conta for criada. A permissão se aplica à divulgação de IA vigente e não substitui suas escolhas de compartilhamento de dados nem as permissões do dispositivo. Contas infantis são excluídas do processamento de IA por terceiros. Contas existentes sem permissão vigente devem concordar explicitamente antes do início do processamento de IA; uma recusa ou revogação anterior não é alterada pelo uso contínuo nem por esta atualização dos Termos. Alterações substanciais na lista de provedores, nas categorias de dados ou no resumo de retenção exigem nova permissão antes do processamento alterado.</p>
+            <p class="mb-3"><strong class="text-text-primary">Sua permissão e controles.</strong> O Intelligence é opcional e exige sua permissão explícita antes do início do processamento por IA. A permissão se aplica à divulgação de IA vigente e não substitui suas escolhas de compartilhamento de dados nem as permissões do dispositivo. Contas infantis são excluídas do processamento de IA por terceiros. Contas existentes sem permissão vigente devem concordar explicitamente antes do início do processamento de IA; uma recusa ou revogação anterior não é alterada pelo uso contínuo nem por esta atualização dos Termos. Alterações substanciais na lista de provedores, nas categorias de dados ou no resumo de retenção exigem nova permissão antes do processamento alterado.</p>
             <p class="mb-3"><strong class="text-text-primary">Armazenamento e retenção.</strong> O StatsKey armazena resumos compactos derivados do índice de busca na sua conta e pode atualizá-los quando os registros ativados mudarem. Os provedores processam o conteúdo transmitido conforme suas próprias políticas de privacidade, incluindo suas práticas de retenção. Desativar o Intelligence solicita a exclusão do índice de busca derivado; seus registros originais salvos continuam disponíveis conforme nossa <a href="/privacy" class="text-accent hover:underline">Política de Privacidade</a>.</p>
             <p class="mb-3"><strong class="text-text-primary">Retirar a permissão.</strong> Você pode desativar o Intelligence nos Ajustes a qualquer momento. Isso desativa o StatsKey Intelligence, a análise de fotos de alimentos, a leitura de rótulos nutricionais, a geração de planos de treino e as informações inteligentes. A entrada manual de alimentos, a leitura de códigos de barras, o registro de treinos e seus dados salvos continuam funcionando. O processamento de IA exige novamente sua permissão explícita antes de ser retomado.</p>
           </section>
@@ -255,12 +255,12 @@ const es = {
   __title: 'Términos del Servicio — StatsKey',
   'lp-title': 'Términos del Servicio',
   'lp-date':
-    'Fecha de entrada en vigor: 9 de septiembre de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
+    'Fecha de entrada en vigor: 11 de septiembre de 2026<span class="block mt-2 italic">Esta traducción al español tiene únicamente fines informativos. En caso de discrepancia, prevalece la versión original en inglés.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Aceptación de los Términos</h2>
             <p>Al descargar, instalar, acceder o usar StatsKey («la Aplicación»), aceptas quedar obligado por estos Términos del Servicio («Términos»). Si no aceptas todos estos Términos, no debes usar la Aplicación. Nos reservamos el derecho de modificar estos Términos en cualquier momento. El uso continuado de la Aplicación tras cualquier cambio constituye la aceptación de los Términos revisados.</p>
-            <p class="mt-3" data-ai-terms-acceptance="true">La <a href="#ai-data-policy" class="text-accent hover:underline">Política de datos de IA de la Sección 5A</a> forma parte de estos Términos. Cuando la pantalla de registro le pida expresamente que acepte estos Términos y autorice el procesamiento de IA, marcar esa casilla otorga el permiso de IA que se describe a continuación. El simple uso de la Aplicación o la aceptación de una versión anterior de estos Términos no otorga ese permiso.</p>
+            <p class="mt-3" data-ai-terms-acceptance="true">La <a href="#ai-data-policy" class="text-accent hover:underline">Política de datos de IA de la Sección 5A</a> forma parte de estos Términos. Aceptar estos Términos por sí solo no autoriza el procesamiento de IA. Intelligence requiere un permiso explícito conforme al aviso vigente dentro de la aplicación.</p>
           </section>
 
           <section>
@@ -325,7 +325,7 @@ const es = {
               <li>Resúmenes compactos del índice de búsqueda derivados de los registros que active.</li>
               <li>Datos básicos del perfil que facilite durante la configuración: nombre, sexo biológico, peso, altura y objetivos.</li>
             </ul>
-            <p class="mb-3"><strong class="text-text-primary">Su permiso y controles.</strong> La aceptación explícita durante el registro puede activar Intelligence en cuanto se cree su cuenta. El permiso se aplica a la divulgación de IA vigente y no anula sus selecciones de intercambio de datos ni los permisos del dispositivo. Las cuentas infantiles quedan excluidas del procesamiento de IA de terceros. Las cuentas existentes sin permiso vigente deben aceptarlo expresamente antes de iniciar el procesamiento de IA; una negativa o revocación anterior no cambia por el uso continuado ni por esta actualización de los Términos. Los cambios sustanciales en la lista de proveedores, las categorías de datos o el resumen de conservación requieren un nuevo permiso antes del procesamiento modificado.</p>
+            <p class="mb-3"><strong class="text-text-primary">Su permiso y controles.</strong> Intelligence es opcional y requiere su permiso explícito antes de que comience el procesamiento de IA. El permiso se aplica a la divulgación de IA vigente y no anula sus selecciones de intercambio de datos ni los permisos del dispositivo. Las cuentas infantiles quedan excluidas del procesamiento de IA de terceros. Las cuentas existentes sin permiso vigente deben aceptarlo expresamente antes de iniciar el procesamiento de IA; una negativa o revocación anterior no cambia por el uso continuado ni por esta actualización de los Términos. Los cambios sustanciales en la lista de proveedores, las categorías de datos o el resumen de conservación requieren un nuevo permiso antes del procesamiento modificado.</p>
             <p class="mb-3"><strong class="text-text-primary">Almacenamiento y conservación.</strong> StatsKey almacena resúmenes compactos derivados del índice de búsqueda en su cuenta y puede actualizarlos cuando cambien los registros activados. Los proveedores procesan el contenido transmitido según sus propias políticas de privacidad, incluidas sus prácticas de conservación. Desactivar Intelligence solicita la eliminación del índice de búsqueda derivado; sus registros originales guardados siguen disponibles conforme a nuestra <a href="/privacy" class="text-accent hover:underline">Política de Privacidad</a>.</p>
             <p class="mb-3"><strong class="text-text-primary">Retirar el permiso.</strong> Puede desactivar Intelligence en Ajustes en cualquier momento. Esto desactiva StatsKey Intelligence, el análisis de fotos de alimentos, el escaneo de etiquetas nutricionales, la generación de planes de entrenamiento y la información inteligente. La entrada manual de alimentos, el escaneo de códigos de barras, el registro de entrenamientos y sus datos guardados siguen funcionando. El procesamiento de IA necesita de nuevo su permiso explícito antes de reanudarse.</p>
           </section>
@@ -502,12 +502,12 @@ const de = {
   __title: 'Nutzungsbedingungen — StatsKey',
   'lp-title': 'Nutzungsbedingungen',
   'lp-date':
-    'Gültig ab: 9. September 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
+    'Gültig ab: 11. September 2026<span class="block mt-2 italic">Diese deutsche Übersetzung dient nur zur Information. Bei Abweichungen ist die englische Originalfassung maßgeblich.</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. Annahme der Bedingungen</h2>
             <p>Durch das Herunterladen, Installieren, den Zugriff auf oder die Nutzung von StatsKey („die Anwendung“) erklärst du dich mit diesen Nutzungsbedingungen („Bedingungen“) einverstanden. Wenn du nicht allen diesen Bedingungen zustimmst, darfst du die Anwendung nicht nutzen. Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern. Deine fortgesetzte Nutzung der Anwendung nach Änderungen gilt als Annahme der überarbeiteten Bedingungen.</p>
-            <p class="mt-3" data-ai-terms-acceptance="true">Die <a href="#ai-data-policy" class="text-accent hover:underline">KI-Datenrichtlinie in Abschnitt 5A</a> ist Bestandteil dieser Bedingungen. Wenn Sie auf dem Registrierungsbildschirm ausdrücklich aufgefordert werden, diese Bedingungen anzunehmen und die KI-Verarbeitung zu erlauben, erteilen Sie durch Aktivieren dieses Kontrollkästchens die unten beschriebene KI-Einwilligung. Die bloße Nutzung der Anwendung oder die Annahme einer früheren Fassung dieser Bedingungen erteilt diese Einwilligung nicht.</p>
+            <p class="mt-3" data-ai-terms-acceptance="true">Die <a href="#ai-data-policy" class="text-accent hover:underline">KI-Datenrichtlinie in Abschnitt 5A</a> ist Bestandteil dieser Bedingungen. Die bloße Annahme dieser Bedingungen erlaubt keine KI-Verarbeitung. Intelligence erfordert eine ausdrückliche Einwilligung auf Grundlage des aktuellen In-App-Hinweises.</p>
           </section>
 
           <section>
@@ -572,7 +572,7 @@ const de = {
               <li>Kompakte Suchindex-Zusammenfassungen aus den von Ihnen aktivierten Aufzeichnungen.</li>
               <li>Grundlegende Profildaten aus der Ersteinrichtung: Name, biologisches Geschlecht, Gewicht, Größe und Ziele.</li>
             </ul>
-            <p class="mb-3"><strong class="text-text-primary">Ihre Einwilligung und Einstellungen.</strong> Die ausdrückliche Zustimmung bei der Registrierung kann Intelligence aktivieren, sobald Ihr Konto erstellt wurde. Die Einwilligung gilt für die aktuelle KI-Offenlegung und setzt weder Ihre Datenfreigaben noch Geräteberechtigungen außer Kraft. Kinderkonten sind von der KI-Verarbeitung durch Dritte ausgeschlossen. Bestehende Konten ohne aktuelle Einwilligung müssen ausdrücklich zustimmen, bevor die KI-Verarbeitung beginnt; eine frühere Ablehnung oder ein Widerruf wird durch die weitere Nutzung oder diese Aktualisierung der Bedingungen nicht geändert. Wesentliche Änderungen der Anbieterliste, Datenkategorien oder Angaben zur Aufbewahrung erfordern eine erneute Einwilligung vor der geänderten Verarbeitung.</p>
+            <p class="mb-3"><strong class="text-text-primary">Ihre Einwilligung und Einstellungen.</strong> Intelligence ist optional und erfordert Ihre ausdrückliche Einwilligung, bevor die KI-Verarbeitung beginnt. Die Einwilligung gilt für die aktuelle KI-Offenlegung und setzt weder Ihre Datenfreigaben noch Geräteberechtigungen außer Kraft. Kinderkonten sind von der KI-Verarbeitung durch Dritte ausgeschlossen. Bestehende Konten ohne aktuelle Einwilligung müssen ausdrücklich zustimmen, bevor die KI-Verarbeitung beginnt; eine frühere Ablehnung oder ein Widerruf wird durch die weitere Nutzung oder diese Aktualisierung der Bedingungen nicht geändert. Wesentliche Änderungen der Anbieterliste, Datenkategorien oder Angaben zur Aufbewahrung erfordern eine erneute Einwilligung vor der geänderten Verarbeitung.</p>
             <p class="mb-3"><strong class="text-text-primary">Speicherung und Aufbewahrung.</strong> StatsKey speichert kompakte abgeleitete Suchindex-Zusammenfassungen in Ihrem Konto und kann sie aktualisieren, wenn sich aktivierte Aufzeichnungen ändern. Anbieter verarbeiten übermittelte Inhalte gemäß ihren eigenen Datenschutzrichtlinien, einschließlich ihrer Aufbewahrungspraktiken. Das Deaktivieren von Intelligence fordert die Löschung des abgeleiteten Suchindexes an; Ihre gespeicherten Ursprungsdaten bleiben gemäß unserer <a href="/privacy" class="text-accent hover:underline">Datenschutzrichtlinie</a> verfügbar.</p>
             <p class="mb-3"><strong class="text-text-primary">Einwilligung widerrufen.</strong> Sie können Intelligence jederzeit in den Einstellungen deaktivieren. Dadurch werden StatsKey Intelligence, die Analyse von Lebensmittelfotos, das Scannen von Nährwertetiketten, die Erstellung von Trainingsplänen und intelligente Einblicke ausgeschaltet. Die manuelle Lebensmitteleingabe, das Scannen von Barcodes, die Trainingsaufzeichnung und Ihre gespeicherten Daten funktionieren weiterhin. Vor der Wiederaufnahme der KI-Verarbeitung ist Ihre ausdrückliche Einwilligung erneut erforderlich.</p>
           </section>
@@ -749,12 +749,12 @@ const ja = {
   __title: '利用規約 — StatsKey',
   'lp-title': '利用規約',
   'lp-date':
-    '発効日: 2026年9月9日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
+    '発効日: 2026年9月11日<span class="block mt-2 italic">この日本語訳は参考用です。内容に相違がある場合は、英語の原文が優先されます。</span>',
   'lp-content': `
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">1. 規約への同意</h2>
             <p>StatsKey（以下「本アプリケーション」）をダウンロード、インストール、アクセス、または利用することにより、お客様は本利用規約（以下「本規約」）に拘束されることに同意するものとします。これらの規約のすべてに同意されない場合は、本アプリケーションを利用してはなりません。当社は、本規約をいつでも変更する権利を留保します。変更後に本アプリケーションを継続して利用することは、改訂後の規約への同意を構成します。</p>
-            <p class="mt-3" data-ai-terms-acceptance="true"><a href="#ai-data-policy" class="text-accent hover:underline">第5A条のAIデータポリシー</a>は本規約の一部です。登録画面で本規約への同意とAI処理の許可を明示的に求められた場合、そのチェックボックスを選択すると、以下に記載するAI処理を許可したことになります。アプリケーションの利用や以前の版の規約への同意だけでは、この許可を与えたことにはなりません。</p>
+            <p class="mt-3" data-ai-terms-acceptance="true"><a href="#ai-data-policy" class="text-accent hover:underline">第5A条のAIデータポリシー</a>は本規約の一部です。本規約への同意だけではAI処理は許可されません。Intelligenceには、現在のアプリ内開示に基づく明示的な許可が必要です。</p>
           </section>
 
           <section>
@@ -819,7 +819,7 @@ const ja = {
               <li>有効にした記録から作成した、コンパクトな検索インデックスの要約。</li>
               <li>初期設定で提供した基本プロフィール情報：名前、生物学的性別、体重、身長、目標。</li>
             </ul>
-            <p class="mb-3"><strong class="text-text-primary">許可と設定。</strong> 登録時の明示的な同意により、アカウントの作成直後からIntelligenceを有効にできます。許可は現在のAI開示内容に適用され、データ共有の選択や端末のアクセス許可を上書きしません。子ども用アカウントは第三者によるAI処理の対象外です。現在有効な許可のない既存アカウントでは、AI処理の開始前に明示的な同意が必要です。以前の拒否や撤回は、継続利用や本規約の更新によって変更されません。プロバイダー一覧、データカテゴリ、保存に関する説明に重要な変更がある場合は、変更後の処理を始める前に改めて許可を求めます。</p>
+            <p class="mb-3"><strong class="text-text-primary">許可と設定。</strong> Intelligenceは任意の機能であり、AI処理の開始前にお客様の明示的な許可が必要です。許可は現在のAI開示内容に適用され、データ共有の選択や端末のアクセス許可を上書きしません。子ども用アカウントは第三者によるAI処理の対象外です。現在有効な許可のない既存アカウントでは、AI処理の開始前に明示的な同意が必要です。以前の拒否や撤回は、継続利用や本規約の更新によって変更されません。プロバイダー一覧、データカテゴリ、保存に関する説明に重要な変更がある場合は、変更後の処理を始める前に改めて許可を求めます。</p>
             <p class="mb-3"><strong class="text-text-primary">保存と保持。</strong> StatsKeyは、派生したコンパクトな検索インデックスの要約をアカウント内に保存し、有効にした記録が変更された後に更新することがあります。各プロバイダーは、保存に関する取り扱いを含む、それぞれのプライバシーポリシーに従って送信されたコンテンツを処理します。Intelligenceを無効にすると、派生した検索インデックスの削除が要求されます。保存済みの元の記録は、当社の<a href="/privacy" class="text-accent hover:underline">プライバシーポリシー</a>に従って引き続き利用できます。</p>
             <p class="mb-3"><strong class="text-text-primary">許可の撤回。</strong> 設定からいつでもIntelligenceを無効にできます。これにより、StatsKey Intelligence、食品写真の分析、栄養成分表示のスキャン、トレーニングプランの生成、インテリジェントなインサイトが停止します。食品の手入力、バーコードのスキャン、ワークアウトの記録、保存済みのデータは引き続き利用できます。AI処理の再開には、改めて明示的な許可が必要です。</p>
           </section>
