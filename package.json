@@ -9,6 +9,7 @@
     "test:nudge-author": "node --test scripts/nudge-author.test.ts scripts/founder-journey.test.mjs",
     "build:founder-history": "node scripts/build-founder-history.mjs",
     "refresh:founder-history": "node scripts/refresh-founder-history.mjs",
+    "test:founder-live": "node --test scripts/founder-live.test.mjs",
     "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",
     "test:founder-nutrition": "node --test scripts/founder-nutrition-fallback.test.mjs scripts/founder-nutrition-ui.test.mjs",
     "test:firestore-failover": "node --test scripts/firestore-failover.test.ts",

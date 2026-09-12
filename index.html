@@ -207,19 +207,23 @@
           <div class="founder-live-suite reveal" id="founder-live" data-source="/statskey-app/founder-live-fallback.json">
             <header class="founder-live-suite__head">
               <div>
-                <span class="founder-live-badge"><i></i> Live from StatsKey</span>
+                <span class="founder-live-badge"><i></i> Founder record</span>
                 <h3>My complete activity and nutrition record</h3>
-                <p>Live recent data plus a date-indexed public archive, built once and served without recomputing the full history for every visit.</p>
+                <p>Activity and nutrition update automatically for eligible adult StatsKey accounts. Sign in with your existing account to follow the record.</p>
               </div>
               <span id="founder-live-updated">Connecting…</span>
             </header>
 
+            <div class="founder-connection-bar">
+              <span id="founder-live-status" role="status">Restoring your sign-in…</span>
+              <button type="button" data-founder-reconnect>Refresh connection</button>
+            </div>
             <section class="founder-journey-note" id="founder-journey-note" aria-live="polite" hidden></section>
 
             <div class="founder-app-screens">
               <article class="founder-app-screen" id="founder-running-app">
                 <div class="founder-panel-head">
-                  <span>Activity · Complete history from late August 2025</span>
+                  <span>Activity · Published history</span><small class="founder-feed-status" data-founder-connection>Connecting…</small>
                 </div>
                 <div class="ios-device" data-live-device="running" aria-label="Live replica of recent activity in the StatsKey iOS app">
                   <div class="ios-device__island" aria-hidden="true"></div>
@@ -243,7 +247,6 @@
                         <i class="ios-toolbar-button ios-toolbar-button--grid"></i>
                       </span>
                     </header>
-                    <span class="sr-only" id="founder-live-status" role="status">Connecting to Ryan's record…</span>
                     <div class="ios-screen-scroll" id="founder-live-screen" tabindex="0" aria-live="polite">
                       <div class="ios-skeleton-card ios-skeleton-card--hero"></div>
                       <div class="ios-skeleton-card"></div>
@@ -255,7 +258,7 @@
 
               <article class="founder-app-screen" id="founder-nutrition-app">
                 <div class="founder-panel-head">
-                  <span>Nutrition · Live insights + complete historical profile</span>
+                  <span>Nutrition · Live insights + historical profile</span><small class="founder-feed-status" data-founder-connection>Connecting…</small>
                 </div>
                 <div class="ios-device" data-live-device="nutrition" aria-label="Live replica of 30-day Nutrition Insights in the StatsKey iOS app">
                   <div class="ios-device__island" aria-hidden="true"></div>
@@ -305,7 +308,7 @@
                   <h4 id="founder-history-archive-title">Every reliable meal. Every recorded nutrient.</h4>
                   <p>Open the archive only when you want it, then load one month, week, nutrient category, or three-day meal chunk at a time.</p>
                 </div>
-                <strong><span><i aria-hidden="true"></i> Static historical archive</span><b>Open archive</b><em aria-hidden="true">⌄</em></strong>
+                <strong><span><i aria-hidden="true"></i> Recent live meals + dated archive</span><b>Open archive</b><em aria-hidden="true">⌄</em></strong>
               </button>
               <div class="founder-history-archive__screen" id="founder-history-archive-screen" aria-live="polite" hidden>
                 <div class="founder-history-archive__loading" aria-hidden="true"><span></span><span></span><span></span></div>

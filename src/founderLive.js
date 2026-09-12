@@ -1,4 +1,8 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
+import {
+  browserLocalPersistence, browserSessionPersistence, inMemoryPersistence,
+  browserPopupRedirectResolver, initializeAuth, getAuth, onAuthStateChanged,
+} from 'firebase/auth'
 import { currentFounderJourneyNote, founderNoteHeading, founderNoteLanguage } from './founderJourney.js'
 import {
   ReCaptchaEnterpriseProvider,
@@ -12,6 +16,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  where,
 } from 'firebase/firestore'
 
 const firebaseConfig = {
@@ -43,6 +48,7 @@ const NUTRITION_RANGE_DAYS = [7, 14, 30, 90]
 const PUBLIC_HISTORY_START_DAY = '2025-08-25'
 const PUBLIC_HISTORY_START_MONTH = '2025-08'
 const PUBLIC_HISTORY_START_LABEL = 'late August 2025'
+const MAX_LIVE_WORKOUTS = 1000
 const FOUNDER_HISTORY_INDEX_PATH = '/statskey-app/founder-history/index.json'
 
 const NUTRIENT_COLORS = {
@@ -67,6 +73,17 @@ const SPORT_LABELS = {
 
 const state = {
   root: null,
+  viewer: null,
+  authorized: false,
+  generation: 0,
+  channels: {},
+  retryAttempt: 0,
+  retryTimer: null,
+  startupTimer: null,
+  pulseTimer: null,
+  unsubscribeAuth: null,
+  syncPublishedChannels: null,
+  mealQueryDay: null,
   journey: null,
   workouts: [],
   historyWorkouts: null,
@@ -106,11 +123,13 @@ const state = {
   unsubscribeWorkouts: null,
   unsubscribeMeals: null,
   unsubscribeRoute: null,
+  routeGeneration: 0,
 }
 
 let elements = {}
 let database = null
 let chartSequence = 0
+let auth = null
 
 const number = (value, fallback = 0) => {
   const parsed = Number(value)
@@ -224,6 +243,13 @@ function initializeFirebase() {
   } catch {
     // Another StatsKey surface or Vite hot reload may already own App Check.
   }
+  // Match the app's persistence so an existing account is restored here too.
+  try {
+    auth = initializeAuth(app, {
+      persistence: [browserLocalPersistence, browserSessionPersistence, inMemoryPersistence],
+      popupRedirectResolver: browserPopupRedirectResolver,
+    })
+  } catch { auth = getAuth(app) }
   return getFirestore(app)
 }
 
@@ -234,9 +260,19 @@ function publicRootReference() {
 function workoutsReference() {
   return query(
     collection(database, 'publicFounderReplicas', 'founder', 'workouts'),
+    where('day', '>=', PUBLIC_HISTORY_START_DAY),
     orderBy('day', 'desc'),
-    limit(48)
+    limit(MAX_LIVE_WORKOUTS)
   )
+}
+
+function currentRecordDay() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: state.root?.timeZone || 'America/Chicago',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(new Date())
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+  return `${values.year}-${values.month}-${values.day}`
 }
 
 // Recent meals stream in live so the archive's newest days never wait for the
@@ -244,172 +280,294 @@ function workoutsReference() {
 function liveMealsReference() {
   return query(
     collection(database, 'publicFounderReplicas', 'founder', 'meals'),
-    orderBy('recordedAt', 'desc'),
+    where('day', '<=', currentRecordDay()),
+    orderBy('day', 'desc'),
     limit(80)
   )
 }
 
+// The live query owns the complete bounded workout window. Mixing 48 recent
+// rows with an August snapshot left a gap and resurrected removed records.
 async function loadCompleteWorkoutHistory() {
-  if (state.historyWorkouts || state.historyLoading) return
-  state.historyLoading = true
-  state.historyError = null
-  renderScreen()
-  try {
-    const response = await fetch(elements.stage.dataset.source)
-    if (!response.ok) {
-      throw new Error(`Workout archive returned ${response.status}`)
-    }
-    const payload = await response.json()
-    const archived = Array.isArray(payload.workouts) ? payload.workouts : []
-    const merged = new Map(
-      [...archived, ...state.workouts]
-        .filter((workout) => workout?.workoutId)
-        .map((workout) => [workout.workoutId, workout])
-    )
-    state.historyWorkouts = Array.from(merged.values())
-      .filter((workout) => String(workout.day || '') >= PUBLIC_HISTORY_START_DAY)
-      .sort((left, right) => (
-        String(right.day || '').localeCompare(String(left.day || '')) ||
-        number(right.startMinute) - number(left.startMinute)
-      ))
-  } catch (error) {
-    console.warn('Founder workout archive unavailable', error)
-    state.historyWorkouts = [...state.workouts]
-    state.historyError = 'The static workout archive is temporarily unavailable; live recent activity is still shown.'
-  } finally {
-    state.historyLoading = false
-    render()
-  }
-}
-
-function setConnectionState(source, message) {
-  state.source = source
-  elements.stage.classList.toggle('is-fallback', source === 'snapshot')
-  elements.stage.classList.toggle('is-error', source === 'error')
-  elements.status.textContent = message
-  const updateValue = state.root?.updatedAt ?? state.root?.generatedAt
-  elements.updated.textContent = source === 'live'
-    ? relativeUpdate(updateValue)
-    : source === 'snapshot'
-      ? `Snapshot · ${dateLabel(state.root?.snapshotDay, { short: true, year: false })}`
-      : message
-}
-
-async function loadFallback(reason = 'Published snapshot') {
-  if (state.source === 'live') return
-  try {
-    const response = await fetch(elements.stage.dataset.source, { cache: 'no-store' })
-    if (!response.ok) throw new Error(`Fallback returned ${response.status}`)
-    const payload = await response.json()
-    // A live record may have arrived while the saved snapshot was loading.
-    if (state.source === 'live') return
-    state.root = payload.root ?? payload
-    state.workouts = Array.isArray(payload.workouts) ? payload.workouts : []
-    setConnectionState('snapshot', `${reason} · live connection pending`)
-  } catch (error) {
-    if (state.source === 'live' || state.source === 'snapshot') return
-    console.error('Founder live fallback failed', error)
-    state.root = {
-      trainingPublished: false,
-      nutritionPublished: false,
-      snapshotDay: null,
-    }
-    state.workouts = []
-    setConnectionState('error', 'Live record temporarily unavailable')
-  }
+  if (!state.authorized) return
   render()
 }
 
-function connectLiveRecord() {
-  void loadCompleteWorkoutHistory()
-  try {
-    database = initializeFirebase()
-  } catch (error) {
-    console.error('Founder live Firebase initialization failed', error)
-    loadFallback('Published snapshot')
+function connectionLabel() {
+  return ({live: 'Live · listening for updates', connecting: 'Connecting…',
+    syncing: 'Syncing latest activity…', offline: 'Connection interrupted · reconnecting',
+    signedOut: 'Sign in to view the live record', restricted: 'Record access unavailable',
+    error: 'Connection unavailable · retrying'})[state.source] || 'Connecting…'
+}
+
+function renderConnectionStatus() {
+  const label = connectionLabel()
+  elements.stage.dataset.connection = state.source
+  elements.stage.classList.toggle('is-fallback', state.source !== 'live')
+  elements.stage.classList.toggle('is-error', ['error', 'restricted'].includes(state.source))
+  elements.status.textContent = label
+  elements.updated.textContent = state.source === 'live'
+    ? relativeUpdate(state.root?.updatedAt ?? state.root?.lastTrainingUpdateAt)
+    : label
+  for (const node of elements.stage.querySelectorAll('[data-founder-connection]')) {
+    node.textContent = label
+  }
+}
+
+function setConnectionState(source) {
+  state.source = source
+  renderConnectionStatus()
+}
+
+function pulseUpdate() {
+  elements.stage.classList.add('has-live-update')
+  window.clearTimeout(state.pulseTimer)
+  state.pulseTimer = window.setTimeout(() => elements.stage.classList.remove('has-live-update'), 1400)
+}
+
+function disconnectRecord() {
+  state.generation += 1
+  for (const key of ['unsubscribeRoot', 'unsubscribeWorkouts', 'unsubscribeMeals', 'unsubscribeJourney']) {
+    state[key]?.()
+    state[key] = null
+  }
+  window.clearTimeout(state.startupTimer)
+  window.clearTimeout(state.retryTimer)
+  state.retryTimer = null
+  state.syncPublishedChannels = null
+}
+
+function clearRecord() {
+  state.authorized = false
+  state.root = null
+  state.journey = null
+  state.workouts = []
+  state.historyWorkouts = null
+  state.liveMeals = []
+  state.channels = {}
+  state.archiveManifest = null
+  state.archiveMealsByMonth.clear()
+  state.archiveOpen = false
+  state.archiveMonth = null
+  state.archiveWeekStart = null
+  state.selectedWorkout = null
+  state.view = 'home'
+  state.nutritionView = 'home'
+  state.selectedNutrient = null
+  stopRouteListener()
+}
+
+function accessMessage() {
+  const signedOut = state.source === 'signedOut'
+  return `<div class="founder-record-access"><strong>${signedOut ? 'Sign in to see the live record' : 'This record is unavailable for this account'}</strong><p>Detailed founder activity and nutrition are available to eligible adult StatsKey accounts.</p><a href="/app/login">${signedOut ? 'Sign in to StatsKey' : 'Manage your sign-in'}</a></div>`
+}
+
+function renderAccessState() {
+  const message = ['signedOut', 'restricted'].includes(state.source)
+    ? accessMessage()
+    : '<div class="founder-record-access"><strong data-founder-connection>Connecting…</strong><p>Restoring your account and checking the latest record.</p></div>'
+  elements.screen.innerHTML = message
+  elements.nutritionScreen.innerHTML = message
+  elements.longitudinal.innerHTML = `<header class="founder-longitudinal__head"><div><span>Longitudinal founder record</span><h4 id="founder-longitudinal-title">The trajectory, not a single day.</h4></div></header>${message}`
+  elements.archiveScreen.replaceChildren()
+  elements.archiveScreen.hidden = true
+  elements.archiveToggle.disabled = true
+  renderJourneyNote()
+  renderConnectionStatus()
+}
+
+function refreshConnectionState() {
+  if (!state.authorized) return
+  const required = ['root', ...(state.root?.trainingPublished === true ? ['workouts'] : []), ...(state.root?.mealsPublished === true ? ['meals'] : [])]
+  const live = navigator.onLine !== false && !state.channels.failed && required.every((key) => state.channels[key] === 'live')
+  setConnectionState(navigator.onLine === false || state.channels.failed ? 'offline' : live ? 'live' : 'syncing')
+  if (live) {
+    state.retryAttempt = 0
+    window.clearTimeout(state.retryTimer)
+    state.retryTimer = null
+    window.clearTimeout(state.startupTimer)
+  }
+}
+
+function retryRecord() {
+  if (!state.viewer || ['signedOut', 'restricted'].includes(state.source) || document.hidden) return
+  if (state.retryTimer) return
+  const delay = Math.min(60_000, 5000 * (2 ** state.retryAttempt++))
+  state.retryTimer = window.setTimeout(() => {
+    state.retryTimer = null
+    if (!document.hidden) startRecordSubscriptions()
+  }, delay)
+}
+
+function recordFailure(error, generation) {
+  if (generation !== state.generation) return
+  if (error?.code === 'permission-denied' || error?.code === 'unauthenticated') {
+    disconnectRecord()
+    clearRecord()
+    setConnectionState(state.viewer ? 'restricted' : 'signedOut')
+    renderAccessState()
     return
   }
+  state.channels.failed = true
+  setConnectionState(state.root ? 'offline' : 'error')
+  if (!state.root) renderAccessState()
+  retryRecord()
+}
 
-  let rootResolved = false
-  const fallbackTimer = window.setTimeout(() => {
-    if (!rootResolved) loadFallback('Published snapshot')
-  }, 4500)
+function startRecordSubscriptions() {
+  if (!state.viewer) return
+  disconnectRecord()
+  const generation = state.generation
+  state.channels = {}
+  setConnectionState(state.root ? 'syncing' : 'connecting')
+  const current = () => generation === state.generation
+  const fail = (error) => recordFailure(error, generation)
+  state.startupTimer = window.setTimeout(() => {
+    if (current() && state.source !== 'live') {
+      setConnectionState(state.root ? 'offline' : 'error')
+      if (!state.root) renderAccessState()
+      retryRecord()
+    }
+  }, 12_000)
 
-  state.unsubscribeRoot = onSnapshot(
-    publicRootReference(),
-    (snapshot) => {
-      rootResolved = true
-      window.clearTimeout(fallbackTimer)
-      if (!snapshot.exists()) {
-        loadFallback('Published snapshot')
-        return
+  const versions = {workouts: 0, meals: 0, journey: 0}
+  const sessionCurrent = current
+  function attachWorkouts() {
+    const version = ++versions.workouts
+    const current = () => sessionCurrent() && versions.workouts === version
+    state.unsubscribeWorkouts = onSnapshot(workoutsReference(), {includeMetadataChanges: true}, (snapshot) => {
+      if (!current()) return
+      state.channels.workouts = snapshot.metadata.fromCache ? 'cache' : 'live'
+      state.workouts = snapshot.docs.map((entry) => ({...entry.data(), workoutId: entry.id}))
+        .sort((a, b) => String(b.day).localeCompare(String(a.day)) || number(b.startMinute) - number(a.startMinute))
+      state.historyWorkouts = state.workouts
+      state.historyLoading = false
+      state.historyError = snapshot.size >= MAX_LIVE_WORKOUTS ? 'Showing the most recent 1,000 published activities.' : null
+      if (state.selectedWorkout) {
+        state.selectedWorkout = state.workouts.find((row) => row.workoutId === state.selectedWorkout.workoutId) || null
+        if (!state.selectedWorkout) state.view = 'home'
       }
-      state.root = { ...snapshot.data(), id: snapshot.id }
-      setConnectionState('live', 'Live from Ryan’s StatsKey record')
-      render()
-    },
-    (error) => {
-      rootResolved = true
-      window.clearTimeout(fallbackTimer)
-      console.warn('Founder live root unavailable', error.code)
-      loadFallback('Published snapshot')
-    }
-  )
+      refreshConnectionState()
+      if (state.authorized) {
+        if (!snapshot.metadata.fromCache && snapshot.docChanges().length) pulseUpdate()
+        render()
+      }
+    }, (error) => { if (current()) fail(error) })
 
-  state.unsubscribeMeals = onSnapshot(
-    liveMealsReference(),
-    (snapshot) => {
-      state.liveMeals = snapshot.docs
-        .map((entry) => ({
-          ...entry.data(),
-          mealId: entry.data().mealId || entry.id,
-        }))
+  }
+  function attachMeals() {
+    state.mealQueryDay = currentRecordDay()
+    const version = ++versions.meals
+    const current = () => sessionCurrent() && versions.meals === version
+    state.unsubscribeMeals = onSnapshot(liveMealsReference(), {includeMetadataChanges: true}, (snapshot) => {
+      if (!current()) return
+      state.channels.meals = snapshot.metadata.fromCache ? 'cache' : 'live'
+      state.liveMeals = snapshot.docs.map((entry) => ({...entry.data(), mealId: entry.id}))
         .filter((meal) => String(meal.day || '') >= PUBLIC_HISTORY_START_DAY)
-      if (state.archiveOpen) renderArchive()
-    },
-    (error) => {
-      console.warn('Founder live meals unavailable', error.code)
-    }
-  )
+      refreshConnectionState()
+      if (state.authorized && state.archiveOpen) renderArchive()
+    }, (error) => { if (current()) fail(error) })
 
-  state.unsubscribeJourney = onSnapshot(
-    doc(database, 'publicFounderReplicas', 'founder', 'journey', 'current'),
-    (snapshot) => {
+  }
+  function attachJourney() {
+    const version = ++versions.journey
+    const current = () => sessionCurrent() && versions.journey === version
+    state.unsubscribeJourney = onSnapshot(doc(database, 'publicFounderReplicas', 'founder', 'journey', 'current'), (snapshot) => {
+      if (!current()) return
       state.journey = snapshot.exists() ? snapshot.data() : null
-      renderJourneyNote()
-    },
-    (error) => {
-      console.warn('Founder journey note unavailable', error.code)
+      if (state.authorized) renderJourneyNote()
+    }, (error) => {
+      // The optional note has a separate publication switch.
+      if (!current()) return
       state.journey = null
       renderJourneyNote()
-    }
-  )
-  // Hide last week's note at the same Chicago calendar boundary as the studio.
-  state.journeyWeekTimer = window.setInterval(renderJourneyNote, 60_000)
-
-  state.unsubscribeWorkouts = onSnapshot(
-    workoutsReference(),
-    (snapshot) => {
-      const workouts = snapshot.docs.map((entry) => ({
-        ...entry.data(),
-        workoutId: entry.id,
-      }))
-      state.workouts = workouts
-      if (state.historyWorkouts) {
-        const merged = new Map(
-          [...state.historyWorkouts, ...workouts]
-            .filter((workout) => workout.workoutId)
-            .map((workout) => [workout.workoutId, workout])
-        )
-        state.historyWorkouts = Array.from(merged.values())
-          .sort((left, right) => String(right.day).localeCompare(String(left.day)))
+    })
+  }
+  function syncPublishedChannels() {
+    for (const [name, flag, key, attach] of [
+      ['workouts', 'trainingPublished', 'unsubscribeWorkouts', attachWorkouts],
+      ['meals', 'mealsPublished', 'unsubscribeMeals', attachMeals],
+      ['journey', 'trainingPlanPublished', 'unsubscribeJourney', attachJourney],
+    ]) {
+      if (state.root?.[flag] === true) {
+        if (name === 'meals' && state.mealQueryDay !== currentRecordDay()) {
+          versions.meals += 1
+          state[key]?.()
+          state[key] = null
+          state.channels.meals = 'connecting'
+        }
+        if (!state[key]) attach()
+      } else {
+        versions[name] += 1
+        state[key]?.()
+        state[key] = null
+        delete state.channels[name]
+        if (name === 'workouts') {
+          state.workouts = []
+          state.historyWorkouts = []
+          state.selectedWorkout = null
+          state.view = 'home'
+          stopRouteListener()
+        } else if (name === 'meals') {
+          state.liveMeals = []
+          state.archiveMealsByMonth.clear()
+          state.archiveManifest = null
+          state.archiveOpen = false
+        } else state.journey = null
       }
-      if (state.source === 'live') render()
-    },
-    (error) => {
-      console.warn('Founder live workouts unavailable', error.code)
     }
-  )
+  }
+
+  state.syncPublishedChannels = syncPublishedChannels
+
+  state.unsubscribeRoot = onSnapshot(publicRootReference(), {includeMetadataChanges: true}, (snapshot) => {
+    if (!current()) return
+    // Cached documents are not proof that this account still has access.
+    if (snapshot.metadata.fromCache && !state.authorized) return
+    if (!snapshot.exists() || snapshot.data().published !== true) {
+      fail({code: 'permission-denied'})
+      return
+    }
+    const previous = state.root
+    state.root = {...snapshot.data(), id: snapshot.id}
+    state.authorized = true
+    state.channels.root = snapshot.metadata.fromCache ? 'cache' : 'live'
+    elements.archiveToggle.disabled = state.root.mealsPublished !== true
+    syncPublishedChannels()
+    refreshConnectionState()
+    if (!snapshot.metadata.fromCache) pulseUpdate()
+    if (previous !== state.root) render()
+  }, fail)
+
+
+}
+
+function connectLiveRecord() {
+  try { database = initializeFirebase() } catch (error) {
+    setConnectionState('error')
+    renderAccessState()
+    return
+  }
+  state.unsubscribeAuth = onAuthStateChanged(auth, (viewer) => {
+    disconnectRecord()
+    clearRecord()
+    state.viewer = viewer && !viewer.isAnonymous ? viewer : null
+    state.retryAttempt = 0
+    setConnectionState(state.viewer ? 'connecting' : 'signedOut')
+    renderAccessState()
+    if (state.viewer) startRecordSubscriptions()
+  }, (error) => recordFailure(error, state.generation))
+  state.journeyWeekTimer = window.setInterval(() => {
+    if (document.hidden) return
+    state.syncPublishedChannels?.()
+    refreshConnectionState()
+    renderConnectionStatus()
+    renderJourneyNote()
+  }, 60_000)
+}
+
+function archiveIsRecent() {
+  return state.archiveMonth == null
 }
 
 function archiveMonthDefinition(month = state.archiveMonth) {
@@ -422,12 +580,12 @@ function archiveWeekDefinition(weekStart = state.archiveWeekStart) {
 
 function archiveMealPool() {
   const records = new Map()
-  for (const meal of Array.from(state.archiveMealsByMonth.values()).flat()) {
-    if (meal?.mealId) records.set(meal.mealId, meal)
-  }
-  // Live records win over the static archive so the newest days stay current
-  // between rebuilds.
-  for (const meal of state.liveMeals) {
+  // The recent query is authoritative for its bounded window. Historical
+  // snapshots stay separate so removed live records cannot reappear from disk.
+  const meals = archiveIsRecent()
+    ? state.liveMeals
+    : Array.from(state.archiveMealsByMonth.values()).flat()
+  for (const meal of meals) {
     if (meal?.mealId && meal.day) records.set(meal.mealId, meal)
   }
   return Array.from(records.values()).sort((left, right) => (
@@ -438,6 +596,7 @@ function archiveMealPool() {
 
 function archiveScopeMeals() {
   const meals = archiveMealPool()
+  if (archiveIsRecent()) return meals
   const week = archiveWeekDefinition()
   if (week) {
     return meals.filter((meal) => (
@@ -511,6 +670,8 @@ function archiveStatusLabel(status) {
 }
 
 async function loadArchiveMonths(months) {
+  if (!state.authorized || state.root?.mealsPublished !== true) return
+  const generation = state.generation
   const missing = (months || [])
     .map((month) => archiveMonthDefinition(month))
     .filter(Boolean)
@@ -521,10 +682,11 @@ async function loadArchiveMonths(months) {
   renderArchive()
   try {
     const payloads = await Promise.all(missing.map(async (month) => {
-      const response = await fetch(month.path)
+      const response = await fetch(month.path, {cache: 'no-cache'})
       if (!response.ok) throw new Error(`${month.month} returned ${response.status}`)
       return [month.month, await response.json()]
     }))
+    if (!state.authorized || state.root?.mealsPublished !== true || generation !== state.generation) return
     for (const [month, payload] of payloads) {
       state.archiveMealsByMonth.set(
         month,
@@ -532,46 +694,57 @@ async function loadArchiveMonths(months) {
       )
     }
   } catch (error) {
+    if (!state.authorized || generation !== state.generation) return
     console.warn('Founder history segment unavailable', error)
     state.archiveError = 'That published archive segment is temporarily unavailable.'
   } finally {
-    state.archiveLoading = false
-    renderArchive()
+    if (state.authorized && generation === state.generation) {
+      state.archiveLoading = false
+      renderArchive()
+    }
   }
 }
 
 async function loadFounderArchive() {
+  if (!state.authorized || state.root?.mealsPublished !== true) return
+  const generation = state.generation
   if (state.archiveManifest) return
   state.archiveLoading = true
   state.archiveError = null
   renderArchive()
   try {
-    const response = await fetch(FOUNDER_HISTORY_INDEX_PATH)
+    const response = await fetch(FOUNDER_HISTORY_INDEX_PATH, {cache: 'no-cache'})
     if (!response.ok) throw new Error(`History index returned ${response.status}`)
-    state.archiveManifest = await response.json()
-    state.archiveMonth = state.archiveManifest?.months?.[0]?.month || null
-    if (state.archiveMonth) await loadArchiveMonths([state.archiveMonth])
+    const manifest = await response.json()
+    if (!state.authorized || state.root?.mealsPublished !== true || generation !== state.generation) return
+    state.archiveManifest = manifest
   } catch (error) {
+    if (!state.authorized || generation !== state.generation) return
     console.warn('Founder history index unavailable', error)
-    state.archiveError = 'The complete published archive is temporarily unavailable.'
+    state.archiveError = 'Historical months are temporarily unavailable. Recent meals continue updating.'
   } finally {
-    state.archiveLoading = false
-    renderArchive()
+    if (state.authorized && generation === state.generation) {
+      state.archiveLoading = false
+      renderArchive()
+    }
   }
 }
 
 async function selectArchiveMonth(month) {
-  if (!archiveMonthDefinition(month)) return
-  state.archiveMonth = month
+  if (!state.authorized || state.root?.mealsPublished !== true) return
+  const recent = month === 'recent'
+  if (!recent && !archiveMonthDefinition(month)) return
+  state.archiveMonth = recent ? null : month
   state.archiveWeekStart = null
   state.archiveNutrientKey = null
   state.archiveExpandedMealId = null
   state.archiveVisibleDayCount = 3
-  await loadArchiveMonths([month])
+  if (!recent) await loadArchiveMonths([month])
   renderArchive()
 }
 
 async function selectArchiveWeek(weekStart) {
+  if (!state.authorized || state.root?.mealsPublished !== true || archiveIsRecent()) return
   if (!weekStart) {
     state.archiveWeekStart = null
     state.archiveExpandedMealId = null
@@ -591,32 +764,34 @@ async function selectArchiveWeek(weekStart) {
 function archiveNavigator() {
   const manifest = state.archiveManifest
   const month = archiveMonthDefinition()
-  if (!manifest || !month) return ''
-  const weeks = (month.weekStarts || [])
+  const recent = archiveIsRecent()
+  const weeks = (month?.weekStarts || [])
     .map((weekStart) => archiveWeekDefinition(weekStart))
     .filter(Boolean)
     .sort((left, right) => right.weekStart.localeCompare(left.weekStart))
   return `
     <section class="founder-archive-nav">
       <header>
-        <div><small>Date-indexed archive</small><strong>Load one bounded segment at a time</strong></div>
-        <span>${integer(month.mealCount)} records in ${escapeHTML(month.label)}</span>
+        <div><small>Food record</small><strong>Recent updates and dated history</strong></div>
+        <span>${recent ? 'Up to 80 recent records' : `${integer(month?.mealCount)} records in ${escapeHTML(month?.label)}`}</span>
       </header>
       <div class="founder-archive-dropdowns">
         <label>
-          <span>Month</span>
+          <span>View</span>
           <select data-archive-month-select aria-label="Food record month">
-            ${manifest.months.map((entry) => `<option value="${entry.month}" ${entry.month === month.month ? 'selected' : ''}>${escapeHTML(entry.label)} · ${integer(entry.mealCount)} records</option>`).join('')}
+            <option value="recent" ${recent ? 'selected' : ''}>Recent live meals</option>
+            ${(manifest?.months || []).map((entry) => `<option value="${escapeHTML(entry.month)}" ${entry.month === month?.month ? 'selected' : ''}>${escapeHTML(entry.label)} · historical snapshot</option>`).join('')}
           </select>
         </label>
-        <label>
+        ${month ? `<label>
           <span>Week</span>
           <select data-archive-week-select aria-label="Week within selected month">
             <option value="" ${state.archiveWeekStart ? '' : 'selected'}>All month · ${integer(month.recordedDays)} recorded ${number(month.recordedDays) === 1 ? 'day' : 'days'}</option>
             ${weeks.map((week) => `<option value="${week.weekStart}" ${state.archiveWeekStart === week.weekStart ? 'selected' : ''}>${escapeHTML(dateLabel(week.weekStart, { short: true, year: false }))}–${escapeHTML(dateLabel(week.weekEnd, { short: true, year: false }))} · ${integer(week.mealCount)} records</option>`).join('')}
           </select>
-        </label>
+        </label>` : ''}
       </div>
+      ${recent && !manifest ? `<p>${escapeHTML(state.archiveError || 'Loading historical month choices…')}</p>` : ''}
     </section>
   `
 }
@@ -791,37 +966,41 @@ function archiveNutrientDropdown() {
 
 function archiveHome() {
   const manifest = state.archiveManifest
-  if (!manifest) {
+  const recent = archiveIsRecent()
+  if (!recent && !manifest) {
     return `<div class="founder-history-archive__loading"><span></span><span></span><span></span><p>${escapeHTML(state.archiveError || 'Loading the full historical archive…')}</p></div>`
   }
   const meals = archiveScopeMeals()
   const totals = archiveAggregate(meals)
   const scopeDayCount = new Set(meals.map((meal) => meal.day)).size
   const visibleDayCount = Math.min(state.archiveVisibleDayCount, scopeDayCount)
-  const week = archiveWeekDefinition()
-  const scope = week
+  const week = recent ? null : archiveWeekDefinition()
+  const scope = recent ? 'Recent live meals' : week
     ? `${dateLabel(week.weekStart, { short: true })}–${dateLabel(week.weekEnd, { short: true })}`
     : archiveMonthDefinition()?.label || 'Selected archive'
-  const liveThroughDay = [
-    String(manifest.reliableThroughDay || ''),
-    ...state.liveMeals.map((meal) => String(meal.day || '')),
-  ].sort().at(-1)
+  const days = meals.map((meal) => meal.day).filter(Boolean).sort()
+  const startDay = recent ? days[0] : manifest.earliestDay
+  const endDay = recent ? days.at(-1) : manifest.reliableThroughDay
+  const windowLabel = startDay && endDay
+    ? `${dateLabel(startDay, { short: true })}–${dateLabel(endDay, { short: true })}`
+    : 'Waiting for recent meals'
   return `
     <section class="founder-archive-summary">
-      <header><div><small>Verified public archive</small><strong>${escapeHTML(dateLabel(manifest.earliestDay, { short: true }))}–${escapeHTML(dateLabel(liveThroughDay, { short: true }))}</strong></div><span>Static history · live recent days</span></header>
+      <header><div><small>${recent ? 'Recent live meals' : 'Historical snapshot'}</small><strong>${escapeHTML(windowLabel)}</strong></div><span>${recent ? 'Updates with the live record' : `Snapshot through ${escapeHTML(dateLabel(manifest.reliableThroughDay, { short: true }))}`}</span></header>
       <div>
-        <article><small>Food records</small><strong>${integer(manifest.mealCount)}</strong><span>every reliable public meal</span></article>
-        <article><small>Food items</small><strong>${integer(manifest.itemCount)}</strong><span>preserved inside each meal</span></article>
-        <article><small>Recorded days</small><strong>${integer(manifest.recordedDays)}</strong><span>${integer(manifest.possibleDays)} calendar days covered</span></article>
-        <article><small>Nutrients</small><strong>${integer(manifest.nutrientCount)}</strong><span>missing fields remain unknown</span></article>
+        <article><small>Food records</small><strong>${integer(recent ? totals.mealCount : manifest.mealCount)}</strong><span>${recent ? 'in this recent window' : 'in the dated snapshot'}</span></article>
+        <article><small>Food items</small><strong>${integer(recent ? totals.itemCount : manifest.itemCount)}</strong><span>preserved inside each meal</span></article>
+        <article><small>Recorded days</small><strong>${integer(recent ? scopeDayCount : manifest.recordedDays)}</strong><span>${recent ? 'oldest day may be partial' : `${integer(manifest.possibleDays)} calendar days in the snapshot`}</span></article>
+        <article><small>Nutrients</small><strong>${integer(recent ? totals.nutrients.size : manifest.nutrientCount)}</strong><span>missing fields remain unknown</span></article>
       </div>
     </section>
+    ${recent ? '<p class="founder-archive-disclaimer">Up to 80 most recent meals through today. The oldest displayed day may be partial. Choose a historical month to view its dated snapshot.</p>' : ''}
     ${archiveNavigator()}
-    ${archiveNutrientDropdown()}
+    ${recent ? '' : archiveNutrientDropdown()}
     <section class="founder-archive-scope">
-      <header><div><small>Every meal in scope</small><strong>${escapeHTML(scope)}</strong></div><span>Showing ${integer(visibleDayCount)} of ${integer(scopeDayCount)} days · ${integer(totals.mealCount)} total records</span></header>
-      ${state.archiveLoading ? '<div class="founder-archive-inline-loading">Loading selected archive segment…</div>' : ''}
-      ${archiveDayGroups(meals) || `<div class="founder-archive-empty">${escapeHTML(state.archiveError || 'No public meals were recorded in this scope.')}</div>`}
+      <header><div><small>${recent ? 'Current query results' : 'Meals in selected snapshot'}</small><strong>${escapeHTML(scope)}</strong></div><span>Showing ${integer(visibleDayCount)} of ${integer(scopeDayCount)} days · ${integer(totals.mealCount)} records in this view</span></header>
+      ${!recent && state.archiveLoading ? '<div class="founder-archive-inline-loading">Loading selected archive segment…</div>' : ''}
+      ${archiveDayGroups(meals) || `<div class="founder-archive-empty">${escapeHTML(recent ? (state.channels.meals === 'live' ? 'No recent meals are available.' : 'Waiting for current meal updates…') : state.archiveError || 'No public meals were recorded in this snapshot.')}</div>`}
       ${visibleDayCount < scopeDayCount ? `<button class="founder-archive-load-more" type="button" data-archive-more-days>Load ${integer(Math.min(3, scopeDayCount - visibleDayCount))} more days</button>` : ''}
     </section>
     <p class="founder-archive-disclaimer">Public food data only. Private notes, photos, medications, supplements, hidden items, and private Intelligence output are excluded.</p>
@@ -830,6 +1009,13 @@ function archiveHome() {
 
 function renderArchive() {
   if (!elements.archive || !elements.archiveScreen || !elements.archiveToggle) return
+  if (!state.authorized || state.root?.mealsPublished !== true) {
+    elements.archive.classList.remove('is-open')
+    elements.archiveToggle.setAttribute('aria-expanded', 'false')
+    elements.archiveScreen.hidden = true
+    elements.archiveScreen.replaceChildren()
+    return
+  }
   elements.archive.classList.toggle('is-open', state.archiveOpen)
   elements.archiveToggle.setAttribute('aria-expanded', String(state.archiveOpen))
   const label = elements.archiveToggle.querySelector('b')
@@ -845,8 +1031,16 @@ function renderArchive() {
 }
 
 function handleArchiveClick(event) {
+  if (!state.authorized || state.root?.mealsPublished !== true) return
   if (event.target.closest('[data-archive-toggle]')) {
     state.archiveOpen = !state.archiveOpen
+    if (state.archiveOpen) {
+      state.archiveMonth = null
+      state.archiveWeekStart = null
+      state.archiveNutrientKey = null
+      state.archiveExpandedMealId = null
+      state.archiveVisibleDayCount = 3
+    }
     renderArchive()
     if (state.archiveOpen && !state.archiveManifest) void loadFounderArchive()
     return
@@ -899,6 +1093,7 @@ function handleArchiveClick(event) {
 }
 
 function handleArchiveChange(event) {
+  if (!state.authorized || state.root?.mealsPublished !== true) return
   if (event.target.matches('[data-archive-month-select]')) {
     void selectArchiveMonth(event.target.value)
     return
@@ -1581,19 +1776,19 @@ function renderLongitudinalRecord() {
         <h4 id="founder-longitudinal-title">The trajectory, not a single day.</h4>
         <p>A live year-scale view of volume and continuity plus every reliable public workout from the start of the experiment. Select an activity to inspect its metrics in the phone above.</p>
       </div>
-      <strong><i aria-hidden="true"></i> Live record</strong>
+      <strong><i aria-hidden="true"></i><span data-founder-connection>${escapeHTML(connectionLabel())}</span></strong>
     </header>
     <div class="founder-longitudinal__metrics">
-      <span><small>Since late Aug 2025</small><strong>${number(trailingYearMiles).toFixed(1)}</strong><em>running miles</em></span>
+      <span><small>Last ${integer(weeks.length)} weeks</small><strong>${number(trailingYearMiles).toFixed(1)}</strong><em>running miles</em></span>
       <span><small>${escapeHTML(year.year)} average</small><strong>${number(year.averageMilesPerWeek).toFixed(1)}</strong><em>miles / week</em></span>
       <span><small>Last 30 days</small><strong>${number(month.runningMiles).toFixed(1)}</strong><em>${integer(month.runningActivities)} runs</em></span>
       <span><small>Calendar year</small><strong>${number(year.runningMiles).toFixed(1)}</strong><em>running miles</em></span>
-      <span><small>Projected record</small><strong>${number(history.runningMiles).toFixed(1)}</strong><em>${integer(history.activities)} activities</em></span>
+      <span><small>Published record</small><strong>${number(training.allTime?.runningMiles ?? history.runningMiles).toFixed(1)}</strong><em>${integer(training.allTime?.activities ?? completeWorkouts.length)} activities</em></span>
     </div>
     <div class="founder-longitudinal__charts">
       <article class="founder-longitudinal__chart-card founder-longitudinal__chart-card--primary">
         <div class="founder-longitudinal__chart-head">
-          <div><small>Weekly running volume</small><strong>Since late August 2025</strong></div>
+          <div><small>Weekly running volume</small><strong>Last ${integer(weeks.length)} weeks</strong></div>
           <span>${number(trailingYearMiles / Math.max(weeks.length, 1)).toFixed(1)} mi / week</span>
         </div>
         ${longitudinalWeeklyChart(weeks)}
@@ -1608,7 +1803,7 @@ function renderLongitudinalRecord() {
     </div>
     <div class="founder-longitudinal__activity">
       <div class="founder-longitudinal__activity-head">
-        <div><small>Complete activity archive</small><strong>Every reliable public workout summary</strong></div>
+        <div><small>${completeWorkouts.length >= MAX_LIVE_WORKOUTS ? "Recent activity archive" : "Complete activity archive"}</small><strong>Every available published workout summary</strong></div>
         <span>${integer(completeWorkouts.length)} activities · newest first</span>
       </div>
       <div class="founder-longitudinal__activity-list">
@@ -2116,11 +2311,20 @@ function renderTrainingRecord() {
 }
 
 function render() {
+  if (!state.authorized) return
+  const runningScroll = elements.screen.scrollTop
+  const nutritionScroll = elements.nutritionScreen.scrollTop
+  const archiveScroll = elements.longitudinal.querySelector('.founder-longitudinal__activity-list')?.scrollTop || 0
   renderJourneyNote()
   renderScreen()
   renderNutritionScreen()
   renderLongitudinalRecord()
   renderArchive()
+  if (state.activityPositionLocked) elements.screen.scrollTop = runningScroll
+  elements.nutritionScreen.scrollTop = nutritionScroll
+  const archiveList = elements.longitudinal.querySelector('.founder-longitudinal__activity-list')
+  if (archiveList) archiveList.scrollTop = archiveScroll
+  renderConnectionStatus()
 }
 
 function renderJourneyNote() {
@@ -2179,6 +2383,7 @@ function keepPhoneNavigationVisible(deviceName = 'running') {
 }
 
 function stopRouteListener() {
+  state.routeGeneration += 1
   state.unsubscribeRoute?.()
   state.unsubscribeRoute = null
   state.route = null
@@ -2186,11 +2391,15 @@ function stopRouteListener() {
 }
 
 function openWorkout(workoutId) {
+  if (!state.authorized) return
   const workout = (state.historyWorkouts ?? state.workouts)
     .find((item) => item.workoutId === workoutId)
   if (!workout) return
   stopRouteListener()
   state.selectedWorkout = workout
+  const generation = state.generation
+  const routeGeneration = state.routeGeneration
+  const current = () => state.authorized && generation === state.generation && routeGeneration === state.routeGeneration && state.selectedWorkout?.workoutId === workoutId
   state.view = 'workout'
   elements.screen.scrollTop = 0
 
@@ -2201,11 +2410,13 @@ function openWorkout(workoutId) {
     state.unsubscribeRoute = onSnapshot(
       doc(database, 'publicFounderReplicas', 'founder', 'routes', workoutId),
       (snapshot) => {
+        if (!current()) return
         state.routeLoading = false
         state.route = snapshot.exists() ? snapshot.data() : null
         renderScreen()
       },
       (error) => {
+        if (!current()) return
         console.warn('Published founder route unavailable', error.code)
         state.routeLoading = false
         state.route = null
@@ -2309,9 +2520,30 @@ export function initFounderLive() {
   })
 
   window.addEventListener('beforeunload', () => {
-    state.unsubscribeJourney?.()
+    disconnectRecord()
+    state.unsubscribeAuth?.()
     window.clearInterval(state.journeyWeekTimer)
+    window.clearTimeout(state.pulseTimer)
   }, { once: true })
+  const resume = () => {
+    if (!document.hidden && state.viewer && !['live', 'restricted'].includes(state.source)) {
+      startRecordSubscriptions()
+    }
+  }
+  window.addEventListener('online', resume)
+  window.addEventListener('offline', () => {
+    window.clearTimeout(state.retryTimer)
+    state.retryTimer = null
+    if (state.viewer && !['signedOut', 'restricted'].includes(state.source)) {
+      setConnectionState(state.root ? 'offline' : 'error')
+    }
+  })
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      window.clearTimeout(state.retryTimer)
+      state.retryTimer = null
+    } else resume()
+  })
 
   elements.back.addEventListener('click', () => {
     stopRouteListener()
@@ -2337,6 +2569,12 @@ export function initFounderLive() {
   elements.archive.addEventListener('click', handleArchiveClick)
   elements.archive.addEventListener('change', handleArchiveChange)
   stage.addEventListener('click', (event) => {
+    if (event.target.closest('[data-founder-reconnect]')) {
+      if (state.viewer) startRecordSubscriptions()
+      else if (!state.unsubscribeAuth) connectLiveRecord()
+      else renderAccessState()
+      return
+    }
     const longitudinalWorkout = event.target.closest(
       '#founder-longitudinal-record [data-live-workout]'
     )
