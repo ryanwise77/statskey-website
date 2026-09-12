@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/check-nudge-portal.mjs",
+    "build": "node scripts/repair-founder-nutrition-fallback.mjs --check && vite build && node scripts/check-nudge-portal.mjs",
     "test:nudge-author": "node --test scripts/nudge-author.test.ts scripts/founder-journey.test.mjs",
     "build:founder-history": "node scripts/build-founder-history.mjs",
     "refresh:founder-history": "node scripts/refresh-founder-history.mjs",
     "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",
+    "test:founder-nutrition": "node --test scripts/founder-nutrition-fallback.test.mjs scripts/founder-nutrition-ui.test.mjs",
     "test:firestore-failover": "node --test scripts/firestore-failover.test.ts",
     "test:standby-auth": "node --test scripts/standby-auth.test.ts",
     "preview": "vite preview",

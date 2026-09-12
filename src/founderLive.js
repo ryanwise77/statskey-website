@@ -301,10 +301,13 @@ async function loadFallback(reason = 'Published snapshot') {
     const response = await fetch(elements.stage.dataset.source, { cache: 'no-store' })
     if (!response.ok) throw new Error(`Fallback returned ${response.status}`)
     const payload = await response.json()
+    // A live record may have arrived while the saved snapshot was loading.
+    if (state.source === 'live') return
     state.root = payload.root ?? payload
     state.workouts = Array.isArray(payload.workouts) ? payload.workouts : []
     setConnectionState('snapshot', `${reason} · live connection pending`)
   } catch (error) {
+    if (state.source === 'live' || state.source === 'snapshot') return
     console.error('Founder live fallback failed', error)
     state.root = {
       trainingPublished: false,
@@ -1654,6 +1657,7 @@ function nutritionRows(items) {
     ...items.filter((item) => !preferred.includes(item.key)),
   ]
   return ordered.map((item) => {
+    const hasValue = item.average != null && number(item.coverageDays) > 0
     const color = NUTRIENT_COLORS[item.status] || NUTRIENT_COLORS.limited
     const status = item.status === 'strong'
       ? 'Optimal'
@@ -1672,9 +1676,9 @@ function nutritionRows(items) {
           <i aria-hidden="true"></i>
           <strong>${escapeHTML(item.label === 'Fiber' ? 'Dietary Fiber' : item.label)}</strong>
         </span>
-        <span class="ios-micronutrient-card__value">${number(item.average).toLocaleString()} ${escapeHTML(item.unit)}</span>
+        <span class="ios-micronutrient-card__value">${hasValue ? number(item.average).toLocaleString() : '—'} ${escapeHTML(item.unit)}</span>
         <span class="ios-micronutrient-card__status">
-          <b>${integer(item.percent)}% of target</b>
+          <b>${hasValue && item.percent != null ? `${integer(item.percent)}% of target` : 'Not recorded'}</b>
           <small>— ${status}</small>
         </span>
       </button>
@@ -1684,6 +1688,8 @@ function nutritionRows(items) {
 
 function nutritionRangeControls() {
   const nutrition = state.root?.nutrition
+  const selected = nutritionSnapshot()
+  const savedSnapshot = state.source === 'snapshot'
   const mode = state.includeToday ? 'includingToday' : 'complete'
   const available = nutrition?.ranges?.[mode]
   const todayAvailable = Boolean(nutrition?.ranges?.includingToday)
@@ -1701,9 +1707,10 @@ function nutritionRangeControls() {
       </div>
       <button class="ios-today-toggle ${state.includeToday ? 'is-on' : ''}" type="button" data-live-action="toggle-today" role="switch" aria-checked="${state.includeToday}" ${todayAvailable ? '' : 'disabled'}>
         <span class="ios-today-toggle__calendar" aria-hidden="true">▦</span>
-        <span><strong>Include Today</strong><small>${state.includeToday ? `Past ${state.nutritionRangeDays - 1} days + today` : `Past ${state.nutritionRangeDays} complete days`}</small></span>
+        <span><strong>${savedSnapshot ? 'Include snapshot day' : 'Include Today'}</strong><small>${savedSnapshot ? `${state.nutritionRangeDays}-day published window` : state.includeToday ? `Past ${state.nutritionRangeDays - 1} days + today` : `Past ${state.nutritionRangeDays} complete days`}</small></span>
         <i aria-hidden="true"></i>
       </button>
+      ${selected?.startDay && selected?.endDay ? `<p class="ios-card-copy" style="margin:10px 0 0">${savedSnapshot ? 'Published snapshot · ' : ''}${escapeHTML(dateLabel(selected.startDay, { short: true }))} – ${escapeHTML(dateLabel(selected.endDay, { short: true }))}</p>` : ''}
     </div>
   `
 }
@@ -1714,7 +1721,7 @@ function macroInsightCard(label, value, unit, tone, icon, coverage) {
       <span class="ios-macro-insight__icon" aria-hidden="true">${icon}</span>
       <small>${escapeHTML(label)}</small>
       <span class="ios-macro-insight__value"><strong>${escapeHTML(value)}</strong><em>${escapeHTML(unit)}</em></span>
-      <span class="ios-macro-insight__caption">recorded daily average</span>
+      <span class="ios-macro-insight__caption">average across selected days</span>
       <i class="ios-macro-insight__track"><b style="width:${coverage}%"></b></i>
     </div>
   `
@@ -1727,13 +1734,17 @@ function nutritionHome() {
   const recordedDays = number(nutrition?.recordedDays)
   const coverage = Math.max(0, Math.min(100, (recordedDays / possibleDays) * 100)).toFixed(1)
   const fiber = nutrition?.micronutrients?.find((item) => item.key === 'dietary_fiber')
-  const activeHours = number(state.root?.training?.periods?.last7Days?.activeHours)
+  const macroValue = (key) => recordedDays > 0 && average[key] != null
+    ? integer(average[key])
+    : '—'
   const signal = recordedDays >= possibleDays
     ? 'Strong record'
     : recordedDays > 0
       ? 'Developing'
       : 'Needs data'
-  const recordedNutrients = nutrition?.micronutrients?.filter((item) => number(item.average) > 0).length ?? 0
+  const recordedNutrients = nutrition?.micronutrients?.filter((item) => (
+    item.average != null && number(item.coverageDays) > 0
+  )).length ?? 0
   return `
     <h3 class="ios-large-title">Insights</h3>
     <div class="ios-insights-hero">
@@ -1745,14 +1756,14 @@ function nutritionHome() {
     ${nutritionRangeControls()}
     <div class="ios-context-strip">
       <p><span aria-hidden="true">▧</span><strong>Signal</strong><b>${signal}</b><small>· Nutrition baseline</small></p>
-      <p><span aria-hidden="true">▥</span><strong>Context</strong><small>${integer(activeHours * 60)} min training and ${integer(recordedDays)} recorded nutrition days</small></p>
+      <p><span aria-hidden="true">▥</span><strong>Context</strong><small>${integer(recordedDays)} of ${integer(possibleDays)} days have food records</small></p>
     </div>
-    <div class="ios-native-section-head"><strong>Daily Average Macronutrients</strong><small>${integer(recordedDays)} complete days</small></div>
+    <div class="ios-native-section-head"><strong>Daily Average Macronutrients</strong><small>${integer(recordedDays)} recorded days</small></div>
     <div class="ios-macro-insights">
-      ${macroInsightCard('Energy', integer(average.calories), 'kcal', '#ec8d7c', '◆', coverage)}
-      ${macroInsightCard('Protein', integer(average.proteinGrams), 'g', '#82b9d7', '♟', coverage)}
-      ${macroInsightCard('Carbs', integer(average.carbohydrateGrams), 'g', '#77c893', '⌁', coverage)}
-      ${macroInsightCard('Fat', integer(average.fatGrams), 'g', '#ae8ce7', '●', coverage)}
+      ${macroInsightCard('Energy', macroValue('calories'), 'kcal', '#ec8d7c', '◆', coverage)}
+      ${macroInsightCard('Protein', macroValue('proteinGrams'), 'g', '#82b9d7', '♟', coverage)}
+      ${macroInsightCard('Carbs', macroValue('carbohydrateGrams'), 'g', '#77c893', '⌁', coverage)}
+      ${macroInsightCard('Fat', macroValue('fatGrams'), 'g', '#ae8ce7', '●', coverage)}
     </div>
     <div class="ios-card ios-average-water">
       <div class="ios-average-water__head">
@@ -1766,7 +1777,7 @@ function nutritionHome() {
     ${fiber ? `
       <div class="ios-fiber-progress">
         <span>Fiber</span>
-        <strong>${number(fiber.average).toFixed(1)}${escapeHTML(fiber.unit)} / ${number(fiber.reference).toFixed(0)}${escapeHTML(fiber.unit)}</strong>
+        <strong>${fiber.average != null && number(fiber.coverageDays) > 0 ? `${number(fiber.average).toFixed(1)}${escapeHTML(fiber.unit)}` : '—'} / ${number(fiber.reference).toFixed(0)}${escapeHTML(fiber.unit)}</strong>
         <i><b style="width:${Math.max(0, Math.min(100, number(fiber.percent)))}%"></b></i>
       </div>
     ` : ''}
@@ -1810,6 +1821,7 @@ function nutrientDetailHome() {
   const nutrient = nutrition?.micronutrients?.find((item) => item.key === state.selectedNutrient)
   if (!nutrient) return nutritionHome()
   const color = NUTRIENT_COLORS[nutrient.status] || NUTRIENT_COLORS.limited
+  const hasValue = nutrient.average != null && number(nutrient.coverageDays) > 0
   const percent = Math.max(0, number(nutrient.percent))
   const direction = nutrient.direction === 'limit' ? 'daily limit' : 'daily reference'
   return `
@@ -1818,8 +1830,8 @@ function nutrientDetailHome() {
         <span aria-hidden="true">●</span>
         <small>Daily average · ${integer(nutrition.possibleDays)} days</small>
         <h3>${escapeHTML(nutrient.label)}</h3>
-        <strong>${number(nutrient.average).toLocaleString()} <em>${escapeHTML(nutrient.unit)}</em></strong>
-        <p>${integer(percent)}% of the ${escapeHTML(direction)}</p>
+        <strong>${hasValue ? number(nutrient.average).toLocaleString() : '—'} <em>${escapeHTML(nutrient.unit)}</em></strong>
+        <p>${hasValue && nutrient.percent != null ? `${integer(percent)}% of the ${escapeHTML(direction)}` : 'Not recorded in this window'}</p>
       </div>
       <div class="ios-card">
         <div class="ios-nutrient-meter" style="--micro-width:${Math.min(percent, 100)}%;--micro-color:${color}">
