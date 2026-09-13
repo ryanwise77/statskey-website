@@ -64,7 +64,7 @@ const de = {
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Welche Sprachen unterstützt StatsKey?</h3>
-                <p>StatsKey ist vollständig lokalisiert in Englisch, Spanisch, Deutsch, Japanisch und brasilianischem Portugiesisch — einschließlich Erfassung, Training, deinem wöchentlichen Rückblick, Erinnerungen und exportierten Berichten.</p>
+                <p>StatsKey ist vollständig lokalisiert in Englisch, Spanisch, Deutsch, Hindi, Japanisch und brasilianischem Portugiesisch — einschließlich Erfassung, Training, deinem wöchentlichen Rückblick, Erinnerungen und exportierten Berichten.</p>
               </div>
 
               <div>
@@ -213,7 +213,7 @@ const ja = {
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">StatsKeyはどの言語に対応していますか？</h3>
-                <p>StatsKeyは英語、スペイン語、ドイツ語、日本語、ブラジルポルトガル語に完全対応しています。記録、トレーニング、週間まとめ、リマインダー、エクスポートしたレポートまで含まれます。</p>
+                <p>StatsKeyは英語、スペイン語、ドイツ語、ヒンディー語、日本語、ブラジルポルトガル語に完全対応しています。記録、トレーニング、週間まとめ、リマインダー、エクスポートしたレポートまで含まれます。</p>
               </div>
 
               <div>
@@ -362,7 +362,7 @@ const pt = {
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">Quais idiomas o StatsKey suporta?</h3>
-                <p>O StatsKey é totalmente localizado em inglês, espanhol, alemão, japonês e português do Brasil — incluindo registro, treino, seu resumo semanal, lembretes e relatórios exportados.</p>
+                <p>O StatsKey é totalmente localizado em inglês, espanhol, alemão, hindi, japonês e português do Brasil — incluindo registro, treino, seu resumo semanal, lembretes e relatórios exportados.</p>
               </div>
 
               <div>
@@ -511,7 +511,7 @@ const es = {
 
               <div>
                 <h3 class="font-medium text-text-primary mb-1">¿Qué idiomas admite StatsKey?</h3>
-                <p>StatsKey está totalmente localizado en inglés, español, alemán, japonés y portugués de Brasil, incluidos el registro, el entrenamiento, tu resumen semanal, los recordatorios y los informes exportados.</p>
+                <p>StatsKey está totalmente localizado en inglés, español, alemán, hindi, japonés y portugués de Brasil, incluidos el registro, el entrenamiento, tu resumen semanal, los recordatorios y los informes exportados.</p>
               </div>
 
               <div>

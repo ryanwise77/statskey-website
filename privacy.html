@@ -29,19 +29,19 @@
 
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-white/[0.04]" style="background:rgba(0,0,0,0.6)">
       <div class="max-w-[1080px] mx-auto px-8 h-11 flex items-center justify-between">
-        <a href="/" class="site-brand" aria-label="StatsKey home">
+        <a href="/" class="site-brand" aria-label="StatsKey home" data-legal-aria="home">
           <span class="site-brand__mark" aria-hidden="true"></span>
           <span>StatsKey</span>
         </a>
         <div class="flex items-center gap-4">
           <div class="hidden md:flex items-center gap-6 text-[12px] text-text-muted">
-            <a href="/#features" class="hover:text-text-primary transition-colors">Features</a>
-            <a href="/#intelligence" class="hover:text-text-primary transition-colors">Intelligence</a>
-            <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="hover:text-text-primary transition-colors">iOS app</a>
-            <a href="/app/login" class="hover:text-text-primary transition-colors">Sign in</a>
-            <a href="/app/signup" class="inline-flex items-center justify-center h-7 px-3 rounded-full border border-white/15 bg-white/[0.06] text-text-primary hover:bg-white/[0.1] hover:border-white/25 transition-colors">Sign up</a>
+            <a href="/#features" class="hover:text-text-primary transition-colors" data-legal-label="features">Features</a>
+            <a href="/#intelligence" class="hover:text-text-primary transition-colors" data-legal-label="intelligence">Intelligence</a>
+            <a href="https://apps.apple.com/us/app/statskey/id6751132823" target="_blank" rel="noopener" class="hover:text-text-primary transition-colors" data-legal-label="iosApp">iOS app</a>
+            <a href="/app/login" class="hover:text-text-primary transition-colors" data-legal-label="signIn">Sign in</a>
+            <a href="/app/signup" class="inline-flex items-center justify-center h-7 px-3 rounded-full border border-white/15 bg-white/[0.06] text-text-primary hover:bg-white/[0.1] hover:border-white/25 transition-colors" data-legal-label="signUp">Sign up</a>
           </div>
-          <div id="lang-switch" role="group" aria-label="Language / Idioma / Sprache / 言語">
+          <div id="lang-switch" role="group" data-legal-aria="language" aria-label="Language / Idioma / Sprache / 言語">
             <button type="button" data-lang="en">EN</button>
             <button type="button" data-lang="es">ES</button>
             <button type="button" data-lang="de">DE</button>
@@ -266,9 +266,9 @@
       <div class="max-w-[1080px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-text-muted">
         <span>StatsKey &copy; 2026</span>
         <div class="flex items-center gap-5">
-          <a href="mailto:ryanws@statskeybiometrics.com" class="hover:text-text-secondary transition-colors">Support</a>
-          <a href="/privacy" class="hover:text-text-secondary transition-colors">Privacy</a>
-          <a href="/terms" class="hover:text-text-secondary transition-colors">Terms</a>
+          <a href="mailto:ryanws@statskeybiometrics.com" class="hover:text-text-secondary transition-colors" data-legal-label="support">Support</a>
+          <a href="/privacy" class="hover:text-text-secondary transition-colors" data-legal-label="privacy">Privacy</a>
+          <a href="/terms" class="hover:text-text-secondary transition-colors" data-legal-label="terms">Terms</a>
         </div>
       </div>
     </footer>

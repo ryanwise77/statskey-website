@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "node scripts/repair-founder-nutrition-fallback.mjs --check && vite build && node scripts/check-nudge-portal.mjs",
     "test:nudge-author": "node --test scripts/nudge-author.test.ts scripts/founder-journey.test.mjs",
+    "test:languages": "node --test scripts/legal-language.test.mjs scripts/founder-journey.test.mjs",
     "build:founder-history": "node scripts/build-founder-history.mjs",
     "refresh:founder-history": "node scripts/refresh-founder-history.mjs",
     "test:founder-live": "node --test scripts/founder-live.test.mjs",
