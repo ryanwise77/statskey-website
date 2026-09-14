@@ -4,6 +4,7 @@ import { functions } from './firebase'
 export type TokenPackId = '1m' | '5m' | '25m' | '100m'
 export type SubscriptionCheckoutPlan =
   | 'pro'
+  | 'proAnnual'
   | 'proPlusMonthly'
   | 'proPlusAnnual'
 
