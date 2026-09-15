@@ -340,9 +340,9 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
           <p className="text-[12px] text-text-muted">Intelligence credit balance</p>
         </div>
         <div className="panel space-y-1">
-          <span className="card-title">Included this month</span>
+          <span className="card-title">Intelligence</span>
           <div className="font-display text-[30px] font-bold tracking-[-0.04em] text-text-primary">
-            {tokenState.loading ? 'Loading…' : formatTokens(tokenState.tokens?.includedBalance ?? 0)}
+            {tokenState.loading ? 'Loading…' : 'Included'}
           </div>
           <p className="text-[12px] text-text-muted">Ordinary managed conversations</p>
         </div>
