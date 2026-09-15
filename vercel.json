@@ -107,6 +107,8 @@
     }
   ],
   "rewrites": [
+    { "source": "/download", "destination": "/download.html" },
+    { "source": "/download/", "destination": "/download.html" },
     {
       "source": "/desktop",
       "destination": "/downloads/statskey/index.html"

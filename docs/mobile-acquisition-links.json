@@ -1,12 +1,37 @@
 {
   "created": "2026-09-15",
   "product": "StatsKey mobile app",
-  "destination": "https://statskey.ai/#download",
+  "destination": "https://statskey.ai/download",
   "links": [
-    { "platform": "YouTube ads (Google Ads)", "source": "youtube", "campaign": "youtube_ads", "url": "https://statskey.ai/?utm_source=youtube&utm_medium=paid_video&utm_campaign=youtube_ads#download" },
-    { "platform": "Reddit ads", "source": "reddit", "campaign": "reddit_ads", "url": "https://statskey.ai/?utm_source=reddit&utm_medium=paid_social&utm_campaign=reddit_ads#download" },
-    { "platform": "TikTok ads", "source": "tiktok", "campaign": "tiktok_ads", "url": "https://statskey.ai/?utm_source=tiktok&utm_medium=paid_social&utm_campaign=tiktok_ads#download" },
-    { "platform": "Meta ads (Facebook + Instagram)", "source": "meta", "campaign": "meta_ads", "url": "https://statskey.ai/?utm_source=meta&utm_medium=paid_social&utm_campaign=meta_ads#download" },
-    { "platform": "Google Search ads", "source": "google", "campaign": "google_ads", "url": "https://statskey.ai/?utm_source=google&utm_medium=cpc&utm_campaign=google_ads#download" }
+    {
+      "platform": "YouTube ads (Google Ads)",
+      "source": "youtube",
+      "campaign": "youtube_ads",
+      "url": "https://statskey.ai/download?utm_source=youtube&utm_medium=paid_video&utm_campaign=youtube_ads"
+    },
+    {
+      "platform": "Reddit ads",
+      "source": "reddit",
+      "campaign": "reddit_ads",
+      "url": "https://statskey.ai/download?utm_source=reddit&utm_medium=paid_social&utm_campaign=reddit_ads"
+    },
+    {
+      "platform": "TikTok ads",
+      "source": "tiktok",
+      "campaign": "tiktok_ads",
+      "url": "https://statskey.ai/download?utm_source=tiktok&utm_medium=paid_social&utm_campaign=tiktok_ads"
+    },
+    {
+      "platform": "Meta ads (Facebook + Instagram)",
+      "source": "meta",
+      "campaign": "meta_ads",
+      "url": "https://statskey.ai/download?utm_source=meta&utm_medium=paid_social&utm_campaign=meta_ads"
+    },
+    {
+      "platform": "Google Search ads",
+      "source": "google",
+      "campaign": "google_ads",
+      "url": "https://statskey.ai/download?utm_source=google&utm_medium=cpc&utm_campaign=google_ads"
+    }
   ]
 }

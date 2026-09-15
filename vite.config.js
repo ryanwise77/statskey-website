@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 // Mirror production Vercel rewrites for extension-less paths during `vite dev`
 // so the embedded bid viewer iframe and clean URLs behave the same locally.
 const DEV_REWRITES = {
+  '/download': '/download.html',
+  '/download/': '/download.html',
   '/desktop': '/downloads/statskey/index.html',
   '/desktop/': '/downloads/statskey/index.html',
   '/web-terms': '/web-terms.html',
@@ -99,6 +101,7 @@ export default {
       clinicians: resolve(__dirname, 'for-clinicians.html'),
       clinician: resolve(__dirname, 'clinician.html'),
         main: resolve(__dirname, 'index.html'),
+        download: resolve(__dirname, 'download.html'),
         privacy: resolve(__dirname, 'privacy.html'),
         terms: resolve(__dirname, 'terms.html'),
         webTerms: resolve(__dirname, 'web-terms.html'),

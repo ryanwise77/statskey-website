@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
-import { APP_STORE_URL, GOOGLE_PLAY_URL, applyStoreLinks, buildStoreLinks, readStoreCampaign } from '../src/storeLinks.js'
+import { APP_STORE_URL, GOOGLE_PLAY_URL, applyStoreLinks, buildStoreLinks, buildTrackedStoreLinks, readStoreCampaign } from '../src/storeLinks.js'
 
 const manifest = JSON.parse(fs.readFileSync(new URL('../docs/mobile-acquisition-links.json', import.meta.url), 'utf8'))
 const storage = () => {
@@ -12,15 +12,15 @@ const params = campaign => new URL(campaign.url).search
 
 test('each ad link lands on the mobile section and retains its identity in both stores', () => {
   assert.equal(new Set(manifest.links.map(row => row.campaign)).size, 5)
-  const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8')
-  const section = html.match(/<section id="download"[\s\S]*?<\/section>/)?.[0]
+  const html = fs.readFileSync(new URL('../download.html', import.meta.url), 'utf8')
+  const section = html.match(/<main[^>]+id="download"[\s\S]*?<\/main>/)?.[0]
   assert.ok(section?.includes('data-store="ios"'))
   assert.ok(section?.includes('data-store="play"'))
   for (const row of manifest.links) {
     const landing = new URL(row.url)
     assert.equal(landing.origin, 'https://statskey.ai')
-    assert.equal(landing.pathname, '/')
-    assert.equal(landing.hash, '#download')
+    assert.equal(landing.pathname, '/download')
+    assert.equal(landing.hash, '')
     const campaign = readStoreCampaign(landing.search)
     const links = buildStoreLinks(campaign)
     const ios = new URL(links.ios)
@@ -98,3 +98,41 @@ test('all mobile buttons are wired even if session storage is unavailable', () =
   assert.ok(ios.every(el => new URL(el.href).searchParams.get('ct') === manifest.links[3].campaign))
   assert.ok(play.every(el => !el.hidden && new URL(el.href).searchParams.get('utm_campaign') === manifest.links[3].campaign))
 })
+
+
+test('each mobile choice uses the collector with a stable visit and distinct event id', async () => {
+  const {webcrypto}=await import('node:crypto');
+  const tab=storage();
+  for(const row of manifest.links){
+    const campaign=readStoreCampaign(params(row));
+    const links=buildTrackedStoreLinks(buildStoreLinks(campaign),campaign,{crypto:webcrypto},tab);
+    const ios=new URL(links.ios),android=new URL(links.play);
+    assert.equal(ios.origin,'https://us-central1-statskey.cloudfunctions.net');
+    assert.equal(ios.pathname,'/recordMobileDownload');
+    assert.equal(ios.searchParams.get('campaign'),row.campaign);
+    assert.equal(ios.searchParams.get('source'),row.source);
+    assert.equal(ios.searchParams.get('store'),'ios');
+    assert.equal(android.searchParams.get('store'),'android');
+    assert.equal(ios.searchParams.get('visitId'),android.searchParams.get('visitId'));
+    assert.notEqual(ios.searchParams.get('eventId'),android.searchParams.get('eventId'));
+    assert.equal(ios.searchParams.has('test'),false);
+  }
+});
+
+test('mobile page has only mobile download destinations and legacy links redirect to its top',()=>{
+  const html=fs.readFileSync(new URL('../download.html',import.meta.url),'utf8');
+  assert.doesNotMatch(html,/href="[^"]*(?:\.dmg|\.exe|\.deb|\/desktop)[^"]*"/);
+  const main=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+  assert.ok(main.includes('window.location.replace(`/download${window.location.search}`)'));
+});
+
+test('separate activations get fresh event IDs while keeping the same browser visit',async()=>{
+  const {webcrypto}=await import('node:crypto');
+  const listeners={};const button={setAttribute(key,value){this[key]=value},getAttribute(key){return this[key]},addEventListener(name,fn){listeners[name]=fn}};
+  const root={defaultView:{crypto:webcrypto,sessionStorage:storage(),location:{search:params(manifest.links[0])}},querySelectorAll:selector=>selector.includes('ios')?[button]:[]};
+  applyStoreLinks(root);const before=new URL(button.href);
+  listeners.click();const first=new URL(button.href);listeners.click();const second=new URL(button.href);
+  assert.notEqual(first.searchParams.get('eventId'),before.searchParams.get('eventId'));
+  assert.notEqual(first.searchParams.get('eventId'),second.searchParams.get('eventId'));
+  assert.equal(first.searchParams.get('visitId'),second.searchParams.get('visitId'));
+});

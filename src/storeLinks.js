@@ -17,6 +17,44 @@ const APPLE_PROVIDER_TOKEN = '128070906'
 const CAMPAIGN_STORAGE_KEY = 'statskey:mobile-campaign:v1'
 const CAMPAIGN_TTL_MS = 24 * 60 * 60 * 1000
 const CAMPAIGN_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']
+const TRACKING_ENDPOINT = 'https://us-central1-statskey.cloudfunctions.net/recordMobileDownload'
+const VISIT_KEY = 'statskey:mobile-download-visit:v1'
+const wiredButtons = new WeakSet()
+
+export function buildTrackedStoreLinks(links, campaign, view, storage) {
+  if (!view?.crypto?.randomUUID) return links
+  let visitId
+  try { visitId = storage?.getItem(VISIT_KEY) } catch { /* A fresh visit still works. */ }
+  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(visitId || '')) {
+    visitId = view.crypto.randomUUID()
+    try { storage?.setItem(VISIT_KEY, visitId) } catch { /* No persistent browser identity required. */ }
+  }
+  const source = ['youtube', 'reddit', 'tiktok', 'meta', 'google'].includes(campaign?.utm_source) ? campaign.utm_source : 'direct'
+  const result = {}
+  for (const [store, link] of Object.entries(links)) {
+    if (!link) { result[store] = link; continue }
+    const url = new URL(TRACKING_ENDPOINT)
+    url.search = new URLSearchParams({ eventId: view.crypto.randomUUID(), visitId, source, campaign: campaign?.utm_campaign || 'direct', store: store === 'ios' ? 'ios' : 'android' })
+    // Save the selection server-side before handing off to the mobile store.
+    result[store] = url.toString()
+  }
+  return result
+}
+
+function wireStoreButton(el, href, view) {
+  el.setAttribute('href', href)
+  if (!el.addEventListener || !view?.crypto?.randomUUID || wiredButtons.has(el)) return
+  const newClick = () => {
+    const current = el.getAttribute('href') || ''
+    if (!current.startsWith(TRACKING_ENDPOINT + '?')) return
+    const url = new URL(current)
+    url.searchParams.set('eventId', view.crypto.randomUUID())
+    el.setAttribute('href', url.toString())
+  }
+  el.addEventListener('click', newClick)
+  el.addEventListener('auxclick', (event) => { if (event.button === 1) newClick() })
+  wiredButtons.add(el)
+}
 
 function validCampaign(value) {
   if (!value || typeof value !== 'object') return null
@@ -82,15 +120,15 @@ export function applyStoreLinks(root = document) {
   let storage
   try { storage = view?.sessionStorage } catch { /* Safari private/storage restrictions. */ }
   const campaign = readStoreCampaign(view?.location.search || '', storage)
-  const links = buildStoreLinks(campaign)
+  const links = buildTrackedStoreLinks(buildStoreLinks(campaign), campaign, view, storage)
   root.querySelectorAll('[data-store="ios"]').forEach((el) => {
-    if (links.ios) el.setAttribute('href', links.ios)
+    if (links.ios) wireStoreButton(el, links.ios, view)
   })
 
   const hasPlay = Boolean(GOOGLE_PLAY_URL)
   root.querySelectorAll('[data-store="play"]').forEach((el) => {
     if (hasPlay) {
-      el.setAttribute('href', links.play)
+      wireStoreButton(el, links.play, view)
       el.hidden = false
     } else {
       el.hidden = true

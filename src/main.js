@@ -7,6 +7,12 @@ import { initFounderLive } from './founderLive.js'
 // while the Play listing is unset, keeping those buttons hidden site-wide).
 applyStoreLinks()
 
+// Keep previously shared ad URLs working while moving the mobile choices to
+// their own page, at the top rather than a fragment near the homepage footer.
+if (window.location.hash === '#download' && new URLSearchParams(window.location.search).has('utm_campaign')) {
+  window.location.replace(`/download${window.location.search}`)
+}
+
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const revealEls = Array.from(document.querySelectorAll('.reveal'))
 
