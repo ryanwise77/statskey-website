@@ -2,11 +2,8 @@ import { httpsCallable } from 'firebase/functions'
 import { functions } from './firebase'
 
 export type TokenPackId = '1m' | '5m' | '25m' | '100m'
-export type SubscriptionCheckoutPlan =
-  | 'pro'
-  | 'proAnnual'
-  | 'proPlusMonthly'
-  | 'proPlusAnnual'
+import { isSubscriptionCheckoutPlan, type SubscriptionCheckoutPlan } from './subscriptionOffer'
+export type { SubscriptionCheckoutPlan } from './subscriptionOffer'
 
 export type AutoRechargeThresholdPercent = 10 | 25 | 50
 export type AutoRechargeMonthlyLimit = 1 | 3 | 5
@@ -142,8 +139,11 @@ export async function fetchTokenPackCatalog(): Promise<TokenPackCatalog> {
 export async function startSubscriptionCheckout(
   plan: SubscriptionCheckoutPlan
 ): Promise<void> {
+  if (!isSubscriptionCheckoutPlan(plan)) {
+    throw new Error('Choose Pro monthly or Pro annual to start a new subscription.')
+  }
   const origin = checkoutReturnOrigin()
-  const path = '/app/settings/connections'
+  const path = '/app/profile'
   const { data } = await createSubscriptionCheckout({
     plan,
     successUrl: `${origin}${path}?billing=subscription-success`,
@@ -157,7 +157,7 @@ export async function startSubscriptionCheckout(
 
 export async function openStripeBillingPortal(): Promise<void> {
   const { data } = await createBillingPortal({
-    returnUrl: `${checkoutReturnOrigin()}/app/settings/connections`,
+    returnUrl: `${checkoutReturnOrigin()}/app/profile`,
   })
   if (!data.url) {
     throw new Error('Stripe did not return a billing portal URL.')

@@ -1,9 +1,10 @@
+import { useProAccess } from '../lib/subscriptionOffer'
 // Full nutrition view for a recorded meal — web mirror of
 // biometrics/StatsKey/Views/Record/NutritionFactsView.swift. Renders the
 // FDA-style facts label (standard rows + every other nutrient the meal
 // actually contains, grouped by category with %DV), an item picker so the
 // label can be read per food, per-row accuracy markers with the same
-// sources-and-confidence drill-down Insights shows on iOS (Pro+), and the
+// sources-and-confidence drill-down Insights shows on iOS (Pro), and the
 // macro-percentage summary.
 
 import { useEffect, useState, type ReactNode } from 'react'
@@ -39,7 +40,7 @@ import {
 } from '../lib/provenance'
 
 /** Mirrors CreditService.unlimitedUIDs — internal accounts that carry every
- *  Pro+ capability, including per-nutrient accuracy markers. */
+ *  Pro capability, including per-nutrient accuracy markers. */
 const UNLIMITED_UIDS = new Set(['PrY2H241HfP5X1MH4sKhQrxgENQ2'])
 
 /** Nutrient ids already rendered in the standard FDA rows. */
@@ -108,11 +109,9 @@ export function NutritionFactsPanel({ meal }: { meal: Meal }) {
       }
     : meal
 
-  // The per-nutrient accuracy evaluation is a Pro+ feature, mirroring the
-  // Pro+ gates used on iOS. Suppressed when totals come from a meal-level
-  // override (e.g. a friend's meal with hidden items).
-  const plan = subscription?.raw['subscriptionPlan']
-  const showsAccuracy = plan === 'proPlus' || (user != null && UNLIMITED_UIDS.has(user.uid))
+  // Pro includes per-nutrient accuracy details. Legacy Pro+ subscriptions retain
+  // access. Hidden-item meal overrides still suppress item-level disclosure.
+  const showsAccuracy = useProAccess(subscription) || (user != null && UNLIMITED_UIDS.has(user.uid))
   const summaries: Summaries =
     showsAccuracy && displayMeal.totalNutrientsOverride == null ? allProvenanceSummaries([displayMeal]) : {}
 

@@ -592,9 +592,9 @@ function TokenPackStore({ testMode }: { testMode: boolean }) {
         <div className="panel space-y-3">
           <span className="card-title">Already subscribed?</span>
           <p className="text-[14px] leading-relaxed text-text-secondary">
-            Pro+ unlimited applies only to eligible Auto-routed conversations under fair use.
+            Pro unlimited applies only to eligible Auto-routed conversations under fair use.
             Data Agent, GPT-5.6 Sol, and other manually selected frontier models use purchased
-            credits (or your own provider key), even on Pro+.
+            credits (or your own provider key), even on Pro.
           </p>
           <p className="text-[12px] leading-relaxed text-text-muted">
             Credits are StatsKey usage units—not literal provider tokens. Purchases are one-time

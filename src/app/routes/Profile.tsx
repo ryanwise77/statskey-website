@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useAuth } from '../lib/auth'
 import { useGlucoseStatus } from '../lib/data/useGlucoseStatus'
 import { useSubscription } from '../lib/data/useSubscription'
+import { useProAccess, PRO_SUBSCRIPTION_OPTIONS, subscriptionPlanLabel, type SubscriptionCheckoutPlan } from '../lib/subscriptionOffer'
+import { startSubscriptionCheckout, openStripeBillingPortal } from '../lib/billing'
 import { formatTokens, useTokenBalance } from '../lib/data/useTokenBalance'
 import { useMacroTargets } from '../lib/data/useMacroTargets'
 import {
@@ -71,6 +73,34 @@ const EXERCISE_OPTIONS: { value: ExerciseCalorieStrategy; label: string }[] = [
 export function Profile() {
   const { user, profile, saveProfile, profileLoaded, signOut } = useAuth()
   const subState = useSubscription(user?.uid)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [billingBusy, setBillingBusy] = useState(false)
+  const [billingNotice, setBillingNotice] = useState<string | null>(null)
+  const isPro = useProAccess(subState.subscription)
+
+  useEffect(() => {
+    const state = searchParams.get('billing')
+    if (!state) return
+    setBillingNotice(state === 'subscription-success'
+      ? 'Checkout completed. Your subscription updates after verified payment confirmation.'
+      : 'Checkout was cancelled.')
+    const next = new URLSearchParams(searchParams)
+    next.delete('billing')
+    setSearchParams(next, { replace: true })
+  }, [searchParams, setSearchParams])
+
+  async function manageSubscription(plan?: SubscriptionCheckoutPlan) {
+    setBillingBusy(true)
+    setBillingNotice(null)
+    try {
+      if (plan) await startSubscriptionCheckout(plan)
+      else await openStripeBillingPortal()
+    } catch (error) {
+      setBillingNotice(error instanceof Error ? error.message : String(error))
+    } finally {
+      setBillingBusy(false)
+    }
+  }
   const tokenState = useTokenBalance(user?.uid)
   const glucoseStatus = useGlucoseStatus(user?.uid)
   const [draft, setDraft] = useState<UserProfile | null>(profile)
@@ -260,7 +290,7 @@ export function Profile() {
             <div className="flex items-center justify-between text-[14px]">
               <span className="text-text-secondary">Tier</span>
               <span className="text-text-primary font-medium">
-                {subState.subscription?.tier === 'pro' ? 'Pro' : 'Free'}
+                {subscriptionPlanLabel(subState.subscription)}
               </span>
             </div>
             {subState.subscription?.researchTokenLimit != null && subState.subscription.researchTokenLimit > 0 && (
@@ -270,9 +300,26 @@ export function Profile() {
               </div>
             )}
             <p className="text-text-muted text-[12px] mt-2">
-              iOS subscriptions are managed through the App Store. Web token packs are available
-              separately for power users who need more managed AI usage without bringing an API key.
+              Pro includes source and accuracy details, automatic background nutrition enrichment,
+              eligible Auto Intelligence under fair use, and a monthly allowance for ordinary pinned conversations.
+              Data Agent, manually selected frontier models, and agentic analysis use separate credits or your own key.
             </p>
+            {isPro ? (
+              <p className="text-text-muted text-[12px]">Your Pro service and existing renewal terms continue unless you choose a billing change.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {PRO_SUBSCRIPTION_OPTIONS.map((plan) => (
+                  <button key={plan.id} type="button" className="btn btn-secondary" disabled={!user || billingBusy || subState.loading}
+                    onClick={() => void manageSubscription(plan.id)}>
+                    {plan.name} · {plan.price}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button type="button" className="btn btn-secondary" disabled={!user || billingBusy}
+              onClick={() => void manageSubscription()}>{billingBusy ? 'Opening…' : 'Manage web billing'}</button>
+            <p className="text-text-muted text-[12px]">App Store and Google Play subscriptions remain managed in their original store. Web billing opens Stripe; it does not change a subscription until you confirm a change there.</p>
+            {billingNotice && <p role="status" className="text-[13px]">{billingNotice}</p>}
             <Link to="/tokens" className="link text-[13px] font-medium">
               Buy web token packs
             </Link>

@@ -68,8 +68,8 @@ const de = {
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">Was ist der Unterschied zwischen Pro und Pro+?</h3>
-                <p>StatsKey ist kostenlos nutzbar. Pro bietet zusätzlich eine genauere Essensanalyse, vollständige Nährwerte, Ernährungspläne, den Routenfinder, soziale Funktionen und ein monatliches Kontingent an KI-Tokens. Pro+ bietet ein deutlich größeres monatliches Token-Kontingent, alle Premium-Intelligence-Modelle und die automatische Nährstoffanreicherung im Hintergrund. Tokens treiben die KI-Funktionen an, und du kannst sie jederzeit aufladen.</p>
+                <h3 class="font-medium text-text-primary mb-1">Was enthält Pro?</h3>
+                <p>StatsKey ist kostenlos nutzbar. Pro ist unser einziges kostenpflichtiges Abo: im Web 69,99 USD pro Monat oder 699 USD pro Jahr, jährlich im Voraus abgerechnet. Enthalten sind genauere Essensanalysen, unterstützte Nährstoffanreicherung, Quellen- und Genauigkeitsdetails, Ernährungspläne, der Routenfinder, soziale Funktionen, automatische Nährstoffanreicherung im Hintergrund, unbegrenzte berechtigte Auto-Intelligence-Gespräche gemäß Fair-Use-Regeln und ein monatliches Guthaben für gewöhnliche Gespräche mit fest gewähltem Modell. Data Agent, manuell ausgewählte Frontier-Modelle und agentische Code- oder Datenbankanalysen benötigen separat gekauftes Guthaben oder einen eigenen Anbieterschlüssel. Bestehende Abonnenten behalten ihren Leistungsumfang und ihre vereinbarten Verlängerungspreise, auch günstigere Bestandspreise. App-Stores zeigen vor dem Kauf ihre aktuellen lokalen Preise und gegebenenfalls berechtigte Aktionen.</p>
               </div>
 
             </div>
@@ -217,8 +217,8 @@ const ja = {
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">ProとPro+の違いは何ですか？</h3>
-                <p>StatsKeyは無料で始められます。Proでは、より詳しい食事分析、完全な栄養情報、食事プラン、ルートファインダー、ソーシャル機能、毎月のAIトークン枠が追加されます。Pro+では、さらに大きな毎月のトークン枠、すべてのプレミアムIntelligenceモデル、バックグラウンドでの自動栄養素補完が追加されます。トークンはAI機能を動かすもので、いつでも追加購入できます。</p>
+                <h3 class="font-medium text-text-primary mb-1">Proには何が含まれますか？</h3>
+                <p>StatsKeyは無料で始められます。有料プランはProの1種類で、ウェブでは月額69.99米ドルまたは年額699米ドル（年額は一括請求）です。詳しい食事分析、対応する栄養情報の補完、情報源と精度の詳細、食事プラン、ルートファインダー、ソーシャル機能、バックグラウンドでの自動栄養素補完、フェアユースの対象となるAuto Intelligence会話の無制限利用、通常の固定モデル会話に使える毎月のクレジット枠が含まれます。Data Agent、手動で選択した最先端モデル、エージェントによるコード・データベース分析には、別途購入したクレジットまたはご自身のプロバイダーキーが必要です。既存の登録者のサービスと合意済みの更新料金（従来の低い料金を含む）は維持されます。アプリストアの現在の現地価格と対象となる特典は購入前に表示されます。</p>
               </div>
 
             </div>
@@ -366,8 +366,8 @@ const pt = {
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">Qual é a diferença entre o Pro e o Pro+?</h3>
-                <p>O StatsKey é gratuito para começar. O Pro adiciona análise de alimentos mais detalhada, nutrição completa, planos de refeições, o localizador de rotas, recursos sociais e uma cota mensal de tokens de IA. O Pro+ adiciona uma cota mensal de tokens muito maior, todos os modelos premium do Intelligence e o preenchimento automático de micronutrientes em segundo plano. Os tokens alimentam os recursos de IA, e você pode recarregá-los a qualquer momento.</p>
+                <h3 class="font-medium text-text-primary mb-1">O que está incluído no Pro?</h3>
+                <p>O StatsKey é gratuito para começar. Pro é nossa única assinatura paga: US$ 69,99 por mês ou US$ 699 por ano na web, com cobrança anual integral. Inclui análise de alimentos mais detalhada, enriquecimento nutricional com suporte das fontes, detalhes de fontes e precisão, planos de refeições, localizador de rotas, recursos sociais, enriquecimento automático de micronutrientes em segundo plano, conversas elegíveis no modo Auto do Intelligence sem limite numérico sob uso justo e uma cota mensal de créditos para conversas comuns com modelo fixado. Data Agent, modelos de fronteira escolhidos manualmente e análise de código ou banco de dados por agentes exigem créditos comprados separadamente ou sua própria chave de provedor. Assinantes existentes mantêm o serviço e os preços de renovação acordados, inclusive preços antigos menores. As lojas de aplicativos mostram seus preços locais atuais e as promoções elegíveis antes da compra.</p>
               </div>
 
             </div>
@@ -515,8 +515,8 @@ const es = {
               </div>
 
               <div>
-                <h3 class="font-medium text-text-primary mb-1">¿Cuál es la diferencia entre Pro y Pro+?</h3>
-                <p>StatsKey es gratis para empezar. Pro añade un análisis de alimentos más detallado, nutrición completa, planes de comidas, el buscador de rutas, funciones sociales y una asignación mensual de tokens de IA. Pro+ añade una asignación mensual de tokens mucho mayor, todos los modelos premium de Intelligence y el enriquecimiento automático de micronutrientes en segundo plano. Los tokens impulsan las funciones de IA y puedes recargarlos cuando quieras.</p>
+                <h3 class="font-medium text-text-primary mb-1">¿Qué incluye Pro?</h3>
+                <p>StatsKey es gratis para empezar. Pro es nuestra única suscripción de pago: 69,99 USD al mes o 699 USD al año en la web, con facturación anual íntegra. Incluye análisis de alimentos más detallado, enriquecimiento nutricional respaldado por fuentes, detalles de fuentes y precisión, planes de comidas, buscador de rutas, funciones sociales, enriquecimiento automático de micronutrientes en segundo plano, conversaciones elegibles de Intelligence en modo Auto sin límite numérico bajo uso razonable y una asignación mensual de créditos para conversaciones comunes con un modelo fijado. Data Agent, los modelos de frontera seleccionados manualmente y el análisis de código o bases de datos por agentes requieren créditos comprados por separado o tu propia clave de proveedor. Los suscriptores existentes mantienen su servicio y los precios de renovación acordados, incluidos los precios anteriores más bajos. Las tiendas de aplicaciones muestran sus precios locales actuales y las promociones elegibles antes de comprar.</p>
               </div>
 
             </div>
