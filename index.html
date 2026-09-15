@@ -55,6 +55,7 @@
           <details class="site-nav__menu">
             <summary>Explore</summary>
             <div class="site-nav__menu-panel">
+              <a href="#strength"><span>Strength</span><small>Every set, ready to review and share</small></a>
               <a href="/wellness"><span>Wellness</span><small>Nutrition, training, and the private journal</small></a>
               <a href="/hardware"><span>Hardware</span><small>Documented research concepts and build studies</small></a>
               <a href="/mindscape"><span>Mindscape</span><small>A spatial canvas for connected thinking</small></a>
@@ -94,6 +95,7 @@
       </div>
       <div id="mobile-menu" class="site-mobile-menu hidden" role="navigation" aria-label="Mobile navigation" aria-hidden="true">
         <a href="#positioning">Why StatsKey</a>
+        <a href="#strength">Strength preview</a>
         <a href="/wellness">Wellness</a>
         <a href="/hardware">Hardware</a>
         <a href="/app/tokens">Store</a>
@@ -148,6 +150,7 @@
               </a>
             </div>
             <div class="hero-note reveal d3">The core app is free. One Pro subscription includes our full Pro feature set for $69.99/month or $699/year on the web. Annual plans are billed in full once a year. Storefront, regional, and existing-subscriber prices may differ; confirm the displayed price before purchase.</div>
+            <a class="strength-preview-jump" href="#strength"><span>New</span> Meet Strength. Every set, ready to share. <b aria-hidden="true">↗</b></a>
           </div>
 
           <div class="hero-film tilt-card reveal d2" id="hero-card" aria-label="Mahi-mahi catch">
@@ -163,6 +166,57 @@
               data-viewport-video
               aria-label="Mahi-mahi being brought alongside a fishing boat"
             ></video>
+          </div>
+        </div>
+      </section>
+
+      <section id="strength" class="strength-preview section-block" aria-labelledby="strength-preview-title">
+        <div class="page-shell">
+          <div class="strength-preview-intro">
+            <div><div class="strength-preview-kicker"><span>New</span> StatsKey Strength</div><h2 id="strength-preview-title">Every set.<br>Ready to share.</h2></div>
+            <div class="strength-preview-copy"><p>Put the work you did and the moment you captured in the same conversation. Turn your sets into a compact workout image, or trim your own video to the set worth keeping.</p><a href="/app/strength">Open Strength <span aria-hidden="true">↗</span></a><small>Sign in to record your own workout.</small></div>
+          </div>
+          <div class="strength-preview-studio" data-strength-preview>
+            <header class="strength-preview-studio-head"><span class="strength-preview-wordmark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 12h10M4 8v8M7 5v14M17 5v14M20 8v8"/></svg> STRENGTH</span><span>Example workout · interactive preview</span></header>
+            <div class="strength-preview-workspace">
+              <div class="strength-preview-log">
+                <div class="strength-preview-log-title"><div><span class="strength-preview-label">YOUR WORKOUT, AT A GLANCE</span><h3>Upper body A</h3><p>3 exercises <span>·</span> 9 sets <span>·</span> 42 min</p></div><label class="strength-preview-unit"><span class="sr-only">Example load units</span><select data-strength-units aria-label="Example load units"><option value="lb">lb</option><option value="kg">kg</option></select></label></div>
+                <div class="strength-preview-exercise"><span class="strength-preview-exercise-icon" aria-hidden="true">01</span><div><h4>Bench press</h4><p>External weight · 3 completed sets</p></div></div>
+                <div class="strength-preview-set-labels" aria-hidden="true"><span>SET</span><span>LOAD × REPS</span><span>EFFORT</span></div>
+                <div class="strength-preview-set-list" role="group" aria-label="Choose a bench press set to preview">
+                  <button type="button" data-strength-set="0" aria-pressed="false"><span><i aria-hidden="true">✓</i> 1</span><strong data-strength-load="0">95 lb × 10</strong><small>Warm-up</small></button>
+                  <button type="button" data-strength-set="1" aria-pressed="true"><span><i aria-hidden="true">✓</i> 2</span><strong data-strength-load="1">135 lb × 8</strong><small>RPE 8</small></button>
+                  <button type="button" data-strength-set="2" aria-pressed="false"><span><i aria-hidden="true">✓</i> 3</span><strong data-strength-load="2">135 lb × 6</strong><small>RPE 9</small></button>
+                </div>
+                <p class="strength-preview-hint"><span aria-hidden="true">↳</span> Pick a set. See its moment on the timeline.</p>
+                <div class="strength-preview-other"><span aria-hidden="true">02</span><div><strong>Dumbbell row</strong><small>3 sets · <span data-strength-row-load>50 lb</span> × 10</small></div><b aria-label="Completed">✓</b></div>
+                <div class="strength-preview-other"><span aria-hidden="true">03</span><div><strong>Plank</strong><small>3 holds · 45 seconds · bodyweight</small></div><b aria-label="Completed">✓</b></div>
+                <div class="strength-preview-log-note">Reps, timed holds, load, and effort.<br>All part of the same workout.</div>
+              </div>
+              <div class="strength-preview-output">
+                <div class="strength-preview-tabs" role="tablist" aria-label="Preview Strength sharing tools"><button type="button" id="strength-preview-clip-tab" role="tab" aria-selected="true" aria-controls="strength-preview-clip" data-strength-tab="clip">Set video clip</button><button type="button" id="strength-preview-image-tab" role="tab" aria-selected="false" aria-controls="strength-preview-image" tabindex="-1" data-strength-tab="image">Compact workout image</button></div>
+                <div id="strength-preview-clip" class="strength-preview-clip" role="tabpanel" aria-labelledby="strength-preview-clip-tab" tabindex="0">
+                  <div class="strength-preview-moment"><div><span class="strength-preview-label">THE MOMENT YOU WANT TO KEEP</span><h4>Bench press <span data-strength-set-title>Set 2</span></h4><p data-strength-selected-load>135 lb × 8 · RPE 8</p></div><div class="strength-preview-duration"><strong data-strength-duration>24</strong><span>second clip</span></div></div>
+                  <div class="strength-preview-timeline" role="group" aria-label="Illustrated three-minute recording, with the selected set highlighted">
+                    <div class="strength-preview-timeline-labels" aria-hidden="true"><span>Set 1</span><span>Set 2</span><span>Set 3</span></div>
+                    <div class="strength-preview-track"><div class="strength-preview-track-grid" aria-hidden="true"></div><span class="strength-preview-recorded" style="left:10%;width:12.222%"></span><span class="strength-preview-recorded" style="left:43.333%;width:13.333%"></span><span class="strength-preview-recorded" style="left:75%;width:13.889%"></span><div class="strength-preview-selection" data-strength-selection style="left:43.333%;width:13.333%"><i></i><i></i></div></div>
+                    <div class="strength-preview-ticks" aria-hidden="true"><span>00:00</span><span>01:00</span><span>02:00</span><span>03:00</span></div>
+                    <div class="strength-preview-range"><span>KEEP THIS PART</span><strong data-strength-range>01:18 → 01:42</strong></div>
+                  </div>
+                  <div class="strength-preview-adjust"><div><label for="strength-preview-offset">Timing a little off?</label><output for="strength-preview-offset" data-strength-offset-label>Original timing</output></div><input id="strength-preview-offset" type="range" min="-8" max="8" step="1" value="0" aria-describedby="strength-preview-adjust-help"/><div class="strength-preview-adjust-foot"><p id="strength-preview-adjust-help">Move the clip to line up with your set.</p><button type="button" data-strength-reset>Reset timing</button></div></div>
+                  <p class="strength-preview-example-note">Timing illustration using sample sets. In Strength, choose your own video, mark the set’s start, and adjust what to keep.</p>
+                </div>
+                <div id="strength-preview-image" class="strength-preview-image" role="tabpanel" aria-labelledby="strength-preview-image-tab" tabindex="0" hidden>
+                  <p>This workout, in one shareable image.</p><div class="strength-preview-image-wrap" tabindex="0" role="region" aria-label="Example workout image; scroll to see all completed sets"><p data-strength-image-status role="status">Preparing the example workout image…</p><img data-strength-image alt="Compact image of the example Upper body A workout, including all nine completed sets." hidden /></div><a data-strength-image-download class="strength-preview-download" hidden>Download example image <span aria-hidden="true">↓</span></a><small>Made with the same image tool as your saved workouts.</small>
+                </div>
+                <noscript><p class="strength-preview-example-note">Open Strength to try workout images and video clipping. The interactive example needs JavaScript.</p></noscript>
+              </div>
+            </div>
+          </div>
+          <div class="strength-preview-benefits">
+            <div><span>01 / RECORD</span><h3>The detail that matters.</h3><p>Track reps or timed holds, load, and effort. Train live with set and rest timers, or log the workout afterward.</p></div>
+            <div><span>02 / ALIGN</span><h3>You choose the moment.</h3><p>Use recorded set timing when it’s available. If your footage starts late, mark the right start and fine-tune the clip.</p></div>
+            <div><span>03 / SHARE</span><h3>Make the work easy to see.</h3><p>Save a compact image of your completed sets or download a short video clip. Keep the context. Share the part that counts.</p></div>
           </div>
         </div>
       </section>

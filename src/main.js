@@ -1,7 +1,9 @@
 import './style.css'
+import './strengthPreview.css'
 import { applyStoreLinks } from './storeLinks.js'
 import { initShowcase } from './showcase.js'
 import { initFounderLive } from './founderLive.js'
+import { initStrengthPreview } from './strengthPreview.js'
 
 // Reveal/point any Google Play buttons once their URL is configured (no-op
 // while the Play listing is unset, keeping those buttons hidden site-wide).
@@ -46,6 +48,12 @@ try {
   initFounderLive()
 } catch (error) {
   console.error('StatsKey live founder record initialization failed', error)
+}
+
+try {
+  initStrengthPreview()
+} catch (error) {
+  console.error('StatsKey strength preview initialization failed', error)
 }
 
 const nav = document.getElementById('nav')
