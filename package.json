@@ -14,6 +14,7 @@
     "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",
     "test:founder-nutrition": "node --test scripts/founder-nutrition-fallback.test.mjs scripts/founder-nutrition-ui.test.mjs",
     "test:firestore-failover": "node --test scripts/firestore-failover.test.ts",
+    "test:strength": "node --test scripts/strength.test.ts",
     "test:standby-auth": "node --test scripts/standby-auth.test.ts",
     "preview": "vite preview",
     "check:deploy": "node scripts/check-deploy-ready.mjs",

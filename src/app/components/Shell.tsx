@@ -9,6 +9,7 @@ const NAV_ITEMS: { to: string; label: string; end?: boolean }[] = [
   { to: '/flow', label: 'Intelligence' },
   { to: '/library', label: 'Library' },
   { to: '/friends', label: 'Friends' },
+  { to: '/strength', label: 'Strength' },
   { to: '/routes', label: 'Routes' },
   { to: '/history', label: 'History' },
   { to: '/tokens', label: 'Store' },

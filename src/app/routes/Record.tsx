@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { MealLogForm } from '../components/log/MealLogForm'
 import { SubstanceLogForm } from '../components/log/SubstanceLogForm'
 import { SupplementLogForm } from '../components/log/SupplementLogForm'
@@ -59,7 +59,7 @@ export function Record() {
         {tab === 'meal' && <MealLogForm initialDate={initialMealDate} onSaved={handleSaved} />}
         {tab === 'water' && <WaterLogForm onSaved={handleSaved} />}
         {tab === 'wellness' && <WellnessLogForm onSaved={handleSaved} />}
-        {tab === 'workout' && <WorkoutLogForm onSaved={handleSaved} />}
+        {tab === 'workout' && <><Link className="btn btn-secondary mb-4" to="/strength">Strength training · log exercises and sets →</Link><WorkoutLogForm onSaved={handleSaved} /></>}
         {tab === 'weight' && <WeightLogForm onSaved={handleSaved} />}
         {tab === 'glucose' && <GlucoseLogForm onSaved={handleSaved} />}
         {tab === 'supplements' && <SupplementLogForm onSaved={handleSaved} />}

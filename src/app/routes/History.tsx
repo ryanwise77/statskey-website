@@ -146,7 +146,7 @@ export function History() {
           />
         </PanelWrap>
       )}
-      {tab === 'workouts' && <WorkoutsHistory uid={uid} start={start} end={end} />}
+      {tab === 'workouts' && <><Link className="btn btn-secondary" to="/strength?view=history">Strength training · exercises and sets →</Link><WorkoutsHistory uid={uid} start={start} end={end} /></>}
       {tab === 'wellness' && <PanelWrap><WellnessHistory uid={uid} start={start} end={end} /></PanelWrap>}
       {tab === 'weight' && <PanelWrap><WeightHistory uid={uid} start={start} end={end} /></PanelWrap>}
       {tab === 'glucose' && <PanelWrap><GlucoseHistory uid={uid} start={start} end={end} /></PanelWrap>}

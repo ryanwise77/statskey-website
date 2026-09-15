@@ -15,6 +15,7 @@ import { Reports, ReportDetail } from './routes/Reports'
 import { Friends } from './routes/Friends'
 import { FriendDetail } from './routes/FriendDetail'
 import { MessageThread } from './routes/MessageThread'
+import { Strength } from './routes/Strength'
 import { TrainingRoutes } from './routes/TrainingRoutes'
 import { Tokens, TokensTest } from './routes/Tokens'
 import { WorkbenchAuth } from './routes/WorkbenchAuth'
@@ -71,6 +72,7 @@ export function App() {
         <Route path="friends" element={<Friends />} />
         <Route path="friends/:uid" element={<FriendDetail />} />
         <Route path="routes" element={<TrainingRoutes />} />
+        <Route path="strength" element={<Strength />} />
         <Route path="messages/:uid" element={<MessageThread />} />
         <Route path="history" element={<History />} />
         <Route path="meals/:id" element={<MealDetail />} />
