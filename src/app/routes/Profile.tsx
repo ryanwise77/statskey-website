@@ -300,12 +300,12 @@ export function Profile() {
               </div>
             )}
             <p className="text-text-muted text-[12px] mt-2">
-              Pro includes source and accuracy details, automatic background nutrition enrichment,
-              eligible Auto Intelligence under fair use, and a monthly allowance for ordinary pinned conversations.
+              Pro includes deeper food analysis and supported nutrition enrichment. Pro+ adds source and accuracy
+              details and unlimited eligible Auto Intelligence under fair use. Ordinary pinned conversations use included Intelligence.
               Data Agent, manually selected frontier models, and agentic analysis use separate credits or your own key.
             </p>
             {isPro ? (
-              <p className="text-text-muted text-[12px]">Your Pro service and existing renewal terms continue unless you choose a billing change.</p>
+              <p className="text-text-muted text-[12px]">Your {subscriptionPlanLabel(subState.subscription)} service and existing renewal terms continue unless you choose a billing change.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {PRO_SUBSCRIPTION_OPTIONS.map((plan) => (

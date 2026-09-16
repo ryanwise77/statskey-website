@@ -119,7 +119,7 @@ const pt = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">8. Assinatura e Pagamento</h2>
             <ul class="list-disc pl-5 space-y-2">
-              <li>O StatsKey oferece acesso gratuito e uma assinatura Pro opcional. O preço, o intervalo de cobrança e as condições de qualquer promoção elegível são apresentados antes da compra. A assinatura anual é cobrada integralmente uma vez por ano. A unificação dos planos pagos não altera os preços de renovação acordados nem reduz o serviço dos assinantes existentes.</li>
+              <li>O StatsKey oferece acesso gratuito e assinaturas Pro e Pro+ opcionais. O preço, o intervalo de cobrança e as condições de qualquer promoção elegível são apresentados antes da compra. A assinatura anual é cobrada integralmente uma vez por ano. Os assinantes existentes mantêm os preços de renovação acordados e o serviço, salvo alteração escolhida por eles.</li>
               <li>As assinaturas no app são cobradas pela App Store da Apple (iOS) ou pelo Google Play (Android) e estão sujeitas aos termos e condições da Apple ou do Google; as assinaturas adquiridas em nosso site são cobradas pela Stripe.</li>
               <li>Sua assinatura é renovada automaticamente, a menos que você a cancele com pelo menos 24 horas de antecedência do fim do período de cobrança atual.</li>
               <li>Seu único recurso em caso de insatisfação com o serviço é o cancelamento da assinatura.</li>
@@ -366,7 +366,7 @@ const es = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">8. Suscripción y pago</h2>
             <ul class="list-disc pl-5 space-y-2">
-              <li>StatsKey ofrece acceso gratuito y una suscripción Pro opcional. El precio, el intervalo de facturación y las condiciones de cualquier promoción elegible se muestran antes de comprar. La suscripción anual se factura íntegramente una vez al año. La unificación de los planes de pago no cambia los precios de renovación acordados ni reduce el servicio de los suscriptores existentes.</li>
+              <li>StatsKey ofrece acceso gratuito y suscripciones Pro y Pro+ opcionales. El precio, el intervalo de facturación y las condiciones de cualquier promoción elegible se muestran antes de comprar. La suscripción anual se factura íntegramente una vez al año. Los suscriptores existentes conservan sus precios de renovación acordados y su servicio, salvo que elijan un cambio.</li>
               <li>Las suscripciones dentro de la app se facturan a través de la App Store de Apple (iOS) o de Google Play (Android) y están sujetas a los términos y condiciones de Apple o de Google; las suscripciones adquiridas en nuestro sitio web se facturan a través de Stripe.</li>
               <li>Tu suscripción se renueva automáticamente a menos que la canceles al menos 24 horas antes del final del período de facturación en curso.</li>
               <li>Tu único recurso en caso de insatisfacción con el servicio es la cancelación de tu suscripción.</li>
@@ -613,7 +613,7 @@ const de = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">8. Abonnement und Zahlung</h2>
             <ul class="list-disc pl-5 space-y-2">
-              <li>StatsKey bietet kostenlosen Zugang und ein optionales Pro-Abonnement. Preis, Abrechnungsintervall und die Bedingungen berechtigter Aktionen werden vor dem Kauf angezeigt. Jahresabonnements werden einmal jährlich vollständig abgerechnet. Die Zusammenlegung der kostenpflichtigen Pläne ändert keine vereinbarten Verlängerungspreise und verringert den Leistungsumfang bestehender Abonnenten nicht.</li>
+              <li>StatsKey bietet kostenlosen Zugang und optionale Pro- und Pro+-Abonnements. Preis, Abrechnungsintervall und die Bedingungen berechtigter Aktionen werden vor dem Kauf angezeigt. Jahresabonnements werden einmal jährlich vollständig abgerechnet. Bestehende Abonnenten behalten ihre vereinbarten Verlängerungspreise und ihren Leistungsumfang, sofern sie keine Änderung wählen.</li>
               <li>In-App-Abonnements werden über den App Store von Apple (iOS) oder Google Play (Android) abgerechnet und unterliegen den Bedingungen von Apple bzw. Google; auf unserer Website abgeschlossene Abonnements werden über Stripe abgerechnet.</li>
               <li>Dein Abonnement verlängert sich automatisch, sofern du nicht mindestens 24 Stunden vor Ende des laufenden Abrechnungszeitraums kündigst.</li>
               <li>Dein einziges Rechtsmittel bei Unzufriedenheit mit dem Dienst ist die Kündigung deines Abonnements.</li>
@@ -860,7 +860,7 @@ const ja = {
           <section>
             <h2 class="font-display font-semibold text-[17px] text-text-primary mb-3">8. サブスクリプションと支払い</h2>
             <ul class="list-disc pl-5 space-y-2">
-              <li>StatsKeyは無料アクセスと任意のProサブスクリプションを提供します。価格、請求周期、対象となるキャンペーンの条件は購入前に表示されます。年額プランは年に1回、一括請求されます。有料プランの統合によって、既存の登録者の合意済み更新料金が変わったり、サービスが縮小したりすることはありません。</li>
+              <li>StatsKeyは無料アクセスと任意のProおよびPro+サブスクリプションを提供します。価格、請求周期、対象となるキャンペーンの条件は購入前に表示されます。年額プランは年に1回、一括請求されます。既存の登録者が変更を選択しない限り、合意済みの更新料金とサービスは維持されます。</li>
               <li>アプリ内のサブスクリプションはApple App Store（iOS）またはGoogle Play（Android）を通じて課金され、AppleまたはGoogleの利用規約が適用されます。当社のウェブサイトで購入したサブスクリプションはStripeを通じて課金されます。</li>
               <li>サブスクリプションは、現在の課金期間の終了の少なくとも24時間前に解約しない限り、自動的に更新されます。</li>
               <li>サービスへの不満に対するお客様の唯一の救済手段は、サブスクリプションの解約です。</li>

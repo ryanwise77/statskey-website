@@ -10,14 +10,14 @@ vi.mock('firebase/functions', () => ({ httpsCallable: (_functions: unknown, name
 vi.mock('./firebase', () => ({ functions: {} }))
 import { openStripeBillingPortal, startSubscriptionCheckout } from './billing'
 
-describe('single Pro hosted checkout requests', () => {
+describe('distinct Pro and Pro+ hosted checkout requests', () => {
   beforeEach(() => {
     for (const call of state.calls.values()) call.mockClear()
     state.bridge = null
     vi.stubGlobal('window', { location: { origin: 'https://statskey.ai', assign: vi.fn() } })
   })
   afterEach(() => { vi.unstubAllGlobals() })
-  it.each(['pro', 'proAnnual'] as const)('sends %s to existing authenticated callable with no client price or entitlement override', async (plan) => {
+  it.each(['pro', 'proAnnual', 'proPlusMonthly', 'proPlusAnnual'] as const)('sends %s to existing authenticated callable with no client price or entitlement override', async (plan) => {
     await startSubscriptionCheckout(plan)
     expect(state.calls.get('createCheckoutSession')).toHaveBeenCalledExactlyOnceWith({
       plan,
@@ -26,8 +26,8 @@ describe('single Pro hosted checkout requests', () => {
     })
     expect(window.location.assign).toHaveBeenCalledWith('https://checkout.stripe.com/c/pay/test_session')
   })
-  it.each(['proPlusMonthly', 'proPlusAnnual', 'proPlus', 'free', 'unexpected'])('rejects new-sale selector %s before a callable or navigation', async (plan) => {
-    await expect(startSubscriptionCheckout(plan as SubscriptionCheckoutPlan)).rejects.toThrow('Choose Pro monthly or Pro annual')
+  it.each(['proPlus', 'free', 'unexpected'])('rejects new-sale selector %s before a callable or navigation', async (plan) => {
+    await expect(startSubscriptionCheckout(plan as SubscriptionCheckoutPlan)).rejects.toThrow('Choose Pro or Pro+ with monthly or annual billing')
     expect(state.calls.get('createCheckoutSession')).not.toHaveBeenCalled()
     expect(window.location.assign).not.toHaveBeenCalled()
   })

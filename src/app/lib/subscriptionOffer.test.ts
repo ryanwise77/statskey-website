@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { hasProAccess, isSubscriptionCheckoutPlan, PRO_SUBSCRIPTION_OPTIONS, subscriptionPlanLabel, useProAccess } from './subscriptionOffer'
+import { hasProAccess, isSubscriptionCheckoutPlan, PRO_SUBSCRIPTION_OPTIONS, subscriptionPlanLabel, useProAccess, hasProPlusAccess } from './subscriptionOffer'
 
-describe('single Pro offer and legacy service compatibility', () => {
-  it('offers one service at the approved two cadences', () => {
+describe('distinct Pro and Pro+ offers and subscription compatibility', () => {
+  it('offers both services at the retained monthly and annual prices', () => {
     expect(PRO_SUBSCRIPTION_OPTIONS.map(({ id, amountCents, interval }) => ({ id, amountCents, interval }))).toEqual([
       { id: 'proAnnual', amountCents: 69900, interval: 'year' },
       { id: 'pro', amountCents: 6999, interval: 'month' },
+      { id: 'proPlusAnnual', amountCents: 99900, interval: 'year' },
+      { id: 'proPlusMonthly', amountCents: 9999, interval: 'month' },
     ])
     expect(PRO_SUBSCRIPTION_OPTIONS.every(({ id }) => isSubscriptionCheckoutPlan(id))).toBe(true)
   })
@@ -17,7 +19,7 @@ describe('single Pro offer and legacy service compatibility', () => {
   ])('retains premium presentation/access for %j without mutating billing data', (identity) => {
     const subscription = Object.freeze({ ...identity, raw: Object.freeze({ subscriptionTier: identity.tier, subscriptionPlan: identity.plan, renewalAmountCents: 1499, stripePriceId: 'legacy_unchanged' }) })
     expect(hasProAccess(subscription)).toBe(true)
-    expect(subscriptionPlanLabel(subscription)).toBe('Pro')
+    expect(subscriptionPlanLabel(subscription)).toBe(identity.plan === 'proPlus' ? 'Pro+' : 'Pro')
     expect(subscription.raw.renewalAmountCents).toBe(1499)
     expect(subscription.raw.stripePriceId).toBe('legacy_unchanged')
   })
@@ -25,7 +27,7 @@ describe('single Pro offer and legacy service compatibility', () => {
     expect(hasProAccess(value)).toBe(false)
     expect(subscriptionPlanLabel(value)).toBe('Free')
   })
-  it.each(['proPlusMonthly', 'proPlusAnnual', 'proPlus', 'free', '', null, undefined])('does not treat legacy or invalid selector %s as a new sale', (value) => {
+  it.each(['proPlus', 'free', '', null, undefined])('does not treat unsupported selector %s as a new sale', (value) => {
     expect(isSubscriptionCheckoutPlan(value)).toBe(false)
   })
 })
@@ -59,7 +61,7 @@ describe('actual subscription projection and timed complimentary access', () => 
     expect(projected.tier).toBe('free')
     expect(projected.raw).toBe(raw)
     expect(hasProAccess(projected)).toBe(true)
-    expect(subscriptionPlanLabel(projected)).toBe('Pro')
+    expect(subscriptionPlanLabel(projected)).toBe(plan === 'proPlus' ? 'Pro+' : 'Pro')
     expect(raw.agreedAmountCents).toBe(1499)
   })
   it.each(['pro', 'proPlus'])('explicit stored free beats retained %s plan after cancellation', (plan) => {
@@ -100,5 +102,22 @@ describe('actual subscription projection and timed complimentary access', () => 
     projection.setCalls = 0; expect(useProAccess(projected)).toBe(true)
     vi.advanceTimersByTime(59_999); expect(projection.setCalls).toBe(0)
     vi.advanceTimersByTime(1); expect(projection.setCalls).toBe(1)
+  })
+})
+
+
+describe('Plus feature boundary', () => {
+  const now = Date.UTC(2026, 8, 15)
+  it.each([
+    [{ subscriptionTier: 'pro', subscriptionPlan: 'proPlus' }, true, 'Pro+'],
+    [{ subscriptionPlan: 'proPlus' }, true, 'Pro+'],
+    [{ subscriptionTier: 'pro', subscriptionPlan: 'pro' }, false, 'Pro'],
+    [{ subscriptionTier: 'free', subscriptionPlan: 'proPlus' }, false, 'Free'],
+    [{ subscriptionTier: 'free', subscriptionPlan: 'proPlus', compProUntil: now + 1000 }, false, 'Pro'],
+    [{ subscriptionTier: 'free', compProUntil: now - 1 }, false, 'Free'],
+  ])('keeps the correct feature boundary for %j', (raw, plus, label) => {
+    const snapshot = Object.freeze({ raw: Object.freeze(raw) })
+    expect(hasProPlusAccess(snapshot, now)).toBe(plus)
+    expect(subscriptionPlanLabel(snapshot, now)).toBe(label)
   })
 })

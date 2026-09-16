@@ -140,7 +140,7 @@ export async function startSubscriptionCheckout(
   plan: SubscriptionCheckoutPlan
 ): Promise<void> {
   if (!isSubscriptionCheckoutPlan(plan)) {
-    throw new Error('Choose Pro monthly or Pro annual to start a new subscription.')
+    throw new Error('Choose Pro or Pro+ with monthly or annual billing to start a new subscription.')
   }
   const origin = checkoutReturnOrigin()
   const path = '/app/profile'
