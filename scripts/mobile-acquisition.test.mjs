@@ -123,8 +123,16 @@ test('campaign landing includes the full site and legacy links redirect without 
   const html=fs.readFileSync(new URL('../download.html',import.meta.url),'utf8');
   assert.match(html, /id="experiment-001"/);
   assert.match(html, /id="strength"/);
-  assert.match(html, /href="\/desktop"/);
+  assert.doesNotMatch(html, /href="\/desktop"/);
   assert.doesNotMatch(html, /href="\/download"/);
+  const hero=html.match(/<section class="campaign-product-hero"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(hero?.includes('data-store="ios"') && hero.includes('data-store="play"'));
+  assert.doesNotMatch(hero, /experiment-001|mahi-mahi/);
+  assert.ok(html.indexOf('id="experiment-001"') > html.indexOf('id="gut"'));
+  for (const page of ['index.html','network.html']) {
+    const source=fs.readFileSync(new URL('../'+page,import.meta.url),'utf8');
+    assert.doesNotMatch(source, /href="\/desktop"/);
+  }
   const main=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
   assert.ok(main.includes('window.location.replace(`/download${window.location.search}`)'));
 });

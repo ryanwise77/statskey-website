@@ -1,4 +1,4 @@
-/* The experiment takes the place of the screenshot directory. */
+/* The founder experiment remains available after the app’s main features. */
 .marathon-feature {
   background: #f4f7fa;
   border-block: 1px solid #dce5ef;
@@ -41,26 +41,6 @@
 }
 .marathon-feature .founder-live-suite {
   margin-top: clamp(36px, 6vw, 80px);
-}
-.campaign-landing .hero-copy .hero-title {
-  font-size: clamp(3.5rem, 7.6vw, 7.4rem);
-  line-height: 0.98;
-  max-width: 850px;
-}
-.campaign-landing .hero-lede {
-  max-width: 570px;
-  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
-}
-.campaign-landing .hero-note {
-  max-width: 580px;
-}
-.campaign-landing .hero-actions {
-  gap: 12px;
-}
-.campaign-landing .hero-actions > .button--primary {
-  flex-basis: 100%;
-  width: fit-content;
-  max-width: 340px;
 }
 .site-analytics-choice {
   position: fixed;
@@ -134,9 +114,6 @@
   .marathon-feature .experiment-copy h2 {
     font-size: clamp(2.7rem, 10vw, 4.8rem);
   }
-  .campaign-landing .hero-copy .hero-title {
-    font-size: clamp(3.1rem, 13vw, 5.8rem);
-  }
   .site-analytics-choice {
     inset: auto 12px max(12px, env(safe-area-inset-bottom)) 12px;
     width: auto;
@@ -158,4 +135,156 @@
   .marketing-light .cta-card {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* A shared, app-first entrance for every social campaign. */
+.campaign-product-hero {
+  padding: clamp(42px, 6vw, 88px) 0 0;
+  background: linear-gradient(155deg, #fff 20%, #edf4ff 100%);
+  color: #142941;
+}
+.campaign-product-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 76px);
+}
+.campaign-eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3266aa;
+  letter-spacing: 0.12em;
+  margin: 0 0 24px;
+}
+.campaign-product-copy h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.6rem, 6.2vw, 5.5rem);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 0.99;
+}
+.campaign-product-copy h1 span { color: #2363ce; }
+.campaign-product-lede {
+  max-width: 490px;
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: #4d6077;
+  margin: 26px 0 28px;
+}
+.campaign-store-choices {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.campaign-availability {
+  margin: 18px 0 24px;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #52667d;
+}
+.campaign-availability a { text-decoration: underline; text-underline-offset: 3px; }
+.campaign-explore {
+  display: inline-flex;
+  gap: 20px;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  color: #234e87;
+}
+.campaign-product-visual { margin: 0; min-width: 0; }
+.campaign-product-stage {
+  padding: 24px 24px 20px;
+  border-radius: 32px;
+  background: linear-gradient(140deg, #193d77, #102943 75%);
+  overflow: hidden;
+  box-shadow: 0 24px 50px #142f5520;
+}
+.campaign-stage-label {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #d7e8ff;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.campaign-phone-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 30px 0 24px;
+}
+.campaign-phone {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 4px solid #eff4fa;
+  border-radius: 23px;
+  box-shadow: 0 16px 30px #0004;
+}
+.campaign-phone--activity { margin-top: 52px; }
+.campaign-stage-caption {
+  color: #d7e8ff;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin: 0;
+  text-align: center;
+}
+.campaign-product-visual figcaption {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #64758a;
+  margin-top: 14px;
+  text-align: center;
+}
+.campaign-benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px;
+  margin-top: clamp(40px, 5vw, 64px);
+  padding-block: 28px;
+  border-top: 1px solid #d7e2ef;
+}
+.campaign-benefits > a {
+  display: flex;
+  align-items: start;
+  gap: 14px;
+  min-width: 0;
+  padding-block: 8px;
+}
+.campaign-benefits > a > span:nth-child(2) { flex: 1; }
+.campaign-benefit-number { color: #6685aa; font-size: 0.875rem; padding-top: 2px; }
+.campaign-benefits strong { display: block; font-size: 1rem; font-weight: 600; line-height: 1.4; }
+.campaign-benefits small { display: block; margin-top: 7px; font-size: 0.875rem; line-height: 1.5; color: #52667d; }
+.campaign-benefits a:hover strong, .campaign-explore:hover { color: #0063cf; }
+@media (max-width: 900px) {
+  .campaign-product-grid { gap: 30px; }
+  .campaign-product-copy h1 { font-size: clamp(3rem, 6.8vw, 4.4rem); }
+  .campaign-product-stage { padding: 18px 14px; border-radius: 24px; }
+  .campaign-phone-pair { gap: 10px; }
+  .campaign-phone { border-radius: 16px; border-width: 3px; }
+  .campaign-stage-label { font-size: 0.7rem; }
+  .campaign-benefits { gap: 20px; }
+}
+@media (max-width: 680px) {
+  .campaign-product-hero { padding-top: 36px; }
+  .campaign-product-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .campaign-eyebrow { font-size: 0.75rem; letter-spacing: 0.07em; margin-bottom: 20px; }
+  .campaign-product-copy h1 { font-size: clamp(3.15rem, 12.2vw, 4.4rem); }
+  .campaign-product-lede { font-size: 1rem; margin: 22px 0; }
+  .campaign-store-choices { gap: 10px; }
+  .campaign-store-choices .button--store { min-width: 0; padding: 10px 12px; flex: 1 1 130px; justify-content: center; }
+  .campaign-store-choices .store-button__icon { width: 25px; height: 28px; }
+  .campaign-store-choices .store-button__copy strong { font-size: 1rem; }
+  .campaign-product-visual { width: min(100%, 430px); justify-self: center; }
+  .campaign-product-stage { padding: 22px; }
+  .campaign-phone { border-radius: 20px; }
+  .campaign-benefits { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 32px; padding-block: 12px; }
+  .campaign-benefits > a { padding-block: 18px; }
+  .campaign-benefits > a + a { border-top: 1px solid #d7e2ef; }
+  .campaign-benefits small { margin-top: 4px; }
 }

@@ -1,6 +1,6 @@
 # StatsKey mobile advertising links
 
-Use these as the destination URLs in ads. All open the dedicated **mobile app download page**, with App Store and Google Play choices at the top. This page contains only mobile download choices. YouTube ads use the YouTube link even when purchased through Google Ads; Google Search uses its own link. Meta combines Facebook and Instagram.
+Use these as the destination URLs in ads. All open the same **mobile-first version of the full website**, led by the app’s nutrition and training benefits, real app previews, and App Store and Google Play choices. The marathon experiment appears after the main app content. Desktop download promotions are hidden. YouTube ads use the YouTube link even when purchased through Google Ads; Google Search uses its own link. Meta combines Facebook and Instagram.
 
 | Advertising platform | Destination | Campaign in download reports |
 | --- | --- | --- |

@@ -30,3 +30,9 @@ Only `recordCampaignJourney` and `getCampaignJourney` were deployed from an isol
 - Full repository TypeScript remains affected by pre-existing missing Vitest declarations in unrelated test files. Production-source TypeScript is checked separately.
 
 Native Android implementation/build evidence and isolated analytics backend verification are recorded under `/Users/ryansullivan/Projects/outputs/strength-cross-device-20260915`.
+
+## Social landing refinement
+
+The shared landing page for YouTube, Reddit, TikTok, Meta, and Google Search now leads with nutrition and training, two real app previews, and direct iPhone/Android store choices. The marathon experiment is below the main app content on both the homepage and campaign page, with its existing IDs and connected record preserved. Desktop download promotions were removed from homepage, generated campaign page, and network navigation; the desktop route remains available for existing direct links. Existing campaign names, attribution, consent handling, and reporting endpoints are unchanged.
+
+Follow-up validation: campaign/attribution checks passed for all five sources. Browser checks at 320, 390, and 768px found no horizontal overflow, no desktop links, and both hero store choices near the top. The desktop layout was visually reviewed at the default 1280px width.

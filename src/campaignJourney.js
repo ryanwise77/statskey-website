@@ -47,6 +47,7 @@ export function publicDestination(href, origin = "https://statskey.ai") {
             "#strength": "strength",
             "#download": "get-app",
             "#positioning": "positioning",
+            "#gut": "wellness",
             "#pricing": "pricing",
           }[url.hash] || "other-public-link"
         );
