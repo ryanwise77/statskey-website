@@ -36,3 +36,7 @@ Native Android implementation/build evidence and isolated analytics backend veri
 The shared landing page for YouTube, Reddit, TikTok, Meta, and Google Search now leads with nutrition and training, two real app previews, and direct iPhone/Android store choices. The marathon experiment is below the main app content on both the homepage and campaign page, with its existing IDs and connected record preserved. Desktop download promotions were removed from homepage, generated campaign page, and network navigation; the desktop route remains available for existing direct links. Existing campaign names, attribution, consent handling, and reporting endpoints are unchanged.
 
 Follow-up validation: campaign/attribution checks passed for all five sources. Browser checks at 320, 390, and 768px found no horizontal overflow, no desktop links, and both hero store choices near the top. The desktop layout was visually reviewed at the default 1280px width.
+
+## App Store image replacement
+
+Replaced the paired hero screens with the unedited map/run-detail image currently returned as iPhone screenshot 4 by Apple’s US lookup for app 6751132823, version 4.7.24. Downloaded at its original 1290×2796 dimensions; the website displays the complete screenshot without cropping. Removed the blue presentation panel and its extra caption. Source: https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/ed/88/2c/ed882ceb-aa8c-a086-cf76-784656bc5158/statskey_appstore_04_1290x2796.jpg/1290x2796bb.jpg
