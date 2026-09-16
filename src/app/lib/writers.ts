@@ -1,3 +1,4 @@
+import { copyNutritionMetadata } from './nutritionMetadata'
 import {
   addDoc,
   collection,
@@ -53,6 +54,7 @@ function encodePortionEstimate(est: PortionEstimate): Record<string, unknown> {
  */
 export function encodeFoodItem(item: FoodItem): Record<string, unknown> {
   const out: Record<string, unknown> = {
+    ...copyNutritionMetadata(item),
     id: item.id,
     name: item.name,
     servingSize: item.servingSize,

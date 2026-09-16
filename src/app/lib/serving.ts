@@ -91,7 +91,8 @@ export function currentGramWeight(item: Pick<FoodItem, 'servingSize' | 'servingU
 
 export function availableServingUnits(item: Pick<FoodItem, 'servingUnit' | 'gramWeight' | 'gramsPerCup' | 'baseServingSize' | 'baseServingUnit'>): string[] {
   const currentUnit = item.servingUnit.trim() || 'serving'
-  const units = COMMON_UNITS.filter((unit) => gramsForOneUnit(item, unit) != null)
+  const units = COMMON_UNITS.filter((unit) => gramsForOneUnit(item, unit) != null ||
+    (VOLUME_CUP_RATIO[normalizeUnit(currentUnit)] != null && VOLUME_CUP_RATIO[normalizeUnit(unit)] != null))
   if (!units.includes(currentUnit)) units.unshift(currentUnit)
   return units
 }
@@ -102,6 +103,9 @@ export function convertServingAmount(
   oldUnit: string,
   newUnit: string
 ): number | undefined {
+  const oldVolume = VOLUME_CUP_RATIO[normalizeUnit(oldUnit)]
+  const newVolume = VOLUME_CUP_RATIO[normalizeUnit(newUnit)]
+  if (oldVolume != null && newVolume != null) return amount * oldVolume / newVolume
   const oldGramsPerUnit = gramsForOneUnit(item, oldUnit)
   const newGramsPerUnit = gramsForOneUnit(item, newUnit)
   if (!finitePositive(oldGramsPerUnit) || !finitePositive(newGramsPerUnit)) return undefined
@@ -119,6 +123,13 @@ export function nutrientsForServing(
 
   const baseNutrients = item.baseNutrients ?? item.nutrients
 
+  if (item.baseNutrients && finitePositive(item.baseServingSize)) {
+    const oldVolume = VOLUME_CUP_RATIO[normalizeUnit(item.baseServingUnit ?? '')]
+    const newVolume = VOLUME_CUP_RATIO[normalizeUnit(unit)]
+    if (oldVolume != null && newVolume != null) {
+      return scaleNutrients(baseNutrients, amount * newVolume / (item.baseServingSize * oldVolume))
+    }
+  }
   if (item.baseNutrients) {
     const gramsPerUnit = gramsForOneUnit(item, unit)
     const baseGramWeight = gramWeightForBaseServing(item)

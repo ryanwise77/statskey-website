@@ -1,8 +1,9 @@
+import { copyNutritionMetadata, rescaleCurrentNutritionMetadata, type NutritionMetadata } from '../../lib/nutritionMetadata'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '../../lib/auth'
 import { analyzeNutritionInput, filesToBase64 } from '../../lib/ai/geminiNutrition'
 import { useFoodLibrary } from '../../lib/data/useFoodLibrary'
-import { clearFillProvenance } from '../../lib/provenance'
+import { markNutrientsAsUserEntered } from '../../lib/provenance'
 import { availableServingUnits, convertServingAmount, nutrientsForServing } from '../../lib/serving'
 import { newId, saveFoodToLibrary, saveMeal } from '../../lib/writers'
 import { TrustBadge } from '../TrustBadge'
@@ -18,7 +19,7 @@ import type {
 type LibrarySubTab = 'foods' | 'meals'
 type LibraryFilter = 'saved' | 'recents' | 'favorites'
 
-interface Draft {
+interface Draft extends NutritionMetadata {
   id: string
   name: string
   brand: string
@@ -128,14 +129,17 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
     setItems((prev) => prev.map((it, i) => (i === idx ? { ...it, [key]: value } : it)))
   }
 
-  function updateNutrient(idx: number, key: string, value: number) {
+  function updateNutrient(idx: number, key: string, value: number | undefined) {
     setItems((prev) =>
       prev.map((it, i) => {
         if (i !== idx) return it
-        const nutrients = { ...it.nutrients, [key]: Number(value) || 0 }
-        // A hand-corrected value is no longer our estimate — drop its fill
-        // provenance so it stops being badged as estimated (mirrors iOS).
-        return clearFillProvenance(
+        const nutrients = { ...it.nutrients }
+        if (value == null) delete nutrients[key]
+        else if (Number.isFinite(value) && value >= 0) nutrients[key] = value
+        else return it
+        // Record hand-corrected values with their own source, preserving
+        // the imported default evidence for untouched nutrients.
+        return markNutrientsAsUserEntered(
           {
             ...it,
             nutrients,
@@ -157,6 +161,7 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
         const servingSize = Number.isFinite(value) ? value : 0
         return {
           ...it,
+          ...rescaleCurrentNutritionMetadata(it, it.servingSize > 0 ? servingSize / it.servingSize : 1),
           servingSize,
           nutrients: nutrientsForServing(it, servingSize, it.servingUnit),
           // The amount is now user-confirmed, so photo-portion uncertainty no
@@ -531,7 +536,7 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
                 <NutrientField
                   key={field.key}
                   label={field.label}
-                  value={it.nutrients[field.key] ?? 0}
+                  value={it.nutrients[field.key]}
                   onChange={(v) => updateNutrient(idx, field.key, v)}
                 />
               ))}
@@ -544,6 +549,9 @@ export function MealLogForm({ onSaved, initialDate, initialMeal, onCancel }: Mea
                 onChange={(e) => update(idx, 'notes', e.target.value)}
               />
             </Field>
+            {it.nutritionSourceCompletion === 'unavailable' && (
+              <p className="text-text-muted text-[12px]">Nutrition lookup is unavailable. You can save this item while the lookup continues.</p>
+            )}
             {it.geminiExplanation && (
               <p className="text-text-muted text-[12px]">{it.geminiExplanation}</p>
             )}
@@ -913,7 +921,7 @@ function FoodResults({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-auto">
       {foods.map((item) => {
-        const calories = item.nutrients.calories ?? 0
+        const calories = item.nutrients.calories
         const isSaved = savedNames.has(item.name.toLowerCase())
         return (
           <button
@@ -928,7 +936,7 @@ function FoodResults({
                 {item.name}
               </span>
               <span className="text-text-secondary text-[12px] tabular-nums">
-                {Math.round(calories)} cal
+                {calories == null ? '—' : Math.round(calories)} cal
               </span>
             </div>
             <div className="text-text-muted text-[11px] mt-1 flex items-center gap-1.5 flex-wrap">
@@ -1028,8 +1036,8 @@ function NutrientField({
   onChange,
 }: {
   label: string
-  value: number
-  onChange: (n: number) => void
+  value: number | undefined
+  onChange: (n: number | undefined) => void
 }) {
   return (
     <label className="block">
@@ -1039,8 +1047,9 @@ function NutrientField({
         type="number"
         step="0.1"
         min={0}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        value={value ?? ''}
+        placeholder="—"
+        onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))}
       />
     </label>
   )
@@ -1159,13 +1168,7 @@ function emptyDraft(source: FoodSource = 'manual'): Draft {
     barcode: '',
     servingSize: 1,
     servingUnit: 'serving',
-    nutrients: {
-      calories: 0,
-      protein: 0,
-      carbohydrates: 0,
-      total_fat: 0,
-      dietary_fiber: 0,
-    },
+    nutrients: {},
     source,
     itemCategory: 'food',
     notes: '',
@@ -1176,9 +1179,10 @@ function isBlank(draft: Draft): boolean {
   return !draft.name.trim() && Object.values(draft.nutrients).every((value) => !value)
 }
 
-function itemToDraft(item: FoodItem): Draft {
+export function itemToDraft(item: FoodItem): Draft {
   const baseNutrients = item.baseNutrients ?? item.nutrients
   return {
+    ...copyNutritionMetadata(item),
     id: item.id,
     name: item.name,
     brand: item.brand ?? '',
@@ -1208,12 +1212,13 @@ function itemToDraft(item: FoodItem): Draft {
   }
 }
 
-function draftToFoodItem(draft: Draft): FoodItem {
+export function draftToFoodItem(draft: Draft): FoodItem {
   const now = new Date()
   const servingSize = Number(draft.servingSize) || 1
   const servingUnit = draft.servingUnit.trim() || 'serving'
   const baseNutrients = draft.baseNutrients ?? draft.nutrients
   return {
+    ...copyNutritionMetadata(draft),
     id: draft.id || newId(),
     name: draft.name.trim(),
     brand: draft.brand.trim() || undefined,

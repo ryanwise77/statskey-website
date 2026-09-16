@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "content": "{\"items\":[{\"product\":{\"name\":\"Organic Orange Juice\",\"brand\":\"Whole Foods Market\",\"variant\":\"Non-pasteurized\"},\"serving\":{\"amount\":8,\"unit\":\"fl oz\",\"grams\":240,\"servingsPerContainer\":2,\"nutrientBasis\":\"per100g\",\"alternateServings\":[{\"amount\":1,\"unit\":\"fl oz\",\"grams\":30},{\"amount\":16,\"unit\":\"fl oz\",\"grams\":480}]},\"nutrients\":{\"calories\":45,\"protein\":0.7,\"total_fat\":0.2,\"saturated_fat\":0,\"trans_fat\":0,\"polyunsaturated_fat\":0,\"monounsaturated_fat\":0,\"cholesterol\":0,\"carbohydrates\":10,\"dietary_fiber\":0.2,\"total_sugars\":8,\"added_sugars\":0,\"sodium\":1,\"potassium\":200,\"calcium\":12,\"iron\":0.1,\"vitamin_d\":0,\"vitamin_a\":100,\"vitamin_c\":50},\"dataQuality\":{\"confidence\":\"high\",\"notes\":\"Nutrient values based on standard USDA database for raw, fresh-squeezed orange juice, as the label provides ingredients but not a full nutrition panel.\"},\"name\":\"Organic Orange Juice\",\"brand\":\"Whole Foods Market\",\"servingSize\":8,\"servingUnit\":\"fl oz\",\"gramWeight\":240,\"geminiExplanation\":\"Nutrient values based on standard USDA database for raw, fresh-squeezed orange juice, as the label provides ingredients but not a full nutrition panel.\"}]}",
+  "resultsCount": 0,
+  "lookupProvider": "gemini",
+  "webSearchUsed": false,
+  "cacheable": false,
+  "lookupDurationMs": 2368
+}

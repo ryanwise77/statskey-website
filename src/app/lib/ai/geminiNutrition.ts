@@ -1,5 +1,7 @@
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import { firebaseApp } from '../firebase'
+import { auth, firebaseApp } from '../firebase'
+import { nutritionCapturePrompt } from './nutritionCapture'
+import { applySourceNutrition, canonicalServingUnit, sourceNutritionRequest } from './nutritionSourceCompletion'
 import { newId } from '../writers'
 import type { FoodItem, FoodSource, ItemCategory, PortionEstimate } from '../types'
 
@@ -12,6 +14,7 @@ interface GeminiNutritionRequest {
   preferToolSearch?: boolean
   searchQuery?: string
   model?: string
+  nativeContext?: { version: number; prompt: string }
 }
 
 // Match the iOS app's fast vision/enrichment model. The old server default
@@ -29,6 +32,7 @@ interface GeminiNutritionResponse {
 }
 
 interface GeminiFood {
+  [key: string]: unknown
   name?: string
   productName?: string
   foodName?: string
@@ -137,21 +141,54 @@ const callGeminiNutrition = httpsCallable<GeminiNutritionRequest, GeminiNutritio
   { timeout: CALLABLE_TIMEOUT_MS }
 )
 
+const callWebEnrichFood = httpsCallable<{ food: Record<string, unknown> }, unknown>(
+  functions, 'webEnrichFood', { timeout: 45_000 }
+)
+
+export function buildNutritionRecognitionRequest(req: GeminiNutritionRequest): GeminiNutritionRequest {
+  return { model: NUTRITION_MODEL, ...req, nativeContext: { version: 1, prompt: nutritionCapturePrompt(req.query) } }
+}
+
 export async function analyzeNutritionInput(
   req: GeminiNutritionRequest,
   source: FoodSource,
   itemCategory: ItemCategory = 'food'
 ): Promise<FoodItem[]> {
-  const { data } = await callGeminiNutrition({ model: NUTRITION_MODEL, ...req })
+  const uid = auth.currentUser?.uid
+  if (!uid) throw new Error('Sign in to analyze food.')
+  const { data } = await callGeminiNutrition(buildNutritionRecognitionRequest(req))
+  if (auth.currentUser?.uid !== uid) throw new Error('Your account changed. Please try again.')
   if (!data.success) throw new Error('Nutrition analysis failed.')
-  return parseGeminiFoods(data.content).map((food) => toFoodItem(food, source, itemCategory))
+  const recognized = parseGeminiFoods(data.content).map((food) => {
+    let item = toFoodItem(food, source, itemCategory)
+    const barcode = source === 'barcode' ? req.query.match(/^Barcode\s+(\d{8,14})$/i)?.[1] : undefined
+    if (barcode) item = { ...item, barcode }
+    if (!req.images?.length && (item.brand || item.barcode) && !item.quantityWasUserAdjusted &&
+        !item.printedLabel && !item.photoPackageQuantityContext) {
+      item = { ...item, servingSize: 1, servingUnit: 'serving', gramWeight: undefined,
+        baseServingSize: 1, baseServingUnit: 'serving', quantityBasis: 'model_default' }
+    }
+    return item
+  })
+  const completed = await Promise.all(recognized.map(async item => {
+    try {
+      const response = await callWebEnrichFood(sourceNutritionRequest(item))
+      return applySourceNutrition(item, response.data)
+    } catch {
+      // Keep the observed item available for review/save. The saved-meal
+      // source worker can complete it without inventing a calorie value.
+      return { ...item, nutritionSourceCompletion: 'unavailable' }
+    }
+  }))
+  if (auth.currentUser?.uid !== uid) throw new Error('Your account changed. Please try again.')
+  return completed
 }
 
 export async function filesToBase64(files: File[]): Promise<string[]> {
   return Promise.all(files.map(fileToBase64))
 }
 
-function parseGeminiFoods(content: string): GeminiFood[] {
+export function parseGeminiFoods(content: string): GeminiFood[] {
   const cleaned = content
     .replace(/```json/gi, '')
     .replace(/```/g, '')
@@ -163,13 +200,42 @@ function parseGeminiFoods(content: string): GeminiFood[] {
   return foods
 }
 
-function toFoodItem(food: GeminiFood, source: FoodSource, itemCategory: ItemCategory): FoodItem {
+export function toFoodItem(food: GeminiFood, source: FoodSource, itemCategory: ItemCategory): FoodItem {
   const now = new Date()
-  const nutrients = cleanNutrients(food.nutrients)
+  const nutrients: Record<string, number> = {}
   const serving = food.serving
-  const servingSize = asNumber(food.servingSize) ?? asNumber(serving?.amount) ?? 1
-  const servingUnit = food.servingUnit || serving?.unit || 'serving'
-  const gramWeight = asNumber(food.gramWeight) ?? asNumber(serving?.grams)
+  const packageServing = food.consumedQuantityBasis === 'single_serving_package'
+    ? readPrintedPackageServing(food.packageNetVolumeText, food.packageNetMassText) : undefined
+  const servingSize = packageServing?.size ?? positive(food.servingSize) ?? positive(serving?.amount) ?? 1
+  const servingUnit = packageServing?.unit ?? canonicalServingUnit(food.servingUnit || serving?.unit || 'serving')
+  const isPackage = food.consumedQuantityBasis === 'single_serving_package' ||
+    typeof food.packageNetVolumeText === 'string' || typeof food.packageNetMassText === 'string'
+  const massFactors: Record<string, number> = { g: 1, gram: 1, grams: 1, kg: 1000, oz: 28.349523125, lb: 453.59237 }
+  const printedMass = food.consumedQuantityBasis === 'single_serving_package'
+    ? readPrintedPackageServing(undefined, food.packageNetMassText) : undefined
+  const nestedMatches = positive(serving?.amount) === servingSize &&
+    typeof serving?.unit === 'string' && canonicalServingUnit(serving.unit) === servingUnit
+  // A flat amount and a nested mass cannot be joined across two portions.
+  // Packaged quantities use literal mass evidence; generated beverage density
+  // or a label-serving mass cannot stand in for the entire package.
+  const gramWeight = isPackage
+    ? massFactors[servingUnit] ? servingSize * massFactors[servingUnit]
+      : printedMass && massFactors[printedMass.unit] ? printedMass.size * massFactors[printedMass.unit] : undefined
+    : positive(food.gramWeight) ?? (nestedMatches ? positive(serving?.grams) : undefined)
+  const labelValues = cleanNutrients(isRecord(food.visibleLabelNutrition) ? food.visibleLabelNutrition : undefined)
+  const basis = food.visibleLabelNutritionBasis
+  const printedLabel = Object.keys(labelValues).length && (basis === 'per_serving' || basis === 'per_container')
+    ? { nutrients: labelValues, nutrientKeys: Object.keys(labelValues), basis,
+      ...defined({ servingSize: positive(food.labelServingSize), servingUnit: food.labelServingUnit,
+        servingGramWeight: positive(food.labelServingGramWeight), servingVolumeMl: positive(food.labelServingVolumeMl),
+        packageNetWeightGrams: positive(food.packageNetWeightGrams),
+        ingredientStatement: food.visibleIngredientStatement, productClaims: food.visibleProductClaims,
+        dailyValues: food.visibleLabelDailyValues, dailyValueReference: food.visibleLabelDailyValueReference,
+        consumedQuantityBasis: food.consumedQuantityBasis }) } : undefined
+  const claims = Array.isArray(food.visibleProductClaims) ? food.visibleProductClaims
+    .filter((value): value is string => typeof value === 'string' && value.length <= 200).slice(0, 30) : []
+  const preparation = claims.some(claim => /^(?:non[-\s]?pasteuri[sz]ed|unpasteuri[sz]ed)$/i.test(claim.trim())) ? 'raw' : undefined
+  const ingredients = typeof food.visibleIngredientStatement === 'string' ? food.visibleIngredientStatement.trim().slice(0, 5000) : undefined
   const name = firstText(
     food.name,
     food.product?.name,
@@ -186,6 +252,16 @@ function toFoodItem(food: GeminiFood, source: FoodSource, itemCategory: ItemCate
     asNumber(food.serving?.highGram)
   )
 
+  // Only the photographed column can populate recognition nutrition, and
+  // only when its physical serving relation is known. Lookup guesses are ignored.
+  if (printedLabel) {
+    const labelAmount = positive(food.labelServingSize)
+    const labelUnit = typeof food.labelServingUnit === 'string' ? canonicalServingUnit(food.labelServingUnit) : ''
+    const factor = basis === 'per_container' && food.consumedQuantityBasis === 'single_serving_package' ? 1
+      : basis === 'per_serving' && labelAmount && labelUnit === servingUnit ? servingSize / labelAmount : undefined
+    if (factor != null) for (const [key, value] of Object.entries(labelValues)) nutrients[key] = value * factor
+  }
+  const printedKeys = Object.keys(nutrients)
   return {
     id: newId(),
     name: name || 'Analyzed item',
@@ -193,18 +269,35 @@ function toFoodItem(food: GeminiFood, source: FoodSource, itemCategory: ItemCate
     servingSize,
     servingUnit,
     nutrients,
-    baseNutrients: nutrients,
+    baseNutrients: { ...nutrients },
+    nutrientFillSources: Object.fromEntries(printedKeys.map(key => [key, 'product_claim'])),
+    nutrientProvenance: Object.fromEntries(printedKeys.map(key => [key, 'label_declared'])),
+    nutrientCitations: Object.fromEntries(printedKeys.map(key => [key, 'Printed Nutrition Facts panel (photographed)'])),
+    explicitZeroNutrientKeys: printedKeys.filter(key => nutrients[key] === 0),
     baseServingSize: servingSize,
     baseServingUnit: servingUnit,
     gramWeight,
-    gramsPerCup: asNumber(food.gramsPerCup),
+    // A generated density must never convert photographed fluid ounces to mass.
+    printedLabel,
+    enrichmentIngredients: ingredients || undefined,
+    visibleProductClaims: claims,
+    preparation,
+    photoPackageQuantityContext: food.consumedQuantityBasis === 'single_serving_package' ? 'single_serving_package' : undefined,
+    photoPackageObservations: isPackage ? defined({
+      packageNetVolumeText: food.packageNetVolumeText, packageNetVolumeMl: positive(food.packageNetVolumeMl),
+      packageNetMassText: food.packageNetMassText, packageNetWeightGrams: positive(food.packageNetWeightGrams),
+      consumedQuantityBasis: food.consumedQuantityBasis,
+    }) : undefined,
+    quantityBasis: food.quantityBasis,
+    sourceServingContractVersion: 1,
+    nutritionSourceCompletion: 'pending',
     isFavorite: false,
     useCount: 0,
     source,
     itemCategory,
     notes: food.notes,
     geminiExplanation: explanation,
-    quantityWasUserAdjusted: false,
+    quantityWasUserAdjusted: food.consumedQuantityBasis === 'user_explicit',
     portionEstimate,
     createdAt: now,
     updatedAt: now,
@@ -235,11 +328,32 @@ function buildPortionEstimate(
   return estimate
 }
 
+/** Literal printed NET text is an observed package size, not an inferred density. */
+export function readPrintedPackageServing(volume: unknown, mass: unknown): { size: number; unit: string } | undefined {
+  for (const [text, pattern] of [
+    [volume, /(?:^|[^\d.])(\d+(?:\.\d+)?)\s*(fl\.?\s*oz\.?|fluid ounces?|ml|milliliters?|l|liters?)\b/i],
+    [mass, /(?:^|[^\d.])(\d+(?:\.\d+)?)\s*(kg|g|grams?|oz\.?|ounces?|lb|pounds?)\b/i],
+  ] as const) {
+    if (typeof text !== 'string') continue
+    const match = text.match(pattern)
+    if (match && Number(match[1]) > 0) return { size: Number(match[1]), unit: canonicalServingUnit(match[2]) }
+  }
+  return undefined
+}
+
+function positive(value: unknown): number | undefined {
+  const n = asNumber(value)
+  return n != null && n > 0 ? n : undefined
+}
+function defined(value: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(value).filter(([, value]) => value != null))
+}
+
 function cleanNutrients(input: Record<string, unknown> | undefined): Record<string, number> {
   const out: Record<string, number> = {}
   for (const [key, value] of Object.entries(input ?? {})) {
     const n = asNumber(value)
-    if (n != null) out[normalizeNutrientKey(key)] = n
+    if (n != null && n >= 0) out[normalizeNutrientKey(key)] = n
   }
   return out
 }

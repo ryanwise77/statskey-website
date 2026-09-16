@@ -1,3 +1,4 @@
+import { copyNutritionMetadata } from './nutritionMetadata'
 import { toDate, toDateOrNow } from './firestore'
 import { deriveTrustMetadata } from './provenance'
 import type {
@@ -153,6 +154,7 @@ export function decodeFoodItem(raw: Raw, idFallback: string): FoodItem {
   const aiEstimatedKeys = strArray(raw.aiEstimatedNutrientKeys)
 
   const item: FoodItem = {
+    ...copyNutritionMetadata(raw),
     id: str(raw.id) ?? idFallback,
     name,
     brand: str(raw.brand),

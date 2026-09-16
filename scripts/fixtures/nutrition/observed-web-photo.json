@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "content": "[{\"name\":\"Organic Orange Juice\",\"brand\":null,\"barcode\":null,\"servingSize\":1,\"servingUnit\":\"serving\",\"quantityBasis\":\"printed_package\",\"consumedQuantityBasis\":\"single_serving_package\",\"packageNetVolumeText\":\"16 FL OZ\",\"packageNetVolumeMl\":473.176,\"packageNetMassText\":null,\"packageNetWeightGrams\":null,\"labelServingSize\":null,\"labelServingUnit\":null,\"labelServingGramWeight\":null,\"labelServingVolumeMl\":null,\"labelServingMassText\":null,\"visibleLabelNutrition\":{},\"visibleLabelNutritionBasis\":\"unknown\",\"visibleLabelNutrientKeys\":[],\"visibleLabelDailyValues\":{},\"visibleLabelDailyValueReference\":\"unknown\",\"visibleIngredientStatement\":\"Organic Orange.\",\"visibleProductClaims\":[\"Organic\",\"NON-PASTEURIZED\"],\"portionDraftGrams\":null,\"nutrients\":{},\"gramWeight\":null,\"gramsPerCup\":null,\"geminiExplanation\":\"Organic Orange Juice. Recognized package volume: 473.176 mL. Printed package mass is unknown; no water density was assumed.\",\"packageServingsPerContainer\":null}]",
+  "resultsCount": 0,
+  "lookupProvider": "gemini",
+  "webSearchUsed": false,
+  "cacheable": false,
+  "lookupDurationMs": 1945,
+  "nativeContextVersion": 1
+}

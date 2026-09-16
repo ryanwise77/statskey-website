@@ -1,3 +1,4 @@
+import type { NutritionMetadata } from './nutritionMetadata'
 // TypeScript mirrors of the iOS Firestore schemas. Field names match the
 // Swift CodingKeys exactly so documents written by the iOS app decode as-is.
 
@@ -101,7 +102,7 @@ export interface PortionEstimate {
   highGram?: number
 }
 
-export interface FoodItem {
+export interface FoodItem extends NutritionMetadata {
   id: string
   name: string
   brand?: string

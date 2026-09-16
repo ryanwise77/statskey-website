@@ -310,6 +310,10 @@ function makeResolved(
  * food's own capture source. Mirrors FoodItem.resolvedNutrientSource(for:).
  */
 export function resolvedNutrientSource(item: FoodItem, key: string): ResolvedNutrientSource {
+  const ids = item.nutrientEvidenceIDs as Record<string, unknown> | undefined
+  const manual = Array.isArray(item.nutritionEvidence) && item.nutritionEvidence.find(record =>
+    record?.id === ids?.[key] && record?.source === 'userEntered')
+  if (manual) return makeResolved('userEntered', undefined, manual.citation)
   const raw = item.nutrientFillSources?.[key]
   if (raw != null) {
     return makeResolved(sourceFromFillRaw(raw), item.nutrientErrPct?.[key], item.enrichmentCitation)
@@ -549,6 +553,8 @@ export type FillProvenanceFields = Pick<
   | 'enrichmentMethod'
   | 'enrichmentCitation'
   | 'enrichmentSchemaVersion'
+  | 'nutrientEvidenceIDs' | 'nutrientProvenance' | 'nutrientCitations' | 'nutrientRanges'
+  | 'nutrientBasis' | 'nutrientUnknownReason' | 'explicitZeroNutrientKeys' | 'nutrientDefinitionEvidence'
 >
 
 /**
@@ -574,6 +580,13 @@ export function clearFillProvenance<T extends FillProvenanceFields>(
   next.nutrientFillSources = withoutKeys(next.nutrientFillSources, drop)
   next.nutrientFillConfidence = withoutKeys(next.nutrientFillConfidence, drop)
   next.nutrientErrPct = withoutKeys(next.nutrientErrPct, drop)
+  for (const field of ['nutrientEvidenceIDs', 'nutrientProvenance', 'nutrientCitations',
+    'nutrientRanges', 'nutrientBasis', 'nutrientUnknownReason', 'nutrientDefinitionEvidence'] as const) {
+    if (next[field] && typeof next[field] === 'object') next[field] = withoutKeys(next[field] as Record<string, unknown>, drop)
+  }
+  if (Array.isArray(next.explicitZeroNutrientKeys)) {
+    next.explicitZeroNutrientKeys = next.explicitZeroNutrientKeys.filter(key => !drop.has(key))
+  }
 
   if (next.aiEstimatedNutrientKeys == null) {
     next.enrichmentMethod = undefined
@@ -581,6 +594,36 @@ export function clearFillProvenance<T extends FillProvenanceFields>(
     next.enrichmentSchemaVersion = undefined
   }
 
+  return next
+}
+
+/** Mirrors native markNutrientsAsUserEntered without changing unrelated source roots. */
+export function markNutrientsAsUserEntered<T extends FillProvenanceFields & Pick<FoodItem, 'nutrients' | 'nutritionEvidence'>>(
+  item: T,
+  keys: Iterable<string>
+): T {
+  const editedKeys = [...keys]
+  const next = clearFillProvenance(item, editedKeys)
+  const presentKeys = editedKeys.filter(key => Number.isFinite(next.nutrients[key]) && next.nutrients[key] >= 0)
+  if (!presentKeys.length) return next
+  const evidence = Array.isArray(next.nutritionEvidence) ? [...next.nutritionEvidence] : []
+  const preferredID = 'user-entered-nutrients'
+  const existing = evidence.find(record => record?.id === preferredID && record?.source === 'userEntered' && record?.sourcePolicyID === 'user-provided-entry-v1')
+  let id = preferredID
+  if (!existing) {
+    let suffix = 1
+    while (evidence.some(record => record?.id === id)) id = `${preferredID}-${suffix++}`
+    evidence.push({ id, source: 'userEntered', citation: 'Value entered or corrected by the user',
+      sourcePolicyID: 'user-provided-entry-v1', reusePolicy: 'allowed', basis: 'userProvided',
+      identityConfidence: 'medium', valueConfidence: 'medium' })
+  }
+  next.nutritionEvidence = evidence
+  next.nutrientEvidenceIDs = { ...(next.nutrientEvidenceIDs as Record<string, unknown> | undefined),
+    ...Object.fromEntries(presentKeys.map(key => [key, id])) }
+  next.explicitZeroNutrientKeys = [...new Set([
+    ...(Array.isArray(next.explicitZeroNutrientKeys) ? next.explicitZeroNutrientKeys : []),
+    ...presentKeys.filter(key => next.nutrients[key] === 0),
+  ])]
   return next
 }
 

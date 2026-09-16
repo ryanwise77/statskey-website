@@ -12,7 +12,7 @@ import {
   setMealFavorite,
   updateLibraryFood,
 } from '../lib/writers'
-import { clearFillProvenance } from '../lib/provenance'
+import { markNutrientsAsUserEntered } from '../lib/provenance'
 import { mealDisplayName, mealTotal } from '../lib/aggregates'
 import { EmptyState } from '../components/EmptyState'
 import { TrustBadge } from '../components/TrustBadge'
@@ -278,10 +278,10 @@ function FoodEditor({
     onError(null)
     try {
       // Hand-edited values lose their "estimated" provenance, mirroring iOS.
-      const editedKeys = Object.keys(nutrients).filter(
-        (k) => (nutrients[k] ?? 0) !== (item.nutrients[k] ?? 0)
+      const editedKeys = [...new Set([...Object.keys(item.nutrients), ...Object.keys(nutrients)])].filter(
+        (key) => nutrients[key] !== item.nutrients[key]
       )
-      const cleared = clearFillProvenance({ ...item }, editedKeys)
+      const cleared = markNutrientsAsUserEntered({ ...item, nutrients }, editedKeys)
       await updateLibraryFood(uid, {
         ...cleared,
         name: name.trim() || item.name,
@@ -333,8 +333,13 @@ function FoodEditor({
               type="number"
               step="0.1"
               min={0}
-              value={nutrients[key] ?? 0}
-              onChange={(e) => setNutrients({ ...nutrients, [key]: Number(e.target.value) })}
+              value={nutrients[key] ?? ''}
+              onChange={(e) => {
+                const next = { ...nutrients }
+                if (e.target.value.trim() === '') delete next[key]
+                else next[key] = Number(e.target.value)
+                setNutrients(next)
+              }}
             />
           </label>
         ))}

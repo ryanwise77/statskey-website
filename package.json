@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/build-download-page.mjs && vite",
-    "build": "node scripts/build-download-page.mjs && node scripts/repair-founder-nutrition-fallback.mjs --check && vite build && node scripts/check-nudge-portal.mjs",
+    "build": "npm run test:nutrition && node scripts/build-download-page.mjs && node scripts/repair-founder-nutrition-fallback.mjs --check && vite build && node scripts/check-nudge-portal.mjs",
     "test:nudge-author": "node --test scripts/nudge-author.test.ts scripts/founder-journey.test.mjs",
     "test:languages": "node --test scripts/legal-language.test.mjs scripts/founder-journey.test.mjs",
     "build:founder-history": "node scripts/build-founder-history.mjs",
@@ -19,7 +19,8 @@
     "preview": "vite preview",
     "check:deploy": "node scripts/check-deploy-ready.mjs",
     "test:security": "node --test scripts/public-api-security.test.mjs",
-    "test:campaign": "node --test scripts/mobile-acquisition.test.mjs scripts/campaign-journey.test.mjs"
+    "test:campaign": "node --test scripts/mobile-acquisition.test.mjs scripts/campaign-journey.test.mjs",
+    "test:nutrition": "node --test scripts/nutrition-source.test.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.0",
