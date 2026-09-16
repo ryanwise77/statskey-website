@@ -16,7 +16,7 @@ export function buildDownloadPage(homepage) {
         <div class="page-shell campaign-product-grid">
           <div class="campaign-product-copy">
             <p class="campaign-eyebrow">NUTRITION. TRAINING. YOUR EVERYDAY.</p>
-            <h1 id="campaign-title">Eat better.<br>Train with<br><span>purpose.</span></h1>
+            <h1 id="campaign-title">Eat better.<br>Exercise with<br><span>purpose.</span></h1>
             <p class="campaign-product-lede">Log a meal, build a workout, and see how your habits add up. StatsKey brings your nutrition and training into one place.</p>
             <div class="campaign-store-choices" aria-label="Download the mobile app">${stores}</div>
             <p class="campaign-availability">Free to download on iPhone and Android.<br>Optional Pro and Pro+ plans. <a href="/app/tokens">Compare plans</a></p>
