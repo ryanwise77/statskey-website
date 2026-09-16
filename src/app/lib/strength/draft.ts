@@ -25,6 +25,13 @@ export function readStrengthDraft(
       return null
     const session = decodeStrengthSession(value.session, value.session.id, uid)
     if (!session || !session.entries.length) return null
+    if (session.recordingMode === 'live' && value.session.timedSetId === undefined) {
+      // Drafts created before the single-clock field existed stored the start
+      // directly on each row. Recover the latest unfinished clock only.
+      session.timedSetId = session.entries.flatMap((e) => e.sets)
+        .filter((s) => !s.isCompleted && s.startedAt && s.durationSeconds == null)
+        .sort((a, b) => b.startedAt!.getTime() - a.startedAt!.getTime())[0]?.id
+    }
     return {
       session,
       duration: typeof value.duration === 'string' ? value.duration : '45',

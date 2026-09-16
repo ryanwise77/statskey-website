@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import {
   completedExercises,
-  EXERCISES,
+  EQUIPMENT,
   LOAD_LABELS,
   loadDisplay,
-  newExercise,
   newSession,
-  newSet,
+  nextStrengthSet,
+  repeatStrengthSession,
+  startStrengthSetTimer,
   setDescription,
   strengthTotals,
   validateStrength,
@@ -17,10 +18,16 @@ import {
   type StrengthSession,
   type StrengthSet,
 } from '../lib/strength/model'
-import { saveStrengthSession, useStrengthHistory } from '../lib/strength/store'
+import { saveStrengthSession, useStrengthHistory, useStrengthLibrary } from '../lib/strength/store'
+import { routineFromStrengthSession, sessionFromStrengthRoutine, type StrengthRoutine } from '../lib/strength/plans'
 import { readStrengthDraft, writeStrengthDraft } from '../lib/strength/draft'
 import { StrengthShare } from '../components/strength/StrengthShare'
 import { StrengthVideo } from '../components/strength/StrengthVideo'
+import { StrengthPlanner } from '../components/strength/StrengthPlanner'
+import { StrengthProgress } from '../components/strength/StrengthProgress'
+import { StrengthExercisePicker } from '../components/strength/StrengthExercisePicker'
+import { StrengthSessionEditor } from '../components/strength/StrengthSessionEditor'
+import { exerciseFromStrengthCatalog } from '../lib/strength/catalog'
 import './Strength.css'
 
 export function Strength() {
@@ -42,6 +49,10 @@ function StrengthWorkspace({
   initialImperial: boolean
 }) {
   const history = useStrengthHistory(uid)
+  const library = useStrengthLibrary(uid)
+  const [routineSeed, setRoutineSeed] = useState<StrengthRoutine | null>(null)
+  const [plannerEditing, setPlannerEditing] = useState(false)
+  const [editingSession, setEditingSession] = useState<StrengthSession | null>(null)
   const [search, setSearch] = useSearchParams()
   const [recovered] = useState(() => readStrengthDraft(uid))
   const [draft, setDraft] = useState(
@@ -50,12 +61,11 @@ function StrengthWorkspace({
   const [draftStored, setDraftStored] = useState(true)
   const [unitOverride, setUnitOverride] = useState<boolean | null>(null)
   const imperial = unitOverride ?? initialImperial
-  const [tab, setTab] = useState<'record' | 'history'>(() =>
+  const [tab, setTab] = useState<'record' | 'history' | 'planner' | 'progress'>(() =>
     search.has('session') || search.get('view') === 'history'
       ? 'history'
       : 'record',
   )
-  const [exerciseName, setExerciseName] = useState('')
   const [duration, setDuration] = useState(recovered?.duration ?? '45')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState(
@@ -93,13 +103,6 @@ function StrengthWorkspace({
   }, [uid, draft, duration, restUntil])
   const totals = strengthTotals(draft)
   const selected = history.sessions.find((s) => s.id === search.get('session'))
-  const matching = useMemo(
-    () =>
-      EXERCISES.filter((e) =>
-        e[0].toLowerCase().includes(exerciseName.toLowerCase()),
-      ).slice(0, 8),
-    [exerciseName],
-  )
   function updateExercise(
     id: string,
     update: (entry: StrengthExercise) => StrengthExercise,
@@ -119,28 +122,11 @@ function StrengthWorkspace({
       sets: entry.sets.map((s) => (s.id === setID ? { ...s, ...patch } : s)),
     }))
   }
-  function addExercise(
-    name: string,
-    equipment = 'other',
-    measure: 'reps' | 'time' = 'reps',
-    exerciseId = '',
-  ) {
-    if (!name.trim()) return
-    setDraft((s) => ({
-      ...s,
-      entries: [
-        ...s.entries,
-        newExercise(name.trim(), equipment, measure, exerciseId),
-      ],
-    }))
-    setExerciseName('')
-    setError('')
-    setMessage('')
-  }
   function changeMode(mode: 'live' | 'afterTheFact') {
     setDraft((s) => ({
       ...s,
       recordingMode: mode,
+      timedSetId: undefined,
       startDate:
         mode === 'live'
           ? new Date()
@@ -164,22 +150,28 @@ function StrengthWorkspace({
     set: StrengthSet,
     done: boolean,
   ) {
-    const completedAt =
-      done && draft.recordingMode === 'live' ? new Date() : undefined
+    const completedAt = done && draft.recordingMode === 'live'
+      ? set.startedAt && draft.timedSetId !== set.id && set.durationSeconds != null
+        ? new Date(set.startedAt.getTime() + set.durationSeconds * 1000)
+        : new Date()
+      : undefined
     const elapsed =
-      set.startedAt && completedAt
+      set.startedAt && completedAt && draft.timedSetId === set.id
         ? (completedAt.getTime() - set.startedAt.getTime()) / 1000
         : undefined
     updateSet(entry.id, set.id, {
       isCompleted: done,
       completedAt,
-      startedAt: done ? set.startedAt : undefined,
-      ...(elapsed && elapsed > 0
+      startedAt: done && (elapsed == null || elapsed >= 1) ? set.startedAt : undefined,
+      ...(elapsed != null && elapsed >= 1
         ? { durationSeconds: Math.round(elapsed * 10) / 10 }
         : {}),
     })
-    if (done && draft.recordingMode === 'live')
-      setRestUntil(Date.now() + draft.defaultRestSeconds * 1000)
+    if (draft.timedSetId === set.id) setDraft((s) => ({ ...s, timedSetId: undefined }))
+    if (done && draft.recordingMode === 'live') {
+      const seconds = set.plannedTarget?.restSeconds ?? entry.restSeconds ?? draft.defaultRestSeconds
+      setRestUntil(seconds > 0 ? Date.now() + seconds * 1000 : null)
+    }
   }
   async function save() {
     if (saving) return
@@ -210,7 +202,7 @@ function StrengthWorkspace({
     try {
       await saveStrengthSession(uid, candidate)
       if (!alive.current) return
-      setMessage('Workout saved. It is also available in Strength on iOS.')
+      setMessage('Workout saved to your StatsKey account across devices.')
       setDraft(newSession(uid))
       setDuration('45')
       setRestUntil(null)
@@ -229,23 +221,7 @@ function StrengthWorkspace({
       !window.confirm('Replace your unsaved workout draft?')
     )
       return
-    setDraft({
-      ...newSession(uid),
-      title: session.title,
-      defaultRestSeconds: session.defaultRestSeconds,
-      entries: completedExercises(session).map((entry) => ({
-        ...entry,
-        id: crypto.randomUUID(),
-        sets: entry.sets.map((s, i) => ({
-          ...s,
-          id: crypto.randomUUID(),
-          number: i + 1,
-          isCompleted: false,
-          startedAt: undefined,
-          completedAt: undefined,
-        })),
-      })),
-    })
+    setDraft(repeatStrengthSession(session, uid))
     setDuration('45')
     setError('')
     setTab('record')
@@ -254,6 +230,24 @@ function StrengthWorkspace({
       'Previous values copied as a starting point. Mark only the sets you complete.',
     )
     setRestUntil(null)
+  }
+  function startRoutine(routine: StrengthRoutine, dayKey?: string) {
+    if (plannerEditing && !window.confirm('Discard unsaved routine or schedule changes and start this saved routine?')) return
+    if (saving || (draft.entries.length && !window.confirm('Replace your unsaved workout draft?'))) return
+    setDraft(sessionFromStrengthRoutine(routine, uid, new Date(), dayKey))
+    setDuration('45'); setRestUntil(null); setTab('record'); setSearch({}); setError(''); setPlannerEditing(false)
+    setMessage('Routine ready. Mark each set Done as you complete it; targets remain separate from recorded effort.')
+  }
+  function makeRoutine(session: StrengthSession) {
+    setRoutineSeed(routineFromStrengthSession(session)); setTab('planner'); setError(''); setMessage('')
+  }
+  function showTab(next: 'record' | 'history' | 'planner' | 'progress') {
+    if (editingSession && !window.confirm('Discard your unsaved workout corrections?')) return
+    setEditingSession(null)
+    if (next !== 'planner' && tab === 'planner' && plannerEditing && !window.confirm('Discard your unsaved routine or schedule changes?')) return
+    if (next !== 'planner') setPlannerEditing(false)
+    if (next === 'planner' && tab !== 'planner') setRoutineSeed(null)
+    setTab(next)
   }
   return (
     <div className="strength-page">
@@ -279,17 +273,19 @@ function StrengthWorkspace({
         <button
           type="button"
           aria-pressed={tab === 'record'}
-          onClick={() => setTab('record')}
+          onClick={() => showTab('record')}
         >
           Record workout
         </button>
         <button
           type="button"
           aria-pressed={tab === 'history'}
-          onClick={() => setTab('history')}
+          onClick={() => showTab('history')}
         >
           Strength history
         </button>
+        <button type="button" aria-pressed={tab === 'planner'} onClick={() => showTab('planner')}>Routines &amp; week</button>
+        <button type="button" aria-pressed={tab === 'progress'} onClick={() => showTab('progress')}>Progress</button>
       </nav>
       {message && (
         <p className="strength-success" role="status">
@@ -301,7 +297,9 @@ function StrengthWorkspace({
           {error}
         </p>
       )}
-      {tab === 'record' ? (
+      {editingSession ? <StrengthSessionEditor key={editingSession.id} session={editingSession} uid={uid} imperial={imperial} customExercises={library.customExercises} onCancel={() => setEditingSession(null)} onSave={(session) => { setEditingSession(null); setSearch({ session: session.id }); setMessage('Workout corrections saved across your devices.'); setError('') }} />
+        : tab === 'progress' ? <StrengthProgress sessions={history.sessions} imperial={imperial} />
+        : tab === 'planner' ? <StrengthPlanner uid={uid} imperial={imperial} library={library} initialRoutine={routineSeed} onStart={startRoutine} onEditingChange={setPlannerEditing} /> : tab === 'record' ? (
         <fieldset disabled={saving} className="strength-layout">
           <div className="strength-main">
             <section className="panel strength-fields">
@@ -405,6 +403,11 @@ function StrengthWorkspace({
                     Remove
                   </button>
                 </header>
+                {entry.supersetGroup && <p>Superset · alternate with the linked exercise.</p>}
+                <div className="strength-set-fields">
+                  <label>Equipment<select className="input" value={entry.equipment} onChange={(e) => updateExercise(entry.id, (v) => ({ ...v, equipment: e.target.value }))}>{EQUIPMENT.map((value) => <option value={value} key={value}>{value === 'smithMachine' ? 'Smith machine' : value}</option>)}</select></label>
+                  <label>Rest for this exercise (sec)<NumberInput value={entry.restSeconds} min={0} max={1800} step="1" onChange={(value) => updateExercise(entry.id, (v) => ({ ...v, restSeconds: value }))} /></label>
+                </div>
                 <label className="strength-measure">
                   Measure
                   <select
@@ -459,6 +462,15 @@ function StrengthWorkspace({
                           ×
                         </button>
                       </div>
+                      {set.plannedTarget && <p className="strength-target">Planned: {[
+                        set.plannedTarget.reps != null ? `${set.plannedTarget.reps} reps` : '',
+                        set.plannedTarget.durationSeconds != null ? `${set.plannedTarget.durationSeconds}s work` : '',
+                        set.plannedTarget.weightLbs != null ? loadDisplay(set.plannedTarget.weightLbs, imperial) : '',
+                        set.plannedTarget.targetRPE != null ? `RPE ${set.plannedTarget.targetRPE}` : '',
+                        set.plannedTarget.targetHeartRateMin != null ? `HR ≥ ${set.plannedTarget.targetHeartRateMin}` : '',
+                        set.plannedTarget.targetHeartRateMax != null ? `HR ≤ ${set.plannedTarget.targetHeartRateMax}` : '',
+                        set.plannedTarget.restSeconds != null ? `${set.plannedTarget.restSeconds}s rest` : '',
+                      ].filter(Boolean).join(' · ') || 'Complete when ready'}</p>}
                       <div className="strength-set-fields">
                         <label>
                           Set type
@@ -570,7 +582,7 @@ function StrengthWorkspace({
                       </div>
                       {draft.recordingMode === 'live' && !set.isCompleted && (
                         <div className="strength-set-timer">
-                          {set.startedAt ? (
+                          {set.startedAt && draft.timedSetId === set.id ? (
                             <>
                               <span aria-live="off">
                                 Work time{' '}
@@ -587,9 +599,7 @@ function StrengthWorkspace({
                             <button
                               className="btn btn-secondary"
                               onClick={() => {
-                                updateSet(entry.id, set.id, {
-                                  startedAt: new Date(),
-                                })
+                                setDraft((session) => startStrengthSetTimer(session, set.id))
                                 setRestUntil(null)
                               }}
                             >
@@ -607,52 +617,18 @@ function StrengthWorkspace({
                   onClick={() =>
                     updateExercise(entry.id, (value) => ({
                       ...value,
-                      sets: [...value.sets, newSet(value.sets.length + 1)],
+                      sets: [...value.sets, nextStrengthSet(value)],
                     }))
                   }
                 >
                   + Add set
                 </button>
+                <label>Exercise notes<textarea className="input" rows={2} maxLength={2000} value={entry.notes ?? ''} onChange={(e) => updateExercise(entry.id, (v) => ({ ...v, notes: e.target.value }))} /></label>
               </section>
             ))}
-            <section className="panel strength-add">
-              <h2>Add an exercise</h2>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  addExercise(exerciseName)
-                }}
-              >
-                <label className="sr-only" htmlFor="strength-exercise-search">
-                  Find or name an exercise
-                </label>
-                <input
-                  id="strength-exercise-search"
-                  className="input"
-                  placeholder="Find an exercise or enter your own"
-                  value={exerciseName}
-                  onChange={(e) => setExerciseName(e.target.value)}
-                  maxLength={180}
-                />
-                <button
-                  className="btn btn-secondary"
-                  disabled={!exerciseName.trim()}
-                >
-                  Add custom
-                </button>
-              </form>
-              <div className="strength-suggestions">
-                {matching.map((e) => (
-                  <button
-                    type="button"
-                    key={e[0]}
-                    onClick={() => addExercise(e[0], e[1], e[2], e[3])}
-                  >
-                    {e[0]} <span aria-hidden="true">+</span>
-                  </button>
-                ))}
-              </div>
-            </section>
+            <section className="panel"><StrengthExercisePicker uid={uid} customExercises={library.customExercises} disabled={saving} onAdd={(exercise) => {
+              setDraft((current) => ({ ...current, entries: [...current.entries, exerciseFromStrengthCatalog(exercise)] })); setError(''); setMessage('')
+            }} /></section>
             <label className="strength-notes">
               Workout notes
               <textarea
@@ -713,6 +689,7 @@ function StrengthWorkspace({
             >
               {saving ? 'Saving workout…' : 'Save workout'}
             </button>
+            <button className="btn btn-secondary" disabled={saving || !draft.entries.length} onClick={() => makeRoutine(draft)}>Save as routine</button>
             <p className="strength-draft-note">
               {draftStored
                 ? 'Your draft is saved in this tab. Save the workout to sync it to your account.'
@@ -751,7 +728,7 @@ function StrengthWorkspace({
                 <h3>No strength workouts yet</h3>
                 <p>
                   Record your first session here, or sign in with the account
-                  you use on iOS.
+                  you use on your other devices.
                 </p>
                 <button
                   className="btn btn-secondary"
@@ -802,6 +779,8 @@ function StrengthWorkspace({
                 >
                   Repeat workout
                 </button>
+                <button className="btn btn-secondary" disabled={saving} onClick={() => makeRoutine(selected)}>Save as routine</button>
+                <button className="btn btn-secondary" disabled={saving} onClick={() => { setEditingSession(selected); setError(''); setMessage('') }}>Correct workout</button>
               </header>
               <StrengthTotals session={selected} imperial={imperial} />
               <div className="strength-video-actions">
@@ -815,10 +794,12 @@ function StrengthWorkspace({
               {completedExercises(selected).map((entry) => (
                 <section className="strength-detail-exercise" key={entry.id}>
                   <h3>{entry.name}</h3>
+                  {entry.notes && <p>{entry.notes}</p>}
                   {entry.sets.map((set) => (
                     <div key={set.id}>
                       <span>Set {set.number}</span>
                       <p>{setDescription(set, entry, imperial)}</p>
+                      {set.notes && <p>{set.notes}</p>}
                     </div>
                   ))}
                 </section>

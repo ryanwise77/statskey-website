@@ -1,0 +1,161 @@
+/* The experiment takes the place of the screenshot directory. */
+.marathon-feature {
+  background: #f4f7fa;
+  border-block: 1px solid #dce5ef;
+}
+.marathon-feature .founder-experiment-original {
+  padding-block: clamp(12px, 3vw, 48px);
+}
+.marathon-feature .experiment-copy h2 {
+  max-width: 740px;
+  font-size: clamp(2.7rem, 5.6vw, 5.5rem);
+  letter-spacing: -0.06em;
+  line-height: 1.02;
+}
+.marathon-feature .experiment-copy .marathon-lede {
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  color: #193653;
+  margin-top: 1.5rem;
+}
+.marathon-feature .experiment-copy > p {
+  max-width: 550px;
+}
+.marathon-feature .experiment-media {
+  border-radius: 22px;
+  box-shadow: 0 28px 65px #1734521f;
+  overflow: hidden;
+  max-width: 400px;
+  justify-self: end;
+}
+.marathon-feature .clinician-preview-card {
+  padding: 0;
+  border: 0;
+  margin: 1.5rem 0;
+}
+.marathon-feature .clinician-preview-card p {
+  font-size: 0.9rem;
+  max-width: 440px;
+}
+.marathon-feature .experiment-copy__live-note {
+  font-size: 0.9rem;
+}
+.marathon-feature .founder-live-suite {
+  margin-top: clamp(36px, 6vw, 80px);
+}
+.campaign-landing .hero-copy .hero-title {
+  font-size: clamp(3.5rem, 7.6vw, 7.4rem);
+  line-height: 0.98;
+  max-width: 850px;
+}
+.campaign-landing .hero-lede {
+  max-width: 570px;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+}
+.campaign-landing .hero-note {
+  max-width: 580px;
+}
+.campaign-landing .hero-actions {
+  gap: 12px;
+}
+.campaign-landing .hero-actions > .button--primary {
+  flex-basis: 100%;
+  width: fit-content;
+  max-width: 340px;
+}
+.site-analytics-choice {
+  position: fixed;
+  inset: auto 20px 20px auto;
+  z-index: 95;
+  width: min(460px, calc(100vw - 40px));
+  border: 1px solid #d7e1eb;
+  border-radius: 16px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 12px 45px #12304d24;
+  color: #1a3550;
+}
+.site-analytics-choice[hidden] {
+  display: none;
+}
+.site-analytics-choice p {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  margin: 0 0 14px;
+}
+.site-analytics-choice strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+.site-analytics-choice div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.site-analytics-choice button {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  cursor: pointer;
+  border: 1px solid #b6c9dc;
+  font-size: 0.875rem;
+}
+.site-analytics-choice [data-analytics-allow] {
+  background: #0563c6;
+  color: white;
+  border-color: #0563c6;
+}
+.site-analytics-choice a {
+  font-size: 0.8rem;
+  margin-left: auto;
+  text-decoration: underline;
+}
+.site-analytics-choice button:focus-visible,
+.analytics-settings:focus-visible {
+  outline: 3px solid #0563c6;
+  outline-offset: 3px;
+}
+.analytics-settings {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .marathon-feature .experiment-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .marathon-feature .experiment-media {
+    justify-self: center;
+    width: min(100%, 340px);
+  }
+  .marathon-feature .experiment-copy h2 {
+    font-size: clamp(2.7rem, 10vw, 4.8rem);
+  }
+  .campaign-landing .hero-copy .hero-title {
+    font-size: clamp(3.1rem, 13vw, 5.8rem);
+  }
+  .site-analytics-choice {
+    inset: auto 12px max(12px, env(safe-area-inset-bottom)) 12px;
+    width: auto;
+  }
+}
+/* Keep download choices within the card at tablet widths and at browser zoom. */
+.marketing-light .cta-card__actions {
+  min-width: 0;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.marketing-light .cta-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .marketing-light .cta-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

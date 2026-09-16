@@ -13,7 +13,7 @@ const params = campaign => new URL(campaign.url).search
 test('each ad link lands on the mobile section and retains its identity in both stores', () => {
   assert.equal(new Set(manifest.links.map(row => row.campaign)).size, 5)
   const html = fs.readFileSync(new URL('../download.html', import.meta.url), 'utf8')
-  const section = html.match(/<main[^>]+id="download"[\s\S]*?<\/main>/)?.[0]
+  const section = html.match(/<section[^>]+id="download"[\s\S]*?<\/section>/)?.[0]
   assert.ok(section?.includes('data-store="ios"'))
   assert.ok(section?.includes('data-store="play"'))
   for (const row of manifest.links) {
@@ -119,9 +119,12 @@ test('each mobile choice uses the collector with a stable visit and distinct eve
   }
 });
 
-test('mobile page has only mobile download destinations and legacy links redirect to its top',()=>{
+test('campaign landing includes the full site and legacy links redirect without looping',()=>{
   const html=fs.readFileSync(new URL('../download.html',import.meta.url),'utf8');
-  assert.doesNotMatch(html,/href="[^"]*(?:\.dmg|\.exe|\.deb|\/desktop)[^"]*"/);
+  assert.match(html, /id="experiment-001"/);
+  assert.match(html, /id="strength"/);
+  assert.match(html, /href="\/desktop"/);
+  assert.doesNotMatch(html, /href="\/download"/);
   const main=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
   assert.ok(main.includes('window.location.replace(`/download${window.location.search}`)'));
 });
@@ -136,3 +139,13 @@ test('separate activations get fresh event IDs while keeping the same browser vi
   assert.notEqual(first.searchParams.get('eventId'),second.searchParams.get('eventId'));
   assert.equal(first.searchParams.get('visitId'),second.searchParams.get('visitId'));
 });
+
+test('blocked session storage keeps one in-memory visit across store link rewiring', async () => {
+  const { webcrypto } = await import('node:crypto')
+  const view = { crypto: webcrypto }
+  const blocked = { getItem() { throw Error('blocked') }, setItem() { throw Error('blocked') } }
+  const campaign = readStoreCampaign(params(manifest.links[0]))
+  const first = buildTrackedStoreLinks(buildStoreLinks(campaign), campaign, view, blocked)
+  const next = buildTrackedStoreLinks(buildStoreLinks(campaign), campaign, view, blocked)
+  assert.equal(new URL(first.ios).searchParams.get('visitId'), new URL(next.play).searchParams.get('visitId'))
+})

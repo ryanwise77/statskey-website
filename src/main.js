@@ -1,6 +1,7 @@
 import './style.css'
 import './strengthPreview.css'
-import './appOverview.css'
+import './trainingCampaign.css'
+import { initCampaignJourney } from './campaignJourney.js'
 import { applyStoreLinks } from './storeLinks.js'
 import { initShowcase } from './showcase.js'
 import { initFounderLive } from './founderLive.js'
@@ -8,11 +9,17 @@ import { initStrengthPreview } from './strengthPreview.js'
 
 // Reveal/point any Google Play buttons once their URL is configured (no-op
 // while the Play listing is unset, keeping those buttons hidden site-wide).
-applyStoreLinks()
+const journeyLanding = ['/', '/index.html', '/download', '/download/', '/download.html'].includes(window.location.pathname)
+applyStoreLinks(document, { track: !journeyLanding })
+try {
+  initCampaignJourney()
+} catch (error) {
+  console.error('StatsKey website analytics could not initialize', error)
+}
 
 // Keep previously shared ad URLs working while moving the mobile choices to
 // their own page, at the top rather than a fragment near the homepage footer.
-if (window.location.hash === '#download' && new URLSearchParams(window.location.search).has('utm_campaign')) {
+if (!window.location.pathname.startsWith('/download') && window.location.hash === '#download' && new URLSearchParams(window.location.search).has('utm_campaign')) {
   window.location.replace(`/download${window.location.search}`)
 }
 

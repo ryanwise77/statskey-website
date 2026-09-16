@@ -9,6 +9,27 @@ export interface ShareRow {
   heading?: string
   text: string
 }
+// File sharing varies by browser, file type, and even the number of attachments.
+// Keep downloads available when a device cannot hand these files to another app.
+export function canShareStrengthFiles(files: File[]): boolean {
+  try {
+    return (
+      files.length > 0 &&
+      typeof navigator !== 'undefined' &&
+      typeof navigator.share === 'function' &&
+      navigator.canShare?.({ files }) === true
+    )
+  } catch {
+    return false
+  }
+}
+export function strengthShareFile(blob: Blob, name: string): File | null {
+  try {
+    return new File([blob], name, { type: blob.type })
+  } catch {
+    return null
+  }
+}
 export function strengthSharePages(
   session: StrengthSession,
   imperial: boolean,

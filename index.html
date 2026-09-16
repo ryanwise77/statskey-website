@@ -1,21 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Reddit Pixel -->
-    <script>
-    !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js?pixel_id=a2_jjx75kx20ekq";t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);rdt('init','a2_jjx75kx20ekq');rdt('track', 'PageVisit');
-    </script>
-    <!-- DO NOT MODIFY UNLESS TO REPLACE A USER IDENTIFIER -->
-    <!-- End Reddit Pixel -->
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18341057139"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'AW-18341057139');
-    </script>
+    <!-- Optional advertising tags are loaded after the visitor’s analytics choice. -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StatsKey | Energy Intelligence</title>
@@ -51,12 +37,12 @@
           <span>StatsKey</span>
         </a>
         <div class="site-nav__links" aria-label="Primary navigation">
-          <a href="#app-features">The app</a>
+          <a href="#experiment-001">The experiment</a>
           <a href="#positioning">Why StatsKey</a>
           <details class="site-nav__menu">
             <summary>Explore</summary>
             <div class="site-nav__menu-panel">
-              <a href="#app-features"><span>App features</span><small>Nutrition, activity, plans, health, and sharing</small></a>
+              <a href="#experiment-001"><span>The marathon experiment</span><small>The training, nutrition, and progress behind the goal</small></a>
               <a href="#strength"><span>Strength</span><small>Plan, train, and review in the app</small></a>
               <a href="/wellness"><span>Wellness</span><small>Digestion, symptoms, and the private journal</small></a>
               <a href="/hardware"><span>Hardware</span><small>Documented research concepts and build studies</small></a>
@@ -96,7 +82,7 @@
         </button>
       </div>
       <div id="mobile-menu" class="site-mobile-menu hidden" role="navigation" aria-label="Mobile navigation" aria-hidden="true">
-        <a href="#app-features">The app</a>
+        <a href="#experiment-001">The experiment</a>
           <a href="#positioning">Why StatsKey</a>
         <a href="#strength">Strength preview</a>
         <a href="/wellness">Wellness</a>
@@ -119,7 +105,7 @@
     </nav>
 
     <main>
-      <section class="hero-section">
+      <section class="hero-section" id="welcome" data-analytics-section="welcome">
         <div class="hero-orb hero-orb--blue"></div>
         <div class="hero-orb hero-orb--data"></div>
         <div class="page-shell hero-grid">
@@ -173,7 +159,7 @@
         </div>
       </section>
 
-      <section id="strength" class="strength-preview section-block" aria-labelledby="strength-preview-title">
+      <section id="strength" data-analytics-section="strength" class="strength-preview section-block" aria-labelledby="strength-preview-title">
         <div class="page-shell">
           <div class="strength-preview-intro">
             <div><div class="strength-preview-kicker">Inside the app / Strength</div><h2 id="strength-preview-title">From your plan<br>to your next best set.</h2></div>
@@ -220,41 +206,16 @@
         </div>
       </section>
 
-      <section id="app-features" class="app-overview section-block" aria-labelledby="app-overview-title">
-        <div class="page-shell">
-          <div class="app-overview-heading"><div class="kicker">The StatsKey app</div><h2 id="app-overview-title">Your day, connected.</h2><p>Meals, movement, plans, and the health record around them. Explore what you can do in StatsKey, from the first entry to the longer view.</p></div>
-          <div class="app-overview-screens" aria-label="Examples from the StatsKey mobile app">
-            <figure><div><img src="/statskey-app/record-nutrition.png" alt="StatsKey nutrition recording screen with daily nutrition totals and recorded foods." loading="lazy" width="471" height="1024" /></div><figcaption><span>01 / RECORD</span>Capture the details of your day.</figcaption></figure>
-            <figure><div><img src="/statskey-app/activity-may11.png" alt="StatsKey Activity screen with a recorded workout and activity information." loading="lazy" width="471" height="1024" /></div><figcaption><span>02 / MOVE</span>Keep your activity in the picture.</figcaption></figure>
-            <figure><div><img src="/statskey-app/flow-home.png" alt="StatsKey Intelligence screen for working with personal health and activity context." loading="lazy" width="471" height="1024" /></div><figcaption><span>03 / UNDERSTAND</span>Bring your records into the conversation.</figcaption></figure>
-          </div>
-          <p class="app-overview-platform-note">Screens shown are from the iPhone app. Availability varies by platform, version, connected device, and subscription. The website preview uses example data; your personal records require sign-in.</p>
-          <div class="app-overview-grid">
-            <article id="feature-nutrition"><span class="app-overview-number">01 / NUTRITION</span><h3>Record, review, and reuse.</h3><p>Record food and water, adjust portions, and see how your day adds up.</p><details><summary>Explore nutrition features</summary><ul><li>Text, food photos, barcodes, and nutrition-label capture</li><li>Editable ingredients, amounts, servings, and saved meals; before-and-after photos with adjustable portion estimates</li><li>A reusable food library and nutrition history</li><li>Macros, vitamins, minerals, and other nutrients with sources and uncertainty when available</li><li>Daily goals, nutrition insights, and adaptive energy estimates</li></ul><p>Unreported nutrients remain unknown. A photo-based portion or calculated value is an estimate.</p></details></article>
-            <article id="feature-activity"><span class="app-overview-number">02 / ACTIVITY</span><h3>Run, lift, and keep moving.</h3><p>Record workouts, follow a plan, and review your progress across activities.</p><details><summary>Explore training features</summary><ul><li>GPS activity recording, manual and timed runs, routes, splits, and personal records</li><li>Guided workouts and track sessions, with coach and team practice tools</li><li>Strength routines, supersets, set and rest timers, history, and estimated exercise records</li><li>Exercise library, custom exercises, and machine scanning where supported</li><li>Cycling, swimming, walking, hiking, rowing, and custom activity entries</li><li>Workout images, video overlays, and set-based video clips</li></ul><a href="#strength">Preview Strength →</a></details></article>
-            <article id="feature-planning"><span class="app-overview-number">03 / PLANNING</span><h3>Make the week yours.</h3><p>Put meals and training on the calendar, then adjust as life changes.</p><details><summary>Explore planning features</summary><ul><li>Dated fitness plans for running, strength, and other sports</li><li>Move, repeat, edit, or remove scheduled sessions</li><li>Meal calendars, dietary preferences, allergies, meal swaps, and grocery lists</li><li>Reviewable Intelligence-generated meal and training drafts</li><li>Manual planning without an AI subscription; paid generation features depend on your plan</li></ul></details></article>
-            <article id="feature-intelligence"><span class="app-overview-number">04 / INTELLIGENCE</span><h3>Ask with your own context.</h3><p>Explore your meals, workouts, glucose, and wellness history together.</p><details><summary>Explore Intelligence features</summary><ul><li>Questions grounded in the personal records you make available</li><li>Computed summaries, comparisons, trends, and reports</li><li>Meal, running, and strength plans you can review and edit</li><li>Explicitly save a discussed workout to the intended date</li></ul><p>Intelligence requires a paid plan or active trial. General attachments, Apple Watch Intelligence, and the full-week AI meal-planning accelerator require Pro+. Patterns are not diagnoses or proof of cause.</p><a href="/app/tokens">Compare current plans →</a></details></article>
-            <article id="feature-health"><span class="app-overview-number">05 / HEALTH</span><h3>A longer view of your body.</h3><p>Keep measurements and health history alongside nutrition and training.</p><details><summary>Explore health features</summary><ul><li>Weight, body measurements, sleep, heart rate, and other available vitals</li><li>Glucose history through supported connections</li><li>Record or import blood-panel results and follow measurement trends</li><li>Review health data with its dates, units, and available source context</li></ul><p>StatsKey records and organizes results; it does not provide laboratory testing or a medical diagnosis.</p></details></article>
-            <article id="feature-wellness"><span class="app-overview-number">06 / WELLNESS</span><h3>Make room for the rest of the day.</h3><p>Capture symptoms and the personal details that a workout chart can miss.</p><details><summary>Explore the private journal</summary><ul><li>Mood, energy, symptoms, and digestion</li><li>Gut Check with Bristol form, mixed episodes, urgency, and other episode details</li><li>Medication and substance records alongside your health history</li><li>Sensitive-record visibility and device security controls where supported</li><li>Personal patterns across food, wellness, and activity records</li></ul><a href="/wellness">Explore the Wellness Journal →</a></details></article>
-            <article id="feature-connections"><span class="app-overview-number">07 / CONNECTIONS</span><h3>Bring supported data with you.</h3><p>Connect the health sources and devices you use, with your permission.</p><details><summary>Explore device support</summary><ul><li>Apple Health on iPhone and Health Connect on supported Android devices</li><li>Apple Watch workouts and strength set/rest tracking with the iPhone app</li><li>Supported glucose connections and their available history</li><li>Health-source permissions and sync controls</li></ul><p>Available measurements depend on the source. A wearable that writes to Apple Health or Health Connect does not necessarily have a native StatsKey app or direct connection.</p></details></article>
-            <article id="feature-sharing"><span class="app-overview-number">08 / FRIENDS</span><h3>Share what you choose.</h3><p>Connect with friends while keeping control of your personal record.</p><details><summary>Explore social features</summary><ul><li>Friend invitations and QR connections</li><li>Messages, shared meals, and workout activity</li><li>Selected comparisons and progress sharing</li><li>Workout images and clips for the moments you want to share</li><li>Record visibility, route-sharing controls, and privacy zones where supported</li></ul></details></article>
-            <article id="feature-reports"><span class="app-overview-number">09 / REPORTS &amp; PRIVACY</span><h3>Take your record with you.</h3><p>Create a useful report, export your data, or share selected information.</p><details><summary>Explore reports and sharing controls</summary><ul><li>Customizable PDF reports with preview and sharing</li><li>CSV and JSON data exports</li><li>Category and date-range selection for supported reports</li><li>Care sharing with selected categories, expiration, and revocation where enabled</li></ul><p>Care sharing depends on enabled portal and account access. Some accounts may see a private-preview notice.</p><a href="/care">Explore professional access →</a></details></article>
-            <article id="feature-pets"><span class="app-overview-number">10 / PET CARE</span><h3>Keep their care organized, too.</h3><p>Use the app’s pet-care area to maintain a separate record for your pets.</p><details><summary>Explore pet care</summary><ul><li>Pet profiles and care records</li><li>Review each pet’s history separately from your own health data</li></ul><p>Pet-care availability depends on the installed app version.</p></details></article>
-          </div>
-          <div class="app-overview-access"><div><h3>Start on your phone. Continue where it fits.</h3><p>Get StatsKey for iPhone or Android. Existing accounts can also use the web app, and the computer download has its own workspace. Feature availability differs across these experiences.</p><p>The mobile app supports English, Spanish, German, Hindi, Japanese, and Brazilian Portuguese. Free, Pro, and Pro+ remain distinct plans.</p></div><div class="app-overview-actions"><a class="button button--primary" href="/download">Get the mobile app</a><a href="/app/login">Sign in on the web →</a><a href="/desktop">Get StatsKey for your computer →</a></div></div>
-        </div>
-      </section>
-
-      <section id="experiment-001" class="section-block section-block--split experiment-section">
+      <section id="experiment-001" class="section-block section-block--split experiment-section marathon-feature" data-analytics-section="marathon">
         <div class="page-shell experiment-live-shell">
           <div class="experiment-layout founder-experiment-original">
             <div class="section-heading experiment-copy reveal">
-              <div class="kicker">How I'm using it</div>
+              <div class="kicker">THE OLYMPIC MARATHON EXPERIMENT</div>
               <h2>Can I run an Olympic marathon?</h2>
-              <p>I build StatsKey to answer a real question: how far can training principle take me?</p>
-              <p class="experiment-copy__live-note">The record below follows the experiment from late August 2025 forward: complete running history, every reliable public food recording, a full historical micronutrient profile, and the current training plan. Location coordinates never load in this public view.</p>
+              <p class="marathon-lede">One runner. A big question. The entire journey.</p><p>I’m building StatsKey while training to find out how far I can go. Follow the miles, the meals, the recovery, and the plan as it unfolds.</p>
+              <p class="experiment-copy__live-note">Training history since August 2025, with nutrition and the current plan alongside it. Explore the record below.</p>
               <div class="clinician-preview-card">
-                <a class="button button--primary" href="/clinician/record/7e5868f410ec65f4b33574c638dfe9da">Clinician portal preview <span aria-hidden="true">→</span></a>
+                <a class="button button--secondary" href="/clinician/record/7e5868f410ec65f4b33574c638dfe9da">Explore the full record <span aria-hidden="true">→</span></a>
                 <p>My full health record alongside the Olympic marathon experiment: running, nutrition, medications, sleep, and biometrics. Updated automatically as new data syncs.</p>
               </div>
               <div class="hero-actions">
@@ -286,8 +247,8 @@
             <header class="founder-live-suite__head">
               <div>
                 <span class="founder-live-badge"><i></i> Founder record</span>
-                <h3>My complete activity and nutrition record</h3>
-                <p>Activity and nutrition update automatically for eligible adult StatsKey accounts. Sign in with your existing account to follow the record.</p>
+                <h3>The work behind the goal.</h3>
+                <p>Explore the training and nutrition behind the experiment. Sign in to follow the connected record.</p>
               </div>
               <span id="founder-live-updated">Connecting…</span>
             </header>
@@ -414,7 +375,7 @@
         </div>
       </section>
 
-      <section id="positioning" class="section-block section-block--split">
+      <section id="positioning" data-analytics-section="positioning" class="section-block section-block--split">
         <div class="page-shell intelligence-grid positioning-intro">
           <div class="section-heading reveal" style="margin-bottom: 0">
             <div class="kicker">Why StatsKey</div>
@@ -581,7 +542,7 @@
         </div>
       </section>
 
-      <section id="hardware" class="section-block">
+      <section id="hardware" data-analytics-section="hardware" class="section-block">
         <div class="page-shell">
           <div class="section-heading reveal">
             <div class="kicker">Research concepts</div>
@@ -712,7 +673,7 @@
         </div>
       </section>
 
-      <section id="download" class="cta-section">
+      <section id="download" data-analytics-section="get-app" class="cta-section">
         <div class="page-shell cta-card cta-card--aurora reveal">
           <div>
             <div class="eyebrow">Start measuring what matters</div>
@@ -751,7 +712,7 @@
       <div class="page-shell site-footer__inner">
         <span>StatsKey &copy; 2026</span>
         <div>
-          <a href="#app-features">App features</a>
+          <a href="#experiment-001">Marathon experiment</a>
           <a href="/wellness">Wellness</a>
           <a href="/mindscape">Mindscape</a>
           <a href="/hardware">Hardware</a>
@@ -759,6 +720,7 @@
           <a href="https://statskeybiometrics.com/support">Support</a>
           <a href="https://statskeybiometrics.com/privacy">Privacy</a>
           <a href="https://statskeybiometrics.com/terms">Terms</a>
+          <button class="analytics-settings" type="button" data-analytics-settings>Privacy choices</button>
         </div>
       </div>
     </footer>

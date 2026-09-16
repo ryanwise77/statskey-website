@@ -90,6 +90,24 @@ export function recordingMimeType(
   )
 }
 
+export function strengthVideoExportProblem(audio: boolean): string | null {
+  if (
+    typeof MediaRecorder === 'undefined' ||
+    typeof HTMLCanvasElement === 'undefined' ||
+    typeof HTMLCanvasElement.prototype.captureStream !== 'function'
+  )
+    return 'This browser can preview clips but cannot export them. Try a current Safari, Chrome, Edge, or Firefox browser.'
+  if (audio && typeof AudioContext === 'undefined')
+    return 'Audio export is unavailable in this browser. Turn off Keep source audio to export a silent clip.'
+  try {
+    if (!recordingMimeType((type) => MediaRecorder.isTypeSupported(type)))
+      return 'This browser has no supported video encoder. You can still preview your selected clip.'
+  } catch {
+    return 'This browser cannot check video export support. You can still preview your selected clip.'
+  }
+  return null
+}
+
 export async function exportStrengthClip(options: {
   source: string
   start: number
@@ -188,10 +206,19 @@ export async function exportStrengthClip(options: {
   }
   try {
     check()
+    let destination: MediaStreamAudioDestinationNode | undefined
     if (audio) {
+      if (typeof AudioContext === 'undefined')
+        throw new Error('Audio export is unavailable. Turn off Keep source audio and try again.')
       context = new AudioContext()
-      await stage(context.resume())
+      destination = context.createMediaStreamDestination()
+      context.createMediaElementSource(video).connect(destination)
     }
+    // Start both operations during the Export click. Awaiting metadata first
+    // loses Safari's user gesture and can prevent videos with audio from playing.
+    const audioReady = context ? stage(context.resume()) : Promise.resolve()
+    const playbackReady = stage(video.play())
+    await Promise.all([audioReady, playbackReady])
     if (video.readyState < 1) await mediaEvent('loadedmetadata')
     if (
       !Number.isFinite(video.duration) ||
@@ -200,7 +227,7 @@ export async function exportStrengthClip(options: {
       video.videoHeight <= 0
     )
       throw new Error('The selected range is outside this video.')
-    if (start > 0)
+    if (start > 0 || video.currentTime > 0)
       await mediaEvent('seeked', () => {
         video.currentTime = start
       })
@@ -215,9 +242,7 @@ export async function exportStrengthClip(options: {
       throw new Error('Video export is not supported in this browser.')
     drawing.drawImage(video, 0, 0, canvas.width, canvas.height)
     stream = canvas.captureStream(30)
-    if (context) {
-      const destination = context.createMediaStreamDestination()
-      context.createMediaElementSource(video).connect(destination)
+    if (destination) {
       for (const track of destination.stream.getAudioTracks())
         stream.addTrack(track)
     }
@@ -225,8 +250,7 @@ export async function exportStrengthClip(options: {
       mimeType,
       videoBitsPerSecond: 6_000_000,
     })
-    // Wait for playback before recording so decode startup does not add frozen footage.
-    await stage(video.play())
+    // Playback and seeking are ready before recording, avoiding frozen startup frames.
     check()
     const chunks: Blob[] = []
     let size = 0
@@ -346,7 +370,13 @@ export async function exportStrengthClip(options: {
       recorder!.start(1000)
       draw()
     })
+  } catch (error) {
+    if (error instanceof Error && error.name === 'NotAllowedError')
+      throw new Error('Your browser blocked video playback. Preview the video, then try Export again, or turn off Keep source audio.')
+    throw error
   } finally {
+    // Settle any sibling preparation promise if playback or audio setup failed.
+    operation.abort(new DOMException('Export finished', 'AbortError'))
     if (timer) clearTimeout(timer)
     if (finalizing) clearTimeout(finalizing)
     cleanupRecording()

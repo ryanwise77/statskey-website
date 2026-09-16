@@ -1,8 +1,21 @@
+import { NATIVE_STRENGTH_CATALOG } from './catalog-data.ts'
+
 export type LoadKind =
   | 'externalWeight'
   | 'addedWeight'
   | 'assistance'
   | 'bodyweightOnly'
+export interface StrengthPlannedSet {
+  id: string
+  setType: string
+  reps?: number
+  weightLbs?: number
+  durationSeconds?: number
+  restSeconds?: number
+  targetHeartRateMin?: number
+  targetHeartRateMax?: number
+  targetRPE?: number
+}
 export interface StrengthSet {
   id: string
   number: number
@@ -15,6 +28,13 @@ export interface StrengthSet {
   rpe?: number
   startedAt?: Date
   completedAt?: Date
+  notes?: string
+  source?: string
+  averageHeartRate?: number
+  peakHeartRate?: number
+  heartRateRecovery60?: number
+  watchSetNumber?: number
+  plannedTarget?: StrengthPlannedSet
 }
 export interface StrengthExercise {
   id: string
@@ -23,6 +43,15 @@ export interface StrengthExercise {
   equipment: string
   measure: 'reps' | 'time'
   sets: StrengthSet[]
+  primaryMuscles?: string[]
+  supersetGroup?: string
+  restSeconds?: number
+  notes?: string
+  targetSets?: number
+  targetRepsLow?: number
+  targetRepsHigh?: number
+  targetWeightLbs?: number
+  targetDurationSeconds?: number
 }
 export interface StrengthSession {
   id: string
@@ -38,14 +67,22 @@ export interface StrengthSession {
   defaultRestSeconds: number
   workoutSessionId?: string
   edited: boolean
+  editRevision?: number
+  routineId?: string
+  routineName?: string
+  planDayKey?: string
+  plannedSessionId?: string
+  /** Browser draft state only; never written to the native workout ledger. */
+  timedSetId?: string
 }
+export const EQUIPMENT = ['barbell', 'dumbbell', 'machine', 'cable', 'smithMachine', 'kettlebell', 'bodyweight', 'band', 'other'] as const
 export const LOAD_LABELS: Record<LoadKind, string> = {
   externalWeight: 'External weight',
   addedWeight: 'Added weight',
   assistance: 'Assistance',
   bodyweightOnly: 'Bodyweight only',
 }
-export const EXERCISES = [
+const QUICK_EXERCISES = [
   ['Barbell Back Squat', 'barbell', 'reps', 'bb-back-squat'],
   ['Bench Press', 'barbell', 'reps', 'bb-bench-press'],
   ['Deadlift', 'barbell', 'reps', 'bb-deadlift'],
@@ -72,8 +109,18 @@ export const EXERCISES = [
   ['Side Plank', 'bodyweight', 'time', 'bw-side-plank'],
   ['Farmer Carry', 'dumbbell', 'time', 'db-farmers-carry'],
 ] as const
+export const EXERCISES: ReadonlyArray<readonly [string, string, 'reps' | 'time', string]> = [
+  ...QUICK_EXERCISES,
+  ...NATIVE_STRENGTH_CATALOG.filter((e) => !QUICK_EXERCISES.some((shortcut) => shortcut[3] === e.id))
+    .map((e) => [e.name, e.equipment, e.measure, e.id] as const),
+]
 export function newStrengthID(): string {
-  return crypto.randomUUID()
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  const bytes = crypto.getRandomValues(new Uint8Array(16))
+  bytes[6] = (bytes[6] & 15) | 64
+  bytes[8] = (bytes[8] & 63) | 128
+  const value = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+  return `${value.slice(0, 8)}-${value.slice(8, 12)}-${value.slice(12, 16)}-${value.slice(16, 20)}-${value.slice(20)}`
 }
 export function newSet(number = 1): StrengthSet {
   return { id: newStrengthID(), number, setType: 'working', isCompleted: false }
@@ -153,6 +200,16 @@ function number(value: unknown, min = 0): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) && value >= min
     ? value
     : undefined
+}
+export function decodePlannedSet(value: unknown): StrengthPlannedSet {
+  const set = raw(value)
+  return {
+    id: str(set.id) || newStrengthID(), setType: str(set.setType, 'working'),
+    reps: number(set.reps, 1), weightLbs: number(set.weightLbs),
+    durationSeconds: number(set.durationSeconds, 1), restSeconds: number(set.restSeconds),
+    targetHeartRateMin: number(set.targetHeartRateMin, 30),
+    targetHeartRateMax: number(set.targetHeartRateMax, 30), targetRPE: number(set.targetRPE, 1),
+  }
 }
 export function effectiveStrengthEntries(
   recorded: unknown,
@@ -236,6 +293,12 @@ export function decodeStrengthSession(
       name: str(e.name, 'Unnamed exercise'),
       equipment: str(e.equipment, 'other'),
       measure: e.measure === 'time' ? 'time' : 'reps',
+      primaryMuscles: strings(e.primaryMuscles),
+      supersetGroup: str(e.supersetGroup) || undefined,
+      restSeconds: number(e.restSeconds), notes: str(e.notes),
+      targetSets: number(e.targetSets, 1), targetRepsLow: number(e.targetRepsLow, 1),
+      targetRepsHigh: number(e.targetRepsHigh, 1), targetWeightLbs: number(e.targetWeightLbs),
+      targetDurationSeconds: number(e.targetDurationSeconds, 1),
       sets: rows(e.sets).map(
         (s, n): StrengthSet => ({
           id: str(s.id, `set-${index}-${n}`),
@@ -254,6 +317,11 @@ export function decodeStrengthSession(
               : undefined,
           startedAt: strengthDate(s.startedAt),
           completedAt: strengthDate(s.completedAt),
+          notes: str(s.notes), source: str(s.source, 'phone'),
+          averageHeartRate: number(s.averageHeartRate, 1), peakHeartRate: number(s.peakHeartRate, 1),
+          heartRateRecovery60: typeof s.heartRateRecovery60 === 'number' && Number.isFinite(s.heartRateRecovery60) ? s.heartRateRecovery60 : undefined,
+          watchSetNumber: number(s.watchSetNumber, 1),
+          plannedTarget: s.plannedTarget && typeof s.plannedTarget === 'object' ? decodePlannedSet(s.plannedTarget) : undefined,
         }),
       ),
     }),
@@ -282,6 +350,10 @@ export function decodeStrengthSession(
     defaultRestSeconds: number(data.defaultRestSeconds) ?? 120,
     workoutSessionId: str(data.workoutSessionId) || undefined,
     edited: typeof edits.revision === 'number' && edits.revision > 0,
+    editRevision: Number.isInteger(edits.revision) && Number(edits.revision) >= 0 ? Number(edits.revision) : 0,
+    routineId: str(data.routineId) || undefined, routineName: str(data.routineName) || undefined,
+    planDayKey: str(data.planDayKey) || undefined, plannedSessionId: str(data.plannedSessionId) || undefined,
+    timedSetId: str(data.timedSetId) || undefined,
   }
 }
 export function completedExercises(
@@ -339,6 +411,8 @@ export function setDescription(
     parts.push(`${set.reps} reps`)
   if (set.durationSeconds != null) parts.push(`${set.durationSeconds}s`)
   if (set.rpe != null) parts.push(`RPE ${set.rpe}`)
+  if (set.averageHeartRate != null) parts.push(`${set.averageHeartRate} bpm average`)
+  if (set.peakHeartRate != null) parts.push(`${set.peakHeartRate} bpm peak`)
   if (set.setType !== 'working') parts.push(set.setType)
   return parts.join(' · ') || 'Completed · values not recorded'
 }
@@ -371,6 +445,8 @@ export function validateStrength(session: StrengthSession): string | null {
     return 'Mark at least one completed set before saving.'
   for (const entry of completedExercises(session)) {
     if (!entry.name.trim()) return 'Give each exercise a name.'
+    if (entry.restSeconds != null && (!Number.isInteger(entry.restSeconds) || entry.restSeconds < 0 || entry.restSeconds > 1800))
+      return 'Exercise rest must be a whole number between 0 and 1800 seconds.'
     for (const set of entry.sets) {
       if (
         set.weightLbs != null &&
@@ -402,7 +478,7 @@ export function encodeStrength(
 ): Record<string, unknown> {
   const error = validateStrength(session)
   if (error) throw new Error(error)
-  return {
+  return cleanStrengthValue({
     id: session.id,
     userId: session.userId,
     title: session.title.trim(),
@@ -414,13 +490,18 @@ export function encodeStrength(
     notes: session.notes.trim(),
     defaultRestSeconds: session.defaultRestSeconds,
     unmatchedWatchSets: 0,
+    routineId: session.routineId, routineName: session.routineName,
+    planDayKey: session.planDayKey, plannedSessionId: session.plannedSessionId,
     entries: completedExercises(session).map((e) => ({
       id: e.id,
       exerciseId: e.exerciseId,
       name: e.name.trim(),
       equipment: e.equipment,
-      primaryMuscles: [],
-      notes: '',
+      primaryMuscles: e.primaryMuscles ?? [],
+      supersetGroup: e.supersetGroup, restSeconds: e.restSeconds,
+      notes: e.notes ?? '',
+      targetSets: e.targetSets, targetRepsLow: e.targetRepsLow, targetRepsHigh: e.targetRepsHigh,
+      targetWeightLbs: e.targetWeightLbs, targetDurationSeconds: e.targetDurationSeconds,
       measure: e.measure,
       sets: e.sets.map((s) =>
         Object.fromEntries(
@@ -429,11 +510,63 @@ export function encodeStrength(
             reps: e.measure === 'time' ? undefined : s.reps,
             weightLbs:
               s.loadKind === 'bodyweightOnly' ? undefined : s.weightLbs,
-            source: 'phone',
-            notes: '',
+            source: s.source ?? 'phone',
+            notes: s.notes ?? '',
           }).filter(([, v]) => v !== undefined),
         ),
       ),
     })),
+  }) as Record<string, unknown>
+}
+
+/** Remove optional fields recursively while retaining Firestore-compatible Dates. */
+export function cleanStrengthValue(value: unknown): unknown {
+  if (value instanceof Date) return value
+  // Existing overlays can retain removed entries with native Firestore
+  // Timestamp values. Preserve those scalar instances instead of turning
+  // their internal seconds/nanoseconds into a map Swift cannot decode as Date.
+  if (value && typeof value === 'object' && typeof (value as { toDate?: unknown }).toDate === 'function') return value
+  if (Array.isArray(value)) return value.map(cleanStrengthValue)
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value)
+    .filter(([, item]) => item !== undefined).map(([key, item]) => [key, cleanStrengthValue(item)]))
+  return value
+}
+
+export function nextStrengthSet(entry: StrengthExercise): StrengthSet {
+  const previous = entry.sets.at(-1)
+  return { ...newSet(entry.sets.length + 1),
+    setType: previous?.setType === 'warmup' ? 'working' : previous?.setType ?? 'working',
+    weightLbs: previous?.weightLbs, loadKind: previous?.loadKind,
+    reps: entry.measure === 'time' ? undefined : previous?.reps,
+    durationSeconds: entry.measure === 'time' ? previous?.durationSeconds : undefined,
   }
+}
+
+export function repeatStrengthSession(session: StrengthSession, uid: string): StrengthSession {
+  return { ...newSession(uid), title: session.title, defaultRestSeconds: session.defaultRestSeconds,
+    entries: completedExercises(session).map((entry) => ({ ...entry, id: newStrengthID(),
+      sets: entry.sets.map((set, i) => ({ ...newSet(i + 1), setType: set.setType,
+        weightLbs: set.weightLbs, loadKind: set.loadKind,
+        reps: entry.measure === 'time' ? undefined : set.reps,
+        durationSeconds: entry.measure === 'time' ? set.durationSeconds : undefined,
+        plannedTarget: set.plannedTarget ? { ...set.plannedTarget, id: newStrengthID() } : undefined,
+      })),
+    })),
+  }
+}
+
+/** One running set at a time. Switching clocks preserves actual work, without marking it done. */
+export function startStrengthSetTimer(session: StrengthSession, setId: string, now = new Date()): StrengthSession {
+  if (session.recordingMode !== 'live' || !session.entries.some((e) => e.sets.some((s) => s.id === setId && !s.isCompleted))) return session
+  return { ...session, timedSetId: setId, entries: session.entries.map((entry) => ({ ...entry,
+    sets: entry.sets.map((set) => {
+      if (set.id === setId) return { ...set, startedAt: now, completedAt: undefined, durationSeconds: undefined }
+      if (set.id === session.timedSetId && set.startedAt) {
+        const elapsed = (now.getTime() - set.startedAt.getTime()) / 1000
+        return { ...set, startedAt: elapsed >= 1 ? set.startedAt : undefined,
+          durationSeconds: elapsed >= 1 ? Math.round(elapsed * 10) / 10 : undefined }
+      }
+      return set
+    }),
+  })) }
 }

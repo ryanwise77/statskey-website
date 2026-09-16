@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   completedExercises,
   setDescription,
@@ -8,8 +8,13 @@ import {
   alignStrengthVideo,
   exportStrengthClip,
   recordedSetRange,
+  strengthVideoExportProblem,
   videoTrimRange,
 } from '../../lib/strength/video'
+import {
+  canShareStrengthFiles,
+  strengthShareFile,
+} from '../../lib/strength/share'
 export function StrengthVideo({
   session,
   imperial,
@@ -58,8 +63,11 @@ function VideoDialog({
       url: string
       extension: string
       label: string
+      file: File | null
     } | null>(null),
     [error, setError] = useState('')
+  const [sharing, setSharing] = useState(false)
+  const exportProblem = useMemo(() => strengthVideoExportProblem(audio), [audio])
   const alive = useRef(true)
   const choices = completedExercises(session).flatMap((entry) =>
     entry.sets.map((set) => ({ entry, set })),
@@ -74,7 +82,7 @@ function VideoDialog({
     ? videoTrimRange(range[0], range[1], offset, duration)
     : null
   useEffect(() => {
-    dialog.current?.showModal()
+    if (!dialog.current?.open) dialog.current?.showModal()
     alive.current = true
     return () => {
       alive.current = false
@@ -146,10 +154,13 @@ function VideoDialog({
       const label = choice
         ? `${choice.entry.name}-Set-${choice.set.number}`
         : session.title
+      const filename =
+        label.replace(/[^\p{L}\p{N}_-]+/gu, '-').slice(0, 100) || 'Strength'
       setResult({
         url: URL.createObjectURL(blob),
         extension,
-        label: label.replace(/[^\p{L}\p{N}_-]+/gu, '-').slice(0, 100),
+        label: filename,
+        file: strengthShareFile(blob, `${filename}.${extension}`),
       })
     } catch (e) {
       if (
@@ -160,6 +171,19 @@ function VideoDialog({
     } finally {
       if (alive.current) setExporting(false)
       job.current = null
+    }
+  }
+  async function shareClip() {
+    if (!result?.file || sharing) return
+    setSharing(true)
+    setError('')
+    try {
+      await navigator.share({ title: session.title, files: [result.file] })
+    } catch (e) {
+      if (alive.current && !(e instanceof Error && e.name === 'AbortError'))
+        setError('Couldn’t share the clip. Download it below instead.')
+    } finally {
+      if (alive.current) setSharing(false)
     }
   }
   return (
@@ -231,11 +255,12 @@ function VideoDialog({
                 setDuration(d)
                 setEnd(d)
               }}
-              onError={() =>
+              onError={() => {
+                setDuration(0)
                 setError(
                   'This file cannot be played in your browser. Try an MP4 video.',
                 )
-              }
+              }}
               onTimeUpdate={(e) => {
                 if (
                   !e.currentTarget.paused &&
@@ -296,6 +321,7 @@ function VideoDialog({
                       aria-label="Clip start in seconds"
                       className="input"
                       type="number"
+                      inputMode="decimal"
                       min={0}
                       max={end - 1}
                       step="0.1"
@@ -325,6 +351,7 @@ function VideoDialog({
                       aria-label="Clip end in seconds"
                       className="input"
                       type="number"
+                      inputMode="decimal"
                       min={start + 1}
                       max={duration}
                       step="0.1"
@@ -371,11 +398,19 @@ function VideoDialog({
                 </p>
                 <button
                   className="btn strength-primary"
-                  disabled={end - start < 1 || end - start > 300}
+                  disabled={!!exportProblem || end - start < 1 || end - start > 300}
+                  aria-describedby={
+                    exportProblem ? 'strength-export-support' : undefined
+                  }
                   onClick={render}
                 >
                   Export {videoTime(end - start)} clip
                 </button>
+                {exportProblem && (
+                  <p id="strength-export-support" role="status">
+                    {exportProblem}
+                  </p>
+                )}
               </>
             )}
           </>
@@ -383,7 +418,7 @@ function VideoDialog({
       </fieldset>
       {exporting && (
         <div role="status">
-          <progress max={1} value={progress} />
+          <progress aria-label="Video export progress" max={1} value={progress} />
           <span> Exporting {Math.round(progress * 100)}%</span>
           <button
             className="btn btn-secondary"
@@ -408,9 +443,26 @@ function VideoDialog({
           >
             Download clip
           </a>
+          {result.file && canShareStrengthFiles([result.file]) && (
+            <button
+              className="btn btn-secondary"
+              onClick={shareClip}
+              disabled={sharing}
+            >
+              {sharing ? 'Sharing…' : 'Share clip'}
+            </button>
+          )}
+          <a
+            className="btn btn-ghost"
+            href={result.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open clip
+          </a>
           <p>
-            This copy stays on your device. Original workout and video files are
-            unchanged.
+            If Download opens a preview, use your device’s share or save menu.
+            Your original video is unchanged.
           </p>
         </div>
       )}

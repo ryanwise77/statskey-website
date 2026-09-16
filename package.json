@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "node scripts/repair-founder-nutrition-fallback.mjs --check && vite build && node scripts/check-nudge-portal.mjs",
+    "dev": "node scripts/build-download-page.mjs && vite",
+    "build": "node scripts/build-download-page.mjs && node scripts/repair-founder-nutrition-fallback.mjs --check && vite build && node scripts/check-nudge-portal.mjs",
     "test:nudge-author": "node --test scripts/nudge-author.test.ts scripts/founder-journey.test.mjs",
     "test:languages": "node --test scripts/legal-language.test.mjs scripts/founder-journey.test.mjs",
     "build:founder-history": "node scripts/build-founder-history.mjs",
@@ -14,11 +14,12 @@
     "test:founder-history": "node --test scripts/founder-history-lib.test.mjs",
     "test:founder-nutrition": "node --test scripts/founder-nutrition-fallback.test.mjs scripts/founder-nutrition-ui.test.mjs",
     "test:firestore-failover": "node --test scripts/firestore-failover.test.ts",
-    "test:strength": "node --test scripts/strength.test.ts",
+    "test:strength": "node --test scripts/strength.test.ts scripts/strength-parity.test.ts scripts/strength-media.test.ts scripts/strength-progress.test.ts scripts/strength-history.test.ts",
     "test:standby-auth": "node --test scripts/standby-auth.test.ts",
     "preview": "vite preview",
     "check:deploy": "node scripts/check-deploy-ready.mjs",
-    "test:security": "node --test scripts/public-api-security.test.mjs"
+    "test:security": "node --test scripts/public-api-security.test.mjs",
+    "test:campaign": "node --test scripts/mobile-acquisition.test.mjs scripts/campaign-journey.test.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.0",

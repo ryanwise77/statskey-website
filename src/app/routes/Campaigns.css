@@ -1,0 +1,150 @@
+.campaign-report {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.campaign-report > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: start;
+}
+.campaign-report h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.12;
+  margin: 8px 0 12px;
+  letter-spacing: -0.04em;
+}
+.campaign-report h2 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin-bottom: 12px;
+}
+.campaign-report h3 {
+  font-size: 0.9rem;
+  font-weight: 650;
+  margin-block: 18px 8px;
+}
+.campaign-report p {
+  line-height: 1.5;
+}
+.campaign-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.campaign-controls label {
+  display: grid;
+  gap: 6px;
+  min-width: 150px;
+}
+.campaign-controls .input {
+  font-size: 16px;
+  min-height: 44px;
+}
+.campaign-note {
+  color: var(--color-text-secondary, #a1a1aa);
+  font-size: 0.85rem;
+}
+.campaign-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.campaign-metrics > div {
+  display: grid;
+  gap: 6px;
+}
+.campaign-metrics strong {
+  font-size: 1.75rem;
+  overflow-wrap: anywhere;
+}
+.campaign-metrics span {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+}
+.campaign-table-scroll {
+  overflow-x: auto;
+}
+.campaign-report table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+.campaign-report th,
+.campaign-report td {
+  padding: 12px;
+  border-bottom: 1px solid #ffffff18;
+  vertical-align: top;
+}
+.campaign-report small {
+  display: block;
+  color: #a1a1aa;
+  margin-top: 4px;
+}
+.campaign-journeys {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  gap: 20px;
+  align-items: start;
+}
+.campaign-visits {
+  max-height: 650px;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+.campaign-visits button {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  text-align: left;
+  display: grid;
+  gap: 4px;
+  border-radius: 10px;
+  background: #ffffff06;
+  overflow-wrap: anywhere;
+}
+.campaign-visits button[aria-pressed="true"] {
+  background: #3d93ff22;
+  outline: 1px solid #3d93ff;
+}
+.campaign-visits span {
+  font-size: 0.85rem;
+}
+.campaign-timeline {
+  display: grid;
+  gap: 12px;
+}
+.campaign-timeline li > div {
+  display: flex;
+  gap: 16px;
+  border-left: 2px solid #3d93ff;
+  padding-left: 12px;
+  font-size: 0.875rem;
+}
+.campaign-timeline time {
+  min-width: 55px;
+  font-variant-numeric: tabular-nums;
+  color: #a1a1aa;
+}
+.campaign-timeline span {
+  overflow-wrap: anywhere;
+}
+.campaign-report button:focus-visible {
+  outline: 2px solid #3d93ff;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .campaign-journeys {
+    grid-template-columns: 1fr;
+  }
+  .campaign-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+  .campaign-report > header {
+    flex-wrap: wrap;
+  }
+}

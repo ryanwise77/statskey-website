@@ -21,14 +21,21 @@ const TRACKING_ENDPOINT = 'https://us-central1-statskey.cloudfunctions.net/recor
 const VISIT_KEY = 'statskey:mobile-download-visit:v1'
 const wiredButtons = new WeakSet()
 
-export function buildTrackedStoreLinks(links, campaign, view, storage) {
-  if (!view?.crypto?.randomUUID) return links
+const memoryVisits = new WeakMap()
+export function getStoreVisitID(view, storage) {
+  if (!view?.crypto?.randomUUID) return null
   let visitId
-  try { visitId = storage?.getItem(VISIT_KEY) } catch { /* A fresh visit still works. */ }
+  try { visitId = storage?.getItem(VISIT_KEY) } catch { /* Use the same page visit when storage is blocked. */ }
   if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(visitId || '')) {
-    visitId = view.crypto.randomUUID()
-    try { storage?.setItem(VISIT_KEY, visitId) } catch { /* No persistent browser identity required. */ }
+    visitId = memoryVisits.get(view) || view.crypto.randomUUID()
+    try { storage?.setItem(VISIT_KEY, visitId) } catch { /* No persistent identity required. */ }
   }
+  memoryVisits.set(view, visitId)
+  return visitId
+}
+export function buildTrackedStoreLinks(links, campaign, view, storage) {
+  const visitId = getStoreVisitID(view, storage)
+  if (!visitId) return links
   const source = ['youtube', 'reddit', 'tiktok', 'meta', 'google'].includes(campaign?.utm_source) ? campaign.utm_source : 'direct'
   const result = {}
   for (const [store, link] of Object.entries(links)) {
@@ -115,12 +122,12 @@ export function buildStoreLinks(campaign) {
 // Wire any opted-in store buttons. iOS buttons keep their hard-coded href as a
 // no-JS fallback and are only re-asserted when a node opts in with
 // data-store="ios"; Play buttons reveal + gain their href once a URL exists.
-export function applyStoreLinks(root = document) {
+export function applyStoreLinks(root = document, { track = true } = {}) {
   const view = root.defaultView || root.ownerDocument?.defaultView
   let storage
   try { storage = view?.sessionStorage } catch { /* Safari private/storage restrictions. */ }
   const campaign = readStoreCampaign(view?.location.search || '', storage)
-  const links = buildTrackedStoreLinks(buildStoreLinks(campaign), campaign, view, storage)
+  const links = track ? buildTrackedStoreLinks(buildStoreLinks(campaign), campaign, view, storage) : buildStoreLinks(campaign)
   root.querySelectorAll('[data-store="ios"]').forEach((el) => {
     if (links.ios) wireStoreButton(el, links.ios, view)
   })

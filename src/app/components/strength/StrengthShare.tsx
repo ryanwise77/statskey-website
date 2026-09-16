@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { renderStrengthImages } from '../../lib/strength/share'
+import {
+  canShareStrengthFiles,
+  renderStrengthImages,
+  strengthShareFile,
+} from '../../lib/strength/share'
 import type { StrengthSession } from '../../lib/strength/model'
 export function StrengthShare({
   session,
@@ -34,7 +38,8 @@ function ShareDialog({
   close: () => void
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
-  const [images, setImages] = useState<Array<{ blob: Blob; url: string }>>([])
+  const [images, setImages] = useState<Array<{ file: File | null; url: string }>>([])
+  const [sharing, setSharing] = useState(false)
   const [page, setPage] = useState(0),
     [error, setError] = useState('')
   useEffect(() => {
@@ -51,7 +56,7 @@ function ShareDialog({
           blobs.map((blob) => {
             const url = URL.createObjectURL(blob)
             urls.push(url)
-            return { blob, url }
+            return { file: strengthShareFile(blob, `Strength-${urls.length}.png`), url }
           }),
         )
       })
@@ -64,21 +69,22 @@ function ShareDialog({
     }
   }, [session, imperial])
   const visiblePage = Math.min(page, Math.max(0, images.length - 1))
+  const allFiles = images.flatMap((image) => image.file ? [image.file] : [])
+  const pageFile = images[visiblePage]?.file
+  const canShareAll = allFiles.length === images.length && canShareStrengthFiles(allFiles)
+  const files = canShareAll ? allFiles : pageFile ? [pageFile] : []
+  const canShare = canShareAll || canShareStrengthFiles(files)
   async function share() {
-    const files = images.map(
-      (image, i) =>
-        new File([image.blob], `Strength-${i + 1}.png`, { type: 'image/png' }),
-    )
+    if (!canShare || sharing) return
+    setSharing(true)
+    setError('')
     try {
-      if (navigator.canShare?.({ files }) && navigator.share)
-        await navigator.share({ title: session.title, files })
-      else
-        setError(
-          'File sharing is not available in this browser. Use Download image to save each page.',
-        )
+      await navigator.share({ title: session.title, files })
     } catch (e) {
-      if (!(e instanceof DOMException && e.name === 'AbortError'))
+      if (!(e instanceof Error && e.name === 'AbortError'))
         setError('Couldn’t share the image. Download it below instead.')
+    } finally {
+      setSharing(false)
     }
   }
   return (
@@ -135,10 +141,16 @@ function ShareDialog({
             >
               Download image{images.length > 1 ? ` ${visiblePage + 1}` : ''}
             </a>
-            <button className="btn btn-secondary" onClick={share}>
-              Share{images.length > 1 ? ' all images' : ' image'}
-            </button>
+            {canShare && (
+              <button className="btn btn-secondary" onClick={share} disabled={sharing}>
+                {sharing ? 'Sharing…' : `Share${canShareAll && images.length > 1 ? ' all images' : ' image'}`}
+              </button>
+            )}
+            <a className="btn btn-ghost" href={images[visiblePage].url} target="_blank" rel="noopener noreferrer">
+              Open image
+            </a>
           </footer>
+          <p>If Download opens a preview, use your device’s share or save menu, or press and hold the image to save it.</p>
         </>
       ) : (
         !error && <p role="status">Preparing your image…</p>

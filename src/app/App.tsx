@@ -15,6 +15,7 @@ import { Reports, ReportDetail } from './routes/Reports'
 import { Friends } from './routes/Friends'
 import { FriendDetail } from './routes/FriendDetail'
 import { MessageThread } from './routes/MessageThread'
+import { Campaigns } from './routes/Campaigns'
 import { Strength } from './routes/Strength'
 import { TrainingRoutes } from './routes/TrainingRoutes'
 import { Tokens, TokensTest } from './routes/Tokens'
@@ -73,6 +74,7 @@ export function App() {
         <Route path="friends/:uid" element={<FriendDetail />} />
         <Route path="routes" element={<TrainingRoutes />} />
         <Route path="strength" element={<Strength />} />
+        <Route path="campaigns" element={<Campaigns />} />
         <Route path="messages/:uid" element={<MessageThread />} />
         <Route path="history" element={<History />} />
         <Route path="meals/:id" element={<MealDetail />} />
