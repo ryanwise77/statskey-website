@@ -324,7 +324,7 @@ function initFusion() {
   const stages = [
     { kcal: 2847, delta: 'formula ensemble sets the baseline', tier: 1, label: 'Baseline confidence — formula ensemble', node: 0 },
     { kcal: 2878, delta: '30-day Watch activity: +31 kcal', tier: 2, label: 'Medium confidence — Watch activity corroborates', node: 1 },
-    { kcal: 2872, delta: 'weight trend reconciles: −6 kcal', tier: 3, label: 'High confidence — cross-validated by your weight trend', node: 2 },
+    { kcal: 2872, delta: 'weight trend reconciles: −6 kcal', tier: 3, label: 'High confidence — informed by your weight trend', node: 2 },
   ]
 
   let stageIdx = -1

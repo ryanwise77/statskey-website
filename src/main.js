@@ -1,5 +1,6 @@
 import './style.css'
 import './strengthPreview.css'
+import './appOverview.css'
 import { applyStoreLinks } from './storeLinks.js'
 import { initShowcase } from './showcase.js'
 import { initFounderLive } from './founderLive.js'
